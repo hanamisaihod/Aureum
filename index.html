@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aureum — Work Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -14,6 +13,17 @@
         body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
         .card { background-color: #1e293b; border: 1px solid #334155; }
         .tab-active { border-bottom: 2px solid #3b82f6; color: #60a5fa; font-weight: 600; }
+        
+        /* Tooltip styling */
+        .tooltip-container { position: relative; display: inline-flex; align-items: center; }
+        .tooltip-text {
+            visibility: hidden; width: 220px; background-color: #020617; color: #cbd5e1;
+            text-align: left; padding: 8px 12px; border-radius: 6px; border: 1px solid #475569;
+            position: absolute; z-index: 10; bottom: 125%; left: 50%; transform: translateX(-50%);
+            opacity: 0; transition: opacity 0.2s; font-size: 0.75rem; font-weight: normal; line-height: 1.4;
+            pointer-events: none; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+        .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
     </style>
 </head>
 <body class="p-4 md:p-8 max-w-6xl mx-auto">
@@ -38,7 +48,7 @@
         </div>
     </div>
 
-    <!-- MAIN APP CONTENT (Hidden until login) -->
+    <!-- MAIN APP CONTENT -->
     <div id="app-content" class="hidden">
         <!-- Header -->
         <header class="flex flex-col md:flex-row justify-between items-center mb-8 pb-4 border-b border-slate-700 gap-4">
@@ -48,10 +58,10 @@
             </div>
             
             <div class="flex items-center gap-4">
-                <!-- User Switcher -->
+                <!-- Dynamic User Switcher -->
                 <div class="flex items-center gap-3 bg-slate-800 p-1.5 rounded-lg border border-slate-700">
-                    <button id="user-me" onclick="switchUser('Me')" class="px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white">Me</button>
-                    <button id="user-wife" onclick="switchUser('Wife')" class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all">Wife</button>
+                    <button id="user-btn-north" onclick="switchActiveUser('North')" class="px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white">North</button>
+                    <button id="user-btn-cream" onclick="switchActiveUser('Cream')" class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all">Cream</button>
                 </div>
                 <button onclick="handleLogout()" class="text-xs text-slate-500 hover:text-slate-300 underline">Sign Out</button>
             </div>
@@ -69,7 +79,7 @@
         <div id="tab-work" class="space-y-6">
             <div class="card p-6 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
                 <div>
-                    <span class="text-xs uppercase tracking-wider text-slate-400">Points This Week</span>
+                    <span class="text-xs uppercase tracking-wider text-slate-400" id="weekly-points-label">Points This Week</span>
                     <div class="text-3xl font-extrabold text-blue-400 mt-1" id="weekly-points">0.00 pts</div>
                     <div class="text-xs text-slate-500 mt-1">Goal: 20 pts | Max Bonus: 30 pts</div>
                 </div>
@@ -87,45 +97,70 @@
                 </div>
             </div>
 
-            <div class="card p-6 rounded-xl">
+            <!-- Work Form (Hidden in View-Only Mode) -->
+            <div id="work-form-card" class="card p-6 rounded-xl">
                 <h2 class="text-lg font-semibold mb-4 text-slate-200">Log Creative Work Session</h2>
                 <form id="work-form" onsubmit="logWork(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Hours Spent</label>
-                        <input type="number" id="work-time" step="0.25" min="0.25" placeholder="e.g. 2.5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <label class="block text-xs text-slate-400 mb-1">
+                            Hours Spent
+                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                                <span class="tooltip-text">Total clock hours spent working on art or writing. Decimals allowed (e.g. 1.5 = 1 hr 30 mins).</span>
+                            </span>
+                        </label>
+                        <input type="number" id="work-time" step="0.25" min="0.25" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Result / Output Quality (1–5)</label>
-                        <input type="number" id="work-results" min="1" max="5" placeholder="1 = Low, 5 = High" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <label class="block text-xs text-slate-400 mb-1">
+                            Output Quality (1–5)
+                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                                <span class="tooltip-text">1 = Low output / Warmup<br>3 = Steady, average output<br>5 = Major breakthrough / High volume</span>
+                            </span>
+                        </label>
+                        <input type="number" id="work-results" min="1" max="5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">How Hard It Was (1–5)</label>
-                        <input type="number" id="work-effort" min="1" max="5" placeholder="1 = Easy, 5 = Heavy" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <label class="block text-xs text-slate-400 mb-1">
+                            How Hard It Was (1–5)
+                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                                <span class="tooltip-text">1 = Smooth, easy focus<br>3 = Moderate effort / Resistance<br>5 = Exhausting, heavy mental friction</span>
+                            </span>
+                        </label>
+                        <input type="number" id="work-effort" min="1" max="5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div class="flex items-end">
                         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Save Work Session</button>
                     </div>
                 </form>
             </div>
+            
+            <div id="read-only-banner" class="hidden card p-4 rounded-xl text-center text-slate-400 text-sm">
+                🔒 You are currently viewing <strong><span id="view-target-name"></span>'s</strong> dashboard in View-Only mode.
+            </div>
         </div>
 
         <!-- TAB 2: HEALTH LEDGER -->
         <div id="tab-health" class="hidden space-y-6">
-            <div class="card p-6 rounded-xl">
+            <div id="health-form-card" class="card p-6 rounded-xl">
                 <h2 class="text-lg font-semibold mb-2 text-slate-200">Log Sweet / Dessert Intake</h2>
                 <p class="text-xs text-slate-400 mb-4">Just for tracking habits—does not affect work points or cash.</p>
                 <form onsubmit="logHealth(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Snack / Dessert Size</label>
+                        <label class="block text-xs text-slate-400 mb-1">
+                            Snack / Dessert Size
+                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                                <span class="tooltip-text">Level 1: Small bite / Light snack<br>Level 2: Standard dessert or sweet drink<br>Level 3: Heavy dessert / Large indulgence</span>
+                            </span>
+                        </label>
                         <select id="health-level" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
-                            <option value="1">Small (Light snack, small bite)</option>
-                            <option value="2">Medium (Normal dessert, sweet drink)</option>
-                            <option value="3">Large (Heavy dessert, big treat)</option>
+                            <option value="1">Level 1 (Small / Light)</option>
+                            <option value="2">Level 2 (Medium / Standard)</option>
+                            <option value="3">Level 3 (Large / Heavy)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">What did you have? (Optional)</label>
-                        <input type="text" id="health-note" placeholder="e.g. Milk tea, Bakery" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <label class="block text-xs text-slate-400 mb-1">What did you have?</label>
+                        <input type="text" id="health-note" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div class="flex items-end">
                         <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Save Entry</button>
@@ -136,17 +171,22 @@
 
         <!-- TAB 3: CHORE LEDGER -->
         <div id="tab-chores" class="hidden space-y-6">
-            <div class="card p-6 rounded-xl">
+            <div id="chore-form-card" class="card p-6 rounded-xl">
                 <h2 class="text-lg font-semibold mb-2 text-slate-200">Log House Chores</h2>
                 <p class="text-xs text-slate-400 mb-4">Track time spent on house tasks without touching cash earnings.</p>
                 <form onsubmit="logChore(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Time Spent (Hours)</label>
-                        <input type="number" id="chore-time" step="0.25" min="0.25" placeholder="e.g. 1.0" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <label class="block text-xs text-slate-400 mb-1">
+                            Time Spent (Hours)
+                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                                <span class="tooltip-text">Total hours spent doing chores (e.g. 0.5 for 30 minutes).</span>
+                            </span>
+                        </label>
+                        <input type="number" id="chore-time" step="0.25" min="0.25" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Chore Details</label>
-                        <input type="text" id="chore-note" placeholder="e.g. Cleaning, Laundry, Cooking" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <input type="text" id="chore-note" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div class="flex items-end">
                         <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Save Chore Time</button>
@@ -178,12 +218,23 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        let currentUser = 'Me';
+        let loggedInUser = 'North'; // Default fallback
+        let viewedUser = 'North';
 
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('login-modal').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('hidden');
+                
+                // Identify account by UID / Email
+                if (user.uid === "ioxjbBLDH0NDLDWVoYCjq8p3PYU2" || (user.email && user.email.includes("north"))) {
+                    loggedInUser = 'North';
+                } else {
+                    loggedInUser = 'Cream';
+                }
+                
+                viewedUser = loggedInUser;
+                updateUserSwitcherUI();
                 loadUserData();
             } else {
                 document.getElementById('login-modal').classList.remove('hidden');
@@ -210,11 +261,36 @@
             auth.signOut();
         }
 
-        function switchUser(user) {
-            currentUser = user;
-            document.getElementById('user-me').className = user === 'Me' ? "px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white" : "px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all";
-            document.getElementById('user-wife').className = user === 'Wife' ? "px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white" : "px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all";
+        function switchActiveUser(targetUser) {
+            viewedUser = targetUser;
+            updateUserSwitcherUI();
             loadUserData();
+        }
+
+        function updateUserSwitcherUI() {
+            const northBtn = document.getElementById('user-btn-north');
+            const creamBtn = document.getElementById('user-btn-cream');
+            
+            // Labels reflect who is logged in vs who is being viewed
+            northBtn.innerText = loggedInUser === 'North' ? "North (You)" : "North";
+            creamBtn.innerText = loggedInUser === 'Cream' ? "Cream (You)" : "Cream";
+
+            northBtn.className = viewedUser === 'North' ? "px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white" : "px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all";
+            creamBtn.className = viewedUser === 'Cream' ? "px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white" : "px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all";
+
+            // Hide/Show logging forms based on whether you are viewing your own profile
+            const isSelf = loggedInUser === viewedUser;
+            document.getElementById('work-form-card').style.display = isSelf ? 'block' : 'none';
+            document.getElementById('health-form-card').style.display = isSelf ? 'block' : 'none';
+            document.getElementById('chore-form-card').style.display = isSelf ? 'block' : 'none';
+            
+            const banner = document.getElementById('read-only-banner');
+            if (!isSelf) {
+                banner.classList.remove('hidden');
+                document.getElementById('view-target-name').innerText = viewedUser;
+            } else {
+                banner.classList.add('hidden');
+            }
         }
 
         function switchTab(tab) {
@@ -235,7 +311,7 @@
 
             await db.collection('logs').add({
                 type: 'work',
-                user: currentUser,
+                user: loggedInUser,
                 hours: T,
                 results: R,
                 effort: E,
@@ -254,7 +330,7 @@
 
             await db.collection('logs').add({
                 type: 'health',
-                user: currentUser,
+                user: loggedInUser,
                 level: level,
                 note: note,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -271,7 +347,7 @@
 
             await db.collection('logs').add({
                 type: 'chore',
-                user: currentUser,
+                user: loggedInUser,
                 hours: hours,
                 note: note,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -283,7 +359,7 @@
 
         function loadUserData() {
             db.collection('logs')
-              .where('user', '==', currentUser)
+              .where('user', '==', viewedUser)
               .where('type', '==', 'work')
               .onSnapshot(snapshot => {
                   let totalPts = 0;
