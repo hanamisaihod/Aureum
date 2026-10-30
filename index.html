@@ -457,6 +457,11 @@
         let spectatorData = null;
         let spectatorSettings = null;
 
+        // Shadow Spectator Timer State (Immune to Clock Skew)
+        let shadowSpectatorTime = 1500;
+        let shadowSpectatorIsRunning = false;
+        let shadowSpectatorInterval = null;
+
         let userSettings = {
             monthlyCash: 8000,
             weeklyHours: 10,
@@ -537,12 +542,12 @@
                     round: myPomoRound,
                     totalRounds: parseInt(userSettings.pomoRounds) || 4,
                     isRunning: myPomoIsRunning,
-                    pomoTime: myPomoTime,
+                    pomoTime: myPomoTime, // Exact remaining seconds for shadow timer sync
                     pomoInitialTime: myPomoInitialTime,
                     pomoFocus: parseInt(userSettings.pomoFocus) || 25,
                     pomoShort: parseInt(userSettings.pomoShort) || 5,
                     pomoLong: parseInt(userSettings.pomoLong) || 15,
-                    targetEndTimeMillis: targetEndTimeMillis,
+                    targetEndTimeMillis: targetEndTimeMillis, // Still kept so YOU can recover if you close your own tab
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
             } catch (err) {
@@ -552,9 +557,17 @@
 
         function startMyPomoBackgroundTimer() {
             if (myPomoInterval) clearInterval(myPomoInterval);
+            let tickCount = 0;
             myPomoInterval = setInterval(() => {
                 if (!myPomoIsRunning) return;
                 myPomoTime--;
+                tickCount++;
+                
+                // Sync every 5 seconds so the spectator shadow timer stays aligned without clock skew
+                if (tickCount >= 5) {
+                    syncMyPomoToCloud();
+                    tickCount = 0;
+                }
 
                 if (myPomoTime <= 0) {
                     myPomoTime = 0;
@@ -632,7 +645,7 @@
             }
         }
 
-        // Startup Recovery
+        // Offline Session Recovery
         async function initAndRecoverMyPomoState() {
             try {
                 const docSnap = await db.collection('pomoState').doc(loggedInUser).get();
@@ -640,7 +653,11 @@
                     const data = docSnap.data();
                     myPomoMode = data.mode || 'focus';
                     myPomoRound = parseInt(data.round) || 1;
-                    myPomoInitialTime = parseInt(data.pomoInitialTime) || (parseInt(userSettings.pomoFocus || 25) * 60);
+                    
+                    const fMins = parseInt(userSettings.pomoFocus) || 25;
+                    const sMins = parseInt(userSettings.pomoShort) || 5;
+                    const lMins = parseInt(userSettings.pomoLong) || 15;
+                    myPomoInitialTime = myPomoMode === 'focus' ? (fMins * 60) : (myPomoMode === 'short' ? (sMins * 60) : (lMins * 60));
 
                     if (data.isRunning && data.targetEndTimeMillis) {
                         const remainingSecs = Math.ceil((data.targetEndTimeMillis - Date.now()) / 1000);
@@ -649,11 +666,24 @@
                             myPomoIsRunning = true;
                             startMyPomoBackgroundTimer();
                         } else {
+                            // Automatically advance if it finished while you were offline to prevent being permanently stuck at 0:00
                             myPomoTime = 0;
                             myPomoIsRunning = false;
                             playTone('pomoDone');
+                            
+                            const totalRounds = parseInt(userSettings.pomoRounds) || 4;
+                            if (myPomoMode === 'focus') {
+                                if (myPomoRound < totalRounds) {
+                                    myPomoRound++;
+                                    setMyPomoMode('short');
+                                } else {
+                                    myPomoRound = 1;
+                                    setMyPomoMode('long');
+                                }
+                            } else {
+                                setMyPomoMode('focus');
+                            }
                             triggerDesktopNotification("🔔 Session Complete!", "Your timer finished while you were away.");
-                            syncMyPomoToCloud();
                         }
                     } else {
                         myPomoTime = data.pomoTime !== undefined ? parseInt(data.pomoTime) : myPomoInitialTime;
@@ -669,7 +699,16 @@
 
         // --- NEW ARCHITECTURE: INSTANT LOCAL UI RENDERER ---
 
-        // This runs blindly at 100ms reading instantly from local JS variables, making buttons instantly responsive
+        function startShadowSpectatorTimer() {
+            if (shadowSpectatorInterval) clearInterval(shadowSpectatorInterval);
+            shadowSpectatorInterval = setInterval(() => {
+                if (shadowSpectatorIsRunning && shadowSpectatorTime > 0) {
+                    shadowSpectatorTime--;
+                }
+            }, 1000);
+        }
+
+        // 100ms loop purely for painting the DOM from memory variables (making buttons feel instant)
         function startGlobalUIRenderer() {
             if (pomoUIRenderInterval) clearInterval(pomoUIRenderInterval);
             
@@ -682,7 +721,6 @@
                 let targetLongMins = parseInt(userSettings.pomoLong) || 15;
                 let targetRounds = parseInt(userSettings.pomoRounds) || 4;
 
-                // 1. Calculate Active Engine Data
                 if (isSelf) {
                     displaySecs = myPomoTime;
                     initialTime = myPomoInitialTime;
@@ -698,14 +736,9 @@
                         targetLongMins = parseInt(spectatorData.pomoLong) || 15;
                         targetRounds = parseInt(spectatorData.totalRounds) || 4;
                         
-                        initialTime = parseInt(spectatorData.pomoInitialTime) || (targetFocusMins * 60);
-                        isRunning = !!spectatorData.isRunning;
-
-                        if (isRunning && spectatorData.targetEndTimeMillis) {
-                            displaySecs = Math.max(0, Math.ceil((spectatorData.targetEndTimeMillis - Date.now()) / 1000));
-                        } else {
-                            displaySecs = spectatorData.pomoTime !== undefined ? parseInt(spectatorData.pomoTime) : initialTime;
-                        }
+                        initialTime = mode === 'focus' ? (targetFocusMins * 60) : (mode === 'short' ? (targetShortMins * 60) : (targetLongMins * 60));
+                        isRunning = shadowSpectatorIsRunning;
+                        displaySecs = shadowSpectatorTime;
                     } else if (spectatorSettings) {
                         targetFocusMins = parseInt(spectatorSettings.pomoFocus) || 25;
                         targetShortMins = parseInt(spectatorSettings.pomoShort) || 5;
@@ -716,7 +749,6 @@
                     }
                 }
 
-                // 2. Paint the DOM
                 document.getElementById('pomo-mode-focus').innerText = `Focus (${targetFocusMins}m)`;
                 document.getElementById('pomo-mode-short').innerText = `Short Break (${targetShortMins}m)`;
                 document.getElementById('pomo-mode-long').innerText = `Long Break (${targetLongMins}m)`;
@@ -768,7 +800,7 @@
             }, 100);
         }
 
-        // Silent background listener just keeps `spectatorData` warm
+        // Silent background listener builds a shadow timer bypassing clock skew
         function attachPomoSpectatorListener() {
             if (pomoSyncUnsubscribe) pomoSyncUnsubscribe();
 
@@ -789,7 +821,18 @@
 
                 pomoSyncUnsubscribe = db.collection('pomoState').doc(viewedUser).onSnapshot(async doc => {
                     spectatorData = doc.exists ? doc.data() : null;
-                    if (!spectatorData) {
+                    if (spectatorData) {
+                        shadowSpectatorTime = spectatorData.pomoTime !== undefined ? parseInt(spectatorData.pomoTime) : 1500;
+                        shadowSpectatorIsRunning = !!spectatorData.isRunning;
+                        
+                        if (shadowSpectatorIsRunning) {
+                            startShadowSpectatorTimer();
+                        } else {
+                            if (shadowSpectatorInterval) clearInterval(shadowSpectatorInterval);
+                        }
+                    } else {
+                        shadowSpectatorIsRunning = false;
+                        if (shadowSpectatorInterval) clearInterval(shadowSpectatorInterval);
                         try {
                             const setSnap = await db.collection('settings').doc(viewedUser).get();
                             if (setSnap.exists) spectatorSettings = setSnap.data();
@@ -828,7 +871,6 @@
                 initCharts();
                 loadUserData();
                 
-                // Fire up decoupled rendering architecture
                 startGlobalUIRenderer();
                 attachPomoSpectatorListener();
             } else {
