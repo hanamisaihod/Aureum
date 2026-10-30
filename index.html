@@ -15,7 +15,6 @@
         .card { background-color: #1e293b; border: 1px solid #334155; }
         .tab-active { border-bottom: 2px solid #3b82f6; color: #60a5fa; font-weight: 600; }
         
-        /* Tooltip styling */
         .tooltip-container { position: relative; display: inline-flex; align-items: center; }
         .tooltip-text {
             visibility: hidden; width: 220px; background-color: #020617; color: #cbd5e1;
@@ -70,9 +69,9 @@
         <!-- Navigation Tabs -->
         <nav class="flex border-b border-slate-700 mb-6 gap-8">
             <button onclick="switchTab('work')" id="nav-work" class="pb-3 text-sm tab-active">Work Engine</button>
-            <button onclick="switchTab('health')" id="nav-health" class="pb-3 text-sm text-slate-400 hover:text-slate-200">Sweet & Snack Log</button>
+            <button onclick="switchTab('health')" id="nav-health" class="pb-3 text-sm text-slate-400 hover:text-slate-200">Snack Log</button>
             <button onclick="switchTab('chores')" id="nav-chores" class="pb-3 text-sm text-slate-400 hover:text-slate-200">House Chores</button>
-            <button onclick="switchTab('settings')" id="nav-settings" class="pb-3 text-sm text-slate-400 hover:text-slate-200">Settings & Goals</button>
+            <button onclick="switchTab('forge')" id="nav-forge" class="pb-3 text-sm text-slate-400 hover:text-slate-200">Forge</button>
         </nav>
 
         <!-- Read-Only Banner -->
@@ -84,17 +83,17 @@
         <div id="tab-work" class="space-y-6">
             <div class="card p-6 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
                 <div>
-                    <span class="text-xs uppercase tracking-wider text-slate-400">Points This Week</span>
-                    <div class="text-3xl font-extrabold text-blue-400 mt-1" id="weekly-points">0.00 pts</div>
-                    <div class="text-xs text-slate-500 mt-1">Goal: <span id="label-soft-cap">20</span> pts | Max Bonus: <span id="label-hard-cap">30</span> pts</div>
+                    <span class="text-xs uppercase tracking-wider text-slate-400">Points This Month</span>
+                    <div class="text-3xl font-extrabold text-blue-400 mt-1" id="monthly-points">0.00 pts</div>
+                    <div class="text-xs text-slate-500 mt-1">Goal: <span id="label-monthly-goal-pts">120</span> pts (<span id="label-weekly-hrs">10</span> hrs/wk)</div>
                 </div>
                 <div>
-                    <span class="text-xs uppercase tracking-wider text-slate-400">Spendable Cash Earned</span>
-                    <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="weekly-payout">฿0</div>
-                    <div class="text-xs text-slate-500 mt-1">Rate: ฿<span id="label-point-rate">250</span> / point</div>
+                    <span class="text-xs uppercase tracking-wider text-slate-400">Spendable Allowance Earned</span>
+                    <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="monthly-payout">฿0</div>
+                    <div class="text-xs text-slate-500 mt-1">Target Base: ฿<span id="label-monthly-cash">10,000</span></div>
                 </div>
                 <div>
-                    <span class="text-xs uppercase tracking-wider text-slate-400">Goal Progress</span>
+                    <span class="text-xs uppercase tracking-wider text-slate-400">Monthly Goal Progress</span>
                     <div class="w-full bg-slate-700 h-3 rounded-full mt-3 overflow-hidden">
                         <div id="cap-bar" class="bg-blue-500 h-full w-0 transition-all duration-500"></div>
                     </div>
@@ -156,7 +155,7 @@
             </div>
         </div>
 
-        <!-- TAB 2: HEALTH LEDGER -->
+        <!-- TAB 2: SNACK LOG -->
         <div id="tab-health" class="hidden space-y-6">
             <div id="health-form-card" class="card p-6 rounded-xl">
                 <h2 class="text-lg font-semibold mb-2 text-slate-200">Log Sweet / Dessert Intake</h2>
@@ -188,7 +187,7 @@
             <!-- Embedded Health Chart -->
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                    <h3 class="text-md font-semibold text-slate-200">Sweet & Snack Trends</h3>
+                    <h3 class="text-md font-semibold text-slate-200">Snack Trends</h3>
                     <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 text-xs">
                         <button onclick="setChartRange('health', 'daily')" id="btn-health-daily" class="px-3 py-1 rounded text-slate-400">Daily</button>
                         <button onclick="setChartRange('health', 'weekly')" id="btn-health-weekly" class="px-3 py-1 rounded text-slate-400">Weekly</button>
@@ -202,7 +201,7 @@
             </div>
         </div>
 
-        <!-- TAB 3: CHORE LEDGER -->
+        <!-- TAB 3: HOUSE CHORES -->
         <div id="tab-chores" class="hidden space-y-6">
             <div id="chore-form-card" class="card p-6 rounded-xl">
                 <h2 class="text-lg font-semibold mb-2 text-slate-200">Log House Chores</h2>
@@ -244,40 +243,40 @@
             </div>
         </div>
 
-        <!-- TAB 4: SETTINGS & GOALS -->
-        <div id="tab-settings" class="hidden space-y-6">
+        <!-- TAB 4: FORGE (SETTINGS & GOALS) -->
+        <div id="tab-forge" class="hidden space-y-6">
             <div class="card p-6 rounded-xl max-w-2xl">
-                <h2 class="text-lg font-semibold mb-2 text-slate-200">Engine Configuration</h2>
-                <p class="text-xs text-slate-400 mb-6">Customize your personal target caps and point monetary conversion rates.</p>
+                <h2 class="text-lg font-semibold mb-2 text-slate-200">Forge Calibration</h2>
+                <p class="text-xs text-slate-400 mb-6">Calibrate your physical monthly work goals and discretionary spending payouts.</p>
                 <form onsubmit="saveSettings(event)" class="space-y-4">
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
-                            Base Rate (฿ per Point)
+                            Target Monthly Cash Allowance (฿)
                             <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">How much cash is unlocked per 1 work point earned.</span>
+                                <span class="tooltip-text">Base cash unlocked at 100% completion of your monthly goal.</span>
                             </span>
                         </label>
-                        <input type="number" id="setting-rate" min="1" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                        <input type="number" id="setting-monthly-cash" min="1000" step="500" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
-                            Weekly Goal / Soft Cap (Points)
+                            Target Weekly Work Hours
                             <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">Target weekly points required to unlock 100% of base allowance.</span>
+                                <span class="tooltip-text">Target weekly hours (e.g., 10 hrs/wk = 40 hrs/month target).</span>
                             </span>
                         </label>
-                        <input type="number" id="setting-soft" min="1" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                        <input type="number" id="setting-weekly-hrs" min="1" max="80" step="1" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
-                            Max Bonus Cap / Hard Cap (Points)
+                            Max Bonus Cap (%)
                             <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">Maximum points cap that can earn financial allowance in a week.</span>
+                                <span class="tooltip-text">Maximum allowance multiplier for overtime work (e.g. 150% = max ฿15,000).</span>
                             </span>
                         </label>
-                        <input type="number" id="setting-hard" min="1" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                        <input type="number" id="setting-bonus-cap" min="100" max="300" step="10" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
                     </div>
-                    <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg text-sm transition-all">Save Settings</button>
+                    <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg text-sm transition-all">Save Forge Settings</button>
                 </form>
             </div>
         </div>
@@ -299,31 +298,32 @@
 
         let loggedInUser = 'North';
         let viewedUser = 'North';
+        let currentUserUid = null;
         
         let charts = {};
         let chartTimeframes = { work: 'daily', health: 'daily', chore: 'daily' };
         
-        // Default User Settings
         let userSettings = {
-            rate: 250,
-            softCap: 20,
-            hardCap: 30
+            monthlyCash: 10000,
+            weeklyHours: 10,
+            maxBonusCapPct: 150
         };
 
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async user => {
             if (user) {
+                currentUserUid = user.uid;
                 document.getElementById('login-modal').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('hidden');
                 
-                // Account Identification Swap (North vs Cream)
-                if (user.uid === "ioxjbBLDH0NDLDWVoYCjq8p3PYU2" || (user.email && user.email.toLowerCase().includes("north"))) {
+                // Account Identification Logic (Cream UID check)
+                if (user.uid === "ioxjbBLDH0NDLDWVoYCjq8p3PYU2" || (user.email && user.email.toLowerCase().includes("cream"))) {
                     loggedInUser = 'Cream';
                 } else {
                     loggedInUser = 'North';
                 }
                 
                 viewedUser = loggedInUser;
-                loadSettings();
+                await loadSettingsFromCloud();
                 updateUserSwitcherUI();
                 initCharts();
                 loadUserData();
@@ -333,32 +333,47 @@
             }
         });
 
-        function loadSettings() {
-            const saved = localStorage.getItem(`aureum_settings_${viewedUser}`);
-            if (saved) {
-                userSettings = JSON.parse(saved);
-            } else {
-                userSettings = { rate: 250, softCap: 20, hardCap: 30 };
+        async function loadSettingsFromCloud() {
+            try {
+                const docRef = db.collection('settings').doc(viewedUser);
+                const docSnap = await docRef.get();
+                if (docSnap.exists) {
+                    userSettings = docSnap.data();
+                } else {
+                    userSettings = { monthlyCash: 10000, weeklyHours: 10, maxBonusCapPct: 150 };
+                }
+            } catch (err) {
+                console.error("Error loading cloud settings:", err);
             }
-            document.getElementById('label-soft-cap').innerText = userSettings.softCap;
-            document.getElementById('label-hard-cap').innerText = userSettings.hardCap;
-            document.getElementById('label-point-rate').innerText = userSettings.rate;
             
-            document.getElementById('setting-rate').value = userSettings.rate;
-            document.getElementById('setting-soft').value = userSettings.softCap;
-            document.getElementById('setting-hard').value = userSettings.hardCap;
+            updateSettingsUI();
         }
 
-        function saveSettings(e) {
-            e.preventDefault();
-            userSettings.rate = parseFloat(document.getElementById('setting-rate').value);
-            userSettings.softCap = parseFloat(document.getElementById('setting-soft').value);
-            userSettings.hardCap = parseFloat(document.getElementById('setting-hard').value);
+        function updateSettingsUI() {
+            const monthlyGoalPts = userSettings.weeklyHours * 4 * 3; // 4 weeks @ avg 3 score
+            document.getElementById('label-monthly-goal-pts').innerText = monthlyGoalPts;
+            document.getElementById('label-weekly-hrs').innerText = userSettings.weeklyHours;
+            document.getElementById('label-monthly-cash').innerText = userSettings.monthlyCash.toLocaleString();
             
-            localStorage.setItem(`aureum_settings_${loggedInUser}`, JSON.stringify(userSettings));
-            alert('Settings saved!');
-            loadSettings();
-            loadUserData();
+            document.getElementById('setting-monthly-cash').value = userSettings.monthlyCash;
+            document.getElementById('setting-weekly-hrs').value = userSettings.weeklyHours;
+            document.getElementById('setting-bonus-cap').value = userSettings.maxBonusCapPct;
+        }
+
+        async function saveSettings(e) {
+            e.preventDefault();
+            userSettings.monthlyCash = parseFloat(document.getElementById('setting-monthly-cash').value);
+            userSettings.weeklyHours = parseFloat(document.getElementById('setting-weekly-hrs').value);
+            userSettings.maxBonusCapPct = parseFloat(document.getElementById('setting-bonus-cap').value);
+            
+            try {
+                await db.collection('settings').doc(loggedInUser).set(userSettings);
+                alert('Forge settings saved to cloud!');
+                updateSettingsUI();
+                loadUserData();
+            } catch (err) {
+                alert('Failed to save settings to Firestore.');
+            }
         }
 
         async function handleLogin(e) {
@@ -380,9 +395,9 @@
             auth.signOut();
         }
 
-        function switchActiveUser(targetUser) {
+        async function switchActiveUser(targetUser) {
             viewedUser = targetUser;
-            loadSettings();
+            await loadSettingsFromCloud();
             updateUserSwitcherUI();
             loadUserData();
         }
@@ -412,7 +427,7 @@
         }
 
         function switchTab(tab) {
-            ['work', 'health', 'chores', 'settings'].forEach(t => {
+            ['work', 'health', 'chores', 'forge'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
                 document.getElementById(`nav-${t}`).className = "pb-3 text-sm text-slate-400 hover:text-slate-200";
             });
@@ -523,13 +538,18 @@
                       if (d.type === 'work') totalPts += (d.points || 0);
                   });
 
-                  // Weekly Card Summary
-                  document.getElementById('weekly-points').innerText = `${totalPts.toFixed(2)} pts`;
-                  const cappedPts = Math.min(totalPts, userSettings.hardCap);
-                  const payout = cappedPts * userSettings.rate;
-                  document.getElementById('weekly-payout').innerText = `฿${Math.round(payout).toLocaleString()}`;
+                  // Monthly Math Calculations
+                  const targetMonthlyPts = userSettings.weeklyHours * 4 * 3;
+                  const pointRate = userSettings.monthlyCash / targetMonthlyPts;
+                  const maxCash = userSettings.monthlyCash * (userSettings.maxBonusCapPct / 100);
                   
-                  const capPercent = Math.min((totalPts / userSettings.softCap) * 100, 100);
+                  document.getElementById('monthly-points').innerText = `${totalPts.toFixed(2)} pts`;
+                  
+                  const calculatedPayout = totalPts * pointRate;
+                  const finalPayout = Math.min(calculatedPayout, maxCash);
+                  document.getElementById('monthly-payout').innerText = `฿${Math.round(finalPayout).toLocaleString()}`;
+                  
+                  const capPercent = Math.min((totalPts / targetMonthlyPts) * 100, 100);
                   document.getElementById('cap-bar').style.width = `${capPercent}%`;
                   document.getElementById('cap-percent').innerText = `${Math.round(capPercent)}%`;
 
@@ -566,10 +586,9 @@
                 values = [0, 0, 0];
             }
 
-            // Populate sample aggregations
             logs.forEach(l => {
                 const val = type === 'work' ? (l.points || 0) : (type === 'health' ? (l.level || 0) : (l.hours || 0));
-                values[values.length - 1] += val; // Aggregate into recent bucket
+                values[values.length - 1] += val;
             });
 
             charts[type].data.labels = labels;
