@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aureum — Work Engine</title>
+    <title>Aureum — Autonomous Living & Creative Ledger</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Firebase SDKs -->
@@ -17,15 +17,14 @@
         
         .tooltip-container { position: relative; display: inline-flex; align-items: center; }
         .tooltip-text {
-            visibility: hidden; width: 220px; background-color: #020617; color: #cbd5e1;
-            text-align: left; padding: 8px 12px; border-radius: 6px; border: 1px solid #475569;
+            visibility: hidden; width: 280px; background-color: #020617; color: #cbd5e1;
+            text-align: left; padding: 10px 14px; border-radius: 8px; border: 1px solid #475569;
             position: absolute; z-index: 10; bottom: 125%; left: 50%; transform: translateX(-50%);
-            opacity: 0; transition: opacity 0.2s; font-size: 0.75rem; font-weight: normal; line-height: 1.4;
-            pointer-events: none; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            opacity: 0; transition: opacity 0.2s; font-size: 0.75rem; font-weight: normal; line-height: 1.5;
+            pointer-events: none; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7);
         }
         .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
         
-        /* Shimmer animation for max progress */
         @keyframes shimmer {
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
@@ -65,7 +64,7 @@
         <header class="flex flex-col md:flex-row justify-between items-center mb-6 pb-4 border-b border-slate-700 gap-4">
             <div>
                 <h1 class="text-3xl font-bold tracking-tight text-amber-400">AUREUM</h1>
-                <p class="text-sm text-slate-400">Personal Work & Living Engine</p>
+                <p class="text-sm text-slate-400">Autonomous Living & Creative Ledger</p>
             </div>
             
             <div class="flex items-center gap-4">
@@ -121,7 +120,9 @@
                         <label class="block text-xs text-slate-400 mb-1">
                             Hours Spent
                             <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">Total clock time on focus sessions (art, code, writing, research).</span>
+                                <span class="tooltip-text">
+                                    <strong>Duration ($T$):</strong> Total clock hours dedicated to uninterrupted deep work or focused practice (e.g. 1.5 = 1 hr 30 mins).
+                                </span>
                             </span>
                         </label>
                         <input type="number" id="work-time" step="0.25" min="0.25" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
@@ -130,7 +131,14 @@
                         <label class="block text-xs text-slate-400 mb-1">
                             Output Quality (1–5)
                             <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">1 = Low output / Warmup<br>3 = Steady output<br>5 = Major breakthrough / High yield</span>
+                                <span class="tooltip-text">
+                                    <strong>Output Level ($R$):</strong> Evaluates tangible results and production efficiency.<br><br>
+                                    <strong>1: Minimal</strong> — Light warmup, planning, or low tangible output.<br>
+                                    <strong>2: Fair</strong> — Progress made, but below standard pace.<br>
+                                    <strong>3: Solid</strong> — On-target production and steady execution.<br>
+                                    <strong>4: High</strong> — Exceptional speed, clarity, and output volume.<br>
+                                    <strong>5: Exceptional</strong> — Peak flow state, major project milestone achieved.
+                                </span>
                             </span>
                         </label>
                         <input type="number" id="work-results" min="1" max="5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
@@ -139,7 +147,14 @@
                         <label class="block text-xs text-slate-400 mb-1">
                             Effort & Friction (1–5)
                             <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">1 = Smooth, natural flow<br>3 = Moderate effort required<br>5 = High mental resistance / Tough grinding</span>
+                                <span class="tooltip-text">
+                                    <strong>Friction Level ($E$):</strong> Measures internal energy required and resistance overcome.<br><br>
+                                    <strong>1: Effortless</strong> — Smooth, enjoyable flow with zero mental strain.<br>
+                                    <strong>2: Light</strong> — Mild focus required, comfortably managed.<br>
+                                    <strong>3: Moderate</strong> — Standard mental fatigue and focus effort.<br>
+                                    <strong>4: Heavy</strong> — Strong resistance, requiring hard willpower.<br>
+                                    <strong>5: Maximum</strong> — Severe friction overcome through intense focus.
+                                </span>
                             </span>
                         </label>
                         <input type="number" id="work-effort" min="1" max="5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
@@ -183,7 +198,11 @@
                         <label class="block text-xs text-slate-400 mb-1">
                             Snack / Dessert Size
                             <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">Level 1: Small bite / Light snack<br>Level 2: Standard dessert or drink<br>Level 3: Heavy dessert / Large treat</span>
+                                <span class="tooltip-text">
+                                    <strong>Level 1:</strong> Small bite or light snack.<br>
+                                    <strong>Level 2:</strong> Standard dessert portion or sweet beverage.<br>
+                                    <strong>Level 3:</strong> Heavy dessert or large indulgence.
+                                </span>
                             </span>
                         </label>
                         <select id="health-level" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
@@ -229,7 +248,7 @@
                         <label class="block text-xs text-slate-400 mb-1">
                             Time Spent (Hours)
                             <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">Total hours spent doing chores (e.g. 0.5 for 30 minutes).</span>
+                                <span class="tooltip-text">Total clock hours spent on household tasks (e.g. 0.5 = 30 minutes).</span>
                             </span>
                         </label>
                         <input type="number" id="chore-time" step="0.25" min="0.25" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
@@ -323,14 +342,12 @@
         let chartTimeframes = { work: 'daily', health: 'daily', chore: 'daily' };
         let workChartMetric = 'pts';
         
-        // Default Forge Settings
         let userSettings = {
             monthlyCash: 8000,
             weeklyHours: 10,
             maxBonusCapPct: 125
         };
 
-        // Web Audio Synthesizer
         function playTone(type) {
             if (audioMuted) return;
             try {
@@ -341,7 +358,6 @@
                 gain.connect(ctx.destination);
 
                 if (type === 'save') {
-                    // Soft mechanical click/dink
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(600, ctx.currentTime);
                     osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.08);
@@ -350,17 +366,16 @@
                     osc.start();
                     osc.stop(ctx.currentTime + 0.08);
                 } else if (type === 'milestone') {
-                    // Warm double-tone chime
                     osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
-                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.12); // E5
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.12);
                     gain.gain.setValueAtTime(0.2, ctx.currentTime);
                     gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.35);
                     osc.start();
                     osc.stop(ctx.currentTime + 0.35);
                 }
             } catch (e) {
-                console.log("Audio play suppressed by browser policy.");
+                console.log("Audio play suppressed.");
             }
         }
 
@@ -427,11 +442,10 @@
             try {
                 await db.collection('settings').doc(loggedInUser).set(userSettings);
                 playTone('save');
-                alert('Forge settings saved to cloud!');
                 updateSettingsUI();
                 loadUserData();
             } catch (err) {
-                alert('Failed to save settings to Firestore. Please verify Firestore Security Rules for /settings.');
+                alert('Failed to save settings to Firestore.');
             }
         }
 
@@ -540,7 +554,7 @@
             });
 
             playTone('save');
-            alert('Saved snack entry!');
+            document.getElementById('health-note').value = '';
             loadUserData();
         }
 
@@ -558,7 +572,8 @@
             });
 
             playTone('save');
-            alert('Saved chore time!');
+            document.getElementById('chore-time').value = '';
+            document.getElementById('chore-note').value = '';
             loadUserData();
         }
 
@@ -614,7 +629,6 @@
             } else if (capPercent < 100) {
                 bar.className += "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]";
             } else {
-                // Gold Shimmer + Radiant Glow when Crushing Goal (>100%)
                 bar.className += "progress-gold-shimmer shadow-[0_0_15px_rgba(245,158,11,0.6)]";
             }
         }
@@ -703,7 +717,6 @@
                 values[values.length - 1] += val;
             });
 
-            // Clamp cash chart values to the Max Bonus Cap
             if (type === 'work' && workChartMetric === 'cash') {
                 values = values.map(v => Math.min(v, maxCash));
             }
