@@ -454,7 +454,6 @@
         // Decoupled Renderer State
         let pomoUIRenderInterval = null;
         let pomoSyncUnsubscribe = null;
-        let spectatorData = null;
         let spectatorSettings = null;
 
         // Shadow Spectator Timer State
@@ -531,26 +530,22 @@
 
         // --- POMODORO PERSISTENCE & BACKGROUND ENGINE ---
 
-        // Pulses the exact current time to the database for spectators to intercept
+        // NEW FIX: All timer data is now forced into the 'settings' collection to bypass DB Rule Blocks
         async function syncMyPomoToCloud() {
             if (!loggedInUser) return;
             try {
-                await db.collection('pomoState').doc(loggedInUser).set({
-                    user: loggedInUser,
-                    mode: myPomoMode,
-                    round: myPomoRound,
-                    totalRounds: parseInt(userSettings.pomoRounds) || 4,
-                    isRunning: myPomoIsRunning,
-                    pomoTime: myPomoTime, // EXACT seconds remaining right now
-                    updatedAtMillis: Date.now(), // Timestamp for spectator elapsed time calculation
-                    pomoInitialTime: myPomoInitialTime,
-                    pomoFocus: parseInt(userSettings.pomoFocus) || 25,
-                    pomoShort: parseInt(userSettings.pomoShort) || 5,
-                    pomoLong: parseInt(userSettings.pomoLong) || 15,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                await db.collection('settings').doc(loggedInUser).set({
+                    livePomoState: {
+                        mode: myPomoMode,
+                        round: myPomoRound,
+                        isRunning: myPomoIsRunning,
+                        pomoTime: myPomoTime, // EXACT seconds remaining right now
+                        updatedAtMillis: Date.now()
+                    }
                 }, { merge: true });
             } catch (err) {
                 console.error("Error syncing pomo state:", err);
+                alert("Database Sync Error: Unable to save clock state. Check your internet or Firebase Security Rules.");
             }
         }
 
@@ -608,7 +603,7 @@
             else myPomoInitialTime = longMins * 60;
 
             myPomoTime = myPomoInitialTime;
-            syncMyPomoToCloud(); // Push immediate 0:00 cleanup
+            syncMyPomoToCloud(); 
         }
 
         function handleUserSelectPomoMode(mode) {
@@ -645,16 +640,17 @@
             }
         }
 
-        // Offline Session Recovery
+        // Offline Session Recovery & Startup Initialization
         async function initAndRecoverMyPomoState() {
             try {
                 const fMins = parseInt(userSettings.pomoFocus) || 25;
                 const sMins = parseInt(userSettings.pomoShort) || 5;
                 const lMins = parseInt(userSettings.pomoLong) || 15;
 
-                const docSnap = await db.collection('pomoState').doc(loggedInUser).get();
-                if (docSnap.exists) {
-                    const data = docSnap.data();
+                // NEW FIX: Now reads exclusively from the safe 'settings' collection
+                const docSnap = await db.collection('settings').doc(loggedInUser).get();
+                if (docSnap.exists && docSnap.data().livePomoState) {
+                    const data = docSnap.data().livePomoState;
                     myPomoMode = data.mode || 'focus';
                     myPomoRound = parseInt(data.round) || 1;
                     myPomoInitialTime = myPomoMode === 'focus' ? (fMins * 60) : (myPomoMode === 'short' ? (sMins * 60) : (lMins * 60));
@@ -687,9 +683,14 @@
                             triggerDesktopNotification("🔔 Session Complete!", "Your timer finished while you were away.");
                         }
                     } else {
-                        myPomoTime = data.pomoTime !== undefined ? parseInt(data.pomoTime) : myPomoInitialTime;
+                        // NEW FIX: Prevents 0:00 bug if database load is weird
+                        if (data.pomoTime !== undefined && data.pomoTime > 0) {
+                            myPomoTime = parseInt(data.pomoTime);
+                        } else {
+                            myPomoTime = myPomoInitialTime;
+                        }
                         myPomoIsRunning = false;
-                        syncMyPomoToCloud(); // Cleans up 0:00 visual glitches immediately on load
+                        syncMyPomoToCloud(); 
                     }
                 } else {
                     setMyPomoMode('focus');
@@ -729,24 +730,30 @@
                     mode = myPomoMode;
                     round = myPomoRound;
                 } else {
-                    if (spectatorData) {
-                        mode = spectatorData.mode || 'focus';
-                        round = parseInt(spectatorData.round) || 1;
-                        targetFocusMins = parseInt(spectatorData.pomoFocus) || 25;
-                        targetShortMins = parseInt(spectatorData.pomoShort) || 5;
-                        targetLongMins = parseInt(spectatorData.pomoLong) || 15;
-                        targetRounds = parseInt(spectatorData.totalRounds) || 4;
-                        
-                        initialTime = mode === 'focus' ? (targetFocusMins * 60) : (mode === 'short' ? (targetShortMins * 60) : (targetLongMins * 60));
-                        isRunning = shadowSpectatorIsRunning;
-                        displaySecs = shadowSpectatorTime;
-                    } else if (spectatorSettings) {
+                    if (spectatorSettings) {
                         targetFocusMins = parseInt(spectatorSettings.pomoFocus) || 25;
                         targetShortMins = parseInt(spectatorSettings.pomoShort) || 5;
                         targetLongMins = parseInt(spectatorSettings.pomoLong) || 15;
                         targetRounds = parseInt(spectatorSettings.pomoRounds) || 4;
+                        
+                        // Default fallback initializations
                         initialTime = targetFocusMins * 60;
                         displaySecs = initialTime;
+
+                        const liveData = spectatorSettings.livePomoState;
+                        if (liveData) {
+                            mode = liveData.mode || 'focus';
+                            round = parseInt(liveData.round) || 1;
+                            initialTime = mode === 'focus' ? (targetFocusMins * 60) : (mode === 'short' ? (targetShortMins * 60) : (targetLongMins * 60));
+                            
+                            isRunning = shadowSpectatorIsRunning;
+                            displaySecs = shadowSpectatorTime;
+                            
+                            // NEW FIX: If it's paused and sitting at 0:00, instantly snap it back to full duration visually
+                            if (displaySecs <= 0 && !isRunning) {
+                                displaySecs = initialTime;
+                            }
+                        }
                     }
                 }
 
@@ -773,7 +780,7 @@
                         toggleBtn.innerText = displaySecs === initialTime ? (mode === 'focus' ? "Start Focus" : "Start Break") : "Resume";
                     }
                 } else {
-                    statusEl.innerText = isRunning ? `LIVE: ${mode.toUpperCase()} SESSION ACTIVE` : (displaySecs === 0 ? "SESSION COMPLETE" : `PAUSED (${mode.toUpperCase()})`);
+                    statusEl.innerText = isRunning ? `LIVE: ${mode.toUpperCase()} SESSION ACTIVE` : (displaySecs === initialTime ? "PAUSED / IDLE" : `PAUSED (${mode.toUpperCase()})`);
                 }
 
                 ['focus', 'short', 'long'].forEach(m => {
@@ -801,7 +808,7 @@
             }, 100);
         }
 
-        // Silent background listener constructs a shadow timer purely from DB pulses
+        // NEW FIX: Spectator Listener now reads strictly from 'settings' collection
         function attachPomoSpectatorListener() {
             if (pomoSyncUnsubscribe) pomoSyncUnsubscribe();
 
@@ -820,29 +827,32 @@
                 clockContainer.classList.remove('cursor-pointer', 'hover:bg-slate-800/50');
                 clockContainer.classList.add('cursor-default');
 
-                pomoSyncUnsubscribe = db.collection('pomoState').doc(viewedUser).onSnapshot(async doc => {
-                    spectatorData = doc.exists ? doc.data() : null;
-                    if (spectatorData) {
-                        let dbTime = spectatorData.pomoTime !== undefined ? parseInt(spectatorData.pomoTime) : 1500;
-                        shadowSpectatorIsRunning = !!spectatorData.isRunning;
-                        
-                        // Synchronize locally using the pulse timestamp
-                        if (shadowSpectatorIsRunning && spectatorData.updatedAtMillis) {
-                            let elapsedSecs = Math.floor((Date.now() - spectatorData.updatedAtMillis) / 1000);
-                            if (elapsedSecs < 0) elapsedSecs = 0;
-                            shadowSpectatorTime = Math.max(0, dbTime - elapsedSecs);
-                            startShadowSpectatorTimer();
+                pomoSyncUnsubscribe = db.collection('settings').doc(viewedUser).onSnapshot(async doc => {
+                    if (doc.exists) {
+                        spectatorSettings = doc.data(); // Grabs both custom durations AND the live clock pulse
+                        const liveData = spectatorSettings.livePomoState;
+
+                        if (liveData) {
+                            let dbTime = liveData.pomoTime !== undefined ? parseInt(liveData.pomoTime) : 1500;
+                            shadowSpectatorIsRunning = !!liveData.isRunning;
+                            
+                            // Synchronize locally using the pulse timestamp
+                            if (shadowSpectatorIsRunning && liveData.updatedAtMillis) {
+                                let elapsedSecs = Math.floor((Date.now() - liveData.updatedAtMillis) / 1000);
+                                if (elapsedSecs < 0) elapsedSecs = 0;
+                                shadowSpectatorTime = Math.max(0, dbTime - elapsedSecs);
+                                startShadowSpectatorTimer();
+                            } else {
+                                shadowSpectatorTime = dbTime;
+                                if (shadowSpectatorInterval) clearInterval(shadowSpectatorInterval);
+                            }
                         } else {
-                            shadowSpectatorTime = dbTime;
+                            shadowSpectatorIsRunning = false;
                             if (shadowSpectatorInterval) clearInterval(shadowSpectatorInterval);
                         }
                     } else {
+                        spectatorSettings = null;
                         shadowSpectatorIsRunning = false;
-                        if (shadowSpectatorInterval) clearInterval(shadowSpectatorInterval);
-                        try {
-                            const setSnap = await db.collection('settings').doc(viewedUser).get();
-                            if (setSnap.exists) spectatorSettings = setSnap.data();
-                        } catch(e) {}
                     }
                 });
             } else {
