@@ -25,7 +25,6 @@
         }
         .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
         
-        /* Premium Minimalist Gold Branding */
         .logo-gold {
             color: #f59e0b;
             letter-spacing: 0.25em;
@@ -201,13 +200,19 @@
             <div class="card p-8 rounded-xl text-center space-y-6 shadow-xl">
                 <!-- Mode Switcher -->
                 <div class="flex justify-center gap-2 bg-slate-900 p-1.5 rounded-lg border border-slate-700 text-xs w-fit mx-auto">
-                    <button onclick="setPomoMode('focus')" id="pomo-mode-focus" class="px-4 py-1.5 rounded-md font-medium transition-all bg-blue-600 text-white">Focus (25m)</button>
-                    <button onclick="setPomoMode('short')" id="pomo-mode-short" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Short Break (5m)</button>
-                    <button onclick="setPomoMode('long')" id="pomo-mode-long" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Long Break (15m)</button>
+                    <button onclick="setPomoMode('focus')" id="pomo-mode-focus" class="px-4 py-1.5 rounded-md font-medium transition-all bg-blue-600 text-white">Focus</button>
+                    <button onclick="setPomoMode('short')" id="pomo-mode-short" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Short Break</button>
+                    <button onclick="setPomoMode('long')" id="pomo-mode-long" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Long Break</button>
+                </div>
+
+                <!-- Round/Lap Indicator -->
+                <div class="flex items-center justify-center gap-2">
+                    <span class="text-xs uppercase tracking-widest text-amber-400 font-bold" id="pomo-round-badge">Round 1 of 4</span>
+                    <div id="pomo-round-dots" class="flex gap-1.5 ml-2"></div>
                 </div>
 
                 <!-- Clickable Main Countdown Display -->
-                <div onclick="togglePomoTimer()" class="cursor-pointer group select-none py-4 my-2 rounded-2xl transition-all hover:bg-slate-800/50">
+                <div onclick="togglePomoTimer()" class="cursor-pointer group select-none py-2 my-1 rounded-2xl transition-all hover:bg-slate-800/50">
                     <div id="pomo-timer-display" class="text-7xl font-mono font-black text-amber-400 tracking-wider group-hover:scale-105 transition-transform">25:00</div>
                     <div id="pomo-status-label" class="text-xs text-slate-400 mt-2 uppercase tracking-widest font-semibold group-hover:text-amber-300">Click Clock to Start</div>
                 </div>
@@ -358,9 +363,9 @@
             <!-- Pomodoro Clock Configuration Section -->
             <div class="card p-6 rounded-xl max-w-2xl">
                 <h2 class="text-lg font-semibold mb-2 text-slate-200">Pomodoro Timer Configuration</h2>
-                <p class="text-xs text-slate-400 mb-6">Customize your default focus session and break durations.</p>
+                <p class="text-xs text-slate-400 mb-6">Customize your focus session durations and round cycles.</p>
                 <form onsubmit="savePomoSettings(event)" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Focus Duration (Minutes)</label>
                             <input type="number" id="setting-pomo-focus" min="1" max="180" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
@@ -372,6 +377,10 @@
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Long Break (Minutes)</label>
                             <input type="number" id="setting-pomo-long" min="1" max="120" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Target Focus Rounds Before Long Break</label>
+                            <input type="number" id="setting-pomo-rounds" min="1" max="12" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
                         </div>
                     </div>
                     <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg text-sm transition-all">Save Timer Settings</button>
@@ -405,6 +414,7 @@
 
         // Pomodoro State
         let currentPomoMode = 'focus';
+        let currentPomoRound = 1;
         let pomoTime = 1500;
         let pomoInitialTime = 1500;
         let pomoTimerId = null;
@@ -416,19 +426,34 @@
             maxBonusCapPct: 125,
             pomoFocus: 25,
             pomoShort: 5,
-            pomoLong: 15
+            pomoLong: 15,
+            pomoRounds: 4
         };
 
+        // Desktop Notification Setup
+        function requestNotificationPermission() {
+            if ("Notification" in window && Notification.permission === "default") {
+                Notification.requestPermission();
+            }
+        }
+
+        function triggerDesktopNotification(title, body) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(title, { body: body, icon: "https://fav.farm/✨" });
+            }
+        }
+
+        // Attention-Grabbing Multi-Chime Web Audio Alarm
         function playTone(type) {
             if (audioMuted) return;
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-
+                
                 if (type === 'save') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(600, ctx.currentTime);
                     osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.08);
@@ -437,14 +462,20 @@
                     osc.start();
                     osc.stop(ctx.currentTime + 0.08);
                 } else if (type === 'pomoDone') {
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.15);
-                    osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.30);
-                    gain.gain.setValueAtTime(0.25, ctx.currentTime);
-                    gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.5);
+                    // Distinct 3-ring recurring bell chime alarm
+                    [0, 0.2, 0.4].forEach(delay => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(880, ctx.currentTime + delay); // A5 note
+                        osc.frequency.exponentialRampToValueAtTime(1760, ctx.currentTime + delay + 0.15);
+                        gain.gain.setValueAtTime(0.3, ctx.currentTime + delay);
+                        gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + delay + 0.18);
+                        osc.start(ctx.currentTime + delay);
+                        osc.stop(ctx.currentTime + delay + 0.18);
+                    });
                 }
             } catch (e) {
                 console.log("Audio play suppressed.");
@@ -456,7 +487,7 @@
             document.getElementById('audio-toggle-btn').innerText = audioMuted ? "🔇" : "🔊";
         }
 
-        // Pomodoro Clock Core
+        // Pomodoro Round Cycle Management
         function setPomoMode(mode) {
             currentPomoMode = mode;
             clearInterval(pomoTimerId);
@@ -473,10 +504,26 @@
 
             pomoTime = pomoInitialTime;
             updatePomoDisplay();
-            document.getElementById('pomo-status-label').innerText = "Click Clock to Start";
+            updatePomoRoundUI();
+        }
+
+        function updatePomoRoundUI() {
+            const totalRounds = userSettings.pomoRounds || 4;
+            document.getElementById('pomo-round-badge').innerText = `Round ${currentPomoRound} of ${totalRounds}`;
+            
+            // Render round dot pips
+            const dotsContainer = document.getElementById('pomo-round-dots');
+            dotsContainer.innerHTML = '';
+            for (let i = 1; i <= totalRounds; i++) {
+                const dot = document.createElement('div');
+                dot.className = i <= currentPomoRound ? "w-2.5 h-2.5 rounded-full bg-amber-400" : "w-2.5 h-2.5 rounded-full bg-slate-700";
+                dotsContainer.appendChild(dot);
+            }
         }
 
         function togglePomoTimer() {
+            requestNotificationPermission();
+            
             if (pomoIsRunning) {
                 clearInterval(pomoTimerId);
                 pomoIsRunning = false;
@@ -485,18 +532,36 @@
             } else {
                 pomoIsRunning = true;
                 document.getElementById('pomo-toggle-btn').innerText = "Pause";
-                document.getElementById('pomo-status-label').innerText = "Session Active";
+                document.getElementById('pomo-status-label').innerText = currentPomoMode === 'focus' ? "Focus Session Active" : "Resting...";
+                
                 pomoTimerId = setInterval(() => {
                     pomoTime--;
                     updatePomoDisplay();
+                    
                     if (pomoTime <= 0) {
                         clearInterval(pomoTimerId);
                         pomoIsRunning = false;
                         playTone('pomoDone');
-                        document.getElementById('pomo-status-label').innerText = "Timer Complete!";
-                        document.getElementById('pomo-toggle-btn').innerText = "Start";
-                        pomoTime = pomoInitialTime;
-                        updatePomoDisplay();
+                        
+                        const totalRounds = userSettings.pomoRounds || 4;
+                        
+                        if (currentPomoMode === 'focus') {
+                            if (currentPomoRound < totalRounds) {
+                                triggerDesktopNotification("✨ Focus Round Complete!", `Round ${currentPomoRound} finished. Take a short break!`);
+                                currentPomoRound++;
+                                setPomoMode('short');
+                                document.getElementById('pomo-status-label').innerText = "Short Break Ready";
+                            } else {
+                                triggerDesktopNotification("🎉 All Rounds Complete!", `You crushed all ${totalRounds} focus rounds! Take a long break.`);
+                                currentPomoRound = 1;
+                                setPomoMode('long');
+                                document.getElementById('pomo-status-label').innerText = "Long Break Unlocked!";
+                            }
+                        } else {
+                            triggerDesktopNotification("🔔 Break Complete!", "Ready to begin your next focus round?");
+                            setPomoMode('focus');
+                            document.getElementById('pomo-status-label').innerText = `Round ${currentPomoRound} Ready`;
+                        }
                     }
                 }, 1000);
             }
@@ -505,9 +570,8 @@
         function resetPomoTimer() {
             clearInterval(pomoTimerId);
             pomoIsRunning = false;
-            pomoTime = pomoInitialTime;
-            updatePomoDisplay();
-            document.getElementById('pomo-toggle-btn').innerText = currentPomoMode === 'focus' ? "Start Focus" : "Start Break";
+            currentPomoRound = 1;
+            setPomoMode('focus');
             document.getElementById('pomo-status-label').innerText = "Click Clock to Start";
         }
 
@@ -517,7 +581,6 @@
             const formatted = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             document.getElementById('pomo-timer-display').innerText = formatted;
 
-            // Update Progress Bar Width
             const pct = (pomoTime / pomoInitialTime) * 100;
             document.getElementById('pomo-progress-bar').style.width = `${pct}%`;
         }
@@ -556,7 +619,7 @@
                 console.error("Error loading cloud settings:", err);
             }
             updateSettingsUI();
-            setPomoMode(currentPomoMode);
+            setPomoMode('focus');
         }
 
         function updateSettingsUI() {
@@ -572,6 +635,7 @@
             document.getElementById('setting-pomo-focus').value = userSettings.pomoFocus || 25;
             document.getElementById('setting-pomo-short').value = userSettings.pomoShort || 5;
             document.getElementById('setting-pomo-long').value = userSettings.pomoLong || 15;
+            document.getElementById('setting-pomo-rounds').value = userSettings.pomoRounds || 4;
 
             document.getElementById('pomo-mode-focus').innerText = `Focus (${userSettings.pomoFocus || 25}m)`;
             document.getElementById('pomo-mode-short').innerText = `Short Break (${userSettings.pomoShort || 5}m)`;
@@ -599,12 +663,13 @@
             userSettings.pomoFocus = parseInt(document.getElementById('setting-pomo-focus').value);
             userSettings.pomoShort = parseInt(document.getElementById('setting-pomo-short').value);
             userSettings.pomoLong = parseInt(document.getElementById('setting-pomo-long').value);
+            userSettings.pomoRounds = parseInt(document.getElementById('setting-pomo-rounds').value);
 
             try {
                 await db.collection('settings').doc(loggedInUser).set(userSettings, { merge: true });
                 playTone('save');
                 updateSettingsUI();
-                setPomoMode(currentPomoMode);
+                setPomoMode('focus');
             } catch (err) {
                 alert('Failed to save timer settings to Firestore.');
             }
