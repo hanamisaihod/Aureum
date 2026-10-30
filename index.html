@@ -24,6 +24,17 @@
             pointer-events: none; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
         }
         .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+        
+        /* Shimmer animation for max progress */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .progress-gold-shimmer {
+            background: linear-gradient(90deg, #f59e0b 0%, #fef08a 50%, #f59e0b 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2.5s infinite linear;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8 max-w-6xl mx-auto">
@@ -62,15 +73,10 @@
                     <button id="user-btn-north" onclick="switchActiveUser('North')" class="px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white">North</button>
                     <button id="user-btn-cream" onclick="switchActiveUser('Cream')" class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all">Cream</button>
                 </div>
+                <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-sm text-slate-400 hover:text-white px-2 py-1 bg-slate-800 rounded border border-slate-700">🔊</button>
                 <button onclick="handleLogout()" class="text-xs text-slate-500 hover:text-slate-300 underline">Sign Out</button>
             </div>
         </header>
-
-        <!-- Dynamic Vibe & Encouragement Banner -->
-        <div id="motivation-banner" class="mb-6 p-3 rounded-lg bg-slate-800/80 border border-slate-700/60 text-xs text-amber-300/90 italic flex items-center justify-between">
-            <span id="motivation-text">"Ready when you are. Step into focus."</span>
-            <span id="streak-counter" class="not-italic text-slate-400 font-medium">⚡ Monthly Focus Active</span>
-        </div>
 
         <!-- Navigation Tabs -->
         <nav class="flex border-b border-slate-700 mb-6 gap-8">
@@ -93,17 +99,17 @@
                     <div class="text-3xl font-extrabold text-blue-400 mt-1" id="monthly-points">0.00 pts</div>
                     <div class="text-xs text-slate-500 mt-1">Goal: <span id="label-monthly-goal-pts">120</span> pts (<span id="label-weekly-hrs">10</span> hrs/wk)</div>
                 </div>
-                <div id="payout-card-box" class="transition-all duration-300">
+                <div id="payout-card-box">
                     <span class="text-xs uppercase tracking-wider text-slate-400">Spendable Allowance Earned</span>
                     <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="monthly-payout">฿0</div>
-                    <div class="text-xs text-slate-500 mt-1">Target Base: ฿<span id="label-monthly-cash">10,000</span></div>
+                    <div class="text-xs text-slate-500 mt-1">Target Base: ฿<span id="label-monthly-cash">8,000</span></div>
                 </div>
                 <div>
                     <span class="text-xs uppercase tracking-wider text-slate-400">Monthly Goal Progress</span>
-                    <div class="w-full bg-slate-700 h-3 rounded-full mt-3 overflow-hidden">
-                        <div id="cap-bar" class="bg-blue-500 h-full w-0 transition-all duration-500"></div>
+                    <div class="w-full bg-slate-900 h-3.5 rounded-full mt-3 overflow-hidden border border-slate-700/60 p-0.5">
+                        <div id="cap-bar" class="bg-blue-500 h-full rounded-full transition-all duration-700"></div>
                     </div>
-                    <div class="text-xs text-right text-slate-400 mt-1" id="cap-percent">0%</div>
+                    <div class="text-xs text-right text-slate-400 mt-1 font-semibold" id="cap-percent">0%</div>
                 </div>
             </div>
 
@@ -283,10 +289,10 @@
                         <label class="block text-xs text-slate-400 mb-1">
                             Max Bonus Cap (%)
                             <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">Maximum allowance multiplier for overtime work (e.g. 150% = max ฿15,000).</span>
+                                <span class="tooltip-text">Maximum allowance multiplier for overtime work (e.g. 125% = max ฿10,000 on ฿8,000 target).</span>
                             </span>
                         </label>
-                        <input type="number" id="setting-bonus-cap" min="100" max="300" step="10" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                        <input type="number" id="setting-bonus-cap" min="100" max="300" step="5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
                     </div>
                     <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg text-sm transition-all">Save Forge Settings</button>
                 </form>
@@ -311,16 +317,57 @@
         let loggedInUser = 'North';
         let viewedUser = 'North';
         let currentUserUid = null;
+        let audioMuted = false;
         
         let charts = {};
         let chartTimeframes = { work: 'daily', health: 'daily', chore: 'daily' };
         let workChartMetric = 'pts';
         
+        // Default Forge Settings
         let userSettings = {
-            monthlyCash: 10000,
+            monthlyCash: 8000,
             weeklyHours: 10,
-            maxBonusCapPct: 150
+            maxBonusCapPct: 125
         };
+
+        // Web Audio Synthesizer
+        function playTone(type) {
+            if (audioMuted) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'save') {
+                    // Soft mechanical click/dink
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.08);
+                } else if (type === 'milestone') {
+                    // Warm double-tone chime
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.12); // E5
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.35);
+                }
+            } catch (e) {
+                console.log("Audio play suppressed by browser policy.");
+            }
+        }
+
+        function toggleAudioMute() {
+            audioMuted = !audioMuted;
+            document.getElementById('audio-toggle-btn').innerText = audioMuted ? "🔇" : "🔊";
+        }
 
         auth.onAuthStateChanged(async user => {
             if (user) {
@@ -352,7 +399,7 @@
                 if (docSnap.exists) {
                     userSettings = docSnap.data();
                 } else {
-                    userSettings = { monthlyCash: 10000, weeklyHours: 10, maxBonusCapPct: 150 };
+                    userSettings = { monthlyCash: 8000, weeklyHours: 10, maxBonusCapPct: 125 };
                 }
             } catch (err) {
                 console.error("Error loading cloud settings:", err);
@@ -379,11 +426,12 @@
             
             try {
                 await db.collection('settings').doc(loggedInUser).set(userSettings);
+                playTone('save');
                 alert('Forge settings saved to cloud!');
                 updateSettingsUI();
                 loadUserData();
             } catch (err) {
-                alert('Failed to save settings to Firestore.');
+                alert('Failed to save settings to Firestore. Please verify Firestore Security Rules for /settings.');
             }
         }
 
@@ -411,7 +459,6 @@
             await loadSettingsFromCloud();
             updateUserSwitcherUI();
             
-            // If user was on Forge tab while switching to someone else, jump back to Work Engine
             if (loggedInUser !== viewedUser) {
                 switchTab('work');
             }
@@ -435,7 +482,6 @@
             document.getElementById('health-form-card').style.display = isSelf ? 'block' : 'none';
             document.getElementById('chore-form-card').style.display = isSelf ? 'block' : 'none';
             
-            // Strictly hide Forge Tab when viewing another user
             navForgeBtn.style.display = isSelf ? 'block' : 'none';
 
             const banner = document.getElementById('read-only-banner');
@@ -475,6 +521,7 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
 
+            playTone('save');
             document.getElementById('work-form').reset();
             loadUserData();
         }
@@ -492,6 +539,7 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
 
+            playTone('save');
             alert('Saved snack entry!');
             loadUserData();
         }
@@ -509,6 +557,7 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
 
+            playTone('save');
             alert('Saved chore time!');
             loadUserData();
         }
@@ -556,16 +605,17 @@
             });
         }
 
-        function updateMotivationBanner(pct) {
-            const txt = document.getElementById('motivation-text');
-            if (pct === 0) {
-                txt.innerText = `"The engine is warm. Time to lay down the first strokes."`;
-            } else if (pct < 50) {
-                txt.innerText = `"Building early momentum. Small efforts stack up fast."`;
-            } else if (pct < 100) {
-                txt.innerText = `"Over halfway there! The monthly focus target is within reach."`;
+        function updateProgressBar(capPercent) {
+            const bar = document.getElementById('cap-bar');
+            bar.className = "h-full rounded-full transition-all duration-700 ";
+
+            if (capPercent < 50) {
+                bar.className += "bg-blue-500";
+            } else if (capPercent < 100) {
+                bar.className += "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]";
             } else {
-                txt.innerText = `"Goal unlocked! You are now earning bonus allowance points."`;
+                // Gold Shimmer + Radiant Glow when Crushing Goal (>100%)
+                bar.className += "progress-gold-shimmer shadow-[0_0_15px_rgba(245,158,11,0.6)]";
             }
         }
 
@@ -604,24 +654,23 @@
                   
                   const capPercent = Math.min((monthlyPoints / targetMonthlyPts) * 100, 100);
                   document.getElementById('cap-bar').style.width = `${capPercent}%`;
-                  document.getElementById('cap-percent').innerText = `${Math.round(capPercent)}%`;
+                  document.getElementById('cap-percent').innerText = `${Math.round((monthlyPoints / targetMonthlyPts) * 100)}%`;
 
-                  updateMotivationBanner(capPercent);
+                  updateProgressBar((monthlyPoints / targetMonthlyPts) * 100);
 
                   ['work', 'health', 'chore'].forEach(type => {
-                      updateChartData(type, rawLogs.filter(l => l.type === type), pointRate);
+                      updateChartData(type, rawLogs.filter(l => l.type === type), pointRate, maxCash);
                   });
               });
         }
 
-        function updateChartData(type, logs, pointRate) {
+        function updateChartData(type, logs, pointRate, maxCash) {
             const range = chartTimeframes[type];
             let labels = [];
             let values = [];
             const now = new Date();
 
             if (range === 'daily') {
-                // Last 14 days with readable Date format (e.g. Oct 28)
                 for (let i = 13; i >= 0; i--) {
                     const d = new Date();
                     d.setDate(now.getDate() - i);
@@ -629,7 +678,6 @@
                     values.push(0);
                 }
             } else if (range === 'weekly') {
-                // Last 8 weeks with start date labels (e.g. Sep 14, Sep 21)
                 for (let i = 7; i >= 0; i--) {
                     const d = new Date();
                     d.setDate(now.getDate() - (i * 7));
@@ -654,6 +702,11 @@
                 
                 values[values.length - 1] += val;
             });
+
+            // Clamp cash chart values to the Max Bonus Cap
+            if (type === 'work' && workChartMetric === 'cash') {
+                values = values.map(v => Math.min(v, maxCash));
+            }
 
             charts[type].data.labels = labels;
             charts[type].data.datasets[0].data = values;
