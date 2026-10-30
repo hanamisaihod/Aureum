@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ AUREUM — Autonomous Living & Creative Ledger</title>
+    <title>AUREUM — Autonomous Living & Creative Ledger</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Firebase SDKs -->
@@ -25,12 +25,11 @@
         }
         .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
         
-        /* Gold Logo Text Gradient */
+        /* Premium Minimalist Gold Branding */
         .logo-gold {
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.2));
+            color: #f59e0b;
+            letter-spacing: 0.25em;
+            text-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
         }
 
         @keyframes shimmer {
@@ -49,7 +48,7 @@
     <!-- LOGIN OVERLAY -->
     <div id="login-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center z-50">
         <div class="card p-8 rounded-xl max-w-md w-full shadow-2xl">
-            <h1 class="text-3xl font-extrabold logo-gold mb-1 tracking-wider">✨ AUREUM</h1>
+            <h1 class="text-2xl font-black logo-gold mb-1 uppercase">AUREUM</h1>
             <p class="text-xs text-slate-400 mb-6">Sign in to open your shared space.</p>
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
@@ -71,9 +70,7 @@
         <!-- Header -->
         <header class="flex flex-col md:flex-row justify-between items-center mb-6 pb-4 border-b border-slate-700 gap-4">
             <div>
-                <h1 class="text-3xl font-black tracking-widest logo-gold flex items-center gap-2">
-                    <span>✨ AUREUM</span>
-                </h1>
+                <h1 class="text-3xl font-black logo-gold uppercase">AUREUM</h1>
                 <p class="text-xs text-slate-400 tracking-wide mt-0.5">Autonomous Living & Creative Ledger</p>
             </div>
             
@@ -201,7 +198,7 @@
 
         <!-- TAB 2: POMODORO CLOCK -->
         <div id="tab-pomo" class="hidden space-y-6 max-w-xl mx-auto">
-            <div class="card p-8 rounded-xl text-center space-y-6">
+            <div class="card p-8 rounded-xl text-center space-y-6 shadow-xl">
                 <!-- Mode Switcher -->
                 <div class="flex justify-center gap-2 bg-slate-900 p-1.5 rounded-lg border border-slate-700 text-xs w-fit mx-auto">
                     <button onclick="setPomoMode('focus')" id="pomo-mode-focus" class="px-4 py-1.5 rounded-md font-medium transition-all bg-blue-600 text-white">Focus (25m)</button>
@@ -210,9 +207,14 @@
                 </div>
 
                 <!-- Clickable Main Countdown Display -->
-                <div onclick="togglePomoTimer()" class="cursor-pointer group select-none py-6 my-2 rounded-2xl transition-all hover:bg-slate-800/50">
+                <div onclick="togglePomoTimer()" class="cursor-pointer group select-none py-4 my-2 rounded-2xl transition-all hover:bg-slate-800/50">
                     <div id="pomo-timer-display" class="text-7xl font-mono font-black text-amber-400 tracking-wider group-hover:scale-105 transition-transform">25:00</div>
                     <div id="pomo-status-label" class="text-xs text-slate-400 mt-2 uppercase tracking-widest font-semibold group-hover:text-amber-300">Click Clock to Start</div>
+                </div>
+
+                <!-- Visual Countdown Progress Bar -->
+                <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
+                    <div id="pomo-progress-bar" class="bg-amber-400 h-full rounded-full transition-all duration-1000 w-full"></div>
                 </div>
 
                 <!-- Controls -->
@@ -317,8 +319,9 @@
 
         <!-- TAB 5: FORGE -->
         <div id="tab-forge" class="hidden space-y-6">
+            <!-- Work Points & Allowance Calibration -->
             <div class="card p-6 rounded-xl max-w-2xl">
-                <h2 class="text-lg font-semibold mb-2 text-slate-200">Forge Calibration</h2>
+                <h2 class="text-lg font-semibold mb-2 text-slate-200">Work & Allowance Calibration</h2>
                 <p class="text-xs text-slate-400 mb-6">Calibrate your physical monthly work goals and discretionary spending payouts.</p>
                 <form onsubmit="saveSettings(event)" class="space-y-4">
                     <div>
@@ -348,7 +351,30 @@
                         </label>
                         <input type="number" id="setting-bonus-cap" min="100" max="300" step="5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
                     </div>
-                    <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg text-sm transition-all">Save Forge Settings</button>
+                    <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg text-sm transition-all">Save Work Settings</button>
+                </form>
+            </div>
+
+            <!-- Pomodoro Clock Configuration Section -->
+            <div class="card p-6 rounded-xl max-w-2xl">
+                <h2 class="text-lg font-semibold mb-2 text-slate-200">Pomodoro Timer Configuration</h2>
+                <p class="text-xs text-slate-400 mb-6">Customize your default focus session and break durations.</p>
+                <form onsubmit="savePomoSettings(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Focus Duration (Minutes)</label>
+                            <input type="number" id="setting-pomo-focus" min="1" max="180" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Short Break (Minutes)</label>
+                            <input type="number" id="setting-pomo-short" min="1" max="60" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Long Break (Minutes)</label>
+                            <input type="number" id="setting-pomo-long" min="1" max="120" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                        </div>
+                    </div>
+                    <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg text-sm transition-all">Save Timer Settings</button>
                 </form>
             </div>
         </div>
@@ -378,7 +404,8 @@
         let workChartMetric = 'pts';
 
         // Pomodoro State
-        let pomoTime = 1500; // Default 25 mins
+        let currentPomoMode = 'focus';
+        let pomoTime = 1500;
         let pomoInitialTime = 1500;
         let pomoTimerId = null;
         let pomoIsRunning = false;
@@ -386,7 +413,10 @@
         let userSettings = {
             monthlyCash: 8000,
             weeklyHours: 10,
-            maxBonusCapPct: 125
+            maxBonusCapPct: 125,
+            pomoFocus: 25,
+            pomoShort: 5,
+            pomoLong: 15
         };
 
         function playTone(type) {
@@ -426,19 +456,20 @@
             document.getElementById('audio-toggle-btn').innerText = audioMuted ? "🔇" : "🔊";
         }
 
-        // Pomodoro Logic
+        // Pomodoro Clock Core
         function setPomoMode(mode) {
+            currentPomoMode = mode;
             clearInterval(pomoTimerId);
             pomoIsRunning = false;
-            document.getElementById('pomo-toggle-btn').innerText = "Start";
+            document.getElementById('pomo-toggle-btn').innerText = mode === 'focus' ? "Start Focus" : "Start Break";
             
             ['focus', 'short', 'long'].forEach(m => {
                 document.getElementById(`pomo-mode-${m}`).className = m === mode ? "px-4 py-1.5 rounded-md font-medium transition-all bg-blue-600 text-white" : "px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all";
             });
 
-            if (mode === 'focus') pomoInitialTime = 1500;
-            else if (mode === 'short') pomoInitialTime = 300;
-            else pomoInitialTime = 900;
+            if (mode === 'focus') pomoInitialTime = (userSettings.pomoFocus || 25) * 60;
+            else if (mode === 'short') pomoInitialTime = (userSettings.pomoShort || 5) * 60;
+            else pomoInitialTime = (userSettings.pomoLong || 15) * 60;
 
             pomoTime = pomoInitialTime;
             updatePomoDisplay();
@@ -465,6 +496,7 @@
                         document.getElementById('pomo-status-label').innerText = "Timer Complete!";
                         document.getElementById('pomo-toggle-btn').innerText = "Start";
                         pomoTime = pomoInitialTime;
+                        updatePomoDisplay();
                     }
                 }, 1000);
             }
@@ -475,7 +507,7 @@
             pomoIsRunning = false;
             pomoTime = pomoInitialTime;
             updatePomoDisplay();
-            document.getElementById('pomo-toggle-btn').innerText = "Start";
+            document.getElementById('pomo-toggle-btn').innerText = currentPomoMode === 'focus' ? "Start Focus" : "Start Break";
             document.getElementById('pomo-status-label').innerText = "Click Clock to Start";
         }
 
@@ -484,6 +516,10 @@
             const secs = pomoTime % 60;
             const formatted = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             document.getElementById('pomo-timer-display').innerText = formatted;
+
+            // Update Progress Bar Width
+            const pct = (pomoTime / pomoInitialTime) * 100;
+            document.getElementById('pomo-progress-bar').style.width = `${pct}%`;
         }
 
         auth.onAuthStateChanged(async user => {
@@ -514,14 +550,13 @@
                 const docRef = db.collection('settings').doc(viewedUser);
                 const docSnap = await docRef.get();
                 if (docSnap.exists) {
-                    userSettings = docSnap.data();
-                } else {
-                    userSettings = { monthlyCash: 8000, weeklyHours: 10, maxBonusCapPct: 125 };
+                    userSettings = { ...userSettings, ...docSnap.data() };
                 }
             } catch (err) {
                 console.error("Error loading cloud settings:", err);
             }
             updateSettingsUI();
+            setPomoMode(currentPomoMode);
         }
 
         function updateSettingsUI() {
@@ -533,6 +568,14 @@
             document.getElementById('setting-monthly-cash').value = userSettings.monthlyCash;
             document.getElementById('setting-weekly-hrs').value = userSettings.weeklyHours;
             document.getElementById('setting-bonus-cap').value = userSettings.maxBonusCapPct;
+
+            document.getElementById('setting-pomo-focus').value = userSettings.pomoFocus || 25;
+            document.getElementById('setting-pomo-short').value = userSettings.pomoShort || 5;
+            document.getElementById('setting-pomo-long').value = userSettings.pomoLong || 15;
+
+            document.getElementById('pomo-mode-focus').innerText = `Focus (${userSettings.pomoFocus || 25}m)`;
+            document.getElementById('pomo-mode-short').innerText = `Short Break (${userSettings.pomoShort || 5}m)`;
+            document.getElementById('pomo-mode-long').innerText = `Long Break (${userSettings.pomoLong || 15}m)`;
         }
 
         async function saveSettings(e) {
@@ -542,12 +585,28 @@
             userSettings.maxBonusCapPct = parseFloat(document.getElementById('setting-bonus-cap').value);
             
             try {
-                await db.collection('settings').doc(loggedInUser).set(userSettings);
+                await db.collection('settings').doc(loggedInUser).set(userSettings, { merge: true });
                 playTone('save');
                 updateSettingsUI();
                 loadUserData();
             } catch (err) {
                 alert('Failed to save settings to Firestore.');
+            }
+        }
+
+        async function savePomoSettings(e) {
+            e.preventDefault();
+            userSettings.pomoFocus = parseInt(document.getElementById('setting-pomo-focus').value);
+            userSettings.pomoShort = parseInt(document.getElementById('setting-pomo-short').value);
+            userSettings.pomoLong = parseInt(document.getElementById('setting-pomo-long').value);
+
+            try {
+                await db.collection('settings').doc(loggedInUser).set(userSettings, { merge: true });
+                playTone('save');
+                updateSettingsUI();
+                setPomoMode(currentPomoMode);
+            } catch (err) {
+                alert('Failed to save timer settings to Firestore.');
             }
         }
 
