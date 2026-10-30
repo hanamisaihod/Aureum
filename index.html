@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aureum — Autonomous Ledger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase SDKs (Compat Version for CDN) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
+        .card { background-color: #1e293b; border: 1px solid #334155; }
+        .tab-active { border-bottom: 2px solid #3b82f6; color: #60a5fa; font-weight: 600; }
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-6xl mx-auto">
+
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row justify-between items-center mb-8 pb-4 border-b border-slate-700 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-amber-400">AUREUM</h1>
+            <p class="text-sm text-slate-400">Autonomous Productivity & Lifestyle Framework</p>
+        </div>
+        
+        <!-- User Switcher -->
+        <div class="flex items-center gap-3 bg-slate-800 p-1.5 rounded-lg border border-slate-700">
+            <button id="user-me" onclick="switchUser('Me')" class="px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white">Me</button>
+            <button id="user-wife" onclick="switchUser('Wife')" class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all">Wife</button>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="flex border-b border-slate-700 mb-6 gap-8">
+        <button onclick="switchTab('work')" id="nav-work" class="pb-3 text-sm tab-active">Work Engine (฿ Payout)</button>
+        <button onclick="switchTab('health')" id="nav-health" class="pb-3 text-sm text-slate-400 hover:text-slate-200">Health Ledger</button>
+        <button onclick="switchTab('chores')" id="nav-chores" class="pb-3 text-sm text-slate-400 hover:text-slate-200">Chore Ledger</button>
+        <button onclick="switchTab('analytics')" id="nav-analytics" class="pb-3 text-sm text-slate-400 hover:text-slate-200">Trends & Logs</button>
+    </nav>
+
+    <!-- TAB 1: WORK ENGINE -->
+    <div id="tab-work" class="space-y-6">
+        <div class="card p-6 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+            <div>
+                <span class="text-xs uppercase tracking-wider text-slate-400">Weekly Points Earned</span>
+                <div class="text-3xl font-extrabold text-blue-400 mt-1" id="weekly-points">0.00 pts</div>
+                <div class="text-xs text-slate-500 mt-1">Soft Cap: 20 pts | Hard Cap: 30 pts</div>
+            </div>
+            <div>
+                <span class="text-xs uppercase tracking-wider text-slate-400">Unlocked Discretionary Allowance</span>
+                <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="weekly-payout">฿0</div>
+                <div class="text-xs text-slate-500 mt-1">Base Rate: ฿250 / point</div>
+            </div>
+            <div>
+                <span class="text-xs uppercase tracking-wider text-slate-400">Cap Progress</span>
+                <div class="w-full bg-slate-700 h-3 rounded-full mt-3 overflow-hidden">
+                    <div id="cap-bar" class="bg-blue-500 h-full w-0 transition-all duration-500"></div>
+                </div>
+                <div class="text-xs text-right text-slate-400 mt-1" id="cap-percent">0%</div>
+            </div>
+        </div>
+
+        <div class="card p-6 rounded-xl">
+            <h2 class="text-lg font-semibold mb-4 text-slate-200">Log Creative Work Session</h2>
+            <form id="work-form" onsubmit="logWork(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Time ($T$ in Hours)</label>
+                    <input type="number" id="work-time" step="0.25" min="0.25" placeholder="e.g. 2.5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Results ($R$: 1–5)</label>
+                    <input type="number" id="work-results" min="1" max="5" placeholder="1 = Low, 5 = Major" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Effort ($E$: 1–5)</label>
+                    <input type="number" id="work-effort" min="1" max="5" placeholder="1 = Easy, 5 = Heavy" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" id="work-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Log Work Session</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TAB 2: HEALTH LEDGER -->
+    <div id="tab-health" class="hidden space-y-6">
+        <div class="card p-6 rounded-xl">
+            <h2 class="text-lg font-semibold mb-2 text-slate-200">Log Sugar / Fat Intake</h2>
+            <p class="text-xs text-slate-400 mb-4">Pure trend observation—does not affect work points or payout.</p>
+            <form onsubmit="logHealth(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Indulgence Level</label>
+                    <select id="health-level" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <option value="1">Level 1: Tiny / Light Snack</option>
+                        <option value="2">Level 2: Standard Snack / Drink</option>
+                        <option value="3">Level 3: Full Heavy Dessert / Feast</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Description (Optional)</label>
+                    <input type="text" id="health-note" placeholder="e.g. Boba tea, Pastry" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Log Health Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TAB 3: CHORE LEDGER -->
+    <div id="tab-chores" class="hidden space-y-6">
+        <div class="card p-6 rounded-xl">
+            <h2 class="text-lg font-semibold mb-2 text-slate-200">Log Household Maintenance</h2>
+            <p class="text-xs text-slate-400 mb-4">Track daily chore efficiency without affecting allowance calculations.</p>
+            <form onsubmit="logChore(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Chore Time (Hours)</label>
+                    <input type="number" id="chore-time" step="0.25" min="0.25" placeholder="e.g. 1.0" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Chore Detail</label>
+                    <input type="text" id="chore-note" placeholder="e.g. Cleaning, Laundry, Cooking" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Log Chore Time</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TAB 4: TRENDS & LOGS -->
+    <div id="tab-analytics" class="hidden space-y-6">
+        <div class="card p-6 rounded-xl">
+            <h2 class="text-lg font-semibold mb-4 text-slate-200">Live Activity Feed</h2>
+            <div id="log-list" class="space-y-2 text-sm text-slate-300">Loading synced entries...</div>
+        </div>
+    </div>
+
+    <script>
+        // Live Firebase Credentials
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJ7cVPRiJfiShTKFi___pJ9VZHEcLM47Q",
+            authDomain: "aureum-214d1.firebaseapp.com",
+            projectId: "aureum-214d1",
+            storageBucket: "aureum-214d1.firebasestorage.app",
+            messagingSenderId: "967566110651",
+            appId: "1:967566110651:web:4ee66bc4a6afd271b45e9e"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let currentUser = 'Me';
+
+        function switchUser(user) {
+            currentUser = user;
+            document.getElementById('user-me').className = user === 'Me' ? "px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white" : "px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all";
+            document.getElementById('user-wife').className = user === 'Wife' ? "px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white" : "px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all";
+            loadUserData();
+        }
+
+        function switchTab(tab) {
+            ['work', 'health', 'chores', 'analytics'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).className = "pb-3 text-sm text-slate-400 hover:text-slate-200";
+            });
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`nav-${tab}`).className = "pb-3 text-sm tab-active";
+        }
+
+        async function logWork(e) {
+            e.preventDefault();
+            const T = parseFloat(document.getElementById('work-time').value);
+            const R = parseFloat(document.getElementById('work-results').value);
+            const E = parseFloat(document.getElementById('work-effort').value);
+            const pts = T * ((R + E) / 2);
+
+            await db.collection('logs').add({
+                type: 'work',
+                user: currentUser,
+                hours: T,
+                results: R,
+                effort: E,
+                points: pts,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            document.getElementById('work-form').reset();
+            loadUserData();
+        }
+
+        async function logHealth(e) {
+            e.preventDefault();
+            const level = parseInt(document.getElementById('health-level').value);
+            const note = document.getElementById('health-note').value;
+
+            await db.collection('logs').add({
+                type: 'health',
+                user: currentUser,
+                level: level,
+                note: note,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            alert('Health entry saved!');
+            loadUserData();
+        }
+
+        async function logChore(e) {
+            e.preventDefault();
+            const hours = parseFloat(document.getElementById('chore-time').value);
+            const note = document.getElementById('chore-note').value;
+
+            await db.collection('logs').add({
+                type: 'chore',
+                user: currentUser,
+                hours: hours,
+                note: note,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            alert('Chore time saved!');
+            loadUserData();
+        }
+
+        function loadUserData() {
+            db.collection('logs')
+              .where('user', '==', currentUser)
+              .where('type', '==', 'work')
+              .onSnapshot(snapshot => {
+                  let totalPts = 0;
+                  snapshot.forEach(doc => {
+                      totalPts += doc.data().points || 0;
+                  });
+
+                  document.getElementById('weekly-points').innerText = `${totalPts.toFixed(2)} pts`;
+                  
+                  // Financial Calculations (Base Rate ฿250/pt)
+                  const payout = totalPts * 250;
+                  document.getElementById('weekly-payout').innerText = `฿${Math.round(payout).toLocaleString()}`;
+                  
+                  // Cap Bar (20 pts soft cap)
+                  const capPercent = Math.min((totalPts / 20) * 100, 100);
+                  document.getElementById('cap-bar').style.width = `${capPercent}%`;
+                  document.getElementById('cap-percent').innerText = `${Math.round(capPercent)}%`;
+              });
+
+            // Load live feed
+            db.collection('logs')
+              .orderBy('timestamp', 'desc')
+              .limit(10)
+              .onSnapshot(snapshot => {
+                  const logContainer = document.getElementById('log-list');
+                  logContainer.innerHTML = '';
+                  snapshot.forEach(doc => {
+                      const d = doc.data();
+                      const item = document.createElement('div');
+                      item.className = "p-2.5 bg-slate-800 rounded border border-slate-700 flex justify-between";
+                      item.innerHTML = `<span><strong>${d.user}</strong> [${d.type.toUpperCase()}]: ${d.points ? d.points.toFixed(2) + ' pts' : (d.note || d.hours + ' hrs')}</span>`;
+                      logContainer.appendChild(item);
+                  });
+              });
+        }
+
+        // Initial Load
+        loadUserData();
+    </script>
+</body>
+</html>
