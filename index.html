@@ -51,7 +51,7 @@
     <!-- MAIN APP CONTENT -->
     <div id="app-content" class="hidden">
         <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-8 pb-4 border-b border-slate-700 gap-4">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-6 pb-4 border-b border-slate-700 gap-4">
             <div>
                 <h1 class="text-3xl font-bold tracking-tight text-amber-400">AUREUM</h1>
                 <p class="text-sm text-slate-400">Personal Work & Living Engine</p>
@@ -66,6 +66,12 @@
             </div>
         </header>
 
+        <!-- Dynamic Vibe & Encouragement Banner -->
+        <div id="motivation-banner" class="mb-6 p-3 rounded-lg bg-slate-800/80 border border-slate-700/60 text-xs text-amber-300/90 italic flex items-center justify-between">
+            <span id="motivation-text">"Ready when you are. Step into focus."</span>
+            <span id="streak-counter" class="not-italic text-slate-400 font-medium">⚡ Monthly Focus Active</span>
+        </div>
+
         <!-- Navigation Tabs -->
         <nav class="flex border-b border-slate-700 mb-6 gap-8">
             <button onclick="switchTab('work')" id="nav-work" class="pb-3 text-sm tab-active">Work Engine</button>
@@ -76,7 +82,7 @@
 
         <!-- Read-Only Banner -->
         <div id="read-only-banner" class="hidden card p-3 mb-6 rounded-xl text-center text-slate-400 text-sm">
-            🔒 You are currently viewing <strong><span id="view-target-name"></span>'s</strong> engine in View-Only mode.
+            🔒 Viewing <strong><span id="view-target-name"></span>'s</strong> dashboard in View-Only mode. Settings and forms are restricted.
         </div>
 
         <!-- TAB 1: WORK ENGINE -->
@@ -87,7 +93,7 @@
                     <div class="text-3xl font-extrabold text-blue-400 mt-1" id="monthly-points">0.00 pts</div>
                     <div class="text-xs text-slate-500 mt-1">Goal: <span id="label-monthly-goal-pts">120</span> pts (<span id="label-weekly-hrs">10</span> hrs/wk)</div>
                 </div>
-                <div>
+                <div id="payout-card-box" class="transition-all duration-300">
                     <span class="text-xs uppercase tracking-wider text-slate-400">Spendable Allowance Earned</span>
                     <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="monthly-payout">฿0</div>
                     <div class="text-xs text-slate-500 mt-1">Target Base: ฿<span id="label-monthly-cash">10,000</span></div>
@@ -143,7 +149,6 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div class="flex items-center gap-3">
                         <h3 class="text-md font-semibold text-slate-200">Work Analytics</h3>
-                        <!-- Points vs Cash Toggle -->
                         <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 text-xs">
                             <button onclick="toggleWorkChartMetric('pts')" id="btn-metric-pts" class="px-2.5 py-1 rounded bg-amber-500 text-slate-950 font-bold">Points</button>
                             <button onclick="toggleWorkChartMetric('cash')" id="btn-metric-cash" class="px-2.5 py-1 rounded text-slate-400 hover:text-white">Cash (฿)</button>
@@ -309,7 +314,7 @@
         
         let charts = {};
         let chartTimeframes = { work: 'daily', health: 'daily', chore: 'daily' };
-        let workChartMetric = 'pts'; // 'pts' or 'cash'
+        let workChartMetric = 'pts';
         
         let userSettings = {
             monthlyCash: 10000,
@@ -405,12 +410,19 @@
             viewedUser = targetUser;
             await loadSettingsFromCloud();
             updateUserSwitcherUI();
+            
+            // If user was on Forge tab while switching to someone else, jump back to Work Engine
+            if (loggedInUser !== viewedUser) {
+                switchTab('work');
+            }
+            
             loadUserData();
         }
 
         function updateUserSwitcherUI() {
             const northBtn = document.getElementById('user-btn-north');
             const creamBtn = document.getElementById('user-btn-cream');
+            const navForgeBtn = document.getElementById('nav-forge');
             
             northBtn.innerText = loggedInUser === 'North' ? "North (You)" : "North";
             creamBtn.innerText = loggedInUser === 'Cream' ? "Cream (You)" : "Cream";
@@ -423,6 +435,9 @@
             document.getElementById('health-form-card').style.display = isSelf ? 'block' : 'none';
             document.getElementById('chore-form-card').style.display = isSelf ? 'block' : 'none';
             
+            // Strictly hide Forge Tab when viewing another user
+            navForgeBtn.style.display = isSelf ? 'block' : 'none';
+
             const banner = document.getElementById('read-only-banner');
             if (!isSelf) {
                 banner.classList.remove('hidden');
@@ -434,8 +449,10 @@
 
         function switchTab(tab) {
             ['work', 'health', 'chores', 'forge'].forEach(t => {
-                document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`nav-${t}`).className = "pb-3 text-sm text-slate-400 hover:text-slate-200";
+                const el = document.getElementById(`tab-${t}`);
+                if (el) el.classList.add('hidden');
+                const nav = document.getElementById(`nav-${t}`);
+                if (nav) nav.className = "pb-3 text-sm text-slate-400 hover:text-slate-200";
             });
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             document.getElementById(`nav-${tab}`).className = "pb-3 text-sm tab-active";
@@ -501,7 +518,7 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                    x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', font: { size: 11 } } },
                     y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
                 },
                 plugins: { legend: { display: false } }
@@ -522,8 +539,6 @@
             workChartMetric = metric;
             document.getElementById('btn-metric-pts').className = metric === 'pts' ? "px-2.5 py-1 rounded bg-amber-500 text-slate-950 font-bold" : "px-2.5 py-1 rounded text-slate-400 hover:text-white";
             document.getElementById('btn-metric-cash').className = metric === 'cash' ? "px-2.5 py-1 rounded bg-emerald-500 text-slate-950 font-bold" : "px-2.5 py-1 rounded text-slate-400 hover:text-white";
-            
-            // Adjust bar color based on metric
             charts['work'].data.datasets[0].backgroundColor = metric === 'cash' ? '#10b981' : '#3b82f6';
             loadUserData();
         }
@@ -541,6 +556,19 @@
             });
         }
 
+        function updateMotivationBanner(pct) {
+            const txt = document.getElementById('motivation-text');
+            if (pct === 0) {
+                txt.innerText = `"The engine is warm. Time to lay down the first strokes."`;
+            } else if (pct < 50) {
+                txt.innerText = `"Building early momentum. Small efforts stack up fast."`;
+            } else if (pct < 100) {
+                txt.innerText = `"Over halfway there! The monthly focus target is within reach."`;
+            } else {
+                txt.innerText = `"Goal unlocked! You are now earning bonus allowance points."`;
+            }
+        }
+
         function loadUserData() {
             db.collection('logs')
               .where('user', '==', viewedUser)
@@ -548,7 +576,6 @@
                   let rawLogs = [];
                   let monthlyPoints = 0;
 
-                  // Define Current Month Bounds for auto-reset calculations
                   const now = new Date();
                   const currentYear = now.getFullYear();
                   const currentMonth = now.getMonth();
@@ -565,7 +592,6 @@
                       }
                   });
 
-                  // Monthly Math Calculations
                   const targetMonthlyPts = userSettings.weeklyHours * 4 * 3;
                   const pointRate = userSettings.monthlyCash / targetMonthlyPts;
                   const maxCash = userSettings.monthlyCash * (userSettings.maxBonusCapPct / 100);
@@ -580,7 +606,8 @@
                   document.getElementById('cap-bar').style.width = `${capPercent}%`;
                   document.getElementById('cap-percent').innerText = `${Math.round(capPercent)}%`;
 
-                  // Update All Charts
+                  updateMotivationBanner(capPercent);
+
                   ['work', 'health', 'chore'].forEach(type => {
                       updateChartData(type, rawLogs.filter(l => l.type === type), pointRate);
                   });
@@ -591,17 +618,22 @@
             const range = chartTimeframes[type];
             let labels = [];
             let values = [];
+            const now = new Date();
 
             if (range === 'daily') {
-                for (let i = 29; i >= 0; i--) {
-                    const date = new Date();
-                    date.setDate(date.getDate() - i);
-                    labels.push(`${date.getMonth() + 1}/${date.getDate()}`);
+                // Last 14 days with readable Date format (e.g. Oct 28)
+                for (let i = 13; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(now.getDate() - i);
+                    labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
                     values.push(0);
                 }
             } else if (range === 'weekly') {
-                for (let i = 11; i >= 0; i--) {
-                    labels.push(`W${12 - i}`);
+                // Last 8 weeks with start date labels (e.g. Sep 14, Sep 21)
+                for (let i = 7; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(now.getDate() - (i * 7));
+                    labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
                     values.push(0);
                 }
             } else if (range === 'monthly') {
@@ -616,7 +648,6 @@
             logs.forEach(l => {
                 let val = type === 'work' ? (l.points || 0) : (type === 'health' ? (l.level || 0) : (l.hours || 0));
                 
-                // If viewing Work Engine in Cash Mode (฿), convert points to ฿
                 if (type === 'work' && workChartMetric === 'cash') {
                     val = val * pointRate;
                 }
