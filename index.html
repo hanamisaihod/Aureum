@@ -131,7 +131,6 @@
             <div id="work-form-card" class="card p-6 rounded-xl">
                 <h2 class="text-lg font-semibold mb-3 text-slate-200">Log Work Session</h2>
                 
-                <!-- Soft Cap Over-Limit Visual Notice -->
                 <div id="work-form-softcap-notice" class="hidden mb-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
                     <span>🍵</span>
                     <span><strong>Soft Cap Active:</strong> You've reached your target hours for today! Time logged past the cap generates points at 25% yield to protect rest and prevent burnout.</span>
@@ -212,9 +211,15 @@
 
         <!-- TAB 2: POMODORO CLOCK -->
         <div id="tab-pomo" class="hidden space-y-6 max-w-xl mx-auto">
-            <div class="card p-8 rounded-xl text-center space-y-6 shadow-xl">
+            <div class="card p-8 rounded-xl text-center space-y-6 shadow-xl relative">
+                
+                <!-- Spectator Mode Banner -->
+                <div id="pomo-spectator-banner" class="hidden p-2.5 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 font-medium">
+                    👁️ Viewing <strong><span id="pomo-spectator-target"></span>'s</strong> Live Pomodoro Clock (View Only)
+                </div>
+
                 <!-- Mode Switcher -->
-                <div class="flex justify-center gap-2 bg-slate-900 p-1.5 rounded-lg border border-slate-700 text-xs w-fit mx-auto">
+                <div id="pomo-mode-box" class="flex justify-center gap-2 bg-slate-900 p-1.5 rounded-lg border border-slate-700 text-xs w-fit mx-auto">
                     <button onclick="setPomoMode('focus')" id="pomo-mode-focus" class="px-4 py-1.5 rounded-md font-medium transition-all bg-blue-600 text-white">Focus</button>
                     <button onclick="setPomoMode('short')" id="pomo-mode-short" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Short Break</button>
                     <button onclick="setPomoMode('long')" id="pomo-mode-long" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Long Break</button>
@@ -227,7 +232,7 @@
                 </div>
 
                 <!-- Clickable Main Countdown Display -->
-                <div onclick="togglePomoTimer()" class="cursor-pointer group select-none py-2 my-1 rounded-2xl transition-all hover:bg-slate-800/50">
+                <div id="pomo-clock-container" onclick="handleClockClick()" class="cursor-pointer group select-none py-2 my-1 rounded-2xl transition-all hover:bg-slate-800/50">
                     <div id="pomo-timer-display" class="text-7xl font-mono font-black text-amber-400 tracking-wider group-hover:scale-105 transition-transform">25:00</div>
                     <div id="pomo-status-label" class="text-xs text-slate-400 mt-2 uppercase tracking-widest font-semibold group-hover:text-amber-300">Click Clock to Start</div>
                 </div>
@@ -238,7 +243,7 @@
                 </div>
 
                 <!-- Controls -->
-                <div class="flex justify-center gap-4">
+                <div id="pomo-controls-box" class="flex justify-center gap-4">
                     <button id="pomo-toggle-btn" onclick="togglePomoTimer()" class="px-8 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition-all">Start Focus</button>
                     <button onclick="resetPomoTimer()" class="px-6 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium text-sm transition-all">Reset</button>
                 </div>
@@ -436,10 +441,9 @@
         let chartTimeframes = { work: 'daily', health: 'daily', chore: 'daily' };
         let workChartMetric = 'pts';
 
-        // Soft Cap Global Tracker
         let currentTodayHoursLogged = 0;
 
-        // Pomodoro State
+        // Pomodoro Core State
         let currentPomoMode = 'focus';
         let currentPomoRound = 1;
         let pomoTime = 1500;
@@ -447,6 +451,11 @@
         let pomoTimerId = null;
         let pomoIsRunning = false;
         
+        // Live Spectator & Cloud Sync Handles
+        let pomoSyncUnsubscribe = null;
+        let spectatorTimerInterval = null;
+        let isInitialRecoveryDone = false;
+
         let userSettings = {
             monthlyCash: 8000,
             weeklyHours: 10,
@@ -512,7 +521,131 @@
             document.getElementById('audio-toggle-btn').innerText = audioMuted ? "🔇" : "🔊";
         }
 
+        // --- CLOUD SYNC & LIVE POMODORO LISTENERS ---
+        async function syncPomoToCloud() {
+            if (loggedInUser !== viewedUser) return;
+            const targetEndTimeMillis = pomoIsRunning ? Date.now() + (pomoTime * 1000) : null;
+            
+            try {
+                await db.collection('pomoState').doc(loggedInUser).set({
+                    user: loggedInUser,
+                    mode: currentPomoMode,
+                    round: currentPomoRound,
+                    isRunning: pomoIsRunning,
+                    pomoTime: pomoTime,
+                    pomoInitialTime: pomoInitialTime,
+                    targetEndTimeMillis: targetEndTimeMillis,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            } catch (err) {
+                console.error("Failed syncing pomodoro state:", err);
+            }
+        }
+
+        function listenToPomoCloudState() {
+            if (pomoSyncUnsubscribe) pomoSyncUnsubscribe();
+            if (spectatorTimerInterval) clearInterval(spectatorTimerInterval);
+
+            pomoSyncUnsubscribe = db.collection('pomoState').doc(viewedUser).onSnapshot(doc => {
+                const isSelf = loggedInUser === viewedUser;
+                const data = doc.exists ? doc.data() : null;
+
+                // Toggle Spectator UI Mode
+                const spectatorBanner = document.getElementById('pomo-spectator-banner');
+                const controlsBox = document.getElementById('pomo-controls-box');
+                const modeBox = document.getElementById('pomo-mode-box');
+                const clockContainer = document.getElementById('pomo-clock-container');
+
+                if (!isSelf) {
+                    spectatorBanner.classList.remove('hidden');
+                    document.getElementById('pomo-spectator-target').innerText = viewedUser;
+                    controlsBox.classList.add('hidden');
+                    modeBox.style.pointerEvents = 'none';
+                    modeBox.style.opacity = '0.6';
+                    clockContainer.classList.remove('cursor-pointer', 'hover:bg-slate-800/50');
+                    clockContainer.classList.add('cursor-default');
+
+                    if (spectatorTimerInterval) clearInterval(spectatorTimerInterval);
+
+                    if (data) {
+                        const updateSpectatorView = () => {
+                            let displaySecs = data.pomoTime || 0;
+                            if (data.isRunning && data.targetEndTimeMillis) {
+                                displaySecs = Math.max(0, Math.ceil((data.targetEndTimeMillis - Date.now()) / 1000));
+                            }
+
+                            // Render Spectator Values
+                            const initialTime = data.pomoInitialTime || 1500;
+                            const mins = Math.floor(displaySecs / 60);
+                            const secs = displaySecs % 60;
+                            document.getElementById('pomo-timer-display').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                            document.getElementById('pomo-progress-bar').style.width = `${(displaySecs / initialTime) * 100}%`;
+                            
+                            const modeLabel = (data.mode || 'focus').toUpperCase();
+                            document.getElementById('pomo-status-label').innerText = data.isRunning ? `LIVE: ${modeLabel} SESSION ACTIVE` : `PAUSED (${modeLabel})`;
+                            
+                            // Highlight mode button
+                            ['focus', 'short', 'long'].forEach(m => {
+                                document.getElementById(`pomo-mode-${m}`).className = m === (data.mode || 'focus') ? "px-4 py-1.5 rounded-md font-medium transition-all bg-blue-600 text-white" : "px-4 py-1.5 rounded-md font-medium text-slate-400 transition-all";
+                            });
+
+                            // Render rounds
+                            const totalRounds = userSettings.pomoRounds || 4;
+                            document.getElementById('pomo-round-badge').innerText = `Round ${data.round || 1} of ${totalRounds}`;
+                            const dotsContainer = document.getElementById('pomo-round-dots');
+                            dotsContainer.innerHTML = '';
+                            for (let i = 1; i <= totalRounds; i++) {
+                                const dot = document.createElement('div');
+                                dot.className = i <= (data.round || 1) ? "w-2.5 h-2.5 rounded-full bg-amber-400" : "w-2.5 h-2.5 rounded-full bg-slate-700";
+                                dotsContainer.appendChild(dot);
+                            }
+                        };
+
+                        updateSpectatorView();
+                        spectatorTimerInterval = setInterval(updateSpectatorView, 1000);
+                    } else {
+                        document.getElementById('pomo-timer-display').innerText = "25:00";
+                        document.getElementById('pomo-status-label').innerText = "NO ACTIVE SESSION";
+                    }
+                } else {
+                    // Owner Mode - Restore full controls
+                    spectatorBanner.classList.add('hidden');
+                    controlsBox.classList.remove('hidden');
+                    modeBox.style.pointerEvents = 'auto';
+                    modeBox.style.opacity = '1';
+                    clockContainer.classList.add('cursor-pointer', 'hover:bg-slate-800/50');
+                    clockContainer.classList.remove('cursor-default');
+
+                    // Instant recovery upon page load/reopen
+                    if (!isInitialRecoveryDone && data) {
+                        isInitialRecoveryDone = true;
+                        currentPomoMode = data.mode || 'focus';
+                        currentPomoRound = data.round || 1;
+                        pomoInitialTime = data.pomoInitialTime || 1500;
+
+                        if (data.isRunning && data.targetEndTimeMillis && data.targetEndTimeMillis > Date.now()) {
+                            pomoTime = Math.ceil((data.targetEndTimeMillis - Date.now()) / 1000);
+                            togglePomoTimer(true); // Resume timer
+                        } else {
+                            pomoTime = data.pomoTime || pomoInitialTime;
+                            pomoIsRunning = false;
+                            updatePomoDisplay();
+                            updatePomoRoundUI();
+                        }
+                    }
+                }
+            });
+        }
+
+        function handleClockClick() {
+            if (loggedInUser === viewedUser) {
+                togglePomoTimer();
+            }
+        }
+
+        // Pomodoro Core Local Controls
         function setPomoMode(mode) {
+            if (loggedInUser !== viewedUser) return;
             currentPomoMode = mode;
             clearInterval(pomoTimerId);
             pomoIsRunning = false;
@@ -529,6 +662,7 @@
             pomoTime = pomoInitialTime;
             updatePomoDisplay();
             updatePomoRoundUI();
+            syncPomoToCloud();
         }
 
         function updatePomoRoundUI() {
@@ -544,19 +678,24 @@
             }
         }
 
-        function togglePomoTimer() {
+        function togglePomoTimer(isRecovery = false) {
+            if (loggedInUser !== viewedUser) return;
             requestNotificationPermission();
             
-            if (pomoIsRunning) {
+            if (pomoIsRunning && !isRecovery) {
                 clearInterval(pomoTimerId);
                 pomoIsRunning = false;
                 document.getElementById('pomo-toggle-btn').innerText = "Resume";
                 document.getElementById('pomo-status-label').innerText = "Paused";
+                syncPomoToCloud();
             } else {
                 pomoIsRunning = true;
                 document.getElementById('pomo-toggle-btn').innerText = "Pause";
                 document.getElementById('pomo-status-label').innerText = currentPomoMode === 'focus' ? "Focus Session Active" : "Resting...";
                 
+                if (!isRecovery) syncPomoToCloud();
+
+                clearInterval(pomoTimerId);
                 pomoTimerId = setInterval(() => {
                     pomoTime--;
                     updatePomoDisplay();
@@ -573,17 +712,14 @@
                                 triggerDesktopNotification("✨ Focus Round Complete!", `Round ${currentPomoRound} finished. Take a short break!`);
                                 currentPomoRound++;
                                 setPomoMode('short');
-                                document.getElementById('pomo-status-label').innerText = "Short Break Ready";
                             } else {
                                 triggerDesktopNotification("🎉 All Rounds Complete!", `You crushed all ${totalRounds} focus rounds! Take a long break.`);
                                 currentPomoRound = 1;
                                 setPomoMode('long');
-                                document.getElementById('pomo-status-label').innerText = "Long Break Unlocked!";
                             }
                         } else {
                             triggerDesktopNotification("🔔 Break Complete!", "Ready to begin your next focus round?");
                             setPomoMode('focus');
-                            document.getElementById('pomo-status-label').innerText = `Round ${currentPomoRound} Ready`;
                         }
                     }
                 }, 1000);
@@ -591,11 +727,13 @@
         }
 
         function resetPomoTimer() {
+            if (loggedInUser !== viewedUser) return;
             clearInterval(pomoTimerId);
             pomoIsRunning = false;
             currentPomoRound = 1;
             setPomoMode('focus');
             document.getElementById('pomo-status-label').innerText = "Click Clock to Start";
+            syncPomoToCloud();
         }
 
         function updatePomoDisplay() {
@@ -723,6 +861,7 @@
             viewedUser = targetUser;
             await loadSettingsFromCloud();
             updateUserSwitcherUI();
+            listenToPomoCloudState();
             
             if (loggedInUser !== viewedUser) {
                 switchTab('work');
@@ -767,6 +906,10 @@
             });
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             document.getElementById(`nav-${tab}`).className = "pb-3 text-sm tab-active whitespace-nowrap";
+            
+            if (tab === 'pomo') {
+                listenToPomoCloudState();
+            }
         }
 
         async function logWork(e) {
@@ -778,12 +921,10 @@
             const softCap = userSettings.dailySoftCap || 4;
             const baseRate = (R + E) / 2;
 
-            // Soft Cap Split Calculation
             const remainingNormalHours = Math.max(0, softCap - currentTodayHoursLogged);
             const normalHours = Math.min(T, remainingNormalHours);
             const overCapHours = T - normalHours;
 
-            // Full yield for normal hours + 25% yield for hours past soft cap
             const pts = (normalHours * baseRate) + (overCapHours * baseRate * 0.25);
 
             await db.collection('logs').add({
@@ -937,7 +1078,6 @@
                   const finalPayout = Math.min(calculatedPayout, maxCash);
                   document.getElementById('monthly-payout').innerText = `฿${Math.round(finalPayout).toLocaleString()}`;
                   
-                  // Daily Soft Cap Visual Updates
                   document.getElementById('today-hours-label').innerText = `${todayHours.toFixed(1)} / ${dailySoftCap} hrs`;
                   const dailyPct = Math.min((todayHours / dailySoftCap) * 100, 100);
                   document.getElementById('daily-bar').style.width = `${dailyPct}%`;
