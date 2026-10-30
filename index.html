@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aureum — Work Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -32,7 +33,7 @@
     <div id="login-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center z-50">
         <div class="card p-8 rounded-xl max-w-md w-full shadow-2xl">
             <h1 class="text-2xl font-bold text-amber-400 mb-1">AUREUM</h1>
-            <p class="text-xs text-slate-400 mb-6">Sign in to open your shared work space.</p>
+            <p class="text-xs text-slate-400 mb-6">Sign in to open your shared space.</p>
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Email</label>
@@ -54,11 +55,10 @@
         <header class="flex flex-col md:flex-row justify-between items-center mb-8 pb-4 border-b border-slate-700 gap-4">
             <div>
                 <h1 class="text-3xl font-bold tracking-tight text-amber-400">AUREUM</h1>
-                <p class="text-sm text-slate-400">Creative Work & Cash Allowance Tracker</p>
+                <p class="text-sm text-slate-400">Personal Work & Living Engine</p>
             </div>
             
             <div class="flex items-center gap-4">
-                <!-- Dynamic User Switcher -->
                 <div class="flex items-center gap-3 bg-slate-800 p-1.5 rounded-lg border border-slate-700">
                     <button id="user-btn-north" onclick="switchActiveUser('North')" class="px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white">North</button>
                     <button id="user-btn-cream" onclick="switchActiveUser('Cream')" class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all">Cream</button>
@@ -69,24 +69,29 @@
 
         <!-- Navigation Tabs -->
         <nav class="flex border-b border-slate-700 mb-6 gap-8">
-            <button onclick="switchTab('work')" id="nav-work" class="pb-3 text-sm tab-active">Work Engine (฿ Earnings)</button>
+            <button onclick="switchTab('work')" id="nav-work" class="pb-3 text-sm tab-active">Work Engine</button>
             <button onclick="switchTab('health')" id="nav-health" class="pb-3 text-sm text-slate-400 hover:text-slate-200">Sweet & Snack Log</button>
             <button onclick="switchTab('chores')" id="nav-chores" class="pb-3 text-sm text-slate-400 hover:text-slate-200">House Chores</button>
-            <button onclick="switchTab('analytics')" id="nav-analytics" class="pb-3 text-sm text-slate-400 hover:text-slate-200">History & Logs</button>
+            <button onclick="switchTab('settings')" id="nav-settings" class="pb-3 text-sm text-slate-400 hover:text-slate-200">Settings & Goals</button>
         </nav>
+
+        <!-- Read-Only Banner -->
+        <div id="read-only-banner" class="hidden card p-3 mb-6 rounded-xl text-center text-slate-400 text-sm">
+            🔒 You are currently viewing <strong><span id="view-target-name"></span>'s</strong> engine in View-Only mode.
+        </div>
 
         <!-- TAB 1: WORK ENGINE -->
         <div id="tab-work" class="space-y-6">
             <div class="card p-6 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
                 <div>
-                    <span class="text-xs uppercase tracking-wider text-slate-400" id="weekly-points-label">Points This Week</span>
+                    <span class="text-xs uppercase tracking-wider text-slate-400">Points This Week</span>
                     <div class="text-3xl font-extrabold text-blue-400 mt-1" id="weekly-points">0.00 pts</div>
-                    <div class="text-xs text-slate-500 mt-1">Goal: 20 pts | Max Bonus: 30 pts</div>
+                    <div class="text-xs text-slate-500 mt-1">Goal: <span id="label-soft-cap">20</span> pts | Max Bonus: <span id="label-hard-cap">30</span> pts</div>
                 </div>
                 <div>
                     <span class="text-xs uppercase tracking-wider text-slate-400">Spendable Cash Earned</span>
                     <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="weekly-payout">฿0</div>
-                    <div class="text-xs text-slate-500 mt-1">Rate: ฿250 per point</div>
+                    <div class="text-xs text-slate-500 mt-1">Rate: ฿<span id="label-point-rate">250</span> / point</div>
                 </div>
                 <div>
                     <span class="text-xs uppercase tracking-wider text-slate-400">Goal Progress</span>
@@ -97,15 +102,15 @@
                 </div>
             </div>
 
-            <!-- Work Form (Hidden in View-Only Mode) -->
+            <!-- Work Log Form -->
             <div id="work-form-card" class="card p-6 rounded-xl">
-                <h2 class="text-lg font-semibold mb-4 text-slate-200">Log Creative Work Session</h2>
+                <h2 class="text-lg font-semibold mb-4 text-slate-200">Log Work Session</h2>
                 <form id="work-form" onsubmit="logWork(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
                             Hours Spent
                             <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">Total clock hours spent working on art or writing. Decimals allowed (e.g. 1.5 = 1 hr 30 mins).</span>
+                                <span class="tooltip-text">Total clock time on focus sessions (art, code, writing, research).</span>
                             </span>
                         </label>
                         <input type="number" id="work-time" step="0.25" min="0.25" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
@@ -114,16 +119,16 @@
                         <label class="block text-xs text-slate-400 mb-1">
                             Output Quality (1–5)
                             <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">1 = Low output / Warmup<br>3 = Steady, average output<br>5 = Major breakthrough / High volume</span>
+                                <span class="tooltip-text">1 = Low output / Warmup<br>3 = Steady output<br>5 = Major breakthrough / High yield</span>
                             </span>
                         </label>
                         <input type="number" id="work-results" min="1" max="5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
-                            How Hard It Was (1–5)
+                            Effort & Friction (1–5)
                             <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">1 = Smooth, easy focus<br>3 = Moderate effort / Resistance<br>5 = Exhausting, heavy mental friction</span>
+                                <span class="tooltip-text">1 = Smooth, natural flow<br>3 = Moderate effort required<br>5 = High mental resistance / Tough grinding</span>
                             </span>
                         </label>
                         <input type="number" id="work-effort" min="1" max="5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
@@ -133,9 +138,21 @@
                     </div>
                 </form>
             </div>
-            
-            <div id="read-only-banner" class="hidden card p-4 rounded-xl text-center text-slate-400 text-sm">
-                🔒 You are currently viewing <strong><span id="view-target-name"></span>'s</strong> dashboard in View-Only mode.
+
+            <!-- Embedded Work Analytics Chart -->
+            <div class="card p-6 rounded-xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                    <h3 class="text-md font-semibold text-slate-200">Work Points History</h3>
+                    <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 text-xs">
+                        <button onclick="setChartRange('work', 'daily')" id="btn-work-daily" class="px-3 py-1 rounded text-slate-400">Daily</button>
+                        <button onclick="setChartRange('work', 'weekly')" id="btn-work-weekly" class="px-3 py-1 rounded text-slate-400">Weekly</button>
+                        <button onclick="setChartRange('work', 'monthly')" id="btn-work-monthly" class="px-3 py-1 rounded text-slate-400">Monthly</button>
+                        <button onclick="setChartRange('work', 'yearly')" id="btn-work-yearly" class="px-3 py-1 rounded text-slate-400">Yearly</button>
+                    </div>
+                </div>
+                <div class="h-64 w-full">
+                    <canvas id="workChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -143,13 +160,13 @@
         <div id="tab-health" class="hidden space-y-6">
             <div id="health-form-card" class="card p-6 rounded-xl">
                 <h2 class="text-lg font-semibold mb-2 text-slate-200">Log Sweet / Dessert Intake</h2>
-                <p class="text-xs text-slate-400 mb-4">Just for tracking habits—does not affect work points or cash.</p>
+                <p class="text-xs text-slate-400 mb-4">Observation log for health trends—does not impact cash or work points.</p>
                 <form onsubmit="logHealth(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
                             Snack / Dessert Size
                             <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">Level 1: Small bite / Light snack<br>Level 2: Standard dessert or sweet drink<br>Level 3: Heavy dessert / Large indulgence</span>
+                                <span class="tooltip-text">Level 1: Small bite / Light snack<br>Level 2: Standard dessert or drink<br>Level 3: Heavy dessert / Large treat</span>
                             </span>
                         </label>
                         <select id="health-level" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
@@ -166,6 +183,22 @@
                         <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Save Entry</button>
                     </div>
                 </form>
+            </div>
+
+            <!-- Embedded Health Chart -->
+            <div class="card p-6 rounded-xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                    <h3 class="text-md font-semibold text-slate-200">Sweet & Snack Trends</h3>
+                    <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 text-xs">
+                        <button onclick="setChartRange('health', 'daily')" id="btn-health-daily" class="px-3 py-1 rounded text-slate-400">Daily</button>
+                        <button onclick="setChartRange('health', 'weekly')" id="btn-health-weekly" class="px-3 py-1 rounded text-slate-400">Weekly</button>
+                        <button onclick="setChartRange('health', 'monthly')" id="btn-health-monthly" class="px-3 py-1 rounded text-slate-400">Monthly</button>
+                        <button onclick="setChartRange('health', 'yearly')" id="btn-health-yearly" class="px-3 py-1 rounded text-slate-400">Yearly</button>
+                    </div>
+                </div>
+                <div class="h-64 w-full">
+                    <canvas id="healthChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -193,13 +226,59 @@
                     </div>
                 </form>
             </div>
+
+            <!-- Embedded Chore Chart -->
+            <div class="card p-6 rounded-xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                    <h3 class="text-md font-semibold text-slate-200">House Chore Hours</h3>
+                    <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 text-xs">
+                        <button onclick="setChartRange('chore', 'daily')" id="btn-chore-daily" class="px-3 py-1 rounded text-slate-400">Daily</button>
+                        <button onclick="setChartRange('chore', 'weekly')" id="btn-chore-weekly" class="px-3 py-1 rounded text-slate-400">Weekly</button>
+                        <button onclick="setChartRange('chore', 'monthly')" id="btn-chore-monthly" class="px-3 py-1 rounded text-slate-400">Monthly</button>
+                        <button onclick="setChartRange('chore', 'yearly')" id="btn-chore-yearly" class="px-3 py-1 rounded text-slate-400">Yearly</button>
+                    </div>
+                </div>
+                <div class="h-64 w-full">
+                    <canvas id="choreChart"></canvas>
+                </div>
+            </div>
         </div>
 
-        <!-- TAB 4: HISTORY & LOGS -->
-        <div id="tab-analytics" class="hidden space-y-6">
-            <div class="card p-6 rounded-xl">
-                <h2 class="text-lg font-semibold mb-4 text-slate-200">Recent Activity</h2>
-                <div id="log-list" class="space-y-2 text-sm text-slate-300">Loading saved entries...</div>
+        <!-- TAB 4: SETTINGS & GOALS -->
+        <div id="tab-settings" class="hidden space-y-6">
+            <div class="card p-6 rounded-xl max-w-2xl">
+                <h2 class="text-lg font-semibold mb-2 text-slate-200">Engine Configuration</h2>
+                <p class="text-xs text-slate-400 mb-6">Customize your personal target caps and point monetary conversion rates.</p>
+                <form onsubmit="saveSettings(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">
+                            Base Rate (฿ per Point)
+                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                                <span class="tooltip-text">How much cash is unlocked per 1 work point earned.</span>
+                            </span>
+                        </label>
+                        <input type="number" id="setting-rate" min="1" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">
+                            Weekly Goal / Soft Cap (Points)
+                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                                <span class="tooltip-text">Target weekly points required to unlock 100% of base allowance.</span>
+                            </span>
+                        </label>
+                        <input type="number" id="setting-soft" min="1" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">
+                            Max Bonus Cap / Hard Cap (Points)
+                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                                <span class="tooltip-text">Maximum points cap that can earn financial allowance in a week.</span>
+                            </span>
+                        </label>
+                        <input type="number" id="setting-hard" min="1" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                    </div>
+                    <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg text-sm transition-all">Save Settings</button>
+                </form>
             </div>
         </div>
     </div>
@@ -218,29 +297,69 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        let loggedInUser = 'North'; // Default fallback
+        let loggedInUser = 'North';
         let viewedUser = 'North';
+        
+        let charts = {};
+        let chartTimeframes = { work: 'daily', health: 'daily', chore: 'daily' };
+        
+        // Default User Settings
+        let userSettings = {
+            rate: 250,
+            softCap: 20,
+            hardCap: 30
+        };
 
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('login-modal').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('hidden');
                 
-                // Identify account by UID / Email
-                if (user.uid === "ioxjbBLDH0NDLDWVoYCjq8p3PYU2" || (user.email && user.email.includes("north"))) {
+                // Account Identification Swap (North vs Cream)
+                if (user.uid === "ioxjbBLDH0NDLDWVoYCjq8p3PYU2" || (user.email && user.email.toLowerCase().includes("north"))) {
                     loggedInUser = 'North';
                 } else {
                     loggedInUser = 'Cream';
                 }
                 
                 viewedUser = loggedInUser;
+                loadSettings();
                 updateUserSwitcherUI();
+                initCharts();
                 loadUserData();
             } else {
                 document.getElementById('login-modal').classList.remove('hidden');
                 document.getElementById('app-content').classList.add('hidden');
             }
         });
+
+        function loadSettings() {
+            const saved = localStorage.getItem(`aureum_settings_${viewedUser}`);
+            if (saved) {
+                userSettings = JSON.parse(saved);
+            } else {
+                userSettings = { rate: 250, softCap: 20, hardCap: 30 };
+            }
+            document.getElementById('label-soft-cap').innerText = userSettings.softCap;
+            document.getElementById('label-hard-cap').innerText = userSettings.hardCap;
+            document.getElementById('label-point-rate').innerText = userSettings.rate;
+            
+            document.getElementById('setting-rate').value = userSettings.rate;
+            document.getElementById('setting-soft').value = userSettings.softCap;
+            document.getElementById('setting-hard').value = userSettings.hardCap;
+        }
+
+        function saveSettings(e) {
+            e.preventDefault();
+            userSettings.rate = parseFloat(document.getElementById('setting-rate').value);
+            userSettings.softCap = parseFloat(document.getElementById('setting-soft').value);
+            userSettings.hardCap = parseFloat(document.getElementById('setting-hard').value);
+            
+            localStorage.setItem(`aureum_settings_${loggedInUser}`, JSON.stringify(userSettings));
+            alert('Settings saved!');
+            loadSettings();
+            loadUserData();
+        }
 
         async function handleLogin(e) {
             e.preventDefault();
@@ -263,6 +382,7 @@
 
         function switchActiveUser(targetUser) {
             viewedUser = targetUser;
+            loadSettings();
             updateUserSwitcherUI();
             loadUserData();
         }
@@ -271,14 +391,12 @@
             const northBtn = document.getElementById('user-btn-north');
             const creamBtn = document.getElementById('user-btn-cream');
             
-            // Labels reflect who is logged in vs who is being viewed
             northBtn.innerText = loggedInUser === 'North' ? "North (You)" : "North";
             creamBtn.innerText = loggedInUser === 'Cream' ? "Cream (You)" : "Cream";
 
             northBtn.className = viewedUser === 'North' ? "px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white" : "px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all";
             creamBtn.className = viewedUser === 'Cream' ? "px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white" : "px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all";
 
-            // Hide/Show logging forms based on whether you are viewing your own profile
             const isSelf = loggedInUser === viewedUser;
             document.getElementById('work-form-card').style.display = isSelf ? 'block' : 'none';
             document.getElementById('health-form-card').style.display = isSelf ? 'block' : 'none';
@@ -294,7 +412,7 @@
         }
 
         function switchTab(tab) {
-            ['work', 'health', 'chores', 'analytics'].forEach(t => {
+            ['work', 'health', 'chores', 'settings'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
                 document.getElementById(`nav-${t}`).className = "pb-3 text-sm text-slate-400 hover:text-slate-200";
             });
@@ -357,40 +475,106 @@
             loadUserData();
         }
 
+        function initCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                    y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+                },
+                plugins: { legend: { display: false } }
+            };
+
+            ['work', 'health', 'chore'].forEach(type => {
+                const ctx = document.getElementById(`${type}Chart`).getContext('2d');
+                charts[type] = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels: [], datasets: [{ data: [], backgroundColor: type === 'work' ? '#3b82f6' : (type === 'health' ? '#10b981' : '#f59e0b'), borderRadius: 4 }] },
+                    options: chartOptions
+                });
+                updateChartTimeframeUI(type, 'daily');
+            });
+        }
+
+        function setChartRange(type, range) {
+            chartTimeframes[type] = range;
+            updateChartTimeframeUI(type, range);
+            loadUserData();
+        }
+
+        function updateChartTimeframeUI(type, range) {
+            ['daily', 'weekly', 'monthly', 'yearly'].forEach(r => {
+                const btn = document.getElementById(`btn-${type}-${r}`);
+                btn.className = r === range ? "px-3 py-1 rounded bg-blue-600 text-white font-medium" : "px-3 py-1 rounded text-slate-400 hover:text-white";
+            });
+        }
+
         function loadUserData() {
             db.collection('logs')
               .where('user', '==', viewedUser)
-              .where('type', '==', 'work')
               .onSnapshot(snapshot => {
                   let totalPts = 0;
-                  snapshot.forEach(doc => {
-                      totalPts += doc.data().points || 0;
-                  });
+                  let rawLogs = [];
 
-                  document.getElementById('weekly-points').innerText = `${totalPts.toFixed(2)} pts`;
-                  
-                  const payout = totalPts * 250;
-                  document.getElementById('weekly-payout').innerText = `฿${Math.round(payout).toLocaleString()}`;
-                  
-                  const capPercent = Math.min((totalPts / 20) * 100, 100);
-                  document.getElementById('cap-bar').style.width = `${capPercent}%`;
-                  document.getElementById('cap-percent').innerText = `${Math.round(capPercent)}%`;
-              });
-
-            db.collection('logs')
-              .orderBy('timestamp', 'desc')
-              .limit(10)
-              .onSnapshot(snapshot => {
-                  const logContainer = document.getElementById('log-list');
-                  logContainer.innerHTML = '';
                   snapshot.forEach(doc => {
                       const d = doc.data();
-                      const item = document.createElement('div');
-                      item.className = "p-2.5 bg-slate-800 rounded border border-slate-700 flex justify-between";
-                      item.innerHTML = `<span><strong>${d.user}</strong> [${d.type.toUpperCase()}]: ${d.points ? d.points.toFixed(2) + ' pts' : (d.note || d.hours + ' hrs')}</span>`;
-                      logContainer.appendChild(item);
+                      rawLogs.push(d);
+                      if (d.type === 'work') totalPts += (d.points || 0);
+                  });
+
+                  // Weekly Card Summary
+                  document.getElementById('weekly-points').innerText = `${totalPts.toFixed(2)} pts`;
+                  const cappedPts = Math.min(totalPts, userSettings.hardCap);
+                  const payout = cappedPts * userSettings.rate;
+                  document.getElementById('weekly-payout').innerText = `฿${Math.round(payout).toLocaleString()}`;
+                  
+                  const capPercent = Math.min((totalPts / userSettings.softCap) * 100, 100);
+                  document.getElementById('cap-bar').style.width = `${capPercent}%`;
+                  document.getElementById('cap-percent').innerText = `${Math.round(capPercent)}%`;
+
+                  // Update All Charts
+                  ['work', 'health', 'chore'].forEach(type => {
+                      updateChartData(type, rawLogs.filter(l => l.type === type));
                   });
               });
+        }
+
+        function updateChartData(type, logs) {
+            const range = chartTimeframes[type];
+            let labels = [];
+            let values = [];
+
+            if (range === 'daily') {
+                for (let i = 29; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    labels.push(`${date.getMonth() + 1}/${date.getDate()}`);
+                    values.push(0);
+                }
+            } else if (range === 'weekly') {
+                for (let i = 11; i >= 0; i--) {
+                    labels.push(`W${12 - i}`);
+                    values.push(0);
+                }
+            } else if (range === 'monthly') {
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                labels = months;
+                values = new Array(12).fill(0);
+            } else {
+                labels = ['2025', '2026', '2027'];
+                values = [0, 0, 0];
+            }
+
+            // Populate sample aggregations
+            logs.forEach(l => {
+                const val = type === 'work' ? (l.points || 0) : (type === 'health' ? (l.level || 0) : (l.hours || 0));
+                values[values.length - 1] += val; // Aggregate into recent bucket
+            });
+
+            charts[type].data.labels = labels;
+            charts[type].data.datasets[0].data = values;
+            charts[type].update();
         }
     </script>
 </body>
