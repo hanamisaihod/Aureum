@@ -141,7 +141,14 @@
             <!-- Embedded Work Analytics Chart -->
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                    <h3 class="text-md font-semibold text-slate-200">Work Points History</h3>
+                    <div class="flex items-center gap-3">
+                        <h3 class="text-md font-semibold text-slate-200">Work Analytics</h3>
+                        <!-- Points vs Cash Toggle -->
+                        <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 text-xs">
+                            <button onclick="toggleWorkChartMetric('pts')" id="btn-metric-pts" class="px-2.5 py-1 rounded bg-amber-500 text-slate-950 font-bold">Points</button>
+                            <button onclick="toggleWorkChartMetric('cash')" id="btn-metric-cash" class="px-2.5 py-1 rounded text-slate-400 hover:text-white">Cash (฿)</button>
+                        </div>
+                    </div>
                     <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 text-xs">
                         <button onclick="setChartRange('work', 'daily')" id="btn-work-daily" class="px-3 py-1 rounded text-slate-400">Daily</button>
                         <button onclick="setChartRange('work', 'weekly')" id="btn-work-weekly" class="px-3 py-1 rounded text-slate-400">Weekly</button>
@@ -243,7 +250,7 @@
             </div>
         </div>
 
-        <!-- TAB 4: FORGE (SETTINGS & GOALS) -->
+        <!-- TAB 4: FORGE -->
         <div id="tab-forge" class="hidden space-y-6">
             <div class="card p-6 rounded-xl max-w-2xl">
                 <h2 class="text-lg font-semibold mb-2 text-slate-200">Forge Calibration</h2>
@@ -302,6 +309,7 @@
         
         let charts = {};
         let chartTimeframes = { work: 'daily', health: 'daily', chore: 'daily' };
+        let workChartMetric = 'pts'; // 'pts' or 'cash'
         
         let userSettings = {
             monthlyCash: 10000,
@@ -315,7 +323,6 @@
                 document.getElementById('login-modal').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('hidden');
                 
-                // Account Identification Logic (Cream UID check)
                 if (user.uid === "ioxjbBLDH0NDLDWVoYCjq8p3PYU2" || (user.email && user.email.toLowerCase().includes("cream"))) {
                     loggedInUser = 'Cream';
                 } else {
@@ -345,12 +352,11 @@
             } catch (err) {
                 console.error("Error loading cloud settings:", err);
             }
-            
             updateSettingsUI();
         }
 
         function updateSettingsUI() {
-            const monthlyGoalPts = userSettings.weeklyHours * 4 * 3; // 4 weeks @ avg 3 score
+            const monthlyGoalPts = userSettings.weeklyHours * 4 * 3;
             document.getElementById('label-monthly-goal-pts').innerText = monthlyGoalPts;
             document.getElementById('label-weekly-hrs').innerText = userSettings.weeklyHours;
             document.getElementById('label-monthly-cash').innerText = userSettings.monthlyCash.toLocaleString();
@@ -512,6 +518,16 @@
             });
         }
 
+        function toggleWorkChartMetric(metric) {
+            workChartMetric = metric;
+            document.getElementById('btn-metric-pts').className = metric === 'pts' ? "px-2.5 py-1 rounded bg-amber-500 text-slate-950 font-bold" : "px-2.5 py-1 rounded text-slate-400 hover:text-white";
+            document.getElementById('btn-metric-cash').className = metric === 'cash' ? "px-2.5 py-1 rounded bg-emerald-500 text-slate-950 font-bold" : "px-2.5 py-1 rounded text-slate-400 hover:text-white";
+            
+            // Adjust bar color based on metric
+            charts['work'].data.datasets[0].backgroundColor = metric === 'cash' ? '#10b981' : '#3b82f6';
+            loadUserData();
+        }
+
         function setChartRange(type, range) {
             chartTimeframes[type] = range;
             updateChartTimeframeUI(type, range);
@@ -529,13 +545,24 @@
             db.collection('logs')
               .where('user', '==', viewedUser)
               .onSnapshot(snapshot => {
-                  let totalPts = 0;
                   let rawLogs = [];
+                  let monthlyPoints = 0;
+
+                  // Define Current Month Bounds for auto-reset calculations
+                  const now = new Date();
+                  const currentYear = now.getFullYear();
+                  const currentMonth = now.getMonth();
 
                   snapshot.forEach(doc => {
                       const d = doc.data();
                       rawLogs.push(d);
-                      if (d.type === 'work') totalPts += (d.points || 0);
+
+                      if (d.type === 'work' && d.timestamp) {
+                          const logDate = d.timestamp.toDate();
+                          if (logDate.getFullYear() === currentYear && logDate.getMonth() === currentMonth) {
+                              monthlyPoints += (d.points || 0);
+                          }
+                      }
                   });
 
                   // Monthly Math Calculations
@@ -543,24 +570,24 @@
                   const pointRate = userSettings.monthlyCash / targetMonthlyPts;
                   const maxCash = userSettings.monthlyCash * (userSettings.maxBonusCapPct / 100);
                   
-                  document.getElementById('monthly-points').innerText = `${totalPts.toFixed(2)} pts`;
+                  document.getElementById('monthly-points').innerText = `${monthlyPoints.toFixed(2)} pts`;
                   
-                  const calculatedPayout = totalPts * pointRate;
+                  const calculatedPayout = monthlyPoints * pointRate;
                   const finalPayout = Math.min(calculatedPayout, maxCash);
                   document.getElementById('monthly-payout').innerText = `฿${Math.round(finalPayout).toLocaleString()}`;
                   
-                  const capPercent = Math.min((totalPts / targetMonthlyPts) * 100, 100);
+                  const capPercent = Math.min((monthlyPoints / targetMonthlyPts) * 100, 100);
                   document.getElementById('cap-bar').style.width = `${capPercent}%`;
                   document.getElementById('cap-percent').innerText = `${Math.round(capPercent)}%`;
 
                   // Update All Charts
                   ['work', 'health', 'chore'].forEach(type => {
-                      updateChartData(type, rawLogs.filter(l => l.type === type));
+                      updateChartData(type, rawLogs.filter(l => l.type === type), pointRate);
                   });
               });
         }
 
-        function updateChartData(type, logs) {
+        function updateChartData(type, logs, pointRate) {
             const range = chartTimeframes[type];
             let labels = [];
             let values = [];
@@ -587,7 +614,13 @@
             }
 
             logs.forEach(l => {
-                const val = type === 'work' ? (l.points || 0) : (type === 'health' ? (l.level || 0) : (l.hours || 0));
+                let val = type === 'work' ? (l.points || 0) : (type === 'health' ? (l.level || 0) : (l.hours || 0));
+                
+                // If viewing Work Engine in Cash Mode (฿), convert points to ฿
+                if (type === 'work' && workChartMetric === 'cash') {
+                    val = val * pointRate;
+                }
+                
                 values[values.length - 1] += val;
             });
 
