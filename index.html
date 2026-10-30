@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aureum — Autonomous Ledger</title>
+    <title>Aureum — Work Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Firebase SDKs -->
@@ -22,17 +22,17 @@
     <div id="login-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center z-50">
         <div class="card p-8 rounded-xl max-w-md w-full shadow-2xl">
             <h1 class="text-2xl font-bold text-amber-400 mb-1">AUREUM</h1>
-            <p class="text-xs text-slate-400 mb-6">Enter your account credentials to access your shared ledger.</p>
+            <p class="text-xs text-slate-400 mb-6">Sign in to open your shared work space.</p>
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Email Address</label>
+                    <label class="block text-xs text-slate-400 mb-1">Email</label>
                     <input type="email" id="login-email" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
                 </div>
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Password</label>
                     <input type="password" id="login-password" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
                 </div>
-                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold p-2.5 rounded-lg text-sm transition-all mt-2">Sign In to Aureum</button>
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold p-2.5 rounded-lg text-sm transition-all mt-2">Sign In</button>
             </form>
             <p id="login-error" class="text-xs text-red-400 mt-3 hidden text-center"></p>
         </div>
@@ -44,7 +44,7 @@
         <header class="flex flex-col md:flex-row justify-between items-center mb-8 pb-4 border-b border-slate-700 gap-4">
             <div>
                 <h1 class="text-3xl font-bold tracking-tight text-amber-400">AUREUM</h1>
-                <p class="text-sm text-slate-400">Autonomous Productivity & Lifestyle Framework</p>
+                <p class="text-sm text-slate-400">Creative Work & Cash Allowance Tracker</p>
             </div>
             
             <div class="flex items-center gap-4">
@@ -59,27 +59,27 @@
 
         <!-- Navigation Tabs -->
         <nav class="flex border-b border-slate-700 mb-6 gap-8">
-            <button onclick="switchTab('work')" id="nav-work" class="pb-3 text-sm tab-active">Work Engine (฿ Payout)</button>
-            <button onclick="switchTab('health')" id="nav-health" class="pb-3 text-sm text-slate-400 hover:text-slate-200">Health Ledger</button>
-            <button onclick="switchTab('chores')" id="nav-chores" class="pb-3 text-sm text-slate-400 hover:text-slate-200">Chore Ledger</button>
-            <button onclick="switchTab('analytics')" id="nav-analytics" class="pb-3 text-sm text-slate-400 hover:text-slate-200">Trends & Logs</button>
+            <button onclick="switchTab('work')" id="nav-work" class="pb-3 text-sm tab-active">Work Engine (฿ Earnings)</button>
+            <button onclick="switchTab('health')" id="nav-health" class="pb-3 text-sm text-slate-400 hover:text-slate-200">Sweet & Snack Log</button>
+            <button onclick="switchTab('chores')" id="nav-chores" class="pb-3 text-sm text-slate-400 hover:text-slate-200">House Chores</button>
+            <button onclick="switchTab('analytics')" id="nav-analytics" class="pb-3 text-sm text-slate-400 hover:text-slate-200">History & Logs</button>
         </nav>
 
         <!-- TAB 1: WORK ENGINE -->
         <div id="tab-work" class="space-y-6">
             <div class="card p-6 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
                 <div>
-                    <span class="text-xs uppercase tracking-wider text-slate-400">Weekly Points Earned</span>
+                    <span class="text-xs uppercase tracking-wider text-slate-400">Points This Week</span>
                     <div class="text-3xl font-extrabold text-blue-400 mt-1" id="weekly-points">0.00 pts</div>
-                    <div class="text-xs text-slate-500 mt-1">Soft Cap: 20 pts | Hard Cap: 30 pts</div>
+                    <div class="text-xs text-slate-500 mt-1">Goal: 20 pts | Max Bonus: 30 pts</div>
                 </div>
                 <div>
-                    <span class="text-xs uppercase tracking-wider text-slate-400">Unlocked Discretionary Allowance</span>
+                    <span class="text-xs uppercase tracking-wider text-slate-400">Spendable Cash Earned</span>
                     <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="weekly-payout">฿0</div>
-                    <div class="text-xs text-slate-500 mt-1">Base Rate: ฿250 / point</div>
+                    <div class="text-xs text-slate-500 mt-1">Rate: ฿250 per point</div>
                 </div>
                 <div>
-                    <span class="text-xs uppercase tracking-wider text-slate-400">Cap Progress</span>
+                    <span class="text-xs uppercase tracking-wider text-slate-400">Goal Progress</span>
                     <div class="w-full bg-slate-700 h-3 rounded-full mt-3 overflow-hidden">
                         <div id="cap-bar" class="bg-blue-500 h-full w-0 transition-all duration-500"></div>
                     </div>
@@ -91,19 +91,19 @@
                 <h2 class="text-lg font-semibold mb-4 text-slate-200">Log Creative Work Session</h2>
                 <form id="work-form" onsubmit="logWork(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Time ($T$ in Hours)</label>
+                        <label class="block text-xs text-slate-400 mb-1">Hours Spent</label>
                         <input type="number" id="work-time" step="0.25" min="0.25" placeholder="e.g. 2.5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Results ($R$: 1–5)</label>
-                        <input type="number" id="work-results" min="1" max="5" placeholder="1 = Low, 5 = Major" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <label class="block text-xs text-slate-400 mb-1">Result / Output Quality (1–5)</label>
+                        <input type="number" id="work-results" min="1" max="5" placeholder="1 = Low, 5 = High" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Effort ($E$: 1–5)</label>
+                        <label class="block text-xs text-slate-400 mb-1">How Hard It Was (1–5)</label>
                         <input type="number" id="work-effort" min="1" max="5" placeholder="1 = Easy, 5 = Heavy" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div class="flex items-end">
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Log Work Session</button>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Save Work Session</button>
                     </div>
                 </form>
             </div>
@@ -112,23 +112,23 @@
         <!-- TAB 2: HEALTH LEDGER -->
         <div id="tab-health" class="hidden space-y-6">
             <div class="card p-6 rounded-xl">
-                <h2 class="text-lg font-semibold mb-2 text-slate-200">Log Sugar / Fat Intake</h2>
-                <p class="text-xs text-slate-400 mb-4">Pure trend observation—does not affect work points or payout.</p>
+                <h2 class="text-lg font-semibold mb-2 text-slate-200">Log Sweet / Dessert Intake</h2>
+                <p class="text-xs text-slate-400 mb-4">Just for tracking habits—does not affect work points or cash.</p>
                 <form onsubmit="logHealth(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Indulgence Level</label>
+                        <label class="block text-xs text-slate-400 mb-1">Snack / Dessert Size</label>
                         <select id="health-level" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
-                            <option value="1">Level 1: Tiny / Light Snack</option>
-                            <option value="2">Level 2: Standard Snack / Drink</option>
-                            <option value="3">Level 3: Full Heavy Dessert / Feast</option>
+                            <option value="1">Small (Light snack, small bite)</option>
+                            <option value="2">Medium (Normal dessert, sweet drink)</option>
+                            <option value="3">Large (Heavy dessert, big treat)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Description (Optional)</label>
-                        <input type="text" id="health-note" placeholder="e.g. Boba tea, Pastry" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <label class="block text-xs text-slate-400 mb-1">What did you have? (Optional)</label>
+                        <input type="text" id="health-note" placeholder="e.g. Milk tea, Bakery" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div class="flex items-end">
-                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Log Health Entry</button>
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Save Entry</button>
                     </div>
                 </form>
             </div>
@@ -137,29 +137,29 @@
         <!-- TAB 3: CHORE LEDGER -->
         <div id="tab-chores" class="hidden space-y-6">
             <div class="card p-6 rounded-xl">
-                <h2 class="text-lg font-semibold mb-2 text-slate-200">Log Household Maintenance</h2>
-                <p class="text-xs text-slate-400 mb-4">Track daily chore efficiency without affecting allowance calculations.</p>
+                <h2 class="text-lg font-semibold mb-2 text-slate-200">Log House Chores</h2>
+                <p class="text-xs text-slate-400 mb-4">Track time spent on house tasks without touching cash earnings.</p>
                 <form onsubmit="logChore(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Chore Time (Hours)</label>
+                        <label class="block text-xs text-slate-400 mb-1">Time Spent (Hours)</label>
                         <input type="number" id="chore-time" step="0.25" min="0.25" placeholder="e.g. 1.0" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Chore Detail</label>
+                        <label class="block text-xs text-slate-400 mb-1">Chore Details</label>
                         <input type="text" id="chore-note" placeholder="e.g. Cleaning, Laundry, Cooking" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div class="flex items-end">
-                        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Log Chore Time</button>
+                        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Save Chore Time</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- TAB 4: TRENDS & LOGS -->
+        <!-- TAB 4: HISTORY & LOGS -->
         <div id="tab-analytics" class="hidden space-y-6">
             <div class="card p-6 rounded-xl">
-                <h2 class="text-lg font-semibold mb-4 text-slate-200">Live Activity Feed</h2>
-                <div id="log-list" class="space-y-2 text-sm text-slate-300">Loading synced entries...</div>
+                <h2 class="text-lg font-semibold mb-4 text-slate-200">Recent Activity</h2>
+                <div id="log-list" class="space-y-2 text-sm text-slate-300">Loading saved entries...</div>
             </div>
         </div>
     </div>
@@ -180,7 +180,6 @@
 
         let currentUser = 'Me';
 
-        // Auth Monitor
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('login-modal').classList.add('hidden');
@@ -202,7 +201,7 @@
                 await auth.signInWithEmailAndPassword(email, password);
                 errorElement.classList.add('hidden');
             } catch (error) {
-                errorElement.innerText = "Invalid credentials. Please check your email/password.";
+                errorElement.innerText = "Incorrect email or password.";
                 errorElement.classList.remove('hidden');
             }
         }
@@ -261,7 +260,7 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            alert('Health entry saved!');
+            alert('Saved snack entry!');
             loadUserData();
         }
 
@@ -278,7 +277,7 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            alert('Chore time saved!');
+            alert('Saved chore time!');
             loadUserData();
         }
 
