@@ -11,9 +11,87 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
-        body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
-        .card { background-color: #1e293b; border: 1px solid #334155; }
-        .tab-active { border-bottom: 2px solid #3b82f6; color: #60a5fa; font-weight: 600; }
+        :root {
+            --bg-main: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --accent-primary: #f59e0b;
+            --accent-primary-hover: #d97706;
+            --accent-primary-text: #020617;
+            --accent-secondary: #3b82f6;
+            --accent-glow: rgba(245, 158, 11, 0.25);
+            --shimmer-grad: linear-gradient(90deg, #f59e0b 0%, #fef08a 50%, #f59e0b 100%);
+        }
+
+        /* 10 DYNAMIC THEME DEFINITIONS */
+        body[data-theme="gold"] {
+            --bg-main: #0f172a; --card-bg: #1e293b; --card-border: #334155;
+            --accent-primary: #f59e0b; --accent-primary-hover: #d97706; --accent-primary-text: #020617;
+            --accent-secondary: #3b82f6; --accent-glow: rgba(245, 158, 11, 0.25);
+            --shimmer-grad: linear-gradient(90deg, #f59e0b 0%, #fef08a 50%, #f59e0b 100%);
+        }
+        body[data-theme="rose"] {
+            --bg-main: #180e15; --card-bg: #271622; --card-border: #442239;
+            --accent-primary: #f472b6; --accent-primary-hover: #e11d48; --accent-primary-text: #020617;
+            --accent-secondary: #fb7185; --accent-glow: rgba(244, 114, 182, 0.3);
+            --shimmer-grad: linear-gradient(90deg, #f472b6 0%, #ffe4e6 50%, #f472b6 100%);
+        }
+        body[data-theme="emerald"] {
+            --bg-main: #061814; --card-bg: #0f2e27; --card-border: #1b4d41;
+            --accent-primary: #10b981; --accent-primary-hover: #059669; --accent-primary-text: #020617;
+            --accent-secondary: #34d399; --accent-glow: rgba(16, 185, 129, 0.3);
+            --shimmer-grad: linear-gradient(90deg, #10b981 0%, #a7f3d0 50%, #10b981 100%);
+        }
+        body[data-theme="cyber"] {
+            --bg-main: #0b0f19; --card-bg: #151c2e; --card-border: #263352;
+            --accent-primary: #a855f7; --accent-primary-hover: #9333ea; --accent-primary-text: #ffffff;
+            --accent-secondary: #06b6d4; --accent-glow: rgba(168, 85, 247, 0.35);
+            --shimmer-grad: linear-gradient(90deg, #a855f7 0%, #67e8f9 50%, #a855f7 100%);
+        }
+        body[data-theme="sunset"] {
+            --bg-main: #1a100c; --card-bg: #2c1a14; --card-border: #482b20;
+            --accent-primary: #f97316; --accent-primary-hover: #ea580c; --accent-primary-text: #020617;
+            --accent-secondary: #fb923c; --accent-glow: rgba(249, 115, 22, 0.3);
+            --shimmer-grad: linear-gradient(90deg, #f97316 0%, #ffedd5 50%, #f97316 100%);
+        }
+        body[data-theme="amethyst"] {
+            --bg-main: #120d1d; --card-bg: #1e1630; --card-border: #362754;
+            --accent-primary: #c084fc; --accent-primary-hover: #a855f7; --accent-primary-text: #020617;
+            --accent-secondary: #818cf8; --accent-glow: rgba(192, 132, 252, 0.3);
+            --shimmer-grad: linear-gradient(90deg, #c084fc 0%, #eef2ff 50%, #c084fc 100%);
+        }
+        body[data-theme="ocean"] {
+            --bg-main: #0b1920; --card-bg: #122834; --card-border: #1e4256;
+            --accent-primary: #14b8a6; --accent-primary-hover: #0d9488; --accent-primary-text: #020617;
+            --accent-secondary: #38bdf8; --accent-glow: rgba(20, 184, 166, 0.3);
+            --shimmer-grad: linear-gradient(90deg, #14b8a6 0%, #bae6fd 50%, #14b8a6 100%);
+        }
+        body[data-theme="crimson"] {
+            --bg-main: #1a0c0e; --card-bg: #2d1317; --card-border: #4a2027;
+            --accent-primary: #ef4444; --accent-primary-hover: #dc2626; --accent-primary-text: #ffffff;
+            --accent-secondary: #f97316; --accent-glow: rgba(239, 68, 68, 0.35);
+            --shimmer-grad: linear-gradient(90deg, #ef4444 0%, #fde047 50%, #ef4444 100%);
+        }
+        body[data-theme="matcha"] {
+            --bg-main: #121813; --card-bg: #1d271f; --card-border: #314234;
+            --accent-primary: #84cc16; --accent-primary-hover: #65a30d; --accent-primary-text: #020617;
+            --accent-secondary: #a3e635; --accent-glow: rgba(132, 204, 22, 0.3);
+            --shimmer-grad: linear-gradient(90deg, #84cc16 0%, #ecfccb 50%, #84cc16 100%);
+        }
+        body[data-theme="monochrome"] {
+            --bg-main: #121212; --card-bg: #1e1e1e; --card-border: #333333;
+            --accent-primary: #e2e8f0; --accent-primary-hover: #cbd5e1; --accent-primary-text: #0f172a;
+            --accent-secondary: #94a3b8; --accent-glow: rgba(226, 232, 240, 0.25);
+            --shimmer-grad: linear-gradient(90deg, #94a3b8 0%, #ffffff 50%, #94a3b8 100%);
+        }
+
+        body { background-color: var(--bg-main); color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.3s ease; }
+        .card { background-color: var(--card-bg); border: 1px solid var(--card-border); transition: background-color 0.3s ease, border-color 0.3s ease; }
+        .tab-active { border-bottom: 2px solid var(--accent-primary); color: var(--accent-primary); font-weight: 600; }
+        
+        .theme-accent-bg { background-color: var(--accent-primary) !important; color: var(--accent-primary-text) !important; }
+        .theme-accent-bg:hover { background-color: var(--accent-primary-hover) !important; }
+        .theme-accent-text { color: var(--accent-primary) !important; }
         
         .tooltip-container { position: relative; display: inline-flex; align-items: center; }
         .tooltip-text {
@@ -26,9 +104,10 @@
         .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
         
         .logo-gold {
-            color: #f59e0b;
+            color: var(--accent-primary);
             letter-spacing: 0.25em;
-            text-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+            text-shadow: 0 0 12px var(--accent-glow);
+            transition: color 0.3s ease;
         }
 
         @keyframes shimmer {
@@ -36,13 +115,13 @@
             100% { background-position: 200% 0; }
         }
         .progress-gold-shimmer {
-            background: linear-gradient(90deg, #f59e0b 0%, #fef08a 50%, #f59e0b 100%);
+            background: var(--shimmer-grad);
             background-size: 200% 100%;
             animation: shimmer 2.5s infinite linear;
         }
     </style>
 </head>
-<body class="p-4 md:p-8 max-w-6xl mx-auto">
+<body data-theme="gold" class="p-4 md:p-8 max-w-6xl mx-auto">
 
     <!-- LOGIN OVERLAY -->
     <div id="login-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center z-50">
@@ -58,7 +137,7 @@
                     <label class="block text-xs text-slate-400 mb-1">Password</label>
                     <input type="password" id="login-password" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
                 </div>
-                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold p-2.5 rounded-lg text-sm transition-all mt-2">Sign In</button>
+                <button type="submit" class="w-full theme-accent-bg font-semibold p-2.5 rounded-lg text-sm transition-all mt-2">Sign In</button>
             </form>
             <p id="login-error" class="text-xs text-red-400 mt-3 hidden text-center"></p>
         </div>
@@ -74,11 +153,11 @@
             </div>
             
             <div class="flex items-center gap-4">
-                <div class="flex items-center gap-3 bg-slate-800 p-1.5 rounded-lg border border-slate-700">
+                <div class="flex items-center gap-3 bg-slate-800/80 p-1.5 rounded-lg border border-slate-700">
                     <button id="user-btn-north" onclick="switchActiveUser('North')" class="px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white">North</button>
                     <button id="user-btn-cream" onclick="switchActiveUser('Cream')" class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all">Cream</button>
                 </div>
-                <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-sm text-slate-400 hover:text-white px-2.5 py-1.5 bg-slate-800 rounded-lg border border-slate-700 transition-all">🔊</button>
+                <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-sm text-slate-400 hover:text-white px-2.5 py-1.5 bg-slate-800/80 rounded-lg border border-slate-700 transition-all">🔊</button>
                 <button onclick="handleLogout()" class="text-xs text-slate-500 hover:text-slate-300 underline">Sign Out</button>
             </div>
         </header>
@@ -113,15 +192,15 @@
                 </div>
                 <div>
                     <span class="text-xs uppercase tracking-wider text-slate-400">Today's Soft Cap</span>
-                    <div class="text-3xl font-extrabold text-amber-400 mt-1" id="today-hours-label">0.0 / 4.0 hrs</div>
-                    <div class="w-full bg-slate-900 h-2.5 rounded-full mt-2.5 overflow-hidden border border-slate-700/60 p-0.5">
+                    <div class="text-3xl font-extrabold theme-accent-text mt-1" id="today-hours-label">0.0 / 4.0 hrs</div>
+                    <div class="w-full bg-slate-900/80 h-2.5 rounded-full mt-2.5 overflow-hidden border border-slate-700/60 p-0.5">
                         <div id="daily-bar" class="bg-blue-500 h-full rounded-full transition-all duration-700"></div>
                     </div>
                     <div class="text-xs mt-1" id="daily-cap-status">4.0 hrs remaining today</div>
                 </div>
                 <div>
                     <span class="text-xs uppercase tracking-wider text-slate-400">Monthly Goal Progress</span>
-                    <div class="w-full bg-slate-900 h-3.5 rounded-full mt-3 overflow-hidden border border-slate-700/60 p-0.5">
+                    <div class="w-full bg-slate-900/80 h-3.5 rounded-full mt-3 overflow-hidden border border-slate-700/60 p-0.5">
                         <div id="cap-bar" class="bg-blue-500 h-full rounded-full transition-all duration-700"></div>
                     </div>
                     <div class="text-xs text-right text-slate-400 mt-1 font-semibold" id="cap-percent">0%</div>
@@ -141,18 +220,18 @@
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
                             Hours Spent
-                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
                                 <span class="tooltip-text">
                                     <strong>Duration:</strong> Total clock hours dedicated to uninterrupted deep work or focused practice (e.g. 1.5 = 1 hr 30 mins).
                                 </span>
                             </span>
                         </label>
-                        <input type="number" id="work-time" step="0.25" min="0.25" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <input type="number" id="work-time" step="0.25" min="0.25" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
                             Output Quality (1–5)
-                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
                                 <span class="tooltip-text">
                                     <strong>Output Level:</strong> Evaluates tangible results and production efficiency.<br><br>
                                     <strong>1: Minimal</strong> — Light warmup, planning, or low tangible output.<br>
@@ -163,12 +242,12 @@
                                 </span>
                             </span>
                         </label>
-                        <input type="number" id="work-results" min="1" max="5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <input type="number" id="work-results" min="1" max="5" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
                             Effort & Friction (1–5)
-                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
                                 <span class="tooltip-text">
                                     <strong>Friction Level:</strong> Measures internal energy required and resistance overcome.<br><br>
                                     <strong>1: Effortless</strong> — Smooth, enjoyable flow with zero mental strain.<br>
@@ -179,7 +258,7 @@
                                 </span>
                             </span>
                         </label>
-                        <input type="number" id="work-effort" min="1" max="5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <input type="number" id="work-effort" min="1" max="5" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div class="flex items-end">
                         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Save Work Session</button>
@@ -192,12 +271,12 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div class="flex items-center gap-3">
                         <h3 class="text-md font-semibold text-slate-200">Work Analytics</h3>
-                        <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 text-xs">
-                            <button onclick="toggleWorkChartMetric('pts')" id="btn-metric-pts" class="px-2.5 py-1 rounded bg-amber-500 text-slate-950 font-bold">Points</button>
+                        <div class="flex bg-slate-900/80 p-1 rounded-lg border border-slate-700 text-xs">
+                            <button onclick="toggleWorkChartMetric('pts')" id="btn-metric-pts" class="px-2.5 py-1 rounded theme-accent-bg font-bold">Points</button>
                             <button onclick="toggleWorkChartMetric('cash')" id="btn-metric-cash" class="px-2.5 py-1 rounded text-slate-400 hover:text-white">Cash (฿)</button>
                         </div>
                     </div>
-                    <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 text-xs">
+                    <div class="flex bg-slate-900/80 p-1 rounded-lg border border-slate-700 text-xs">
                         <button onclick="setChartRange('work', 'daily')" id="btn-work-daily" class="px-3 py-1 rounded text-slate-400">Daily</button>
                         <button onclick="setChartRange('work', 'weekly')" id="btn-work-weekly" class="px-3 py-1 rounded text-slate-400">Weekly</button>
                         <button onclick="setChartRange('work', 'monthly')" id="btn-work-monthly" class="px-3 py-1 rounded text-slate-400">Monthly</button>
@@ -220,7 +299,7 @@
                 </div>
 
                 <!-- Mode Switcher -->
-                <div id="pomo-mode-box" class="flex justify-center gap-2 bg-slate-900 p-1.5 rounded-lg border border-slate-700 text-xs w-fit mx-auto">
+                <div id="pomo-mode-box" class="flex justify-center gap-2 bg-slate-900/80 p-1.5 rounded-lg border border-slate-700 text-xs w-fit mx-auto">
                     <button onclick="handleUserSelectPomoMode('focus')" id="pomo-mode-focus" class="px-4 py-1.5 rounded-md font-medium transition-all bg-blue-600 text-white">Focus</button>
                     <button onclick="handleUserSelectPomoMode('short')" id="pomo-mode-short" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Short Break</button>
                     <button onclick="handleUserSelectPomoMode('long')" id="pomo-mode-long" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Long Break</button>
@@ -228,25 +307,25 @@
 
                 <!-- Round/Lap Indicator -->
                 <div class="flex items-center justify-center gap-2">
-                    <span class="text-xs uppercase tracking-widest text-amber-400 font-bold" id="pomo-round-badge">Round 1 of 4</span>
+                    <span class="text-xs uppercase tracking-widest theme-accent-text font-bold" id="pomo-round-badge">Round 1 of 4</span>
                     <div id="pomo-round-dots" class="flex gap-1.5 ml-2"></div>
                 </div>
 
                 <!-- Clickable Main Countdown Display -->
                 <div id="pomo-clock-container" onclick="handleClockClick()" class="cursor-pointer group select-none py-2 my-1 rounded-2xl transition-all hover:bg-slate-800/50">
-                    <div id="pomo-timer-display" class="text-7xl font-mono font-black text-amber-400 tracking-wider group-hover:scale-105 transition-transform">25:00</div>
+                    <div id="pomo-timer-display" class="text-7xl font-mono font-black theme-accent-text tracking-wider group-hover:scale-105 transition-transform">25:00</div>
                     <div id="pomo-status-label" class="text-xs text-slate-400 mt-2 uppercase tracking-widest font-semibold group-hover:text-amber-300">Click Clock to Start</div>
                 </div>
 
                 <!-- Visual Countdown Progress Bar -->
-                <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
-                    <div id="pomo-progress-bar" class="bg-amber-400 h-full rounded-full transition-all duration-1000 w-full"></div>
+                <div class="w-full bg-slate-900/80 h-2.5 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
+                    <div id="pomo-progress-bar" class="theme-accent-bg h-full rounded-full transition-all duration-1000 w-full"></div>
                 </div>
 
                 <!-- Controls -->
                 <div id="pomo-controls-box" class="flex justify-center gap-4">
-                    <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="px-8 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition-all">Start Focus</button>
-                    <button onclick="resetMyPomoTimer()" class="px-6 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium text-sm transition-all">Reset</button>
+                    <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="px-8 py-2.5 rounded-lg theme-accent-bg font-bold text-sm transition-all">Start Focus</button>
+                    <button onclick="resetMyPomoTimer()" class="px-6 py-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium text-sm transition-all">Reset</button>
                 </div>
             </div>
         </div>
@@ -260,7 +339,7 @@
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
                             Snack / Dessert Size
-                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
                                 <span class="tooltip-text">
                                     <strong>Level 1:</strong> Small bite or light snack.<br>
                                     <strong>Level 2:</strong> Standard dessert portion or sweet beverage.<br>
@@ -268,7 +347,7 @@
                                 </span>
                             </span>
                         </label>
-                        <select id="health-level" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <select id="health-level" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                             <option value="1">Level 1 (Small / Light)</option>
                             <option value="2">Level 2 (Medium / Standard)</option>
                             <option value="3">Level 3 (Large / Heavy)</option>
@@ -276,7 +355,7 @@
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">What did you have?</label>
-                        <input type="text" id="health-note" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <input type="text" id="health-note" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div class="flex items-end">
                         <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Save Entry</button>
@@ -288,7 +367,7 @@
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <h3 class="text-md font-semibold text-slate-200">Snack Trends</h3>
-                    <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 text-xs">
+                    <div class="flex bg-slate-900/80 p-1 rounded-lg border border-slate-700 text-xs">
                         <button onclick="setChartRange('health', 'daily')" id="btn-health-daily" class="px-3 py-1 rounded text-slate-400">Daily</button>
                         <button onclick="setChartRange('health', 'weekly')" id="btn-health-weekly" class="px-3 py-1 rounded text-slate-400">Weekly</button>
                         <button onclick="setChartRange('health', 'monthly')" id="btn-health-monthly" class="px-3 py-1 rounded text-slate-400">Monthly</button>
@@ -310,18 +389,18 @@
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
                             Time Spent (Hours)
-                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
                                 <span class="tooltip-text">Total clock hours spent on household tasks (e.g. 0.5 = 30 minutes).</span>
                             </span>
                         </label>
-                        <input type="number" id="chore-time" step="0.25" min="0.25" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <input type="number" id="chore-time" step="0.25" min="0.25" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Chore Details</label>
-                        <input type="text" id="chore-note" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <input type="text" id="chore-note" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div class="flex items-end">
-                        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Save Chore Time</button>
+                        <button type="submit" class="w-full theme-accent-bg font-medium p-2.5 rounded-lg text-sm transition-all">Save Chore Time</button>
                     </div>
                 </form>
             </div>
@@ -330,7 +409,7 @@
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <h3 class="text-md font-semibold text-slate-200">House Chore Hours</h3>
-                    <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 text-xs">
+                    <div class="flex bg-slate-900/80 p-1 rounded-lg border border-slate-700 text-xs">
                         <button onclick="setChartRange('chore', 'daily')" id="btn-chore-daily" class="px-3 py-1 rounded text-slate-400">Daily</button>
                         <button onclick="setChartRange('chore', 'weekly')" id="btn-chore-weekly" class="px-3 py-1 rounded text-slate-400">Weekly</button>
                         <button onclick="setChartRange('chore', 'monthly')" id="btn-chore-monthly" class="px-3 py-1 rounded text-slate-400">Monthly</button>
@@ -345,6 +424,33 @@
 
         <!-- TAB 5: FORGE -->
         <div id="tab-forge" class="hidden space-y-6">
+            
+            <!-- Aesthetic Profile Theme Selection Section -->
+            <div class="card p-6 rounded-xl max-w-2xl">
+                <h2 class="text-lg font-semibold mb-2 text-slate-200">Visual Theme & Aesthetics</h2>
+                <p class="text-xs text-slate-400 mb-4">Select your personal color palette. Automatically syncs and switches when spectating profiles.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Theme Palette</label>
+                        <select id="setting-user-theme" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                            <option value="gold">Aureum Gold (Classic Amber)</option>
+                            <option value="rose">Rose Quartz (Soft Magenta & Pink)</option>
+                            <option value="emerald">Emerald Grove (Mint & Forest)</option>
+                            <option value="cyber">Midnight Cyber (Neon Violet & Cyan)</option>
+                            <option value="sunset">Sunset Terracotta (Warm Peach)</option>
+                            <option value="amethyst">Amethyst Dusk (Lavender & Purple)</option>
+                            <option value="ocean">Ocean Abyss (Deep Sea Teal)</option>
+                            <option value="crimson">Crimson Forge (Ruby Flame)</option>
+                            <option value="matcha">Matcha Latte (Sage & Cream)</option>
+                            <option value="monochrome">Monochrome Slate (Silver Minimal)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="saveThemeSetting()" class="w-full theme-accent-bg font-semibold p-2.5 rounded-lg text-sm transition-all">Apply & Save Theme</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Work Points & Allowance Calibration -->
             <div class="card p-6 rounded-xl max-w-2xl">
                 <h2 class="text-lg font-semibold mb-2 text-slate-200">Work & Allowance Calibration</h2>
@@ -353,40 +459,40 @@
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
                             Target Monthly Cash Allowance (฿)
-                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
                                 <span class="tooltip-text">Base cash unlocked at 100% completion of your monthly goal.</span>
                             </span>
                         </label>
-                        <input type="number" id="setting-monthly-cash" min="1000" step="500" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                        <input type="number" id="setting-monthly-cash" min="1000" step="500" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
                             Target Weekly Work Hours
-                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
                                 <span class="tooltip-text">Target weekly hours (e.g., 10 hrs/wk = 40 hrs/month target).</span>
                             </span>
                         </label>
-                        <input type="number" id="setting-weekly-hrs" min="1" max="80" step="1" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                        <input type="number" id="setting-weekly-hrs" min="1" max="80" step="1" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
                             Daily Soft Cap (Hours)
-                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
                                 <span class="tooltip-text">Target hours per day before soft cap activates. Hours logged past this limit generate points at 25% yield to prevent burnout.</span>
                             </span>
                         </label>
-                        <input type="number" id="setting-daily-soft-cap" min="1" max="16" step="0.5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                        <input type="number" id="setting-daily-soft-cap" min="1" max="16" step="0.5" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
                             Max Bonus Cap (%)
-                            <span class="tooltip-container ml-1 text-amber-400 font-bold cursor-pointer">[?]
+                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
                                 <span class="tooltip-text">Maximum allowance multiplier for overtime work (e.g. 125% = max ฿10,000 on ฿8,000 target).</span>
                             </span>
                         </label>
-                        <input type="number" id="setting-bonus-cap" min="100" max="300" step="5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                        <input type="number" id="setting-bonus-cap" min="100" max="300" step="5" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
                     </div>
-                    <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg text-sm transition-all">Save Work Settings</button>
+                    <button type="submit" class="theme-accent-bg font-semibold px-6 py-2.5 rounded-lg text-sm transition-all">Save Work Settings</button>
                 </form>
             </div>
 
@@ -398,22 +504,22 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Focus Duration (Minutes)</label>
-                            <input type="number" id="setting-pomo-focus" min="1" max="180" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                            <input type="number" id="setting-pomo-focus" min="1" max="180" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Short Break (Minutes)</label>
-                            <input type="number" id="setting-pomo-short" min="1" max="60" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                            <input type="number" id="setting-pomo-short" min="1" max="60" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Long Break (Minutes)</label>
-                            <input type="number" id="setting-pomo-long" min="1" max="120" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                            <input type="number" id="setting-pomo-long" min="1" max="120" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Target Focus Rounds Before Long Break</label>
-                            <input type="number" id="setting-pomo-rounds" min="1" max="12" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                            <input type="number" id="setting-pomo-rounds" min="1" max="12" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
                         </div>
                     </div>
-                    <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg text-sm transition-all">Save Timer Settings</button>
+                    <button type="submit" class="theme-accent-bg font-semibold px-6 py-2.5 rounded-lg text-sm transition-all">Save Timer Settings</button>
                 </form>
             </div>
         </div>
@@ -446,7 +552,7 @@
                     <!-- Chore Column -->
                     <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3">
                         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wider">🧹 Chore Logs</h3>
+                            <h3 class="text-sm font-bold theme-accent-text uppercase tracking-wider">🧹 Chore Logs</h3>
                             <span id="ledger-count-chore" class="text-xs text-slate-500">0 entries</span>
                         </div>
                         <div id="ledger-list-chore" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
@@ -507,7 +613,8 @@
             pomoFocus: 25,
             pomoShort: 5,
             pomoLong: 15,
-            pomoRounds: 4
+            pomoRounds: 4,
+            userTheme: 'gold'
         };
 
         function requestNotificationPermission() {
@@ -844,7 +951,7 @@
                     }
                 }
                 Array.from(dotsContainer.children).forEach((dot, index) => {
-                    dot.className = index < round ? "w-2.5 h-2.5 rounded-full bg-amber-400" : "w-2.5 h-2.5 rounded-full bg-slate-700";
+                    dot.className = index < round ? "w-2.5 h-2.5 rounded-full theme-accent-bg" : "w-2.5 h-2.5 rounded-full bg-slate-700";
                 });
 
             }, 100);
@@ -871,6 +978,12 @@
                 pomoSyncUnsubscribe = db.collection('settings').doc(viewedUser).onSnapshot(async doc => {
                     if (doc.exists) {
                         spectatorSettings = doc.data();
+                        
+                        // Apply spectator's theme dynamically
+                        if (spectatorSettings.userTheme) {
+                            applyThemeToBody(spectatorSettings.userTheme);
+                        }
+
                         const liveData = spectatorSettings.livePomoState;
 
                         if (liveData) {
@@ -935,6 +1048,10 @@
             }
         });
 
+        function applyThemeToBody(themeKey) {
+            document.body.setAttribute('data-theme', themeKey || 'gold');
+        }
+
         async function loadSettingsFromCloud() {
             try {
                 const docRef = db.collection('settings').doc(viewedUser);
@@ -945,6 +1062,8 @@
             } catch (err) {
                 console.error("Error loading cloud settings:", err);
             }
+            // Instant theme application upon page enter
+            applyThemeToBody(userSettings.userTheme);
             updateSettingsUI();
         }
 
@@ -963,6 +1082,21 @@
             document.getElementById('setting-pomo-short').value = userSettings.pomoShort || 5;
             document.getElementById('setting-pomo-long').value = userSettings.pomoLong || 15;
             document.getElementById('setting-pomo-rounds').value = userSettings.pomoRounds || 4;
+
+            document.getElementById('setting-user-theme').value = userSettings.userTheme || 'gold';
+        }
+
+        async function saveThemeSetting() {
+            const selectedTheme = document.getElementById('setting-user-theme').value;
+            userSettings.userTheme = selectedTheme;
+            applyThemeToBody(selectedTheme);
+            
+            try {
+                await db.collection('settings').doc(loggedInUser).set({ userTheme: selectedTheme }, { merge: true });
+                playTone('save');
+            } catch (err) {
+                console.error('Failed to save theme setting.');
+            }
         }
 
         async function saveSettings(e) {
@@ -1042,14 +1176,14 @@
             document.getElementById('health-form-card').style.display = isSelf ? 'block' : 'none';
             document.getElementById('chore-form-card').style.display = isSelf ? 'block' : 'none';
 
-            const forgeInputs = document.querySelectorAll('#tab-forge input');
+            const forgeInputs = document.querySelectorAll('#tab-forge input, #tab-forge select');
             forgeInputs.forEach(input => {
                 input.disabled = !isSelf;
                 if (!isSelf) input.classList.add('opacity-50', 'cursor-not-allowed');
                 else input.classList.remove('opacity-50', 'cursor-not-allowed');
             });
 
-            const forgeButtons = document.querySelectorAll('#tab-forge button[type="submit"]');
+            const forgeButtons = document.querySelectorAll('#tab-forge button');
             forgeButtons.forEach(btn => {
                 btn.style.display = isSelf ? 'block' : 'none';
             });
@@ -1147,7 +1281,6 @@
             loadUserData();
         }
 
-        // SILENT DELETE FUNCTION (NO POPUP MESSAGES)
         async function deleteLogEntry(docId) {
             if (loggedInUser !== viewedUser) return;
             try {
@@ -1182,7 +1315,7 @@
 
         function toggleWorkChartMetric(metric) {
             workChartMetric = metric;
-            document.getElementById('btn-metric-pts').className = metric === 'pts' ? "px-2.5 py-1 rounded bg-amber-500 text-slate-950 font-bold" : "px-2.5 py-1 rounded text-slate-400 hover:text-white";
+            document.getElementById('btn-metric-pts').className = metric === 'pts' ? "px-2.5 py-1 rounded theme-accent-bg font-bold" : "px-2.5 py-1 rounded text-slate-400 hover:text-white";
             document.getElementById('btn-metric-cash').className = metric === 'cash' ? "px-2.5 py-1 rounded bg-emerald-500 text-slate-950 font-bold" : "px-2.5 py-1 rounded text-slate-400 hover:text-white";
             charts['work'].data.datasets[0].backgroundColor = metric === 'cash' ? '#10b981' : '#3b82f6';
             loadUserData();
@@ -1229,7 +1362,7 @@
 
                   snapshot.forEach(doc => {
                       const d = doc.data();
-                      d.id = doc.id; // Attach Firestore Document ID for deletion
+                      d.id = doc.id;
                       rawLogs.push(d);
 
                       if (d.type === 'work' && d.timestamp) {
@@ -1243,7 +1376,6 @@
                       }
                   });
 
-                  // Sort raw logs descending by timestamp
                   rawLogs.sort((a, b) => {
                       const tA = a.timestamp ? a.timestamp.toDate().getTime() : 0;
                       const tB = b.timestamp ? b.timestamp.toDate().getTime() : 0;
@@ -1272,8 +1404,8 @@
 
                   if (todayHours >= dailySoftCap) {
                       dailyStatusEl.innerText = "🍵 Soft Cap Active (25% Yield)";
-                      dailyStatusEl.className = "text-xs font-semibold text-amber-400 mt-1";
-                      document.getElementById('daily-bar').className = "bg-amber-400 h-full rounded-full transition-all duration-700 shadow-[0_0_8px_rgba(245,158,11,0.4)]";
+                      dailyStatusEl.className = "text-xs font-semibold theme-accent-text mt-1";
+                      document.getElementById('daily-bar').className = "theme-accent-bg h-full rounded-full transition-all duration-700 shadow-[0_0_8px_rgba(245,158,11,0.4)]";
                       if (noticeBox) noticeBox.classList.remove('hidden');
                   } else {
                       const remaining = (dailySoftCap - todayHours).toFixed(1);
@@ -1293,7 +1425,6 @@
                       updateChartData(type, rawLogs.filter(l => l.type === type), pointRate, maxCash);
                   });
 
-                  // Render Ledger History Lists
                   renderLedgerLists(rawLogs);
               });
         }
@@ -1369,7 +1500,7 @@
                                 ${delBtn}
                             </div>
                             <div class="flex justify-between items-center font-medium">
-                                <span class="text-amber-300">${l.hours} hrs</span>
+                                <span class="theme-accent-text font-bold">${l.hours} hrs</span>
                                 <span class="text-slate-300 italic truncate max-w-[120px]">${l.note || 'No details'}</span>
                             </div>
                         </div>
