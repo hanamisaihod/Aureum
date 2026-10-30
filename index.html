@@ -94,7 +94,7 @@
 
         <!-- Read-Only Banner -->
         <div id="read-only-banner" class="hidden card p-3 mb-6 rounded-xl text-center text-slate-400 text-sm">
-            🔒 Viewing <strong><span id="view-target-name"></span>'s</strong> dashboard in View-Only mode. Settings and forms are restricted.
+            🔒 Viewing <strong><span id="view-target-name"></span>'s</strong> dashboard in View-Only mode. Setting updates and work logs are restricted.
         </div>
 
         <!-- TAB 1: WORK ENGINE -->
@@ -531,10 +531,9 @@
 
         // --- POMODORO PERSISTENCE & BACKGROUND ENGINE ---
 
+        // Pulses the exact current time to the database for spectators to intercept
         async function syncMyPomoToCloud() {
             if (!loggedInUser) return;
-            const targetEndTimeMillis = myPomoIsRunning ? Date.now() + (myPomoTime * 1000) : null;
-
             try {
                 await db.collection('pomoState').doc(loggedInUser).set({
                     user: loggedInUser,
@@ -542,12 +541,12 @@
                     round: myPomoRound,
                     totalRounds: parseInt(userSettings.pomoRounds) || 4,
                     isRunning: myPomoIsRunning,
-                    pomoTime: myPomoTime,
+                    pomoTime: myPomoTime, // EXACT seconds remaining right now
+                    updatedAtMillis: Date.now(), // Timestamp for spectator elapsed time calculation
                     pomoInitialTime: myPomoInitialTime,
                     pomoFocus: parseInt(userSettings.pomoFocus) || 25,
                     pomoShort: parseInt(userSettings.pomoShort) || 5,
                     pomoLong: parseInt(userSettings.pomoLong) || 15,
-                    targetEndTimeMillis: targetEndTimeMillis,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
             } catch (err) {
@@ -563,7 +562,8 @@
                 myPomoTime--;
                 tickCount++;
                 
-                if (tickCount >= 5) {
+                // Pulse to database every 4 seconds to guarantee spectator stays in perfect sync
+                if (tickCount >= 4) {
                     syncMyPomoToCloud();
                     tickCount = 0;
                 }
@@ -573,6 +573,7 @@
                     myPomoIsRunning = false;
                     clearInterval(myPomoInterval);
                     playTone('pomoDone');
+                    syncMyPomoToCloud();
                     
                     const totalRounds = parseInt(userSettings.pomoRounds) || 4;
                     if (myPomoMode === 'focus') {
@@ -607,7 +608,7 @@
             else myPomoInitialTime = longMins * 60;
 
             myPomoTime = myPomoInitialTime;
-            syncMyPomoToCloud();
+            syncMyPomoToCloud(); // Push immediate 0:00 cleanup
         }
 
         function handleUserSelectPomoMode(mode) {
@@ -644,7 +645,7 @@
             }
         }
 
-        // Offline Session Recovery & Startup Initialization
+        // Offline Session Recovery
         async function initAndRecoverMyPomoState() {
             try {
                 const fMins = parseInt(userSettings.pomoFocus) || 25;
@@ -656,11 +657,12 @@
                     const data = docSnap.data();
                     myPomoMode = data.mode || 'focus';
                     myPomoRound = parseInt(data.round) || 1;
-                    
                     myPomoInitialTime = myPomoMode === 'focus' ? (fMins * 60) : (myPomoMode === 'short' ? (sMins * 60) : (lMins * 60));
 
-                    if (data.isRunning && data.targetEndTimeMillis) {
-                        const remainingSecs = Math.ceil((data.targetEndTimeMillis - Date.now()) / 1000);
+                    if (data.isRunning && data.updatedAtMillis) {
+                        const elapsedSecs = Math.floor((Date.now() - data.updatedAtMillis) / 1000);
+                        const remainingSecs = (parseInt(data.pomoTime) || myPomoInitialTime) - elapsedSecs;
+                        
                         if (remainingSecs > 0) {
                             myPomoTime = remainingSecs;
                             myPomoIsRunning = true;
@@ -685,16 +687,14 @@
                             triggerDesktopNotification("🔔 Session Complete!", "Your timer finished while you were away.");
                         }
                     } else {
-                        // FIX 1: If timer is not running, overwrite whatever is in Firestore with actual settings
-                        myPomoTime = myPomoInitialTime;
+                        myPomoTime = data.pomoTime !== undefined ? parseInt(data.pomoTime) : myPomoInitialTime;
                         myPomoIsRunning = false;
-                        syncMyPomoToCloud(); 
+                        syncMyPomoToCloud(); // Cleans up 0:00 visual glitches immediately on load
                     }
                 } else {
                     setMyPomoMode('focus');
                 }
             } catch (err) {
-                console.error("Error recovering Pomodoro state:", err);
                 setMyPomoMode('focus');
             }
         }
@@ -739,9 +739,6 @@
                         
                         initialTime = mode === 'focus' ? (targetFocusMins * 60) : (mode === 'short' ? (targetShortMins * 60) : (targetLongMins * 60));
                         isRunning = shadowSpectatorIsRunning;
-                        
-                        // FIX 2: Completely removed absolute timestamp math from the spectator UI. 
-                        // It now strictly uses the shadow timer value that ticks down safely.
                         displaySecs = shadowSpectatorTime;
                     } else if (spectatorSettings) {
                         targetFocusMins = parseInt(spectatorSettings.pomoFocus) || 25;
@@ -804,6 +801,7 @@
             }, 100);
         }
 
+        // Silent background listener constructs a shadow timer purely from DB pulses
         function attachPomoSpectatorListener() {
             if (pomoSyncUnsubscribe) pomoSyncUnsubscribe();
 
@@ -825,12 +823,17 @@
                 pomoSyncUnsubscribe = db.collection('pomoState').doc(viewedUser).onSnapshot(async doc => {
                     spectatorData = doc.exists ? doc.data() : null;
                     if (spectatorData) {
-                        shadowSpectatorTime = spectatorData.pomoTime !== undefined ? parseInt(spectatorData.pomoTime) : 1500;
+                        let dbTime = spectatorData.pomoTime !== undefined ? parseInt(spectatorData.pomoTime) : 1500;
                         shadowSpectatorIsRunning = !!spectatorData.isRunning;
                         
-                        if (shadowSpectatorIsRunning) {
+                        // Synchronize locally using the pulse timestamp
+                        if (shadowSpectatorIsRunning && spectatorData.updatedAtMillis) {
+                            let elapsedSecs = Math.floor((Date.now() - spectatorData.updatedAtMillis) / 1000);
+                            if (elapsedSecs < 0) elapsedSecs = 0;
+                            shadowSpectatorTime = Math.max(0, dbTime - elapsedSecs);
                             startShadowSpectatorTimer();
                         } else {
+                            shadowSpectatorTime = dbTime;
                             if (shadowSpectatorInterval) clearInterval(shadowSpectatorInterval);
                         }
                     } else {
@@ -970,18 +973,12 @@
             await loadSettingsFromCloud();
             updateUserSwitcherUI();
             attachPomoSpectatorListener();
-            
-            if (loggedInUser !== viewedUser) {
-                switchTab('work');
-            }
-            
             loadUserData();
         }
 
         function updateUserSwitcherUI() {
             const northBtn = document.getElementById('user-btn-north');
             const creamBtn = document.getElementById('user-btn-cream');
-            const navForgeBtn = document.getElementById('nav-forge');
             
             northBtn.innerText = loggedInUser === 'North' ? "North (You)" : "North";
             creamBtn.innerText = loggedInUser === 'Cream' ? "Cream (You)" : "Cream";
@@ -990,11 +987,23 @@
             creamBtn.className = viewedUser === 'Cream' ? "px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white" : "px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all";
 
             const isSelf = loggedInUser === viewedUser;
+            
             document.getElementById('work-form-card').style.display = isSelf ? 'block' : 'none';
             document.getElementById('health-form-card').style.display = isSelf ? 'block' : 'none';
             document.getElementById('chore-form-card').style.display = isSelf ? 'block' : 'none';
-            
-            navForgeBtn.style.display = isSelf ? 'block' : 'none';
+
+            // Make Forge accessible to spectators but restrict inputs
+            const forgeInputs = document.querySelectorAll('#tab-forge input');
+            forgeInputs.forEach(input => {
+                input.disabled = !isSelf;
+                if (!isSelf) input.classList.add('opacity-50', 'cursor-not-allowed');
+                else input.classList.remove('opacity-50', 'cursor-not-allowed');
+            });
+
+            const forgeButtons = document.querySelectorAll('#tab-forge button[type="submit"]');
+            forgeButtons.forEach(btn => {
+                btn.style.display = isSelf ? 'block' : 'none';
+            });
 
             const banner = document.getElementById('read-only-banner');
             if (!isSelf) {
