@@ -457,7 +457,7 @@
         let spectatorData = null;
         let spectatorSettings = null;
 
-        // Shadow Spectator Timer State (Immune to Clock Skew)
+        // Shadow Spectator Timer State
         let shadowSpectatorTime = 1500;
         let shadowSpectatorIsRunning = false;
         let shadowSpectatorInterval = null;
@@ -542,12 +542,12 @@
                     round: myPomoRound,
                     totalRounds: parseInt(userSettings.pomoRounds) || 4,
                     isRunning: myPomoIsRunning,
-                    pomoTime: myPomoTime, // Exact remaining seconds for shadow timer sync
+                    pomoTime: myPomoTime,
                     pomoInitialTime: myPomoInitialTime,
                     pomoFocus: parseInt(userSettings.pomoFocus) || 25,
                     pomoShort: parseInt(userSettings.pomoShort) || 5,
                     pomoLong: parseInt(userSettings.pomoLong) || 15,
-                    targetEndTimeMillis: targetEndTimeMillis, // Still kept so YOU can recover if you close your own tab
+                    targetEndTimeMillis: targetEndTimeMillis,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
             } catch (err) {
@@ -563,7 +563,6 @@
                 myPomoTime--;
                 tickCount++;
                 
-                // Sync every 5 seconds so the spectator shadow timer stays aligned without clock skew
                 if (tickCount >= 5) {
                     syncMyPomoToCloud();
                     tickCount = 0;
@@ -645,18 +644,19 @@
             }
         }
 
-        // Offline Session Recovery
+        // Offline Session Recovery & Startup Initialization
         async function initAndRecoverMyPomoState() {
             try {
+                const fMins = parseInt(userSettings.pomoFocus) || 25;
+                const sMins = parseInt(userSettings.pomoShort) || 5;
+                const lMins = parseInt(userSettings.pomoLong) || 15;
+
                 const docSnap = await db.collection('pomoState').doc(loggedInUser).get();
                 if (docSnap.exists) {
                     const data = docSnap.data();
                     myPomoMode = data.mode || 'focus';
                     myPomoRound = parseInt(data.round) || 1;
                     
-                    const fMins = parseInt(userSettings.pomoFocus) || 25;
-                    const sMins = parseInt(userSettings.pomoShort) || 5;
-                    const lMins = parseInt(userSettings.pomoLong) || 15;
                     myPomoInitialTime = myPomoMode === 'focus' ? (fMins * 60) : (myPomoMode === 'short' ? (sMins * 60) : (lMins * 60));
 
                     if (data.isRunning && data.targetEndTimeMillis) {
@@ -666,7 +666,6 @@
                             myPomoIsRunning = true;
                             startMyPomoBackgroundTimer();
                         } else {
-                            // Automatically advance if it finished while you were offline to prevent being permanently stuck at 0:00
                             myPomoTime = 0;
                             myPomoIsRunning = false;
                             playTone('pomoDone');
@@ -686,18 +685,21 @@
                             triggerDesktopNotification("🔔 Session Complete!", "Your timer finished while you were away.");
                         }
                     } else {
-                        myPomoTime = data.pomoTime !== undefined ? parseInt(data.pomoTime) : myPomoInitialTime;
+                        // FIX 1: If timer is not running, overwrite whatever is in Firestore with actual settings
+                        myPomoTime = myPomoInitialTime;
                         myPomoIsRunning = false;
+                        syncMyPomoToCloud(); 
                     }
                 } else {
                     setMyPomoMode('focus');
                 }
             } catch (err) {
                 console.error("Error recovering Pomodoro state:", err);
+                setMyPomoMode('focus');
             }
         }
 
-        // --- NEW ARCHITECTURE: INSTANT LOCAL UI RENDERER ---
+        // --- INSTANT LOCAL UI RENDERER ---
 
         function startShadowSpectatorTimer() {
             if (shadowSpectatorInterval) clearInterval(shadowSpectatorInterval);
@@ -708,7 +710,6 @@
             }, 1000);
         }
 
-        // 100ms loop purely for painting the DOM from memory variables (making buttons feel instant)
         function startGlobalUIRenderer() {
             if (pomoUIRenderInterval) clearInterval(pomoUIRenderInterval);
             
@@ -738,6 +739,9 @@
                         
                         initialTime = mode === 'focus' ? (targetFocusMins * 60) : (mode === 'short' ? (targetShortMins * 60) : (targetLongMins * 60));
                         isRunning = shadowSpectatorIsRunning;
+                        
+                        // FIX 2: Completely removed absolute timestamp math from the spectator UI. 
+                        // It now strictly uses the shadow timer value that ticks down safely.
                         displaySecs = shadowSpectatorTime;
                     } else if (spectatorSettings) {
                         targetFocusMins = parseInt(spectatorSettings.pomoFocus) || 25;
@@ -800,7 +804,6 @@
             }, 100);
         }
 
-        // Silent background listener builds a shadow timer bypassing clock skew
         function attachPomoSpectatorListener() {
             if (pomoSyncUnsubscribe) pomoSyncUnsubscribe();
 
