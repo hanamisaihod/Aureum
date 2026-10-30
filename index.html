@@ -521,19 +521,23 @@
             document.getElementById('audio-toggle-btn').innerText = audioMuted ? "🔇" : "🔊";
         }
 
-        // --- CLOUD SYNC & LIVE POMODORO LISTENERS ---
+        // Synchronize local timer state to Firestore
         async function syncPomoToCloud() {
             if (loggedInUser !== viewedUser) return;
             const targetEndTimeMillis = pomoIsRunning ? Date.now() + (pomoTime * 1000) : null;
-            
+
             try {
                 await db.collection('pomoState').doc(loggedInUser).set({
                     user: loggedInUser,
                     mode: currentPomoMode,
                     round: currentPomoRound,
+                    totalRounds: userSettings.pomoRounds || 4,
                     isRunning: pomoIsRunning,
                     pomoTime: pomoTime,
                     pomoInitialTime: pomoInitialTime,
+                    pomoFocus: userSettings.pomoFocus || 25,
+                    pomoShort: userSettings.pomoShort || 5,
+                    pomoLong: userSettings.pomoLong || 15,
                     targetEndTimeMillis: targetEndTimeMillis,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
@@ -542,55 +546,79 @@
             }
         }
 
+        // Live Real-Time Spectator & State Listener
         function listenToPomoCloudState() {
             if (pomoSyncUnsubscribe) pomoSyncUnsubscribe();
             if (spectatorTimerInterval) clearInterval(spectatorTimerInterval);
 
+            const isSelf = loggedInUser === viewedUser;
+
+            const spectatorBanner = document.getElementById('pomo-spectator-banner');
+            const controlsBox = document.getElementById('pomo-controls-box');
+            const modeBox = document.getElementById('pomo-mode-box');
+            const clockContainer = document.getElementById('pomo-clock-container');
+
+            if (!isSelf) {
+                spectatorBanner.classList.remove('hidden');
+                document.getElementById('pomo-spectator-target').innerText = viewedUser;
+                controlsBox.classList.add('hidden');
+                modeBox.style.pointerEvents = 'none';
+                modeBox.style.opacity = '0.6';
+                clockContainer.classList.remove('cursor-pointer', 'hover:bg-slate-800/50');
+                clockContainer.classList.add('cursor-default');
+            } else {
+                spectatorBanner.classList.add('hidden');
+                controlsBox.classList.remove('hidden');
+                modeBox.style.pointerEvents = 'auto';
+                modeBox.style.opacity = '1';
+                clockContainer.classList.add('cursor-pointer', 'hover:bg-slate-800/50');
+                clockContainer.classList.remove('cursor-default');
+            }
+
             pomoSyncUnsubscribe = db.collection('pomoState').doc(viewedUser).onSnapshot(doc => {
-                const isSelf = loggedInUser === viewedUser;
                 const data = doc.exists ? doc.data() : null;
 
-                // Toggle Spectator UI Mode
-                const spectatorBanner = document.getElementById('pomo-spectator-banner');
-                const controlsBox = document.getElementById('pomo-controls-box');
-                const modeBox = document.getElementById('pomo-mode-box');
-                const clockContainer = document.getElementById('pomo-clock-container');
-
                 if (!isSelf) {
-                    spectatorBanner.classList.remove('hidden');
-                    document.getElementById('pomo-spectator-target').innerText = viewedUser;
-                    controlsBox.classList.add('hidden');
-                    modeBox.style.pointerEvents = 'none';
-                    modeBox.style.opacity = '0.6';
-                    clockContainer.classList.remove('cursor-pointer', 'hover:bg-slate-800/50');
-                    clockContainer.classList.add('cursor-default');
-
                     if (spectatorTimerInterval) clearInterval(spectatorTimerInterval);
 
                     if (data) {
-                        const updateSpectatorView = () => {
+                        const focusMins = data.pomoFocus || 25;
+                        const shortMins = data.pomoShort || 5;
+                        const longMins = data.pomoLong || 15;
+                        const totalRounds = data.totalRounds || 4;
+
+                        document.getElementById('pomo-mode-focus').innerText = `Focus (${focusMins}m)`;
+                        document.getElementById('pomo-mode-short').innerText = `Short Break (${shortMins}m)`;
+                        document.getElementById('pomo-mode-long').innerText = `Long Break (${longMins}m)`;
+
+                        const updateSpectatorTick = () => {
                             let displaySecs = data.pomoTime || 0;
                             if (data.isRunning && data.targetEndTimeMillis) {
                                 displaySecs = Math.max(0, Math.ceil((data.targetEndTimeMillis - Date.now()) / 1000));
                             }
 
-                            // Render Spectator Values
-                            const initialTime = data.pomoInitialTime || 1500;
+                            const initialTime = data.pomoInitialTime || (focusMins * 60);
                             const mins = Math.floor(displaySecs / 60);
                             const secs = displaySecs % 60;
                             document.getElementById('pomo-timer-display').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                            document.getElementById('pomo-progress-bar').style.width = `${(displaySecs / initialTime) * 100}%`;
                             
+                            const pct = initialTime > 0 ? (displaySecs / initialTime) * 100 : 0;
+                            document.getElementById('pomo-progress-bar').style.width = `${pct}%`;
+
                             const modeLabel = (data.mode || 'focus').toUpperCase();
-                            document.getElementById('pomo-status-label').innerText = data.isRunning ? `LIVE: ${modeLabel} SESSION ACTIVE` : `PAUSED (${modeLabel})`;
-                            
-                            // Highlight mode button
+                            document.getElementById('pomo-status-label').innerText = data.isRunning 
+                                ? `LIVE: ${modeLabel} SESSION ACTIVE` 
+                                : (displaySecs === 0 ? `SESSION COMPLETE` : `PAUSED (${modeLabel})`);
+
                             ['focus', 'short', 'long'].forEach(m => {
-                                document.getElementById(`pomo-mode-${m}`).className = m === (data.mode || 'focus') ? "px-4 py-1.5 rounded-md font-medium transition-all bg-blue-600 text-white" : "px-4 py-1.5 rounded-md font-medium text-slate-400 transition-all";
+                                const btn = document.getElementById(`pomo-mode-${m}`);
+                                if (m === (data.mode || 'focus')) {
+                                    btn.className = "px-4 py-1.5 rounded-md font-medium transition-all bg-blue-600 text-white";
+                                } else {
+                                    btn.className = "px-4 py-1.5 rounded-md font-medium text-slate-400 transition-all";
+                                }
                             });
 
-                            // Render rounds
-                            const totalRounds = userSettings.pomoRounds || 4;
                             document.getElementById('pomo-round-badge').innerText = `Round ${data.round || 1} of ${totalRounds}`;
                             const dotsContainer = document.getElementById('pomo-round-dots');
                             dotsContainer.innerHTML = '';
@@ -601,22 +629,15 @@
                             }
                         };
 
-                        updateSpectatorView();
-                        spectatorTimerInterval = setInterval(updateSpectatorView, 1000);
+                        updateSpectatorTick();
+                        spectatorTimerInterval = setInterval(updateSpectatorTick, 1000);
                     } else {
                         document.getElementById('pomo-timer-display').innerText = "25:00";
                         document.getElementById('pomo-status-label').innerText = "NO ACTIVE SESSION";
+                        document.getElementById('pomo-round-badge').innerText = "Round 1 of 4";
+                        document.getElementById('pomo-round-dots').innerHTML = '';
                     }
                 } else {
-                    // Owner Mode - Restore full controls
-                    spectatorBanner.classList.add('hidden');
-                    controlsBox.classList.remove('hidden');
-                    modeBox.style.pointerEvents = 'auto';
-                    modeBox.style.opacity = '1';
-                    clockContainer.classList.add('cursor-pointer', 'hover:bg-slate-800/50');
-                    clockContainer.classList.remove('cursor-default');
-
-                    // Instant recovery upon page load/reopen
                     if (!isInitialRecoveryDone && data) {
                         isInitialRecoveryDone = true;
                         currentPomoMode = data.mode || 'focus';
@@ -625,7 +646,7 @@
 
                         if (data.isRunning && data.targetEndTimeMillis && data.targetEndTimeMillis > Date.now()) {
                             pomoTime = Math.ceil((data.targetEndTimeMillis - Date.now()) / 1000);
-                            togglePomoTimer(true); // Resume timer
+                            togglePomoTimer(true);
                         } else {
                             pomoTime = data.pomoTime || pomoInitialTime;
                             pomoIsRunning = false;
@@ -643,21 +664,20 @@
             }
         }
 
-        // Pomodoro Core Local Controls
         function setPomoMode(mode) {
             if (loggedInUser !== viewedUser) return;
             currentPomoMode = mode;
             clearInterval(pomoTimerId);
             pomoIsRunning = false;
             document.getElementById('pomo-toggle-btn').innerText = mode === 'focus' ? "Start Focus" : "Start Break";
-            
-            ['focus', 'short', 'long'].forEach(m => {
-                document.getElementById(`pomo-mode-${m}`).className = m === mode ? "px-4 py-1.5 rounded-md font-medium transition-all bg-blue-600 text-white" : "px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all";
-            });
 
-            if (mode === 'focus') pomoInitialTime = (userSettings.pomoFocus || 25) * 60;
-            else if (mode === 'short') pomoInitialTime = (userSettings.pomoShort || 5) * 60;
-            else pomoInitialTime = (userSettings.pomoLong || 15) * 60;
+            const focusMins = userSettings.pomoFocus || 25;
+            const shortMins = userSettings.pomoShort || 5;
+            const longMins = userSettings.pomoLong || 15;
+
+            if (mode === 'focus') pomoInitialTime = focusMins * 60;
+            else if (mode === 'short') pomoInitialTime = shortMins * 60;
+            else pomoInitialTime = longMins * 60;
 
             pomoTime = pomoInitialTime;
             updatePomoDisplay();
@@ -781,6 +801,7 @@
             }
             updateSettingsUI();
             setPomoMode('focus');
+            listenToPomoCloudState();
         }
 
         function updateSettingsUI() {
