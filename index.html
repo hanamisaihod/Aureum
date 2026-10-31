@@ -188,10 +188,7 @@
                 
                 <!-- Allowance Tracker Box -->
                 <div id="payout-card-box">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs uppercase tracking-wider text-slate-400">Allowance Earned</span>
-                        <span id="current-month-vault-badge" class="text-[10px] font-bold px-2 py-0.5 rounded border transition-all bg-emerald-500/20 text-emerald-300 border-emerald-500/40">🔓 UNLOCKED</span>
-                    </div>
+                    <span class="text-xs uppercase tracking-wider text-slate-400 block">Allowance Earned</span>
                     <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="monthly-payout">฿0</div>
                     <div class="text-xs text-slate-500 mt-1">Target Base: ฿<span id="label-monthly-cash">8,000</span></div>
                 </div>
@@ -332,7 +329,7 @@
                     <button onclick="handleUserSelectPomoMode('long')" id="pomo-mode-long" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Long Break</button>
                 </div>
 
-                <!-- Sorted Focus Preset Chips (Ascending Duration) -->
+                <!-- Sorted Focus Preset Chips -->
                 <div id="pomo-presets-box" class="flex justify-center items-center gap-1.5 text-xs text-slate-400">
                     <span class="text-[10px] uppercase font-bold text-slate-500 mr-1">Presets:</span>
                     <button onclick="applyPomoPreset(15, 3, 10)" class="px-2.5 py-1 rounded bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 transition-all text-[11px]">15/3 Sprint</button>
@@ -559,11 +556,21 @@
             </div>
         </div>
 
-        <!-- TAB 6: LEDGER HISTORY -->
+        <!-- TAB 6: LEDGER HISTORY WITH PERIOD SELECTOR -->
         <div id="tab-ledger" class="hidden space-y-6">
             <div class="card p-6 rounded-xl">
-                <h2 class="text-lg font-semibold mb-2 text-slate-200">Activity Log Ledger</h2>
-                <p class="text-xs text-slate-400 mb-6">View and manage all historical log submissions for the selected profile.</p>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-lg font-semibold text-slate-200">Activity Log Ledger</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">View and manage historical log submissions for the selected profile.</p>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-900/80 p-2 rounded-lg border border-slate-700">
+                        <label for="ledger-month-select" class="text-xs text-slate-400 font-medium whitespace-nowrap">Period Filter:</label>
+                        <select id="ledger-month-select" onchange="applyLedgerFilter()" class="bg-slate-800 border border-slate-700 rounded-md px-3 py-1 text-xs text-white focus:outline-none focus:border-blue-500">
+                            <!-- Options populated dynamically -->
+                        </select>
+                    </div>
+                </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <!-- Work Column -->
@@ -630,6 +637,7 @@
         let workChartMetric = 'pts';
 
         let currentTodayHoursLogged = 0;
+        let currentRawLogsCache = [];
 
         let myPomoMode = 'focus';
         let myPomoRound = 1;
@@ -1376,7 +1384,7 @@
             }
         }
 
-        // INITIALIZE CHARTS WITH INTERACTIVE MONTHLY BAR VAULTING & TOOLTIPS
+        // INITIALIZE CHARTS WITH FULL VAULT TOGGLE CONTROL FOR VIEWED PROFILE
         function initCharts() {
             const chartOptions = {
                 responsive: true,
@@ -1388,7 +1396,7 @@
                 plugins: { legend: { display: false } }
             };
 
-            // Work Chart Specific Setup
+            // Work Chart Setup
             const workCtx = document.getElementById('workChart').getContext('2d');
             charts['work'] = new Chart(workCtx, {
                 type: 'bar',
@@ -1403,7 +1411,7 @@
                             evt.chart.canvas.style.cursor = 'default';
                         }
                     },
-                    onClick: (evt, activeElements) => {
+                    onClick: async (evt, activeElements) => {
                         if (chartTimeframes['work'] === 'monthly' && activeElements.length > 0) {
                             const index = activeElements[0].index;
                             const now = new Date();
@@ -1413,12 +1421,14 @@
                             userSettings.vaultedMonths = userSettings.vaultedMonths || {};
                             userSettings.vaultedMonths[monthKey] = !userSettings.vaultedMonths[monthKey];
 
-                            if (loggedInUser === viewedUser) {
-                                db.collection('settings').doc(loggedInUser).set({
+                            try {
+                                await db.collection('settings').doc(viewedUser).set({
                                     vaultedMonths: userSettings.vaultedMonths
                                 }, { merge: true });
                                 playTone('save');
                                 loadUserData();
+                            } catch (err) {
+                                console.error("Error saving vaulted status:", err);
                             }
                         }
                     },
@@ -1529,6 +1539,7 @@
                   });
 
                   currentTodayHoursLogged = todayHours;
+                  currentRawLogsCache = rawLogs;
 
                   const targetMonthlyPts = userSettings.weeklyHours * 4 * 3;
                   const pointRate = userSettings.monthlyCash / targetMonthlyPts;
@@ -1540,19 +1551,14 @@
                   const calculatedPayout = monthlyPoints * pointRate;
                   const finalPayout = Math.min(calculatedPayout, maxCash);
                   
-                  // Allowance Vault UI Status Sync
+                  // Allowance Status Display
                   const isVaulted = userSettings.vaultedMonths && userSettings.vaultedMonths[monthKey];
-                  const vaultBadge = document.getElementById('current-month-vault-badge');
                   const payoutEl = document.getElementById('monthly-payout');
 
                   if (isVaulted) {
-                      vaultBadge.innerText = "🔒 VAULTED";
-                      vaultBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded border transition-all bg-amber-500/20 text-amber-300 border-amber-500/40";
                       payoutEl.innerText = `฿${Math.round(finalPayout).toLocaleString()}`;
                       payoutEl.className = "text-3xl font-extrabold text-amber-400 mt-1 opacity-70 line-through";
                   } else {
-                      vaultBadge.innerText = "🔓 UNLOCKED";
-                      vaultBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded border transition-all bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
                       payoutEl.innerText = `฿${Math.round(finalPayout).toLocaleString()}`;
                       payoutEl.className = "text-3xl font-extrabold text-emerald-400 mt-1";
                   }
@@ -1561,7 +1567,7 @@
                   const dailyPct = Math.min((todayHours / dailySoftCap) * 100, 100);
                   document.getElementById('daily-bar').style.width = `${dailyPct}%`;
 
-                  // Soft Cap & 2.0h Visual Reward Logic
+                  // Soft Cap & 2.0h Visual Milestone Logic
                   const dailyBarEl = document.getElementById('daily-bar');
                   const milestoneBadge = document.getElementById('milestone-2h-badge');
                   const dailyStatusEl = document.getElementById('daily-cap-status');
@@ -1578,7 +1584,6 @@
                       const remaining = (dailySoftCap - todayHours).toFixed(1);
                       dailyStatusEl.innerText = `${remaining} hrs remaining today`;
                       dailyStatusEl.className = "text-xs text-slate-400 mt-1";
-                      // High-satisfaction glowing cyan-to-emerald gradient when 2.0h goal is hit!
                       dailyBarEl.className = "bg-gradient-to-r from-blue-500 via-cyan-400 to-emerald-400 h-full rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(56,189,248,0.5)]";
                       milestoneBadge.innerText = "🎯 2.0h Reached!";
                       milestoneBadge.className = "text-[10px] font-bold text-emerald-400";
@@ -1613,8 +1618,85 @@
                       document.getElementById('diary-status-badge').innerText = "Jot down thoughts or wins";
                   }
 
-                  renderLedgerLists(rawLogs);
+                  populateAndFilterLedger();
               });
+        }
+
+        // DYNAMIC LEDGER MONTH SELECTOR & FILTER
+        function populateAndFilterLedger() {
+            const select = document.getElementById('ledger-month-select');
+            if (!select) return;
+
+            const previousValue = select.value || 'current';
+            const monthSet = new Set();
+            const now = new Date();
+            const currentKey = `${now.getFullYear()}-${now.getMonth()}`;
+
+            currentRawLogsCache.forEach(l => {
+                if (l.timestamp) {
+                    const d = l.timestamp.toDate();
+                    monthSet.add(`${d.getFullYear()}-${d.getMonth()}`);
+                }
+            });
+
+            monthSet.add(currentKey);
+
+            const sortedMonths = Array.from(monthSet).sort((a, b) => {
+                const [yA, mA] = a.split('-').map(Number);
+                const [yB, mB] = b.split('-').map(Number);
+                if (yA !== yB) return yB - yA;
+                return mB - mA;
+            });
+
+            const monthsNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            let optionsHtml = `<option value="current">Current Month (${monthsNames[now.getMonth()]} ${now.getFullYear()})</option>`;
+            
+            sortedMonths.forEach(mKey => {
+                if (mKey !== currentKey) {
+                    const [y, m] = mKey.split('-').map(Number);
+                    optionsHtml += `<option value="${mKey}">${monthsNames[m]} ${y}</option>`;
+                }
+            });
+
+            optionsHtml += `<option value="all">All Time Records</option>`;
+            select.innerHTML = optionsHtml;
+
+            if (Array.from(select.options).some(opt => opt.value === previousValue)) {
+                select.value = previousValue;
+            } else {
+                select.value = 'current';
+            }
+
+            applyLedgerFilter();
+        }
+
+        function applyLedgerFilter() {
+            const select = document.getElementById('ledger-month-select');
+            const val = select ? select.value : 'current';
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth();
+
+            let filteredLogs = [];
+
+            if (val === 'all') {
+                filteredLogs = currentRawLogsCache;
+            } else if (val === 'current') {
+                filteredLogs = currentRawLogsCache.filter(l => {
+                    if (!l.timestamp) return true;
+                    const d = l.timestamp.toDate();
+                    return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+                });
+            } else {
+                const [targetY, targetM] = val.split('-').map(Number);
+                filteredLogs = currentRawLogsCache.filter(l => {
+                    if (!l.timestamp) return false;
+                    const d = l.timestamp.toDate();
+                    return d.getFullYear() === targetY && d.getMonth() === targetM;
+                });
+            }
+
+            renderLedgerLists(filteredLogs);
         }
 
         function renderLedgerLists(logs) {
@@ -1632,7 +1714,7 @@
             // 1. Work List
             const workContainer = document.getElementById('ledger-list-work');
             if (workLogs.length === 0) {
-                workContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No work logs.</div>`;
+                workContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No work logs for period.</div>`;
             } else {
                 workContainer.innerHTML = workLogs.map(l => {
                     const dateStr = l.timestamp ? l.timestamp.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just now';
@@ -1655,7 +1737,7 @@
             // 2. Health List
             const healthContainer = document.getElementById('ledger-list-health');
             if (healthLogs.length === 0) {
-                healthContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No snack logs.</div>`;
+                healthContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No snack logs for period.</div>`;
             } else {
                 healthContainer.innerHTML = healthLogs.map(l => {
                     const dateStr = l.timestamp ? l.timestamp.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just now';
@@ -1678,7 +1760,7 @@
             // 3. Chore List
             const choreContainer = document.getElementById('ledger-list-chore');
             if (choreLogs.length === 0) {
-                choreContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No chore logs.</div>`;
+                choreContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No chore logs for period.</div>`;
             } else {
                 choreContainer.innerHTML = choreLogs.map(l => {
                     const dateStr = l.timestamp ? l.timestamp.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just now';
@@ -1701,7 +1783,7 @@
             // 4. Reflections / Diary List
             const diaryContainer = document.getElementById('ledger-list-diary');
             if (diaryLogs.length === 0) {
-                diaryContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No reflections recorded.</div>`;
+                diaryContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No reflections for period.</div>`;
             } else {
                 diaryContainer.innerHTML = diaryLogs.map(l => {
                     const dateStr = l.timestamp ? l.timestamp.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just now';
