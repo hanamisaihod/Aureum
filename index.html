@@ -822,9 +822,13 @@
             if (max !== undefined) val = Math.min(max, val);
             el.value = step < 1 ? val.toFixed(2) : Math.round(val);
         }
-        function startHoldStep(id, delta, step, min, max) {
-            stopHoldStep(); stepValue(id, delta, step, min, max);
-            holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepValue(id, delta, step, min, max), 80); }, 300);
+        function startHoldStep(id, delta, step, min, max, e) {
+            if (e && e.type === 'touchstart') e.preventDefault(); // Prevents simulated mouse event
+            stopHoldStep(); 
+            stepValue(id, delta, step, min, max);
+            holdTimeout = setTimeout(() => { 
+                holdInterval = setInterval(() => stepValue(id, delta, step, min, max), 80); 
+            }, 300);
         }
         function stopHoldStep() { clearTimeout(holdTimeout); clearInterval(holdInterval); holdTimeout = null; holdInterval = null; }
 
@@ -841,9 +845,13 @@
             input.value = Math.max(1, Math.min(5, (parseInt(input.value) || 3) + delta));
             updateRatingUI(field);
         }
-        function startHoldStepRating(field, delta) {
-            stopHoldStep(); stepRating(field, delta);
-            holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepRating(field, delta), 120); }, 300);
+        function startHoldStepRating(field, delta, e) {
+            if (e && e.type === 'touchstart') e.preventDefault(); // Prevents simulated mouse event
+            stopHoldStep(); 
+            stepRating(field, delta);
+            holdTimeout = setTimeout(() => { 
+                holdInterval = setInterval(() => stepRating(field, delta), 120); 
+            }, 300);
         }
 
         function applyThemeToBody(t) { document.body.setAttribute('data-theme', t || 'gold'); }
@@ -1319,6 +1327,13 @@
             render('ledger-list-chore', c, 'No chore logs.', l => `<div class="flex justify-between font-medium"><span class="theme-accent-text font-bold">${l.hours} hrs</span><span class="text-slate-300 italic truncate max-w-[100px]">${l.note || 'No details'}</span></div>`);
             render('ledger-list-diary', d, 'No reflections.', l => `<div class="text-slate-200 italic leading-snug break-words">"${l.text}"</div>`);
         }
+    document.addEventListener('touchstart', (e) => {
+        const btn = e.target.closest('button');
+        if (btn && btn.getAttribute('onmousedown')) {
+            e.preventDefault();
+            btn.dispatchEvent(new Event('mousedown'));
+        }
+    }, { passive: false });    
     </script>
 </body>
 </html>
