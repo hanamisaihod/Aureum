@@ -690,7 +690,7 @@
             }).join('');
         }
 
-        // UNIFIED SMOOTH TOAST NOTIFICATION ENGINE
+        // UNIFIED SMOOTH TOAST NOTIFICATION ENGINE (WITH REFLOW & ANIMATION CLEAR FIX)
         function showToast({ title, subtitle, icon, tier = 'gold', duration = 3800 }) {
             const container = document.getElementById('badge-toast-container');
             if (!container) return;
@@ -707,6 +707,8 @@
             playTone('save');
 
             setTimeout(() => {
+                toast.style.animation = 'none'; // Release CSS keyframe fill lock
+                void toast.offsetHeight;       // Trigger reflow to restart render engine
                 toast.classList.add('toast-hiding');
                 setTimeout(() => toast.remove(), 500);
             }, duration);
