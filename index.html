@@ -22,21 +22,37 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <style>
-        :root { --bg-main: #0f172a; --card-bg: #1e293b; --card-border: #334155; --accent-primary: #f59e0b; --accent-primary-hover: #d97706; --accent-primary-text: #020617; --accent-glow: rgba(245, 158, 11, 0.25); }
-        body[data-theme="gold"] { --bg-main: #0f172a; --card-bg: #1e293b; --card-border: #334155; --accent-primary: #f59e0b; --accent-primary-hover: #d97706; --accent-primary-text: #020617; --accent-glow: rgba(245, 158, 11, 0.25); }
-        body[data-theme="rose"] { --bg-main: #180e15; --card-bg: #271622; --card-border: #442239; --accent-primary: #f472b6; --accent-primary-hover: #e11d48; --accent-primary-text: #020617; --accent-glow: rgba(244, 114, 182, 0.3); }
-        body[data-theme="emerald"] { --bg-main: #061814; --card-bg: #0f2e27; --card-border: #1b4d41; --accent-primary: #10b981; --accent-primary-hover: #059669; --accent-primary-text: #020617; --accent-glow: rgba(16, 185, 129, 0.3); }
-        body[data-theme="cyber"] { --bg-main: #0b0f19; --card-bg: #151c2e; --card-border: #263352; --accent-primary: #a855f7; --accent-primary-hover: #9333ea; --accent-primary-text: #ffffff; --accent-glow: rgba(168, 85, 247, 0.35); }
-        body[data-theme="sunset"] { --bg-main: #1a100c; --card-bg: #2c1a14; --card-border: #482b20; --accent-primary: #f97316; --accent-primary-hover: #ea580c; --accent-primary-text: #020617; --accent-glow: rgba(249, 115, 22, 0.3); }
-        body[data-theme="amethyst"] { --bg-main: #120d1d; --card-bg: #1e1630; --card-border: #362754; --accent-primary: #c084fc; --accent-primary-hover: #a855f7; --accent-primary-text: #020617; --accent-glow: rgba(192, 132, 252, 0.3); }
-        body[data-theme="ocean"] { --bg-main: #0b1920; --card-bg: #122834; --card-border: #1e4256; --accent-primary: #14b8a6; --accent-primary-hover: #0d9488; --accent-primary-text: #020617; --accent-glow: rgba(20, 184, 166, 0.3); }
-        body[data-theme="crimson"] { --bg-main: #1a0c0e; --card-bg: #2d1317; --card-border: #4a2027; --accent-primary: #ef4444; --accent-primary-hover: #dc2626; --accent-primary-text: #ffffff; --accent-glow: rgba(239, 68, 68, 0.35); }
-        body[data-theme="matcha"] { --bg-main: #121813; --card-bg: #1d271f; --card-border: #314234; --accent-primary: #84cc16; --accent-primary-hover: #65a30d; --accent-primary-text: #020617; --accent-glow: rgba(132, 204, 22, 0.3); }
-        body[data-theme="monochrome"] { --bg-main: #121212; --card-bg: #1e1e1e; --card-border: #333333; --accent-primary: #e2e8f0; --accent-primary-hover: #cbd5e1; --accent-primary-text: #0f172a; --accent-glow: rgba(226, 232, 240, 0.25); }
+        :root { --bg-main: #0f172a; --card-bg: rgba(30, 41, 59, 0.7); --card-border: rgba(255, 255, 255, 0.08); --accent-primary: #f59e0b; --accent-primary-hover: #d97706; --accent-primary-text: #020617; --accent-glow: rgba(245, 158, 11, 0.25); }
+        body[data-theme="gold"] { --bg-main: #0f172a; --card-bg: rgba(30, 41, 59, 0.7); --card-border: rgba(255, 255, 255, 0.08); --accent-primary: #f59e0b; --accent-primary-hover: #d97706; --accent-primary-text: #020617; --accent-glow: rgba(245, 158, 11, 0.25); }
+        body[data-theme="rose"] { --bg-main: #180e15; --card-bg: rgba(39, 22, 34, 0.7); --card-border: rgba(244, 114, 182, 0.15); --accent-primary: #f472b6; --accent-primary-hover: #e11d48; --accent-primary-text: #020617; --accent-glow: rgba(244, 114, 182, 0.3); }
+        body[data-theme="emerald"] { --bg-main: #061814; --card-bg: rgba(15, 46, 39, 0.7); --card-border: rgba(16, 185, 129, 0.15); --accent-primary: #10b981; --accent-primary-hover: #059669; --accent-primary-text: #020617; --accent-glow: rgba(16, 185, 129, 0.3); }
+        body[data-theme="cyber"] { --bg-main: #0b0f19; --card-bg: rgba(21, 28, 46, 0.7); --card-border: rgba(168, 85, 247, 0.15); --accent-primary: #a855f7; --accent-primary-hover: #9333ea; --accent-primary-text: #ffffff; --accent-glow: rgba(168, 85, 247, 0.35); }
+        body[data-theme="sunset"] { --bg-main: #1a100c; --card-bg: rgba(44, 26, 20, 0.7); --card-border: rgba(249, 115, 22, 0.15); --accent-primary: #f97316; --accent-primary-hover: #ea580c; --accent-primary-text: #020617; --accent-glow: rgba(249, 115, 22, 0.3); }
+        body[data-theme="amethyst"] { --bg-main: #120d1d; --card-bg: rgba(30, 22, 48, 0.7); --card-border: rgba(192, 132, 252, 0.15); --accent-primary: #c084fc; --accent-primary-hover: #a855f7; --accent-primary-text: #020617; --accent-glow: rgba(192, 132, 252, 0.3); }
+        body[data-theme="ocean"] { --bg-main: #0b1920; --card-bg: rgba(18, 40, 52, 0.7); --card-border: rgba(20, 184, 166, 0.15); --accent-primary: #14b8a6; --accent-primary-hover: #0d9488; --accent-primary-text: #020617; --accent-glow: rgba(20, 184, 166, 0.3); }
+        body[data-theme="crimson"] { --bg-main: #1a0c0e; --card-bg: rgba(45, 19, 23, 0.7); --card-border: rgba(239, 68, 68, 0.15); --accent-primary: #ef4444; --accent-primary-hover: #dc2626; --accent-primary-text: #ffffff; --accent-glow: rgba(239, 68, 68, 0.35); }
+        body[data-theme="matcha"] { --bg-main: #121813; --card-bg: rgba(29, 39, 31, 0.7); --card-border: rgba(132, 204, 22, 0.15); --accent-primary: #84cc16; --accent-primary-hover: #65a30d; --accent-primary-text: #020617; --accent-glow: rgba(132, 204, 22, 0.3); }
+        body[data-theme="monochrome"] { --bg-main: #121212; --card-bg: rgba(30, 30, 30, 0.7); --card-border: rgba(255, 255, 255, 0.1); --accent-primary: #e2e8f0; --accent-primary-hover: #cbd5e1; --accent-primary-text: #0f172a; --accent-glow: rgba(226, 232, 240, 0.25); }
 
         body { background-color: var(--bg-main); color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.3s; }
         button, input, select { touch-action: manipulation; }
-        .card { background-color: var(--card-bg); border: 1px solid var(--card-border); transition: all 0.3s; }
+
+        /* GLASSMORPHISM STAT CARDS & TILT ACCELERATION */
+        .card { 
+            background: var(--card-bg); 
+            backdrop-filter: blur(14px); 
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--card-border); 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s, border-color 0.3s; 
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+        .card:hover {
+            box-shadow: 0 12px 40px -10px var(--accent-glow);
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
         .tab-btn { color: #94a3b8; background-color: transparent; border: 1px solid transparent; transition: all 0.2s; }
         .tab-btn:hover { color: #f8fafc; background-color: rgba(30, 41, 59, 0.7); }
         .tab-btn.active { background-color: rgba(245, 158, 11, 0.15) !important; color: var(--accent-primary) !important; border-color: var(--accent-primary) !important; font-weight: 700; box-shadow: 0 0 14px var(--accent-glow); }
@@ -52,10 +68,20 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+        /* LIVE FOCUS ATMOSPHERE GLOW PULSE */
+        body.focus-ambient-active {
+            animation: focusAmbientPulse 4s ease-in-out infinite alternate;
+        }
+        @keyframes focusAmbientPulse {
+            0% { box-shadow: inset 0 0 40px rgba(59, 130, 246, 0.12); }
+            100% { box-shadow: inset 0 0 100px var(--accent-glow); }
+        }
+
         /* BADGES & TOAST ANIMATIONS */
-        .badge-card { background-color: var(--card-bg); border: 1px solid var(--card-border); transition: all 0.3s; }
-        .badge-card.locked { opacity: 0.4; filter: grayscale(0.85); border-color: #334155 !important; }
-        .badge-card.locked:hover { opacity: 0.65; filter: grayscale(0.4); }
+        .badge-card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--card-border); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .badge-card:hover:not(.locked) { transform: translateY(-3px) scale(1.02); }
+        .badge-card.locked { opacity: 0.35; filter: grayscale(0.9); border-color: rgba(255, 255, 255, 0.05) !important; }
+        .badge-card.locked:hover { opacity: 0.6; filter: grayscale(0.5); }
         .badge-tier-bronze { border-color: #d97706 !important; box-shadow: 0 0 12px rgba(217, 119, 6, 0.2); }
         .badge-tier-silver { border-color: #38bdf8 !important; box-shadow: 0 0 14px rgba(56, 189, 248, 0.25); }
         .badge-tier-gold { border-color: #f59e0b !important; box-shadow: 0 0 16px rgba(245, 158, 11, 0.35); }
@@ -68,7 +94,10 @@
         @keyframes toastSlideIn { from { opacity: 0; transform: translateY(-25px) scale(0.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
     </style>
 </head>
-<body data-theme="gold" class="p-4 md:p-8 max-w-6xl mx-auto">
+<body data-theme="gold" class="p-4 md:p-8 max-w-6xl mx-auto relative min-h-screen">
+
+    <!-- FX CANVAS OVERLAY (PARTICLE BURSTS) -->
+    <canvas id="fx-canvas" class="fixed inset-0 pointer-events-none z-[200]"></canvas>
 
     <!-- LOGIN OVERLAY -->
     <div id="login-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center z-50">
@@ -93,7 +122,7 @@
     <!-- MAIN APP CONTENT -->
     <div id="app-content" class="hidden">
         <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-6 pb-4 border-b border-slate-700 gap-4">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-6 pb-4 border-b border-slate-700/80 gap-4">
             <div>
                 <h1 class="text-3xl font-black logo-gold uppercase">AUREUM</h1>
                 <p class="text-xs text-slate-400 tracking-wide mt-0.5">Autonomous Living & Creative Ledger</p>
@@ -228,7 +257,7 @@
                     </div>
 
                     <div class="flex justify-end pt-2">
-                        <button type="submit" class="w-full md:w-auto px-8 bg-blue-600 hover:bg-blue-500 text-white font-semibold p-2.5 rounded-xl text-sm transition-all shadow-md">Save Work Session</button>
+                        <button type="submit" id="work-submit-btn" class="w-full md:w-auto px-8 bg-blue-600 hover:bg-blue-500 text-white font-semibold p-2.5 rounded-xl text-sm transition-all shadow-md">Save Work Session</button>
                     </div>
                 </form>
             </div>
@@ -642,7 +671,85 @@
             ]
         };
 
-        // 2. BADGE CATALOG & ENGINE
+        // 2. FX ENGINE: CANVAS PARTICLE BURSTS & TILT EFFECT
+        const canvas = document.getElementById('fx-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeFxCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeFxCanvas);
+        resizeFxCanvas();
+
+        function spawnParticleBurst(x, y) {
+            const colors = ['#fef08a', '#f59e0b', '#b45309', '#38bdf8', '#10b981'];
+            const count = 35;
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 6 + 2;
+                particles.push({
+                    x: x, y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 1.5,
+                    size: Math.random() * 5 + 3,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    alpha: 1,
+                    decay: Math.random() * 0.025 + 0.015
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.12; // Gravity
+                p.alpha -= p.decay;
+
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // DELEGATED 3D GLASS TILT FOR STAT CARDS & BADGES
+        document.addEventListener('mousemove', (e) => {
+            const card = e.target.closest('.card');
+            if (!card || card.classList.contains('locked')) return;
+
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+
+            const rotX = (-y / (rect.height / 2)) * 6;
+            const rotY = (x / (rect.width / 2)) * 6;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) translateZ(4px)`;
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            const card = e.target.closest('.card');
+            if (card) {
+                card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
+            }
+        });
+
+        // 3. BADGE CATALOG & ENGINE
         const BADGE_CATALOG = [
             { id: 'work_1', tier: 'bronze', icon: '🌱', title: "Initiate's First Step", desc: 'Log your very first work session.' },
             { id: 'work_cap', tier: 'silver', icon: '🍵', title: 'Soft Cap Survivor', desc: 'Reach daily Soft Cap (4.0h) in a single day.' },
@@ -676,7 +783,7 @@
             gridEl.innerHTML = BADGE_CATALOG.map(b => {
                 const isUnlocked = unlockedSet.has(b.id);
                 return `
-                    <div class="badge-card ${isUnlocked ? '' : 'locked'} badge-tier-${b.tier} p-4 rounded-xl flex items-start gap-3 select-none">
+                    <div class="badge-card ${isUnlocked ? '' : 'locked'} badge-tier-${b.tier} p-4 rounded-xl flex items-start gap-3 select-none cursor-pointer">
                         <div class="text-3xl p-2 bg-slate-900/80 rounded-xl border border-slate-700/60 shrink-0">${isUnlocked ? b.icon : '🔒'}</div>
                         <div class="space-y-0.5">
                             <div class="flex items-center gap-2">
@@ -690,8 +797,8 @@
             }).join('');
         }
 
-        // UNIFIED SMOOTH TOAST NOTIFICATION ENGINE (WITH REFLOW & ANIMATION CLEAR FIX)
-        function showToast({ title, subtitle, icon, tier = 'gold', duration = 3800 }) {
+        // UNIFIED TOAST NOTIFICATION ENGINE WITH PARTICLE BURST CALL
+        function showToast({ title, subtitle, icon, tier = 'gold', duration = 3800, originEvt }) {
             const container = document.getElementById('badge-toast-container');
             if (!container) return;
             const toast = document.createElement('div');
@@ -705,6 +812,11 @@
             `;
             container.appendChild(toast);
             playTone('save');
+
+            // Trigger Particle Burst
+            const burstX = originEvt?.clientX || window.innerWidth - 120;
+            const burstY = originEvt?.clientY || 80;
+            spawnParticleBurst(burstX, burstY);
 
             setTimeout(() => {
                 toast.style.animation = 'none'; // Release CSS keyframe fill lock
@@ -816,7 +928,7 @@
             } else { renderBadgeGrid(unlockedSet); }
         }
 
-        // 3. AUDIO & UI HELPERS
+        // 4. AUDIO & UI HELPERS
         function playTone(type) {
             if (audioMuted) return;
             try {
@@ -886,7 +998,7 @@
 
         function applyThemeToBody(t) { document.body.setAttribute('data-theme', t || 'gold'); }
 
-        // 4. POMODORO ENGINE
+        // 5. POMODORO ENGINE WITH LIVE AMBIENT ATMOSPHERE PULSE
         let myPomoMode = 'focus', myPomoRound = 1, myPomoTime = 1500, myPomoInitialTime = 1500, myPomoIsRunning = false, myPomoInterval = null, currentSessionWasPaused = false;
         let pomoUIRenderInterval = null, pomoSyncUnsubscribe = null, spectatorSettings = null, shadowSpectatorTime = 1500, shadowSpectatorIsRunning = false, shadowSpectatorInterval = null;
 
@@ -901,15 +1013,21 @@
             try { db.collection('settings').doc(loggedInUser).set({ livePomoState: { mode: myPomoMode, round: myPomoRound, isRunning: myPomoIsRunning, pomoTime: myPomoTime, updatedAtMillis: Date.now() } }, { merge: true }); } catch (e) {}
         }
 
+        function updateAmbientFocusState(isRunning) {
+            document.body.classList.toggle('focus-ambient-active', isRunning && myPomoMode === 'focus');
+        }
+
         function startMyPomoBackgroundTimer() {
             if (myPomoInterval) clearInterval(myPomoInterval);
             let ticks = 0;
+            updateAmbientFocusState(true);
             myPomoInterval = setInterval(() => {
                 if (!myPomoIsRunning) return;
                 myPomoTime--; ticks++;
                 if (ticks >= 4) { syncMyPomoToCloud(); ticks = 0; }
                 if (myPomoTime <= 0) {
                     myPomoTime = 0; myPomoIsRunning = false; clearInterval(myPomoInterval); playTone('pomoDone'); syncMyPomoToCloud();
+                    updateAmbientFocusState(false);
                     const totalRounds = parseInt(userSettings.pomoRounds) || 4;
                     if (myPomoMode === 'focus') {
                         userSettings.completedPomoHistory = userSettings.completedPomoHistory || [];
@@ -924,6 +1042,7 @@
 
         function setMyPomoMode(mode) {
             myPomoMode = mode; myPomoIsRunning = false; currentSessionWasPaused = false;
+            updateAmbientFocusState(false);
             if (myPomoInterval) clearInterval(myPomoInterval);
             const f = parseInt(userSettings.pomoFocus) || 25, s = parseInt(userSettings.pomoShort) || 5, l = parseInt(userSettings.pomoLong) || 15;
             myPomoInitialTime = (mode === 'focus' ? f : (mode === 'short' ? s : l)) * 60;
@@ -934,11 +1053,15 @@
         function toggleMyPomoTimer() {
             if (loggedInUser !== viewedUser) return;
             requestNotificationPermission();
-            if (myPomoIsRunning) { myPomoIsRunning = false; currentSessionWasPaused = true; clearInterval(myPomoInterval); }
-            else { myPomoIsRunning = true; startMyPomoBackgroundTimer(); }
+            if (myPomoIsRunning) { 
+                myPomoIsRunning = false; currentSessionWasPaused = true; clearInterval(myPomoInterval); 
+                updateAmbientFocusState(false);
+            } else { 
+                myPomoIsRunning = true; startMyPomoBackgroundTimer(); 
+            }
             syncMyPomoToCloud();
         }
-        function resetMyPomoTimer() { if (loggedInUser === viewedUser) { clearInterval(myPomoInterval); myPomoIsRunning = false; myPomoRound = 1; setMyPomoMode('focus'); } }
+        function resetMyPomoTimer() { if (loggedInUser === viewedUser) { clearInterval(myPomoInterval); myPomoIsRunning = false; myPomoRound = 1; updateAmbientFocusState(false); setMyPomoMode('focus'); } }
         function handleClockClick() { if (loggedInUser === viewedUser) toggleMyPomoTimer(); }
 
         async function applyPomoPreset(f, s, l) {
@@ -1033,7 +1156,7 @@
             }
         }
 
-        // 5. CHARTS ENGINE
+        // 6. CHARTS ENGINE
         let charts = {}, chartTimeframes = { work: 'daily', health: 'daily', chore: 'daily' }, workChartMode = 'bar';
         function initCharts() {
             const opts = { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }, y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } } }, plugins: { legend: { display: false } } };
@@ -1101,7 +1224,7 @@
             charts[type].update();
         }
 
-        // 6. FIRESTORE CRUD & APP LOGIC
+        // 7. FIRESTORE CRUD & APP LOGIC
         let currentTodayHoursLogged = 0, currentRawLogsCache = [], settingsUnsubscribe = null;
 
         auth.onAuthStateChanged(async u => {
@@ -1220,7 +1343,8 @@
                 title: '💼 Work Session Logged',
                 subtitle: `<strong>+฿${Math.round(netCashEarned).toLocaleString()} Earned</strong> (${T}h logged @ Lvl ${R}/${E})`,
                 icon: '🎯',
-                tier: 'gold'
+                tier: 'gold',
+                originEvt: e
             });
 
             loadUserData();
@@ -1237,7 +1361,8 @@
                 title: '🍨 Sweet Treat Logged',
                 subtitle: `Level ${lvl} snack recorded${note ? `: "${note}"` : ''}`,
                 icon: '🍦',
-                tier: 'emerald'
+                tier: 'emerald',
+                originEvt: e
             });
 
             document.getElementById('health-note').value = ''; 
@@ -1255,7 +1380,8 @@
                 title: '🧹 House Chore Logged',
                 subtitle: `${hrs}h sanctuary time saved${note ? `: "${note}"` : ''}`,
                 icon: '🏰',
-                tier: 'silver'
+                tier: 'silver',
+                originEvt: e
             });
 
             document.getElementById('chore-note').value = ''; 
@@ -1281,7 +1407,8 @@
                 title: '📖 Reflection Saved',
                 subtitle: 'Daily mindset note updated!',
                 icon: '✍️',
-                tier: 'titan'
+                tier: 'titan',
+                originEvt: e
             });
 
             loadUserData();
@@ -1322,7 +1449,7 @@
 
             await db.collection('settings').doc(loggedInUser).set(userSettings, { merge: true });
             
-            showToast({ title: '⚙️ Settings Updated', subtitle: 'All Forge calibrations saved successfully.', icon: '🔧', tier: 'gold', duration: 3000 });
+            showToast({ title: '⚙️ Settings Updated', subtitle: 'All Forge calibrations saved successfully.', icon: '🔧', tier: 'gold', duration: 3000, originEvt: e });
             updateSettingsUI(); loadUserData(); setMyPomoMode('focus');
         }
 
