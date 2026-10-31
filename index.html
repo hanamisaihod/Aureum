@@ -111,45 +111,39 @@
             transform: scale(1.08);
         }
         .avatar-btn .avatar-tooltip {
-            visibility: hidden;
-            opacity: 0;
-            position: absolute;
-            top: 115%;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #020617;
-            color: #f8fafc;
-            padding: 4px 10px;
-            border-radius: 6px;
-            border: 1px solid #475569;
-            font-size: 11px;
-            font-weight: 600;
-            white-space: nowrap;
-            transition: opacity 0.2s ease;
-            pointer-events: none;
-            z-index: 20;
+            visibility: hidden; opacity: 0; position: absolute; top: 115%; left: 50%; transform: translateX(-50%);
+            background-color: #020617; color: #f8fafc; padding: 4px 10px; border-radius: 6px; border: 1px solid #475569;
+            font-size: 11px; font-weight: 600; white-space: nowrap; transition: opacity 0.2s ease; pointer-events: none; z-index: 20;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
-        .avatar-btn:hover .avatar-tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
+        .avatar-btn:hover .avatar-tooltip { visibility: visible; opacity: 1; }
         
         .logo-gold {
-            color: var(--accent-primary);
-            letter-spacing: 0.25em;
-            text-shadow: 0 0 12px var(--accent-glow);
-            transition: color 0.3s ease;
+            color: var(--accent-primary); letter-spacing: 0.25em; text-shadow: 0 0 12px var(--accent-glow); transition: color 0.3s ease;
         }
 
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+        /* Tactile Input Rating Pills */
+        .rating-pill {
+            transition: all 0.15s ease-in-out;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: #94a3b8;
         }
-        .progress-gold-shimmer {
-            background: var(--shimmer-grad);
-            background-size: 200% 100%;
-            animation: shimmer 2.5s infinite linear;
+        .rating-pill:hover {
+            border-color: #64748b;
+            color: #f8fafc;
+        }
+        .rating-pill.active {
+            background-color: var(--accent-primary) !important;
+            color: var(--accent-primary-text) !important;
+            border-color: var(--accent-primary) !important;
+            font-weight: 700;
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        /* Ring Gauge SVG animation */
+        .gauge-circle {
+            transition: stroke-dashoffset 0.8s ease-in-out, stroke 0.3s ease;
         }
     </style>
 </head>
@@ -221,7 +215,7 @@
 
         <!-- TAB 1: WORK ENGINE -->
         <div id="tab-work" class="space-y-6">
-            <div class="card p-6 rounded-xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center md:text-left">
+            <div class="card p-6 rounded-xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center md:text-left items-center">
                 <div>
                     <span class="text-xs uppercase tracking-wider text-slate-400">Points This Month</span>
                     <div class="text-3xl font-extrabold text-blue-400 mt-1" id="monthly-points">0.00 pts</div>
@@ -250,16 +244,25 @@
                         <span id="milestone-2h-badge" class="text-[10px] font-semibold text-slate-500">2.0h Target</span>
                     </div>
                 </div>
-                <div>
-                    <span class="text-xs uppercase tracking-wider text-slate-400">Monthly Goal Progress</span>
-                    <div class="w-full bg-slate-900/80 h-3.5 rounded-full mt-3 overflow-hidden border border-slate-700/60 p-0.5">
-                        <div id="cap-bar" class="bg-blue-500 h-full rounded-full transition-all duration-700"></div>
+
+                <!-- Unique Goal Ring Gauge (Replaces Plain Progress Bar) -->
+                <div class="flex items-center justify-center sm:justify-start gap-4 p-2 bg-slate-900/50 rounded-xl border border-slate-800/80">
+                    <div class="relative w-16 h-16 flex-shrink-0 flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            <path class="text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path id="gauge-circle-path" class="gauge-circle theme-accent-text" stroke-dasharray="100, 100" stroke-dashoffset="100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                        <span id="gauge-percent-text" class="absolute text-xs font-black text-slate-200">0%</span>
                     </div>
-                    <div class="text-xs text-right text-slate-400 mt-1 font-semibold" id="cap-percent">0%</div>
+                    <div>
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Monthly Goal Tier</span>
+                        <span id="gauge-tier-badge" class="text-xs font-extrabold theme-accent-text block mt-0.5">Initiate</span>
+                        <span id="gauge-tier-sub" class="text-[10px] text-slate-500 block">0% of target reached</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Work Log Form -->
+            <!-- Work Log Form with Upgraded Interactive Rating Controls -->
             <div id="work-form-card" class="card p-6 rounded-xl">
                 <h2 class="text-lg font-semibold mb-3 text-slate-200">Log Work Session</h2>
                 
@@ -268,52 +271,95 @@
                     <span><strong>Soft Cap Active:</strong> You've reached your target hours for today! Time logged past the cap generates points at 25% yield to protect rest and prevent burnout.</span>
                 </div>
 
-                <form id="work-form" onsubmit="logWork(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">
-                            Hours Spent
-                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">
-                                    <strong>Duration:</strong> Total clock hours dedicated to uninterrupted deep work or focused practice (e.g. 1.5 = 1 hr 30 mins).
+                <form id="work-form" onsubmit="logWork(event)" class="space-y-4">
+                    <!-- Hidden Form Inputs -->
+                    <input type="hidden" id="work-results" value="3">
+                    <input type="hidden" id="work-effort" value="3">
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        
+                        <!-- Tactile Duration Input -->
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-2 font-medium">
+                                Hours Spent
+                                <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
+                                    <span class="tooltip-text">
+                                        <strong>Duration:</strong> Total clock hours dedicated to uninterrupted deep work or focused practice (e.g. 1.5 = 1 hr 30 mins).
+                                    </span>
                                 </span>
-                            </span>
-                        </label>
-                        <input type="number" id="work-time" step="0.25" min="0.25" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                            </label>
+
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="adjustWorkTime(-0.25)" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-all">-0.25</button>
+                                <input type="number" id="work-time" step="0.25" min="0.25" value="1.0" required class="w-full text-center bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-amber-500">
+                                <button type="button" onclick="adjustWorkTime(0.25)" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-all">+0.25</button>
+                            </div>
+
+                            <div class="flex gap-1.5 mt-2">
+                                <button type="button" onclick="setWorkTimePreset(0.5)" class="flex-1 py-1 rounded bg-slate-900/80 border border-slate-800 hover:border-slate-700 text-[10px] text-slate-400">30m</button>
+                                <button type="button" onclick="setWorkTimePreset(1.0)" class="flex-1 py-1 rounded bg-slate-900/80 border border-slate-800 hover:border-slate-700 text-[10px] text-slate-400">1h</button>
+                                <button type="button" onclick="setWorkTimePreset(1.5)" class="flex-1 py-1 rounded bg-slate-900/80 border border-slate-800 hover:border-slate-700 text-[10px] text-slate-400">1.5h</button>
+                                <button type="button" onclick="setWorkTimePreset(2.0)" class="flex-1 py-1 rounded bg-slate-900/80 border border-slate-800 hover:border-slate-700 text-[10px] text-slate-400">2h</button>
+                            </div>
+                        </div>
+
+                        <!-- Tactile Output Rating Pills -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-xs text-slate-400 font-medium">
+                                    Output Quality
+                                    <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
+                                        <span class="tooltip-text">
+                                            <strong>Output Level:</strong><br>
+                                            <strong>1: Minimal</strong> — Light warmup / planning.<br>
+                                            <strong>2: Fair</strong> — Progress made, under standard pace.<br>
+                                            <strong>3: Solid</strong> — On-target production.<br>
+                                            <strong>4: High</strong> — Exceptional speed & clarity.<br>
+                                            <strong>5: Exceptional</strong> — Peak flow state.
+                                        </span>
+                                    </span>
+                                </label>
+                                <span id="label-results-text" class="text-[11px] theme-accent-text font-semibold">3 (Solid)</span>
+                            </div>
+                            <div class="grid grid-cols-5 gap-1.5" id="pills-results-container">
+                                <button type="button" onclick="selectRating('results', 1)" class="rating-pill py-2 rounded-lg text-xs font-semibold">1</button>
+                                <button type="button" onclick="selectRating('results', 2)" class="rating-pill py-2 rounded-lg text-xs font-semibold">2</button>
+                                <button type="button" onclick="selectRating('results', 3)" class="rating-pill active py-2 rounded-lg text-xs font-semibold">3</button>
+                                <button type="button" onclick="selectRating('results', 4)" class="rating-pill py-2 rounded-lg text-xs font-semibold">4</button>
+                                <button type="button" onclick="selectRating('results', 5)" class="rating-pill py-2 rounded-lg text-xs font-semibold">5</button>
+                            </div>
+                        </div>
+
+                        <!-- Tactile Effort Rating Pills -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-xs text-slate-400 font-medium">
+                                    Effort & Friction
+                                    <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
+                                        <span class="tooltip-text">
+                                            <strong>Friction Level:</strong><br>
+                                            <strong>1: Effortless</strong> — Zero mental strain.<br>
+                                            <strong>2: Light</strong> — Mild focus required.<br>
+                                            <strong>3: Moderate</strong> — Standard focus effort.<br>
+                                            <strong>4: Heavy</strong> — Strong resistance overcome.<br>
+                                            <strong>5: Maximum</strong> — Intense willpower needed.
+                                        </span>
+                                    </span>
+                                </label>
+                                <span id="label-effort-text" class="text-[11px] theme-accent-text font-semibold">3 (Moderate)</span>
+                            </div>
+                            <div class="grid grid-cols-5 gap-1.5" id="pills-effort-container">
+                                <button type="button" onclick="selectRating('effort', 1)" class="rating-pill py-2 rounded-lg text-xs font-semibold">1</button>
+                                <button type="button" onclick="selectRating('effort', 2)" class="rating-pill py-2 rounded-lg text-xs font-semibold">2</button>
+                                <button type="button" onclick="selectRating('effort', 3)" class="rating-pill active py-2 rounded-lg text-xs font-semibold">3</button>
+                                <button type="button" onclick="selectRating('effort', 4)" class="rating-pill py-2 rounded-lg text-xs font-semibold">4</button>
+                                <button type="button" onclick="selectRating('effort', 5)" class="rating-pill py-2 rounded-lg text-xs font-semibold">5</button>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">
-                            Output Quality (1–5)
-                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">
-                                    <strong>Output Level:</strong> Evaluates tangible results and production efficiency.<br><br>
-                                    <strong>1: Minimal</strong> — Light warmup, planning, or low tangible output.<br>
-                                    <strong>2: Fair</strong> — Progress made, but below standard pace.<br>
-                                    <strong>3: Solid</strong> — On-target production and steady execution.<br>
-                                    <strong>4: High</strong> — Exceptional speed, clarity, and output volume.<br>
-                                    <strong>5: Exceptional</strong> — Peak flow state, major project milestone achieved.
-                                </span>
-                            </span>
-                        </label>
-                        <input type="number" id="work-results" min="1" max="5" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">
-                            Effort & Friction (1–5)
-                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">
-                                    <strong>Friction Level:</strong> Measures internal energy required and resistance overcome.<br><br>
-                                    <strong>1: Effortless</strong> — Smooth, enjoyable flow with zero mental strain.<br>
-                                    <strong>2: Light</strong> — Mild focus required, comfortably managed.<br>
-                                    <strong>3: Moderate</strong> — Standard mental fatigue and focus effort.<br>
-                                    <strong>4: Heavy</strong> — Strong resistance, requiring hard willpower.<br>
-                                    <strong>5: Maximum</strong> — Severe friction overcome through intense focus.
-                                </span>
-                            </span>
-                        </label>
-                        <input type="number" id="work-effort" min="1" max="5" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
-                    </div>
-                    <div class="flex items-end">
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Save Work Session</button>
+
+                    <div class="flex justify-end pt-2">
+                        <button type="submit" class="w-full md:w-auto px-8 bg-blue-600 hover:bg-blue-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all shadow-lg">Save Work Session</button>
                     </div>
                 </form>
             </div>
@@ -407,8 +453,8 @@
         <!-- TAB 3: SNACK LOG -->
         <div id="tab-health" class="hidden space-y-6">
             <div id="health-form-card" class="card p-6 rounded-xl">
-                <h2 class="text-lg font-semibold mb-2 text-slate-200">Log Sweet / Dessert Intake</h2>
-                <p class="text-xs text-slate-400 mb-4">Observation log for health trends—does not impact cash or work points.</p>
+                <h2 class="text-lg font-semibold mb-1 text-slate-200">Log Sweet / Dessert Intake</h2>
+                <p class="text-xs text-slate-400 mb-4">A cozy spot to track your sweet treats. Just for curiosity—doesn't touch your points or allowance!</p>
                 <form onsubmit="logHealth(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
@@ -429,7 +475,7 @@
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">What did you have?</label>
-                        <input type="text" id="health-note" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <input type="text" id="health-note" placeholder="e.g. Matcha ice cream, boba..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div class="flex items-end">
                         <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Save Entry</button>
@@ -457,8 +503,8 @@
         <!-- TAB 4: HOUSE CHORES -->
         <div id="tab-chores" class="hidden space-y-6">
             <div id="chore-form-card" class="card p-6 rounded-xl">
-                <h2 class="text-lg font-semibold mb-2 text-slate-200">Log House Chores</h2>
-                <p class="text-xs text-slate-400 mb-4">Track time spent on house tasks without touching cash earnings.</p>
+                <h2 class="text-lg font-semibold mb-1 text-slate-200">Log House Chores</h2>
+                <p class="text-xs text-slate-400 mb-4">Keeping the sanctuary glowing. Tracks your household hustle without messing with your cash.</p>
                 <form onsubmit="logChore(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">
@@ -467,11 +513,11 @@
                                 <span class="tooltip-text">Total clock hours spent on household tasks (e.g. 0.5 = 30 minutes).</span>
                             </span>
                         </label>
-                        <input type="number" id="chore-time" step="0.25" min="0.25" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <input type="number" id="chore-time" step="0.25" min="0.25" placeholder="0.5" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Chore Details</label>
-                        <input type="text" id="chore-note" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <input type="text" id="chore-note" placeholder="e.g. Laundry, vacuuming, dishes..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div class="flex items-end">
                         <button type="submit" class="w-full theme-accent-bg font-medium p-2.5 rounded-lg text-sm transition-all">Save Chore Time</button>
@@ -499,12 +545,12 @@
         <!-- TAB 5: FORGE -->
         <div id="tab-forge" class="hidden space-y-6">
             
-            <!-- Aesthetic Profile Theme & Avatar Selection Section -->
+            <!-- Aesthetic Profile Theme & Expanded Avatar Selection Section -->
             <div class="card p-6 rounded-xl max-w-2xl">
                 <h2 class="text-lg font-semibold mb-2 text-slate-200">Visual Theme & Avatar Customization</h2>
                 <p class="text-xs text-slate-400 mb-6">Select your personal color palette and header profile avatar image.</p>
                 
-                <div class="space-y-4">
+                <div class="space-y-5">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Theme Palette</label>
@@ -522,32 +568,24 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Avatar Image URL</label>
+                            <label class="block text-xs text-slate-400 mb-1">Custom Image URL</label>
                             <input type="text" id="setting-avatar-url" placeholder="https://..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
                         </div>
                     </div>
 
-                    <!-- Preset Avatar Quick Select -->
+                    <!-- Expanded Avatar Presets Grid -->
                     <div>
-                        <span class="block text-xs text-slate-400 mb-2">Or choose a preset style:</span>
-                        <div class="flex gap-3">
-                            <button onclick="setAvatarPreset('bottts', 'North')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-500 transition-all">
-                                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=North" class="w-8 h-8 rounded-full">
-                            </button>
-                            <button onclick="setAvatarPreset('bottts', 'Cream')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-500 transition-all">
-                                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" class="w-8 h-8 rounded-full">
-                            </button>
-                            <button onclick="setAvatarPreset('thumbs', 'Celestial')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-500 transition-all">
-                                <img src="https://api.dicebear.com/7.x/thumbs/svg?seed=Celestial" class="w-8 h-8 rounded-full">
-                            </button>
-                            <button onclick="setAvatarPreset('identicon', 'Aureum')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-500 transition-all">
-                                <img src="https://api.dicebear.com/7.x/identicon/svg?seed=Aureum" class="w-8 h-8 rounded-full">
-                            </button>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs text-slate-400 font-medium">Avatar Presets Gallery</span>
+                            <button type="button" onclick="randomizeAvatar()" class="text-[11px] theme-accent-text font-semibold hover:underline">🎲 Surprise Me</button>
+                        </div>
+                        <div class="grid grid-cols-4 sm:grid-cols-8 gap-2 p-2 bg-slate-900/60 rounded-xl border border-slate-800 max-h-48 overflow-y-auto" id="avatar-presets-grid">
+                            <!-- Populated dynamically via JS -->
                         </div>
                     </div>
 
                     <div class="pt-2">
-                        <button onclick="saveThemeAndAvatarSetting()" class="w-full theme-accent-bg font-semibold p-2.5 rounded-lg text-sm transition-all">Save Aesthetics & Avatar</button>
+                        <button onclick="saveThemeAndAvatarSetting()" class="w-full theme-accent-bg font-semibold p-2.5 rounded-lg text-sm transition-all shadow-lg">Save Aesthetics & Avatar</button>
                     </div>
                 </div>
             </div>
@@ -738,6 +776,25 @@
             vaultedMonths: {}
         };
 
+        const AVATAR_PRESETS = [
+            { style: 'adventurer', seed: 'North' },
+            { style: 'adventurer', seed: 'Cream' },
+            { style: 'lorelei', seed: 'Aureum' },
+            { style: 'lorelei', seed: 'Sol' },
+            { style: 'bottts', seed: 'North' },
+            { style: 'bottts', seed: 'Cream' },
+            { style: 'avataaars', seed: 'Felix' },
+            { style: 'avataaars', seed: 'Luna' },
+            { style: 'big-smile', seed: 'Milo' },
+            { style: 'big-smile', seed: 'Nala' },
+            { style: 'fun-emoji', seed: 'Spark' },
+            { style: 'fun-emoji', seed: 'Zen' },
+            { style: 'personas', seed: 'Aria' },
+            { style: 'personas', seed: 'Leo' },
+            { style: 'micah', seed: 'Nova' },
+            { style: 'micah', seed: 'Orion' }
+        ];
+
         function requestNotificationPermission() {
             try {
                 if ("Notification" in window && Notification.permission === "default") {
@@ -804,6 +861,39 @@
         function toggleAudioMute() {
             audioMuted = !audioMuted;
             document.getElementById('audio-toggle-btn').innerText = audioMuted ? "🔇" : "🔊";
+        }
+
+        // --- TACTILE FORM CONTROLS ---
+
+        function adjustWorkTime(delta) {
+            const input = document.getElementById('work-time');
+            let val = parseFloat(input.value) || 1.0;
+            val = Math.max(0.25, val + delta);
+            input.value = val.toFixed(2).replace(/\.00$/, '');
+        }
+
+        function setWorkTimePreset(val) {
+            document.getElementById('work-time').value = val;
+        }
+
+        function selectRating(field, val) {
+            document.getElementById(`work-${field}`).value = val;
+            
+            const container = document.getElementById(`pills-${field}-container`);
+            const buttons = container.querySelectorAll('.rating-pill');
+            buttons.forEach((btn, idx) => {
+                if (idx + 1 === val) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            const labels = {
+                results: ['1 (Minimal)', '2 (Fair)', '3 (Solid)', '4 (High)', '5 (Exceptional)'],
+                effort: ['1 (Effortless)', '2 (Light)', '3 (Moderate)', '4 (Heavy)', '5 (Maximum)']
+            };
+            document.getElementById(`label-${field}-text`).innerText = labels[field][val - 1];
         }
 
         // --- POMODORO PERSISTENCE & PRESET ENGINE ---
@@ -1197,6 +1287,7 @@
                 }
                 
                 viewedUser = loggedInUser;
+                renderAvatarPresetsGrid();
                 initRealtimeSettingsListener();
                 await initAndRecoverMyPomoState();
                 
@@ -1216,7 +1307,26 @@
             document.body.setAttribute('data-theme', themeKey || 'gold');
         }
 
-        // REALTIME SETTINGS LISTENER (Realtime Chart Vault Updates Across Spectator Sessions)
+        function renderAvatarPresetsGrid() {
+            const grid = document.getElementById('avatar-presets-grid');
+            if (!grid) return;
+            grid.innerHTML = AVATAR_PRESETS.map(p => {
+                const url = `https://api.dicebear.com/7.x/${p.style}/svg?seed=${p.seed}`;
+                return `
+                    <button type="button" onclick="setAvatarPreset('${p.style}', '${p.seed}')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-400 transition-all flex items-center justify-center">
+                        <img src="${url}" alt="${p.seed}" class="w-8 h-8 rounded-full object-cover">
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function randomizeAvatar() {
+            const styles = ['adventurer', 'lorelei', 'bottts', 'avataaars', 'big-smile', 'fun-emoji', 'personas', 'micah'];
+            const randomStyle = styles[Math.floor(Math.random() * styles.length)];
+            const randomSeed = Math.random().toString(36).substring(7);
+            setAvatarPreset(randomStyle, randomSeed);
+        }
+
         function initRealtimeSettingsListener() {
             if (settingsUnsubscribe) settingsUnsubscribe();
 
@@ -1434,7 +1544,6 @@
             });
 
             playTone('save');
-            document.getElementById('work-form').reset();
             loadUserData();
         }
 
@@ -1485,7 +1594,7 @@
             }
         }
 
-        // INITIALIZE CHARTS WITH REALTIME VAULT TOGGLES
+        // INITIALIZE CHARTS
         function initCharts() {
             const chartOptions = {
                 responsive: true,
@@ -1497,7 +1606,6 @@
                 plugins: { legend: { display: false } }
             };
 
-            // Work Chart Setup
             const workCtx = document.getElementById('workChart').getContext('2d');
             charts['work'] = new Chart(workCtx, {
                 type: 'bar',
@@ -1589,16 +1697,36 @@
             });
         }
 
-        function updateProgressBar(capPercent) {
-            const bar = document.getElementById('cap-bar');
-            bar.className = "h-full rounded-full transition-all duration-700 ";
+        function updateGoalGauge(monthlyPoints, targetMonthlyPts) {
+            const rawPct = (monthlyPoints / targetMonthlyPts) * 100;
+            const cappedPct = Math.min(Math.round(rawPct), 100);
+            
+            const circlePath = document.getElementById('gauge-circle-path');
+            const percentText = document.getElementById('gauge-percent-text');
+            const tierBadge = document.getElementById('gauge-tier-badge');
+            const tierSub = document.getElementById('gauge-tier-sub');
 
-            if (capPercent < 50) {
-                bar.className += "bg-blue-500";
-            } else if (capPercent < 100) {
-                bar.className += "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]";
+            if (percentText) percentText.innerText = `${Math.round(rawPct)}%`;
+            if (circlePath) {
+                const offset = 100 - cappedPct;
+                circlePath.style.strokeDashoffset = offset;
+            }
+
+            if (rawPct >= 100) {
+                tierBadge.innerText = "✨ Ascended Master";
+                tierSub.innerText = "Maximum goal crushed!";
+            } else if (rawPct >= 75) {
+                tierBadge.innerText = "🥇 Gold Tier";
+                tierSub.innerText = "Final stretch to max base!";
+            } else if (rawPct >= 50) {
+                tierBadge.innerText = "🥈 Silver Tier";
+                tierSub.innerText = "Halfway benchmark unlocked";
+            } else if (rawPct >= 25) {
+                tierBadge.innerText = "🥉 Bronze Tier";
+                tierSub.innerText = "Building momentum";
             } else {
-                bar.className += "progress-gold-shimmer shadow-[0_0_15px_rgba(245,158,11,0.6)]";
+                tierBadge.innerText = "🌱 Initiate";
+                tierSub.innerText = `${Math.round(rawPct)}% of target reached`;
             }
         }
 
@@ -1667,7 +1795,7 @@
                   const dailyPct = Math.min((todayHours / dailySoftCap) * 100, 100);
                   document.getElementById('daily-bar').style.width = `${dailyPct}%`;
 
-                  // Soft Cap & 2.0h Visual Milestone Logic
+                  // Soft Cap Logic
                   const dailyBarEl = document.getElementById('daily-bar');
                   const milestoneBadge = document.getElementById('milestone-2h-badge');
                   const dailyStatusEl = document.getElementById('daily-cap-status');
@@ -1698,17 +1826,13 @@
                       if (noticeBox) noticeBox.classList.add('hidden');
                   }
 
-                  const capPercent = Math.min((monthlyPoints / targetMonthlyPts) * 100, 100);
-                  document.getElementById('cap-bar').style.width = `${capPercent}%`;
-                  document.getElementById('cap-percent').innerText = `${Math.round((monthlyPoints / targetMonthlyPts) * 100)}%`;
-
-                  updateProgressBar((monthlyPoints / targetMonthlyPts) * 100);
+                  updateGoalGauge(monthlyPoints, targetMonthlyPts);
 
                   ['work', 'health', 'chore'].forEach(type => {
                       updateChartData(type, rawLogs.filter(l => l.type === type), pointRate, maxCash);
                   });
 
-                  // Populate Daily Reflection Box if today's note exists
+                  // Daily Reflection
                   const todayDiary = rawLogs.find(l => l.type === 'diary' && l.timestamp && (l.timestamp.toDate() >= startOfToday));
                   if (todayDiary) {
                       document.getElementById('diary-text').value = todayDiary.text;
@@ -1722,7 +1846,7 @@
               });
         }
 
-        // DYNAMIC LEDGER MONTH SELECTOR & AUTO CURRENT-MONTH DEFAULT
+        // DYNAMIC LEDGER MONTH SELECTOR
         function populateAndFilterLedger() {
             const select = document.getElementById('ledger-month-select');
             if (!select) return;
@@ -1761,7 +1885,6 @@
             optionsHtml += `<option value="all">All Time Records</option>`;
             select.innerHTML = optionsHtml;
 
-            // Auto-default to current month unless explicitly filtered to another option
             if (Array.from(select.options).some(opt => opt.value === previousValue)) {
                 select.value = previousValue;
             } else {
@@ -1955,7 +2078,7 @@
                     const monthKey = `${now.getFullYear()}-${i}`;
                     const isVaulted = userSettings.vaultedMonths && userSettings.vaultedMonths[monthKey];
                     if (isVaulted) {
-                        bgColors.push('#f59e0b'); // Distinct Gold bar for VAULTED / Paid months
+                        bgColors.push('#f59e0b');
                     } else {
                         bgColors.push(workChartMetric === 'cash' ? '#10b981' : '#3b82f6');
                     }
