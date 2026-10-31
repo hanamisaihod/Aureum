@@ -185,11 +185,17 @@
                     <div class="text-3xl font-extrabold text-blue-400 mt-1" id="monthly-points">0.00 pts</div>
                     <div class="text-xs text-slate-500 mt-1">Goal: <span id="label-monthly-goal-pts">120</span> pts (<span id="label-weekly-hrs">10</span> hrs/wk)</div>
                 </div>
+                
+                <!-- Allowance Tracker Box with Vault Status Toggle -->
                 <div id="payout-card-box">
-                    <span class="text-xs uppercase tracking-wider text-slate-400">Spendable Allowance Earned</span>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs uppercase tracking-wider text-slate-400">Allowance Earned</span>
+                        <button id="allowance-vault-btn" onclick="toggleAllowanceVault()" class="text-[10px] font-bold px-2 py-0.5 rounded border transition-all bg-emerald-500/20 text-emerald-300 border-emerald-500/40">🔓 UNLOCKED</button>
+                    </div>
                     <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="monthly-payout">฿0</div>
                     <div class="text-xs text-slate-500 mt-1">Target Base: ฿<span id="label-monthly-cash">8,000</span></div>
                 </div>
+
                 <div>
                     <span class="text-xs uppercase tracking-wider text-slate-400">Today's Soft Cap</span>
                     <div class="text-3xl font-extrabold theme-accent-text mt-1" id="today-hours-label">0.0 / 4.0 hrs</div>
@@ -266,6 +272,20 @@
                 </form>
             </div>
 
+            <!-- Daily Reflection & Mindset Card -->
+            <div id="diary-form-card" class="card p-6 rounded-xl">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-lg font-semibold text-slate-200">Daily Reflection Note</h2>
+                    <span id="diary-status-badge" class="text-xs text-slate-400">Jot down thoughts or wins</span>
+                </div>
+                <form onsubmit="saveDailyDiary(event)" class="space-y-3">
+                    <textarea id="diary-text" rows="2" placeholder="What went well today? Any mindsets or lessons learned?" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 resize-none"></textarea>
+                    <div class="flex justify-end">
+                        <button type="submit" id="diary-save-btn" class="theme-accent-bg font-medium px-5 py-2 rounded-lg text-xs transition-all">Save Today's Reflection</button>
+                    </div>
+                </form>
+            </div>
+
             <!-- Embedded Work Analytics Chart -->
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
@@ -303,6 +323,14 @@
                     <button onclick="handleUserSelectPomoMode('focus')" id="pomo-mode-focus" class="px-4 py-1.5 rounded-md font-medium transition-all bg-blue-600 text-white">Focus</button>
                     <button onclick="handleUserSelectPomoMode('short')" id="pomo-mode-short" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Short Break</button>
                     <button onclick="handleUserSelectPomoMode('long')" id="pomo-mode-long" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Long Break</button>
+                </div>
+
+                <!-- Uncluttered Focus Preset Chips -->
+                <div id="pomo-presets-box" class="flex justify-center items-center gap-1.5 text-xs text-slate-400">
+                    <span class="text-[10px] uppercase font-bold text-slate-500 mr-1">Presets:</span>
+                    <button onclick="applyPomoPreset(25, 5, 15)" class="px-2.5 py-1 rounded bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 transition-all text-[11px]">25/5 Classic</button>
+                    <button onclick="applyPomoPreset(50, 10, 15)" class="px-2.5 py-1 rounded bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 transition-all text-[11px]">50/10 Deep Flow</button>
+                    <button onclick="applyPomoPreset(15, 3, 10)" class="px-2.5 py-1 rounded bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 transition-all text-[11px]">15/3 Sprint</button>
                 </div>
 
                 <!-- Round/Lap Indicator -->
@@ -530,12 +558,12 @@
                 <h2 class="text-lg font-semibold mb-2 text-slate-200">Activity Log Ledger</h2>
                 <p class="text-xs text-slate-400 mb-6">View and manage all historical log submissions for the selected profile.</p>
                 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <!-- Work Column -->
                     <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3">
                         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <h3 class="text-sm font-bold text-blue-400 uppercase tracking-wider">💼 Work Logs</h3>
-                            <span id="ledger-count-work" class="text-xs text-slate-500">0 entries</span>
+                            <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider">💼 Work</h3>
+                            <span id="ledger-count-work" class="text-[10px] text-slate-500">0 entries</span>
                         </div>
                         <div id="ledger-list-work" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
                     </div>
@@ -543,8 +571,8 @@
                     <!-- Snack Column -->
                     <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3">
                         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider">🍨 Snack Logs</h3>
-                            <span id="ledger-count-health" class="text-xs text-slate-500">0 entries</span>
+                            <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">🍨 Snacks</h3>
+                            <span id="ledger-count-health" class="text-[10px] text-slate-500">0 entries</span>
                         </div>
                         <div id="ledger-list-health" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
                     </div>
@@ -552,10 +580,19 @@
                     <!-- Chore Column -->
                     <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3">
                         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <h3 class="text-sm font-bold theme-accent-text uppercase tracking-wider">🧹 Chore Logs</h3>
-                            <span id="ledger-count-chore" class="text-xs text-slate-500">0 entries</span>
+                            <h3 class="text-xs font-bold theme-accent-text uppercase tracking-wider">🧹 Chores</h3>
+                            <span id="ledger-count-chore" class="text-[10px] text-slate-500">0 entries</span>
                         </div>
                         <div id="ledger-list-chore" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
+                    </div>
+
+                    <!-- Reflections Column -->
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                            <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider">📖 Reflections</h3>
+                            <span id="ledger-count-diary" class="text-[10px] text-slate-500">0 entries</span>
+                        </div>
+                        <div id="ledger-list-diary" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
                     </div>
                 </div>
             </div>
@@ -587,7 +624,6 @@
 
         let currentTodayHoursLogged = 0;
 
-        // Logged-in user's background active timer state
         let myPomoMode = 'focus';
         let myPomoRound = 1;
         let myPomoTime = 1500;
@@ -595,12 +631,10 @@
         let myPomoIsRunning = false;
         let myPomoInterval = null;
         
-        // Decoupled Renderer State
         let pomoUIRenderInterval = null;
         let pomoSyncUnsubscribe = null;
         let spectatorSettings = null;
 
-        // Shadow Spectator Timer State
         let shadowSpectatorTime = 1500;
         let shadowSpectatorIsRunning = false;
         let shadowSpectatorInterval = null;
@@ -614,7 +648,8 @@
             pomoShort: 5,
             pomoLong: 15,
             pomoRounds: 4,
-            userTheme: 'gold'
+            userTheme: 'gold',
+            vaultedMonths: {}
         };
 
         function requestNotificationPermission() {
@@ -685,7 +720,30 @@
             document.getElementById('audio-toggle-btn').innerText = audioMuted ? "🔇" : "🔊";
         }
 
-        // --- POMODORO PERSISTENCE & BACKGROUND ENGINE ---
+        // --- POMODORO PERSISTENCE & PRESET ENGINE ---
+
+        async function applyPomoPreset(focus, shortBreak, longBreak) {
+            if (loggedInUser !== viewedUser) return;
+            userSettings.pomoFocus = focus;
+            userSettings.pomoShort = shortBreak;
+            userSettings.pomoLong = longBreak;
+
+            document.getElementById('setting-pomo-focus').value = focus;
+            document.getElementById('setting-pomo-short').value = shortBreak;
+            document.getElementById('setting-pomo-long').value = longBreak;
+
+            try {
+                await db.collection('settings').doc(loggedInUser).set({
+                    pomoFocus: focus,
+                    pomoShort: shortBreak,
+                    pomoLong: longBreak
+                }, { merge: true });
+                playTone('save');
+                setMyPomoMode(myPomoMode);
+            } catch (err) {
+                console.error("Failed to save pomo preset:", err);
+            }
+        }
 
         async function syncMyPomoToCloud() {
             if (!loggedInUser) return;
@@ -964,12 +1022,14 @@
             const spectatorBanner = document.getElementById('pomo-spectator-banner');
             const controlsBox = document.getElementById('pomo-controls-box');
             const modeBox = document.getElementById('pomo-mode-box');
+            const presetsBox = document.getElementById('pomo-presets-box');
             const clockContainer = document.getElementById('pomo-clock-container');
 
             if (!isSelf) {
                 spectatorBanner.classList.remove('hidden');
                 document.getElementById('pomo-spectator-target').innerText = viewedUser;
                 controlsBox.classList.add('hidden');
+                if (presetsBox) presetsBox.classList.add('hidden');
                 modeBox.style.pointerEvents = 'none';
                 modeBox.style.opacity = '0.6';
                 clockContainer.classList.remove('cursor-pointer', 'hover:bg-slate-800/50');
@@ -979,7 +1039,6 @@
                     if (doc.exists) {
                         spectatorSettings = doc.data();
                         
-                        // Apply spectator's theme dynamically
                         if (spectatorSettings.userTheme) {
                             applyThemeToBody(spectatorSettings.userTheme);
                         }
@@ -1011,11 +1070,50 @@
             } else {
                 spectatorBanner.classList.add('hidden');
                 controlsBox.classList.remove('hidden');
+                if (presetsBox) presetsBox.classList.remove('hidden');
                 modeBox.style.pointerEvents = 'auto';
                 modeBox.style.opacity = '1';
                 clockContainer.classList.add('cursor-pointer', 'hover:bg-slate-800/50');
                 clockContainer.classList.remove('cursor-default');
             }
+        }
+
+        // --- ALLOWANCE VAULT TRACKER ENGINE ---
+
+        async function toggleAllowanceVault() {
+            if (loggedInUser !== viewedUser) return;
+            const now = new Date();
+            const monthKey = `${now.getFullYear()}-${now.getMonth()}`;
+            userSettings.vaultedMonths = userSettings.vaultedMonths || {};
+            userSettings.vaultedMonths[monthKey] = !userSettings.vaultedMonths[monthKey];
+
+            try {
+                await db.collection('settings').doc(loggedInUser).set({
+                    vaultedMonths: userSettings.vaultedMonths
+                }, { merge: true });
+                playTone('save');
+                loadUserData();
+            } catch (err) {
+                console.error("Failed to toggle vault status:", err);
+            }
+        }
+
+        // --- DAILY DIARY / REFLECTION ENGINE ---
+
+        async function saveDailyDiary(e) {
+            e.preventDefault();
+            const text = document.getElementById('diary-text').value.trim();
+            if (!text) return;
+
+            await db.collection('logs').add({
+                type: 'diary',
+                user: loggedInUser,
+                text: text,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            playTone('save');
+            loadUserData();
         }
 
         // --- APP AUTHENTICATION & DATA HANDLING ---
@@ -1062,7 +1160,6 @@
             } catch (err) {
                 console.error("Error loading cloud settings:", err);
             }
-            // Instant theme application upon page enter
             applyThemeToBody(userSettings.userTheme);
             updateSettingsUI();
         }
@@ -1173,8 +1270,16 @@
             const isSelf = loggedInUser === viewedUser;
             
             document.getElementById('work-form-card').style.display = isSelf ? 'block' : 'none';
+            document.getElementById('diary-form-card').style.display = isSelf ? 'block' : 'none';
             document.getElementById('health-form-card').style.display = isSelf ? 'block' : 'none';
             document.getElementById('chore-form-card').style.display = isSelf ? 'block' : 'none';
+
+            const vaultBtn = document.getElementById('allowance-vault-btn');
+            if (vaultBtn) {
+                vaultBtn.disabled = !isSelf;
+                if (!isSelf) vaultBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                else vaultBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
 
             const forgeInputs = document.querySelectorAll('#tab-forge input, #tab-forge select');
             forgeInputs.forEach(input => {
@@ -1358,6 +1463,7 @@
                   const now = new Date();
                   const currentYear = now.getFullYear();
                   const currentMonth = now.getMonth();
+                  const monthKey = `${currentYear}-${currentMonth}`;
                   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
                   snapshot.forEach(doc => {
@@ -1393,7 +1499,23 @@
                   
                   const calculatedPayout = monthlyPoints * pointRate;
                   const finalPayout = Math.min(calculatedPayout, maxCash);
-                  document.getElementById('monthly-payout').innerText = `฿${Math.round(finalPayout).toLocaleString()}`;
+                  
+                  // Allowance Vault UI Status Sync
+                  const isVaulted = userSettings.vaultedMonths && userSettings.vaultedMonths[monthKey];
+                  const vaultBtn = document.getElementById('allowance-vault-btn');
+                  const payoutEl = document.getElementById('monthly-payout');
+
+                  if (isVaulted) {
+                      vaultBtn.innerText = "🔒 VAULTED";
+                      vaultBtn.className = "text-[10px] font-bold px-2 py-0.5 rounded border transition-all bg-amber-500/20 text-amber-300 border-amber-500/40";
+                      payoutEl.innerText = `฿${Math.round(finalPayout).toLocaleString()}`;
+                      payoutEl.className = "text-3xl font-extrabold text-amber-400 mt-1 opacity-70 line-through";
+                  } else {
+                      vaultBtn.innerText = "🔓 UNLOCKED";
+                      vaultBtn.className = "text-[10px] font-bold px-2 py-0.5 rounded border transition-all bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
+                      payoutEl.innerText = `฿${Math.round(finalPayout).toLocaleString()}`;
+                      payoutEl.className = "text-3xl font-extrabold text-emerald-400 mt-1";
+                  }
                   
                   document.getElementById('today-hours-label').innerText = `${todayHours.toFixed(1)} / ${dailySoftCap} hrs`;
                   const dailyPct = Math.min((todayHours / dailySoftCap) * 100, 100);
@@ -1425,6 +1547,16 @@
                       updateChartData(type, rawLogs.filter(l => l.type === type), pointRate, maxCash);
                   });
 
+                  // Populate Daily Reflection Box if today's note exists
+                  const todayDiary = rawLogs.find(l => l.type === 'diary' && l.timestamp && (l.timestamp.toDate() >= startOfToday));
+                  if (todayDiary) {
+                      document.getElementById('diary-text').value = todayDiary.text;
+                      document.getElementById('diary-status-badge').innerText = "Today's Note Saved ✨";
+                  } else {
+                      document.getElementById('diary-text').value = '';
+                      document.getElementById('diary-status-badge').innerText = "Jot down thoughts or wins";
+                  }
+
                   renderLedgerLists(rawLogs);
               });
         }
@@ -1434,15 +1566,17 @@
             const workLogs = logs.filter(l => l.type === 'work');
             const healthLogs = logs.filter(l => l.type === 'health');
             const choreLogs = logs.filter(l => l.type === 'chore');
+            const diaryLogs = logs.filter(l => l.type === 'diary');
 
             document.getElementById('ledger-count-work').innerText = `${workLogs.length} entries`;
             document.getElementById('ledger-count-health').innerText = `${healthLogs.length} entries`;
             document.getElementById('ledger-count-chore').innerText = `${choreLogs.length} entries`;
+            document.getElementById('ledger-count-diary').innerText = `${diaryLogs.length} entries`;
 
             // 1. Work List
             const workContainer = document.getElementById('ledger-list-work');
             if (workLogs.length === 0) {
-                workContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No work logs recorded.</div>`;
+                workContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No work logs.</div>`;
             } else {
                 workContainer.innerHTML = workLogs.map(l => {
                     const dateStr = l.timestamp ? l.timestamp.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just now';
@@ -1454,7 +1588,7 @@
                                 ${delBtn}
                             </div>
                             <div class="flex justify-between items-center font-medium">
-                                <span class="text-slate-200">${l.hours} hrs (Out: ${l.results}/5 | Eff: ${l.effort}/5)</span>
+                                <span class="text-slate-200">${l.hours} hrs (${l.results}/${l.effort})</span>
                                 <span class="text-blue-400 font-bold">+${(l.points || 0).toFixed(2)} pts</span>
                             </div>
                         </div>
@@ -1465,7 +1599,7 @@
             // 2. Health List
             const healthContainer = document.getElementById('ledger-list-health');
             if (healthLogs.length === 0) {
-                healthContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No snack logs recorded.</div>`;
+                healthContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No snack logs.</div>`;
             } else {
                 healthContainer.innerHTML = healthLogs.map(l => {
                     const dateStr = l.timestamp ? l.timestamp.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just now';
@@ -1477,8 +1611,8 @@
                                 ${delBtn}
                             </div>
                             <div class="flex justify-between items-center font-medium">
-                                <span class="text-emerald-300">Level ${l.level} Portion</span>
-                                <span class="text-slate-300 italic truncate max-w-[120px]">${l.note || 'No note'}</span>
+                                <span class="text-emerald-300">Level ${l.level}</span>
+                                <span class="text-slate-300 italic truncate max-w-[100px]">${l.note || 'No note'}</span>
                             </div>
                         </div>
                     `;
@@ -1488,7 +1622,7 @@
             // 3. Chore List
             const choreContainer = document.getElementById('ledger-list-chore');
             if (choreLogs.length === 0) {
-                choreContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No chore logs recorded.</div>`;
+                choreContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No chore logs.</div>`;
             } else {
                 choreContainer.innerHTML = choreLogs.map(l => {
                     const dateStr = l.timestamp ? l.timestamp.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just now';
@@ -1501,7 +1635,29 @@
                             </div>
                             <div class="flex justify-between items-center font-medium">
                                 <span class="theme-accent-text font-bold">${l.hours} hrs</span>
-                                <span class="text-slate-300 italic truncate max-w-[120px]">${l.note || 'No details'}</span>
+                                <span class="text-slate-300 italic truncate max-w-[100px]">${l.note || 'No details'}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // 4. Reflections / Diary List
+            const diaryContainer = document.getElementById('ledger-list-diary');
+            if (diaryLogs.length === 0) {
+                diaryContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No reflections recorded.</div>`;
+            } else {
+                diaryContainer.innerHTML = diaryLogs.map(l => {
+                    const dateStr = l.timestamp ? l.timestamp.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just now';
+                    const delBtn = isSelf ? `<button onclick="deleteLogEntry('${l.id}')" class="text-[10px] text-red-400 hover:text-red-300 font-semibold px-2 py-0.5 rounded bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-all">Delete</button>` : '';
+                    return `
+                        <div class="p-2.5 bg-slate-800/70 border border-slate-700/60 rounded-lg text-xs space-y-1">
+                            <div class="flex justify-between items-center text-slate-400">
+                                <span>${dateStr}</span>
+                                ${delBtn}
+                            </div>
+                            <div class="text-slate-200 italic leading-snug break-words">
+                                "${l.text}"
                             </div>
                         </div>
                     `;
