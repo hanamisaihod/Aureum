@@ -23,6 +23,7 @@
         body[data-theme="monochrome"] { --bg-main: #121212; --card-bg: #1e1e1e; --card-border: #333333; --accent-primary: #e2e8f0; --accent-primary-hover: #cbd5e1; --accent-primary-text: #0f172a; --accent-glow: rgba(226, 232, 240, 0.25); }
 
         body { background-color: var(--bg-main); color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.3s; }
+        button, input, select { touch-action: manipulation; }
         .card { background-color: var(--card-bg); border: 1px solid var(--card-border); transition: all 0.3s; }
         .tab-btn { color: #94a3b8; background-color: transparent; border: 1px solid transparent; transition: all 0.2s; }
         .tab-btn:hover { color: #f8fafc; background-color: rgba(30, 41, 59, 0.7); }
@@ -589,25 +590,6 @@
 
     <!-- APPLICATION SCRIPT ENGINE -->
     <script>
-        // GLOBAL MOBILE TOUCH DEDUPING
-        let lastTouchEndTime = 0;
-        window.addEventListener('touchstart', (e) => {
-            const btn = e.target.closest('button');
-            if (btn) {
-                lastTouchEndTime = Date.now();
-            }
-        }, true);
-
-        // Intercept simulated mouse events generated shortly after a touch event
-        ['mousedown', 'click'].forEach(evtType => {
-            window.addEventListener(evtType, (e) => {
-                if (Date.now() - lastTouchEndTime < 500) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            }, true);
-        });
-
         // 1. CONFIG & INIT
         const firebaseConfig = {
             apiKey: "AIzaSyAJ7cVPRiJfiShTKFi___pJ9VZHEcLM47Q",
@@ -839,7 +821,12 @@
             if (max !== undefined) val = Math.min(max, val);
             el.value = step < 1 ? val.toFixed(2) : Math.round(val);
         }
-        function startHoldStep(id, delta, step, min, max) {
+
+        function startHoldStep(id, delta, step, min, max, e) {
+            const evt = e || window.event;
+            if (evt && evt.type === 'touchstart' && evt.cancelable) {
+                evt.preventDefault();
+            }
             stopHoldStep(); stepValue(id, delta, step, min, max);
             holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepValue(id, delta, step, min, max), 80); }, 300);
         }
@@ -858,7 +845,11 @@
             input.value = Math.max(1, Math.min(5, (parseInt(input.value) || 3) + delta));
             updateRatingUI(field);
         }
-        function startHoldStepRating(field, delta) {
+        function startHoldStepRating(field, delta, e) {
+            const evt = e || window.event;
+            if (evt && evt.type === 'touchstart' && evt.cancelable) {
+                evt.preventDefault();
+            }
             stopHoldStep(); stepRating(field, delta);
             holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepRating(field, delta), 120); }, 300);
         }
