@@ -104,12 +104,9 @@
         .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
 
         .avatar-btn {
-            position: relative;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative; transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .avatar-btn:hover {
-            transform: scale(1.08);
-        }
+        .avatar-btn:hover { transform: scale(1.08); }
         .avatar-btn .avatar-tooltip {
             visibility: hidden; opacity: 0; position: absolute; top: 115%; left: 50%; transform: translateX(-50%);
             background-color: #020617; color: #f8fafc; padding: 4px 10px; border-radius: 6px; border: 1px solid #475569;
@@ -122,29 +119,24 @@
             color: var(--accent-primary); letter-spacing: 0.25em; text-shadow: 0 0 12px var(--accent-glow); transition: color 0.3s ease;
         }
 
-        /* Tactile Input Rating Pills */
+        /* Minimal Tactile Rating Pills */
         .rating-pill {
             transition: all 0.15s ease-in-out;
             border: 1px solid #334155;
             background-color: #0f172a;
             color: #94a3b8;
         }
-        .rating-pill:hover {
-            border-color: #64748b;
-            color: #f8fafc;
-        }
+        .rating-pill:hover { border-color: #64748b; color: #f8fafc; }
         .rating-pill.active {
             background-color: var(--accent-primary) !important;
             color: var(--accent-primary-text) !important;
             border-color: var(--accent-primary) !important;
             font-weight: 700;
-            box-shadow: 0 0 12px var(--accent-glow);
+            box-shadow: 0 0 10px var(--accent-glow);
         }
 
-        /* Ring Gauge SVG animation */
-        .gauge-circle {
-            transition: stroke-dashoffset 0.8s ease-in-out, stroke 0.3s ease;
-        }
+        /* Ring Gauge Circle */
+        .gauge-circle { transition: stroke-dashoffset 0.8s ease-in-out, stroke 0.3s ease; }
     </style>
 </head>
 <body data-theme="gold" class="p-4 md:p-8 max-w-6xl mx-auto">
@@ -245,9 +237,9 @@
                     </div>
                 </div>
 
-                <!-- Unique Goal Ring Gauge (Replaces Plain Progress Bar) -->
-                <div class="flex items-center justify-center sm:justify-start gap-4 p-2 bg-slate-900/50 rounded-xl border border-slate-800/80">
-                    <div class="relative w-16 h-16 flex-shrink-0 flex items-center justify-center">
+                <!-- Goal Ring Gauge -->
+                <div class="flex items-center justify-center sm:justify-start gap-4 p-2.5 bg-slate-900/50 rounded-xl border border-slate-800/80">
+                    <div class="relative w-14 h-14 flex-shrink-0 flex items-center justify-center">
                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                             <path class="text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             <path id="gauge-circle-path" class="gauge-circle theme-accent-text" stroke-dasharray="100, 100" stroke-dashoffset="100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -257,12 +249,12 @@
                     <div>
                         <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Monthly Goal Tier</span>
                         <span id="gauge-tier-badge" class="text-xs font-extrabold theme-accent-text block mt-0.5">Initiate</span>
-                        <span id="gauge-tier-sub" class="text-[10px] text-slate-500 block">0% of target reached</span>
+                        <span id="gauge-tier-sub" class="text-[10px] text-slate-500 block">0% reached</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Work Log Form with Upgraded Interactive Rating Controls -->
+            <!-- Streamlined Work Log Form -->
             <div id="work-form-card" class="card p-6 rounded-xl">
                 <h2 class="text-lg font-semibold mb-3 text-slate-200">Log Work Session</h2>
                 
@@ -272,94 +264,57 @@
                 </div>
 
                 <form id="work-form" onsubmit="logWork(event)" class="space-y-4">
-                    <!-- Hidden Form Inputs -->
                     <input type="hidden" id="work-results" value="3">
                     <input type="hidden" id="work-effort" value="3">
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                         
-                        <!-- Tactile Duration Input -->
+                        <!-- Hours Input -->
                         <div>
                             <label class="block text-xs text-slate-400 mb-2 font-medium">
                                 Hours Spent
                                 <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
                                     <span class="tooltip-text">
-                                        <strong>Duration:</strong> Total clock hours dedicated to uninterrupted deep work or focused practice (e.g. 1.5 = 1 hr 30 mins).
+                                        <strong>Duration:</strong> Total clock hours dedicated to work (e.g. 1.5 = 1 hr 30 mins).
                                     </span>
                                 </span>
                             </label>
-
-                            <div class="flex items-center gap-2">
-                                <button type="button" onclick="adjustWorkTime(-0.25)" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-all">-0.25</button>
-                                <input type="number" id="work-time" step="0.25" min="0.25" value="1.0" required class="w-full text-center bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-amber-500">
-                                <button type="button" onclick="adjustWorkTime(0.25)" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-all">+0.25</button>
-                            </div>
-
-                            <div class="flex gap-1.5 mt-2">
-                                <button type="button" onclick="setWorkTimePreset(0.5)" class="flex-1 py-1 rounded bg-slate-900/80 border border-slate-800 hover:border-slate-700 text-[10px] text-slate-400">30m</button>
-                                <button type="button" onclick="setWorkTimePreset(1.0)" class="flex-1 py-1 rounded bg-slate-900/80 border border-slate-800 hover:border-slate-700 text-[10px] text-slate-400">1h</button>
-                                <button type="button" onclick="setWorkTimePreset(1.5)" class="flex-1 py-1 rounded bg-slate-900/80 border border-slate-800 hover:border-slate-700 text-[10px] text-slate-400">1.5h</button>
-                                <button type="button" onclick="setWorkTimePreset(2.0)" class="flex-1 py-1 rounded bg-slate-900/80 border border-slate-800 hover:border-slate-700 text-[10px] text-slate-400">2h</button>
-                            </div>
+                            <input type="number" id="work-time" step="0.25" min="0.25" value="1.0" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white font-mono font-semibold focus:outline-none focus:border-amber-500">
                         </div>
 
-                        <!-- Tactile Output Rating Pills -->
+                        <!-- Output Quality -->
                         <div>
                             <div class="flex justify-between items-center mb-2">
-                                <label class="text-xs text-slate-400 font-medium">
-                                    Output Quality
-                                    <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
-                                        <span class="tooltip-text">
-                                            <strong>Output Level:</strong><br>
-                                            <strong>1: Minimal</strong> — Light warmup / planning.<br>
-                                            <strong>2: Fair</strong> — Progress made, under standard pace.<br>
-                                            <strong>3: Solid</strong> — On-target production.<br>
-                                            <strong>4: High</strong> — Exceptional speed & clarity.<br>
-                                            <strong>5: Exceptional</strong> — Peak flow state.
-                                        </span>
-                                    </span>
-                                </label>
-                                <span id="label-results-text" class="text-[11px] theme-accent-text font-semibold">3 (Solid)</span>
+                                <label class="text-xs text-slate-400 font-medium">Output Quality</label>
+                                <span id="label-results-text" class="text-xs theme-accent-text font-semibold">3 (Solid)</span>
                             </div>
                             <div class="grid grid-cols-5 gap-1.5" id="pills-results-container">
-                                <button type="button" onclick="selectRating('results', 1)" class="rating-pill py-2 rounded-lg text-xs font-semibold">1</button>
-                                <button type="button" onclick="selectRating('results', 2)" class="rating-pill py-2 rounded-lg text-xs font-semibold">2</button>
-                                <button type="button" onclick="selectRating('results', 3)" class="rating-pill active py-2 rounded-lg text-xs font-semibold">3</button>
-                                <button type="button" onclick="selectRating('results', 4)" class="rating-pill py-2 rounded-lg text-xs font-semibold">4</button>
-                                <button type="button" onclick="selectRating('results', 5)" class="rating-pill py-2 rounded-lg text-xs font-semibold">5</button>
+                                <button type="button" onclick="selectRating('results', 1)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">1</button>
+                                <button type="button" onclick="selectRating('results', 2)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">2</button>
+                                <button type="button" onclick="selectRating('results', 3)" class="rating-pill active py-2.5 rounded-lg text-xs font-semibold">3</button>
+                                <button type="button" onclick="selectRating('results', 4)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">4</button>
+                                <button type="button" onclick="selectRating('results', 5)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">5</button>
                             </div>
                         </div>
 
-                        <!-- Tactile Effort Rating Pills -->
+                        <!-- Effort & Friction -->
                         <div>
                             <div class="flex justify-between items-center mb-2">
-                                <label class="text-xs text-slate-400 font-medium">
-                                    Effort & Friction
-                                    <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
-                                        <span class="tooltip-text">
-                                            <strong>Friction Level:</strong><br>
-                                            <strong>1: Effortless</strong> — Zero mental strain.<br>
-                                            <strong>2: Light</strong> — Mild focus required.<br>
-                                            <strong>3: Moderate</strong> — Standard focus effort.<br>
-                                            <strong>4: Heavy</strong> — Strong resistance overcome.<br>
-                                            <strong>5: Maximum</strong> — Intense willpower needed.
-                                        </span>
-                                    </span>
-                                </label>
-                                <span id="label-effort-text" class="text-[11px] theme-accent-text font-semibold">3 (Moderate)</span>
+                                <label class="text-xs text-slate-400 font-medium">Effort & Friction</label>
+                                <span id="label-effort-text" class="text-xs theme-accent-text font-semibold">3 (Moderate)</span>
                             </div>
                             <div class="grid grid-cols-5 gap-1.5" id="pills-effort-container">
-                                <button type="button" onclick="selectRating('effort', 1)" class="rating-pill py-2 rounded-lg text-xs font-semibold">1</button>
-                                <button type="button" onclick="selectRating('effort', 2)" class="rating-pill py-2 rounded-lg text-xs font-semibold">2</button>
-                                <button type="button" onclick="selectRating('effort', 3)" class="rating-pill active py-2 rounded-lg text-xs font-semibold">3</button>
-                                <button type="button" onclick="selectRating('effort', 4)" class="rating-pill py-2 rounded-lg text-xs font-semibold">4</button>
-                                <button type="button" onclick="selectRating('effort', 5)" class="rating-pill py-2 rounded-lg text-xs font-semibold">5</button>
+                                <button type="button" onclick="selectRating('effort', 1)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">1</button>
+                                <button type="button" onclick="selectRating('effort', 2)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">2</button>
+                                <button type="button" onclick="selectRating('effort', 3)" class="rating-pill active py-2.5 rounded-lg text-xs font-semibold">3</button>
+                                <button type="button" onclick="selectRating('effort', 4)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">4</button>
+                                <button type="button" onclick="selectRating('effort', 5)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">5</button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex justify-end pt-2">
-                        <button type="submit" class="w-full md:w-auto px-8 bg-blue-600 hover:bg-blue-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all shadow-lg">Save Work Session</button>
+                    <div class="flex justify-end pt-1">
+                        <button type="submit" class="w-full md:w-auto px-8 bg-blue-600 hover:bg-blue-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all shadow-md">Save Work Session</button>
                     </div>
                 </form>
             </div>
@@ -417,7 +372,7 @@
                     <button onclick="handleUserSelectPomoMode('long')" id="pomo-mode-long" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Long Break</button>
                 </div>
 
-                <!-- Sorted Focus Preset Chips -->
+                <!-- Focus Preset Chips -->
                 <div id="pomo-presets-box" class="flex justify-center items-center gap-1.5 text-xs text-slate-400">
                     <span class="text-[10px] uppercase font-bold text-slate-500 mr-1">Presets:</span>
                     <button onclick="applyPomoPreset(15, 3, 10)" class="px-2.5 py-1 rounded bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 transition-all text-[11px]">15/3 Sprint</button>
@@ -542,104 +497,87 @@
             </div>
         </div>
 
-        <!-- TAB 5: FORGE -->
+        <!-- TAB 5: FORGE (UNIFIED SAVE AT BOTTOM) -->
         <div id="tab-forge" class="hidden space-y-6">
-            
-            <!-- Aesthetic Profile Theme & Expanded Avatar Selection Section -->
-            <div class="card p-6 rounded-xl max-w-2xl">
-                <h2 class="text-lg font-semibold mb-2 text-slate-200">Visual Theme & Avatar Customization</h2>
-                <p class="text-xs text-slate-400 mb-6">Select your personal color palette and header profile avatar image.</p>
+            <form onsubmit="saveAllForgeSettings(event)" class="space-y-6 max-w-2xl">
                 
-                <div class="space-y-5">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Theme Palette</label>
-                            <select id="setting-user-theme" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
-                                <option value="gold">Aureum Gold (Classic Amber)</option>
-                                <option value="rose">Rose Quartz (Soft Magenta & Pink)</option>
-                                <option value="emerald">Emerald Grove (Mint & Forest)</option>
-                                <option value="cyber">Midnight Cyber (Neon Violet & Cyan)</option>
-                                <option value="sunset">Sunset Terracotta (Warm Peach)</option>
-                                <option value="amethyst">Amethyst Dusk (Lavender & Purple)</option>
-                                <option value="ocean">Ocean Abyss (Deep Sea Teal)</option>
-                                <option value="crimson">Crimson Forge (Ruby Flame)</option>
-                                <option value="matcha">Matcha Latte (Sage & Cream)</option>
-                                <option value="monochrome">Monochrome Slate (Silver Minimal)</option>
-                            </select>
+                <!-- Section 1: Aesthetics & Avatar -->
+                <div class="card p-6 rounded-xl">
+                    <h2 class="text-lg font-semibold mb-2 text-slate-200">Visual Theme & Avatar Customization</h2>
+                    <p class="text-xs text-slate-400 mb-5">Select your color palette and customize your header profile avatar.</p>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Theme Palette</label>
+                                <select id="setting-user-theme" onchange="handleInstantThemeChange()" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                                    <option value="gold">Aureum Gold (Classic Amber)</option>
+                                    <option value="rose">Rose Quartz (Soft Magenta & Pink)</option>
+                                    <option value="emerald">Emerald Grove (Mint & Forest)</option>
+                                    <option value="cyber">Midnight Cyber (Neon Violet & Cyan)</option>
+                                    <option value="sunset">Sunset Terracotta (Warm Peach)</option>
+                                    <option value="amethyst">Amethyst Dusk (Lavender & Purple)</option>
+                                    <option value="ocean">Ocean Abyss (Deep Sea Teal)</option>
+                                    <option value="crimson">Crimson Forge (Ruby Flame)</option>
+                                    <option value="matcha">Matcha Latte (Sage & Cream)</option>
+                                    <option value="monochrome">Monochrome Slate (Silver Minimal)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Custom Image URL</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="setting-avatar-url" placeholder="https://..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                                    <button type="button" onclick="applyCustomAvatarUrl()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-200 font-semibold rounded-lg transition-all whitespace-nowrap">Apply</button>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Custom Image URL</label>
-                            <input type="text" id="setting-avatar-url" placeholder="https://..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
-                        </div>
-                    </div>
 
-                    <!-- Expanded Avatar Presets Grid -->
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs text-slate-400 font-medium">Avatar Presets Gallery</span>
-                            <button type="button" onclick="randomizeAvatar()" class="text-[11px] theme-accent-text font-semibold hover:underline">🎲 Surprise Me</button>
+                        <!-- Presets & Surprise Me -->
+                        <div>
+                            <span class="block text-xs text-slate-400 mb-2">Preset Avatars</span>
+                            <div class="flex items-center gap-3">
+                                <button type="button" onclick="setAvatarPreset('bottts', 'North')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-400 transition-all flex items-center justify-center" title="Bottts North">
+                                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North Robot" class="w-8 h-8 rounded-full object-cover">
+                                </button>
+                                <button type="button" onclick="setAvatarPreset('bottts', 'Cream')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-400 transition-all flex items-center justify-center" title="Bottts Cream">
+                                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream Robot" class="w-8 h-8 rounded-full object-cover">
+                                </button>
+                                <button type="button" onclick="randomizeAvatar()" class="px-4 py-2 theme-accent-bg text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 shadow-md">
+                                    <span>🎲</span> <span>Surprise Me</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="grid grid-cols-4 sm:grid-cols-8 gap-2 p-2 bg-slate-900/60 rounded-xl border border-slate-800 max-h-48 overflow-y-auto" id="avatar-presets-grid">
-                            <!-- Populated dynamically via JS -->
-                        </div>
-                    </div>
-
-                    <div class="pt-2">
-                        <button onclick="saveThemeAndAvatarSetting()" class="w-full theme-accent-bg font-semibold p-2.5 rounded-lg text-sm transition-all shadow-lg">Save Aesthetics & Avatar</button>
                     </div>
                 </div>
-            </div>
 
-            <!-- Work Points & Allowance Calibration -->
-            <div class="card p-6 rounded-xl max-w-2xl">
-                <h2 class="text-lg font-semibold mb-2 text-slate-200">Work & Allowance Calibration</h2>
-                <p class="text-xs text-slate-400 mb-6">Calibrate your physical monthly work goals and discretionary spending payouts.</p>
-                <form onsubmit="saveSettings(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">
-                            Target Monthly Cash Allowance (฿)
-                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">Base cash unlocked at 100% completion of your monthly goal.</span>
-                            </span>
-                        </label>
-                        <input type="number" id="setting-monthly-cash" min="1000" step="500" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                <!-- Section 2: Work & Allowance Calibration -->
+                <div class="card p-6 rounded-xl">
+                    <h2 class="text-lg font-semibold mb-2 text-slate-200">Work & Allowance Calibration</h2>
+                    <p class="text-xs text-slate-400 mb-4">Calibrate your physical monthly work goals and discretionary spending payouts.</p>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Target Monthly Cash Allowance (฿)</label>
+                            <input type="number" id="setting-monthly-cash" min="1000" step="500" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Target Weekly Work Hours</label>
+                            <input type="number" id="setting-weekly-hrs" min="1" max="80" step="1" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Daily Soft Cap (Hours)</label>
+                            <input type="number" id="setting-daily-soft-cap" min="1" max="16" step="0.5" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Max Bonus Cap (%)</label>
+                            <input type="number" id="setting-bonus-cap" min="100" max="300" step="5" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">
-                            Target Weekly Work Hours
-                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">Target weekly hours (e.g., 10 hrs/wk = 40 hrs/month target).</span>
-                            </span>
-                        </label>
-                        <input type="number" id="setting-weekly-hrs" min="1" max="80" step="1" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">
-                            Daily Soft Cap (Hours)
-                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">Target hours per day before soft cap activates. Hours logged past this limit generate points at 25% yield to prevent burnout.</span>
-                            </span>
-                        </label>
-                        <input type="number" id="setting-daily-soft-cap" min="1" max="16" step="0.5" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">
-                            Max Bonus Cap (%)
-                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">Maximum allowance multiplier for overtime work (e.g. 125% = max ฿10,000 on ฿8,000 target).</span>
-                            </span>
-                        </label>
-                        <input type="number" id="setting-bonus-cap" min="100" max="300" step="5" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
-                    </div>
-                    <button type="submit" class="theme-accent-bg font-semibold px-6 py-2.5 rounded-lg text-sm transition-all">Save Work Settings</button>
-                </form>
-            </div>
+                </div>
 
-            <!-- Pomodoro Clock Configuration Section -->
-            <div class="card p-6 rounded-xl max-w-2xl">
-                <h2 class="text-lg font-semibold mb-2 text-slate-200">Pomodoro Timer Configuration</h2>
-                <p class="text-xs text-slate-400 mb-6">Customize your focus session durations and round cycles.</p>
-                <form onsubmit="savePomoSettings(event)" class="space-y-4">
+                <!-- Section 3: Pomodoro Clock Configuration -->
+                <div class="card p-6 rounded-xl">
+                    <h2 class="text-lg font-semibold mb-2 text-slate-200">Pomodoro Timer Configuration</h2>
+                    <p class="text-xs text-slate-400 mb-4">Customize your focus session durations and round cycles.</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Focus Duration (Minutes)</label>
@@ -658,9 +596,13 @@
                             <input type="number" id="setting-pomo-rounds" min="1" max="12" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
                         </div>
                     </div>
-                    <button type="submit" class="theme-accent-bg font-semibold px-6 py-2.5 rounded-lg text-sm transition-all">Save Timer Settings</button>
-                </form>
-            </div>
+                </div>
+
+                <!-- SINGLE UNIFIED SAVE BUTTON -->
+                <div class="pt-2">
+                    <button type="submit" id="forge-save-all-btn" class="w-full theme-accent-bg font-bold p-3 rounded-xl text-sm transition-all shadow-xl">Save All Forge Settings</button>
+                </div>
+            </form>
         </div>
 
         <!-- TAB 6: LEDGER HISTORY WITH PERIOD SELECTOR -->
@@ -776,25 +718,6 @@
             vaultedMonths: {}
         };
 
-        const AVATAR_PRESETS = [
-            { style: 'adventurer', seed: 'North' },
-            { style: 'adventurer', seed: 'Cream' },
-            { style: 'lorelei', seed: 'Aureum' },
-            { style: 'lorelei', seed: 'Sol' },
-            { style: 'bottts', seed: 'North' },
-            { style: 'bottts', seed: 'Cream' },
-            { style: 'avataaars', seed: 'Felix' },
-            { style: 'avataaars', seed: 'Luna' },
-            { style: 'big-smile', seed: 'Milo' },
-            { style: 'big-smile', seed: 'Nala' },
-            { style: 'fun-emoji', seed: 'Spark' },
-            { style: 'fun-emoji', seed: 'Zen' },
-            { style: 'personas', seed: 'Aria' },
-            { style: 'personas', seed: 'Leo' },
-            { style: 'micah', seed: 'Nova' },
-            { style: 'micah', seed: 'Orion' }
-        ];
-
         function requestNotificationPermission() {
             try {
                 if ("Notification" in window && Notification.permission === "default") {
@@ -863,18 +786,7 @@
             document.getElementById('audio-toggle-btn').innerText = audioMuted ? "🔇" : "🔊";
         }
 
-        // --- TACTILE FORM CONTROLS ---
-
-        function adjustWorkTime(delta) {
-            const input = document.getElementById('work-time');
-            let val = parseFloat(input.value) || 1.0;
-            val = Math.max(0.25, val + delta);
-            input.value = val.toFixed(2).replace(/\.00$/, '');
-        }
-
-        function setWorkTimePreset(val) {
-            document.getElementById('work-time').value = val;
-        }
+        // --- TACTILE RATING PILL CONTROLS ---
 
         function selectRating(field, val) {
             document.getElementById(`work-${field}`).value = val;
@@ -894,6 +806,91 @@
                 effort: ['1 (Effortless)', '2 (Light)', '3 (Moderate)', '4 (Heavy)', '5 (Maximum)']
             };
             document.getElementById(`label-${field}-text`).innerText = labels[field][val - 1];
+        }
+
+        // --- INSTANT AVATAR & THEME HANDLERS ---
+
+        async function handleInstantThemeChange() {
+            const selectedTheme = document.getElementById('setting-user-theme').value;
+            userSettings.userTheme = selectedTheme;
+            applyThemeToBody(selectedTheme);
+            if (loggedInUser === viewedUser) {
+                try {
+                    await db.collection('settings').doc(loggedInUser).set({ userTheme: selectedTheme }, { merge: true });
+                    playTone('save');
+                } catch (e) { console.error(e); }
+            }
+        }
+
+        async function applyCustomAvatarUrl() {
+            const url = document.getElementById('setting-avatar-url').value.trim();
+            if (!url) return;
+            userSettings.avatarUrl = url;
+            updateAvatarsInHeader();
+            if (loggedInUser === viewedUser) {
+                try {
+                    await db.collection('settings').doc(loggedInUser).set({ avatarUrl: url }, { merge: true });
+                    playTone('save');
+                } catch (e) { console.error(e); }
+            }
+        }
+
+        async function setAvatarPreset(style, seed) {
+            const url = `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}`;
+            document.getElementById('setting-avatar-url').value = url;
+            userSettings.avatarUrl = url;
+            updateAvatarsInHeader();
+            if (loggedInUser === viewedUser) {
+                try {
+                    await db.collection('settings').doc(loggedInUser).set({ avatarUrl: url }, { merge: true });
+                    playTone('save');
+                } catch (e) { console.error(e); }
+            }
+        }
+
+        async function randomizeAvatar() {
+            const styles = ['bottts', 'adventurer', 'lorelei', 'avataaars', 'big-smile', 'fun-emoji', 'personas', 'micah'];
+            const randomStyle = styles[Math.floor(Math.random() * styles.length)];
+            const randomSeed = Math.random().toString(36).substring(7);
+            const url = `https://api.dicebear.com/7.x/${randomStyle}/svg?seed=${randomSeed}`;
+            
+            document.getElementById('setting-avatar-url').value = url;
+            userSettings.avatarUrl = url;
+            updateAvatarsInHeader();
+            if (loggedInUser === viewedUser) {
+                try {
+                    await db.collection('settings').doc(loggedInUser).set({ avatarUrl: url }, { merge: true });
+                    playTone('save');
+                } catch (e) { console.error(e); }
+            }
+        }
+
+        // --- UNIFIED FORGE SAVE ---
+
+        async function saveAllForgeSettings(e) {
+            if (e) e.preventDefault();
+            userSettings.monthlyCash = parseFloat(document.getElementById('setting-monthly-cash').value) || 8000;
+            userSettings.weeklyHours = parseFloat(document.getElementById('setting-weekly-hrs').value) || 10;
+            userSettings.dailySoftCap = parseFloat(document.getElementById('setting-daily-soft-cap').value) || 4;
+            userSettings.maxBonusCapPct = parseFloat(document.getElementById('setting-bonus-cap').value) || 125;
+            
+            userSettings.pomoFocus = parseInt(document.getElementById('setting-pomo-focus').value) || 25;
+            userSettings.pomoShort = parseInt(document.getElementById('setting-pomo-short').value) || 5;
+            userSettings.pomoLong = parseInt(document.getElementById('setting-pomo-long').value) || 15;
+            userSettings.pomoRounds = parseInt(document.getElementById('setting-pomo-rounds').value) || 4;
+
+            userSettings.userTheme = document.getElementById('setting-user-theme').value;
+            userSettings.avatarUrl = document.getElementById('setting-avatar-url').value.trim();
+
+            try {
+                await db.collection('settings').doc(loggedInUser).set(userSettings, { merge: true });
+                playTone('save');
+                updateSettingsUI();
+                loadUserData();
+                setMyPomoMode('focus');
+            } catch (err) {
+                console.error('Failed to save settings to Firestore:', err);
+            }
         }
 
         // --- POMODORO PERSISTENCE & PRESET ENGINE ---
@@ -1287,7 +1284,6 @@
                 }
                 
                 viewedUser = loggedInUser;
-                renderAvatarPresetsGrid();
                 initRealtimeSettingsListener();
                 await initAndRecoverMyPomoState();
                 
@@ -1305,26 +1301,6 @@
 
         function applyThemeToBody(themeKey) {
             document.body.setAttribute('data-theme', themeKey || 'gold');
-        }
-
-        function renderAvatarPresetsGrid() {
-            const grid = document.getElementById('avatar-presets-grid');
-            if (!grid) return;
-            grid.innerHTML = AVATAR_PRESETS.map(p => {
-                const url = `https://api.dicebear.com/7.x/${p.style}/svg?seed=${p.seed}`;
-                return `
-                    <button type="button" onclick="setAvatarPreset('${p.style}', '${p.seed}')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-400 transition-all flex items-center justify-center">
-                        <img src="${url}" alt="${p.seed}" class="w-8 h-8 rounded-full object-cover">
-                    </button>
-                `;
-            }).join('');
-        }
-
-        function randomizeAvatar() {
-            const styles = ['adventurer', 'lorelei', 'bottts', 'avataaars', 'big-smile', 'fun-emoji', 'personas', 'micah'];
-            const randomStyle = styles[Math.floor(Math.random() * styles.length)];
-            const randomSeed = Math.random().toString(36).substring(7);
-            setAvatarPreset(randomStyle, randomSeed);
         }
 
         function initRealtimeSettingsListener() {
@@ -1365,11 +1341,6 @@
             }
         }
 
-        function setAvatarPreset(style, seed) {
-            const url = `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}`;
-            document.getElementById('setting-avatar-url').value = url;
-        }
-
         function updateSettingsUI() {
             const monthlyGoalPts = userSettings.weeklyHours * 4 * 3;
             document.getElementById('label-monthly-goal-pts').innerText = monthlyGoalPts;
@@ -1388,59 +1359,6 @@
 
             document.getElementById('setting-user-theme').value = userSettings.userTheme || 'gold';
             document.getElementById('setting-avatar-url').value = userSettings.avatarUrl || '';
-        }
-
-        async function saveThemeAndAvatarSetting() {
-            const selectedTheme = document.getElementById('setting-user-theme').value;
-            const avatarUrl = document.getElementById('setting-avatar-url').value.trim();
-            
-            userSettings.userTheme = selectedTheme;
-            userSettings.avatarUrl = avatarUrl;
-            applyThemeToBody(selectedTheme);
-            
-            try {
-                await db.collection('settings').doc(loggedInUser).set({
-                    userTheme: selectedTheme,
-                    avatarUrl: avatarUrl
-                }, { merge: true });
-                playTone('save');
-            } catch (err) {
-                console.error('Failed to save aesthetics and avatar settings.');
-            }
-        }
-
-        async function saveSettings(e) {
-            e.preventDefault();
-            userSettings.monthlyCash = parseFloat(document.getElementById('setting-monthly-cash').value);
-            userSettings.weeklyHours = parseFloat(document.getElementById('setting-weekly-hrs').value);
-            userSettings.dailySoftCap = parseFloat(document.getElementById('setting-daily-soft-cap').value);
-            userSettings.maxBonusCapPct = parseFloat(document.getElementById('setting-bonus-cap').value);
-            
-            try {
-                await db.collection('settings').doc(loggedInUser).set(userSettings, { merge: true });
-                playTone('save');
-                updateSettingsUI();
-                loadUserData();
-            } catch (err) {
-                console.error('Failed to save settings to Firestore.');
-            }
-        }
-
-        async function savePomoSettings(e) {
-            e.preventDefault();
-            userSettings.pomoFocus = parseInt(document.getElementById('setting-pomo-focus').value);
-            userSettings.pomoShort = parseInt(document.getElementById('setting-pomo-short').value);
-            userSettings.pomoLong = parseInt(document.getElementById('setting-pomo-long').value);
-            userSettings.pomoRounds = parseInt(document.getElementById('setting-pomo-rounds').value);
-
-            try {
-                await db.collection('settings').doc(loggedInUser).set(userSettings, { merge: true });
-                playTone('save');
-                updateSettingsUI();
-                setMyPomoMode('focus');
-            } catch (err) {
-                console.error('Failed to save timer settings to Firestore.');
-            }
         }
 
         async function handleLogin(e) {
@@ -1487,7 +1405,7 @@
 
             const forgeButtons = document.querySelectorAll('#tab-forge button');
             forgeButtons.forEach(btn => {
-                btn.style.display = isSelf ? 'block' : 'none';
+                btn.style.display = isSelf ? 'inline-block' : 'none';
             });
 
             const banner = document.getElementById('read-only-banner');
@@ -1726,7 +1644,7 @@
                 tierSub.innerText = "Building momentum";
             } else {
                 tierBadge.innerText = "🌱 Initiate";
-                tierSub.innerText = `${Math.round(rawPct)}% of target reached`;
+                tierSub.innerText = `${Math.round(rawPct)}% reached`;
             }
         }
 
