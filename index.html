@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AUREUM — Autonomous Living & Creative Ledger</title>
     
-    <!-- PWA & Theme Meta Configuration -->
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -32,7 +31,6 @@
         body[data-theme="matcha"] { --bg-main: #121813; --card-bg: rgba(29, 39, 31, 0.7); --card-border: rgba(132, 204, 22, 0.15); --accent-primary: #84cc16; --accent-primary-hover: #65a30d; --accent-primary-text: #020617; --accent-glow: rgba(132, 204, 22, 0.3); }
         body[data-theme="monochrome"] { --bg-main: #121212; --card-bg: rgba(30, 30, 30, 0.7); --card-border: rgba(255, 255, 255, 0.1); --accent-primary: #e2e8f0; --accent-primary-hover: #cbd5e1; --accent-primary-text: #0f172a; --accent-glow: rgba(226, 232, 240, 0.25); }
 
-        /* CUSTOM CURSORS */
         body[data-cursor="gold"] { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><polygon points='3,3 21,11 13,13 11,21' fill='%23f59e0b' stroke='%23020617' stroke-width='1.5'/></svg>"), auto; }
         body[data-cursor="sparkle"] { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M12,2 L14.5,9.5 L22,12 L14.5,14.5 L12,22 L9.5,14.5 L2,12 L9.5,9.5 Z' fill='%2338bdf8' stroke='%23020617' stroke-width='1.5'/></svg>"), auto; }
         body[data-cursor="quill"] { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M2,22 L8,20 L20,4 C20,4 22,2 18,2 C14,2 12,4 12,4 L4,16 Z' fill='%23c084fc' stroke='%23020617' stroke-width='1.5'/></svg>"), auto; }
@@ -64,35 +62,17 @@
         .gauge-circle { transition: stroke-dashoffset 0.8s ease-in-out, stroke 0.3s; }
         .avatar-btn { position: relative; transition: transform 0.2s; }
         .avatar-btn:hover { transform: scale(1.08); }
-        .avatar-btn.active-spectate { ring: 2px; ring-color: var(--accent-primary); transform: scale(1.05); }
         .avatar-btn .avatar-tooltip { visibility: hidden; opacity: 0; position: absolute; top: 115%; left: 50%; transform: translateX(-50%); background-color: #020617; color: #f8fafc; padding: 4px 10px; border-radius: 6px; border: 1px solid #475569; font-size: 11px; font-weight: 600; white-space: nowrap; transition: opacity 0.2s; pointer-events: none; z-index: 20; }
         .avatar-btn:hover .avatar-tooltip { visibility: visible; opacity: 1; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* AMBIENT HEADER STATUS GLOW RINGS */
-        .glow-ring-idle { box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.4); opacity: 0.6; }
-        .glow-ring-active { box-shadow: 0 0 12px 3px rgba(59, 130, 246, 0.7); opacity: 1; animation: ringPulse 3s ease-in-out infinite alternate; }
-        .glow-ring-baseline { box-shadow: 0 0 18px 4px rgba(16, 185, 129, 0.85); opacity: 1; animation: ringPulse 2.5s ease-in-out infinite alternate; }
-        .glow-ring-softcap { box-shadow: 0 0 22px 5px rgba(245, 158, 11, 0.95); opacity: 1; animation: ringPulse 2s ease-in-out infinite alternate; }
-
-        @keyframes ringPulse {
-            0% { transform: scale(1); filter: brightness(1); }
-            100% { transform: scale(1.05); filter: brightness(1.25); }
-        }
-
-        /* POWER LEVEL BAR GLOW */
         .power-bar-fill {
             background: linear-gradient(90deg, #38bdf8 0%, #10b981 50%, #f59e0b 80%, #a855f7 100%);
             box-shadow: 0 0 14px var(--accent-glow);
             transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* LIVE FOCUS ATMOSPHERE GLOW */
-        body.focus-ambient-active { animation: focusAmbientPulse 4s ease-in-out infinite alternate; }
-        @keyframes focusAmbientPulse { 0% { box-shadow: inset 0 0 40px rgba(59, 130, 246, 0.12); } 100% { box-shadow: inset 0 0 100px var(--accent-glow); } }
-
-        /* BADGES / RELICS & TOAST ANIMATIONS */
         .badge-card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--card-border); transition: all 0.25s ease-out; }
         .badge-card:hover:not(.locked) { transform: translateY(-2px); }
         .badge-card.locked { opacity: 0.35; filter: grayscale(0.9); border-color: rgba(255, 255, 255, 0.05) !important; }
@@ -110,10 +90,8 @@
 </head>
 <body data-theme="gold" data-cursor="default" class="p-4 md:p-8 max-w-6xl mx-auto relative min-h-screen">
 
-    <!-- FX CANVAS OVERLAY -->
     <canvas id="fx-canvas" class="fixed inset-0 pointer-events-none z-[200]"></canvas>
 
-    <!-- LOGIN OVERLAY -->
     <div id="login-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center z-50">
         <div class="card p-8 rounded-xl max-w-md w-full shadow-2xl">
             <h1 class="text-2xl font-black logo-gold mb-1 uppercase">AUREUM</h1>
@@ -133,9 +111,7 @@
         </div>
     </div>
 
-    <!-- MAIN APP CONTENT -->
     <div id="app-content" class="hidden">
-        <!-- Header -->
         <header class="flex flex-col md:flex-row justify-between items-center mb-6 pb-4 border-b border-slate-700/80 gap-4">
             <div>
                 <h1 class="text-3xl font-black logo-gold uppercase">AUREUM</h1>
@@ -143,7 +119,6 @@
             </div>
             
             <div class="flex items-center gap-5">
-                <!-- DYNAMIC HEADER AVATARS WITH SIMULTANEOUS STATUS GLOW -->
                 <div class="flex items-center gap-3 bg-slate-900/90 p-1.5 px-3 rounded-full border border-slate-700/80 shadow-lg">
                     <button id="user-btn-north" onclick="switchActiveUser('North')" class="avatar-btn rounded-full p-0.5">
                         <img id="avatar-img-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="w-9 h-9 rounded-full bg-slate-800 object-cover transition-all">
@@ -159,7 +134,6 @@
             </div>
         </header>
 
-        <!-- Navigation Bar -->
         <nav class="flex items-center gap-2 mb-6 p-1.5 bg-slate-900/80 rounded-2xl border border-slate-800/90 overflow-x-auto no-scrollbar">
             <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap"><span>⚗️</span> <span>Crucible</span></button>
             <button onclick="switchTab('hourglass')" id="nav-hourglass" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⏳</span> <span>Hourglass</span></button>
@@ -169,24 +143,26 @@
             <button onclick="switchTab('relics')" id="nav-relics" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🏺</span> <span>Relics</span></button>
         </nav>
 
-        <!-- Read-Only Banner -->
         <div id="read-only-banner" class="hidden card p-3 mb-6 rounded-xl text-center text-slate-400 text-sm">
             🔒 Viewing <strong><span id="view-target-name"></span>'s</strong> space in View-Only mode. Log deletion and settings are restricted.
         </div>
 
-        <!-- TAB 1: CRUCIBLE (WORK LOGGING & ALLOWANCE) -->
+        <!-- TAB 1: CRUCIBLE (BALANCED ALLOWANCE CARD LAYOUT) -->
         <div id="tab-crucible" class="space-y-6">
-            <!-- RE-BALANCED EQUAL-SPACED METRIC CARDS GRID -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-                <div id="payout-card-box" class="card p-6 rounded-xl flex flex-col justify-between text-center md:text-left">
-                    <div>
-                        <span class="text-xs uppercase tracking-wider text-slate-400 block font-medium">Allowance Earned</span>
-                        <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="monthly-payout">฿0</div>
+                <!-- RE-BALANCED ALLOWANCE CARD -->
+                <div id="payout-card-box" class="card p-6 rounded-xl flex flex-col justify-between text-center md:text-left min-h-[145px]">
+                    <div class="my-auto">
+                        <div class="flex items-center justify-between md:justify-start gap-2">
+                            <span class="text-xs uppercase tracking-wider text-slate-400 font-medium">Allowance Earned</span>
+                            <span id="allowance-yield-pill" class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">⚡ Standard Yield</span>
+                        </div>
+                        <div class="text-3xl font-extrabold text-emerald-400 mt-1.5" id="monthly-payout">฿0</div>
                     </div>
-                    <div class="text-xs text-slate-500 mt-3 pt-3 border-t border-slate-800">Target Base: ฿<span id="label-monthly-cash">8,000</span> (<span id="label-weekly-hrs">10</span> hrs/wk)</div>
+                    <div class="text-xs text-slate-500 pt-3 border-t border-slate-800/80 mt-2">Target Base: ฿<span id="label-monthly-cash">8,000</span> (<span id="label-weekly-hrs">10</span> hrs/wk)</div>
                 </div>
 
-                <div class="card p-6 rounded-xl flex flex-col justify-between text-center md:text-left">
+                <div class="card p-6 rounded-xl flex flex-col justify-between text-center md:text-left min-h-[145px]">
                     <div>
                         <span class="text-xs uppercase tracking-wider text-slate-400 font-medium">Today's Work Cap</span>
                         <div class="text-3xl font-extrabold theme-accent-text mt-1" id="today-hours-label">0.0 / 4.0 hrs</div>
@@ -195,13 +171,13 @@
                             <div id="daily-bar" class="bg-blue-500 h-full rounded-full transition-all duration-700"></div>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center text-xs mt-3 pt-3 border-t border-slate-800">
+                    <div class="flex justify-between items-center text-xs pt-3 border-t border-slate-800/80 mt-2">
                         <span id="daily-cap-status" class="text-slate-400">4.0 hrs remaining today</span>
                         <span id="milestone-2h-badge" class="text-[10px] font-semibold text-slate-500">2.0h Baseline</span>
                     </div>
                 </div>
 
-                <div class="card p-6 rounded-xl flex items-center justify-between gap-4">
+                <div class="card p-6 rounded-xl flex items-center justify-between gap-4 min-h-[145px]">
                     <div class="relative w-16 h-16 flex-shrink-0 flex items-center justify-center">
                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                             <path class="text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -317,7 +293,7 @@
             </div>
         </div>
 
-        <!-- TAB 2: HOURGLASS (POMODORO & ENHANCED AUDIO ENGINE) -->
+        <!-- TAB 2: HOURGLASS (CLEAN POMODORO FOCUS TIMER) -->
         <div id="tab-hourglass" class="hidden space-y-6 max-w-xl mx-auto">
             <div class="card p-8 rounded-xl text-center space-y-6 shadow-xl relative">
                 <div id="pomo-spectator-banner" class="hidden p-2.5 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 font-medium">
@@ -342,7 +318,7 @@
                     <div id="pomo-round-dots" class="flex gap-1.5 ml-2"></div>
                 </div>
 
-                <div id="pomo-clock-container" onclick="handleClockClick()" class="cursor-pointer group select-none py-2 my-1 rounded-2xl transition-all hover:bg-slate-800/50">
+                <div id="pomo-clock-container" onclick="handleClockClick()" class="cursor-pointer group select-none py-4 my-1 rounded-2xl transition-all hover:bg-slate-800/50">
                     <div id="pomo-timer-display" class="text-7xl font-mono font-black theme-accent-text tracking-wider group-hover:scale-105 transition-transform">25:00</div>
                     <div id="pomo-status-label" class="text-xs text-slate-400 mt-2 uppercase tracking-widest font-semibold group-hover:text-amber-300">Click Timer or Press Spacebar</div>
                 </div>
@@ -351,54 +327,27 @@
                     <div id="pomo-progress-bar" class="theme-accent-bg h-full rounded-full transition-all duration-1000 w-full"></div>
                 </div>
 
-                <!-- OVERHAULED AUDIBLE SOUNDSCAPE GENERATOR -->
-                <div class="p-4 bg-slate-900/70 border border-slate-800 rounded-xl space-y-3">
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="text-slate-400 font-semibold flex items-center gap-1.5">
-                            <span>🎧</span> <span>Focus Atmosphere</span>
-                        </span>
-                        <button onclick="toggleAmbientSoundscape()" id="ambient-toggle-btn" class="px-3.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 transition-all">
-                            ▶ Play Sound
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3 items-center">
-                        <select id="ambient-sound-select" onchange="changeAmbientSoundscape(this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none font-medium">
-                            <option value="rain">🌧️ Heavy Rain & Thunder</option>
-                            <option value="fire">🔥 Cozy Hearth & Crackle</option>
-                            <option value="cafe">☕ Coffee Shop Ambience</option>
-                            <option value="cosmos">🌌 Cosmic Deep Space</option>
-                            <option value="wind">🍃 Mountain Breeze</option>
-                            <option value="ocean">🌊 Gentle Shore Waves</option>
-                        </select>
-
-                        <div class="flex items-center gap-2 bg-slate-800/60 p-1.5 px-3 rounded-lg border border-slate-700/60">
-                            <span class="text-[11px] text-slate-400">Vol</span>
-                            <input type="range" id="ambient-vol-slider" min="0" max="100" value="70" oninput="updateAmbientVolume(this.value)" class="w-full accent-amber-500 cursor-pointer">
-                        </div>
-                    </div>
-                </div>
-
-                <div id="pomo-controls-box" class="flex justify-center gap-4">
-                    <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="px-8 py-2.5 rounded-lg theme-accent-bg font-bold text-sm transition-all">Start Focus</button>
+                <div id="pomo-controls-box" class="flex justify-center gap-4 pt-2">
+                    <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="px-8 py-2.5 rounded-lg theme-accent-bg font-bold text-sm transition-all shadow-md">Start Focus</button>
                     <button onclick="resetMyPomoTimer()" class="px-6 py-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium text-sm transition-all">Reset</button>
                 </div>
             </div>
         </div>
 
-        <!-- TAB 3: SANCTUARY (Y-AXIS PERFECTLY ALIGNED SAVE BUTTONS) -->
+        <!-- TAB 3: SANCTUARY (STRICT Y-AXIS PERFECT ALIGNMENT) -->
         <div id="tab-sanctuary" class="hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                 <!-- 🏃 Fitness Card -->
-                <div id="workout-form-card" class="card p-6 rounded-xl flex flex-col justify-between h-full">
-                    <div>
-                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2 mb-1"><span>🏃</span> <span>Fitness Log</span></h2>
-                        <p class="text-xs text-slate-400 mb-4">Log exercise & workout sessions.</p>
+                <div id="workout-form-card" class="card p-6 rounded-xl flex flex-col justify-between h-full min-h-[340px]">
+                    <div class="h-12 flex flex-col justify-center">
+                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>🏃</span> <span>Fitness Log</span></h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Log exercise & workout sessions.</p>
                     </div>
-                    <form onsubmit="logWorkout(event)" class="flex flex-col flex-1 justify-between space-y-4">
+                    <form onsubmit="logWorkout(event)" class="flex flex-col flex-1 justify-between space-y-4 mt-2">
                         <input type="hidden" id="workout-strain" value="3">
+                        
                         <div class="space-y-4">
-                            <div>
+                            <div class="h-[64px] flex flex-col justify-center">
                                 <label class="block text-xs text-slate-400 mb-1 font-medium">Time Spent (Hours)</label>
                                 <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
                                     <button type="button" onmousedown="startHoldStep('workout-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('workout-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
@@ -407,18 +356,18 @@
                                 </div>
                             </div>
 
-                            <div>
+                            <div class="h-[76px] flex flex-col justify-center">
                                 <label class="block text-xs text-slate-400 mb-1 font-medium">Effort & Intensity</label>
                                 <div class="flex items-center bg-slate-900/90 rounded-xl border border-slate-800 p-1">
-                                    <button type="button" onmousedown="startHoldStepWorkoutStrain(-1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(-1)" ontouchend="stopHoldStep()" class="px-2.5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none">◀</button>
-                                    <div id="selector-box-workout" class="flex-1 px-2 py-1 text-center">
+                                    <button type="button" onmousedown="startHoldStepWorkoutStrain(-1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(-1)" ontouchend="stopHoldStep()" class="px-2.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none">◀</button>
+                                    <div id="selector-box-workout" class="flex-1 px-2 text-center">
                                         <div class="flex items-center justify-center gap-1.5">
-                                            <span id="w-icon" class="text-xl">🔥</span>
+                                            <span id="w-icon" class="text-lg">🔥</span>
                                             <span id="w-badge" class="text-[10px] font-bold theme-accent-text uppercase">LVL 3</span>
                                         </div>
-                                        <div id="w-title" class="text-xs font-bold text-slate-100 mt-0.5">Moderate Effort</div>
+                                        <div id="w-title" class="text-[11px] font-bold text-slate-100">Moderate Effort</div>
                                     </div>
-                                    <button type="button" onmousedown="startHoldStepWorkoutStrain(1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(1)" ontouchend="stopHoldStep()" class="px-2.5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none">▶</button>
+                                    <button type="button" onmousedown="startHoldStepWorkoutStrain(1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(1)" ontouchend="stopHoldStep()" class="px-2.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none">▶</button>
                                 </div>
                             </div>
                         </div>
@@ -428,14 +377,14 @@
                 </div>
 
                 <!-- 🧹 House Chores Card -->
-                <div id="chore-form-card" class="card p-6 rounded-xl flex flex-col justify-between h-full">
-                    <div>
-                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2 mb-1"><span>🧹</span> <span>House Chores</span></h2>
-                        <p class="text-xs text-slate-400 mb-4">Log household tasks & cleaning.</p>
+                <div id="chore-form-card" class="card p-6 rounded-xl flex flex-col justify-between h-full min-h-[340px]">
+                    <div class="h-12 flex flex-col justify-center">
+                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>🧹</span> <span>House Chores</span></h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Log household tasks & cleaning.</p>
                     </div>
-                    <form onsubmit="logChore(event)" class="flex flex-col flex-1 justify-between space-y-4">
+                    <form onsubmit="logChore(event)" class="flex flex-col flex-1 justify-between space-y-4 mt-2">
                         <div class="space-y-4">
-                            <div>
+                            <div class="h-[64px] flex flex-col justify-center">
                                 <label class="block text-xs text-slate-400 mb-1 font-medium">Time Spent (Hours)</label>
                                 <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
                                     <button type="button" onmousedown="startHoldStep('chore-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('chore-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
@@ -444,7 +393,7 @@
                                 </div>
                             </div>
 
-                            <div>
+                            <div class="h-[76px] flex flex-col justify-center">
                                 <label class="block text-xs text-slate-400 mb-1 font-medium">Task Details</label>
                                 <input type="text" id="chore-note" placeholder="e.g. Laundry, dishes, vacuuming..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none">
                             </div>
@@ -454,15 +403,15 @@
                     </form>
                 </div>
 
-                <!-- 🍨 Snacks & Treats Card -->
-                <div id="health-form-card" class="card p-6 rounded-xl flex flex-col justify-between h-full">
-                    <div>
-                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2 mb-1"><span>🍨</span> <span>Snacks & Treats</span></h2>
-                        <p class="text-xs text-slate-400 mb-4">Track sweet treats & refreshments.</p>
+                <!-- 🍨 Snacks Card -->
+                <div id="health-form-card" class="card p-6 rounded-xl flex flex-col justify-between h-full min-h-[340px]">
+                    <div class="h-12 flex flex-col justify-center">
+                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>🍨</span> <span>Snacks & Treats</span></h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Track sweet treats & refreshments.</p>
                     </div>
-                    <form onsubmit="logHealth(event)" class="flex flex-col flex-1 justify-between space-y-4">
+                    <form onsubmit="logHealth(event)" class="flex flex-col flex-1 justify-between space-y-4 mt-2">
                         <div class="space-y-4">
-                            <div>
+                            <div class="h-[64px] flex flex-col justify-center">
                                 <label class="block text-xs text-slate-400 mb-1 font-medium">Portion Size</label>
                                 <select id="health-level" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none">
                                     <option value="1">Level 1 (Small / Light)</option>
@@ -471,7 +420,7 @@
                                 </select>
                             </div>
 
-                            <div>
+                            <div class="h-[76px] flex flex-col justify-center">
                                 <label class="block text-xs text-slate-400 mb-1 font-medium">Snack / Dessert Name</label>
                                 <input type="text" id="health-note" placeholder="e.g. Ice cream, matcha, boba..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none">
                             </div>
@@ -482,7 +431,6 @@
                 </div>
             </div>
 
-            <!-- Analytics Chart -->
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div class="flex items-center gap-3">
@@ -835,7 +783,7 @@
         }
         animateParticles();
 
-        // 2. MYTHIC RELICS CATALOG & ENGINE
+        // 2. MYTHIC RELICS CATALOG & ISOLATED SPECTATOR BADGE ENGINE
         const BADGE_CATALOG = [
             { id: 'work_1', tier: 'bronze', icon: '🌱', title: "Spark of Endeavor", desc: 'Log your very first work session.' },
             { id: 'work_cap', tier: 'silver', icon: '🍵', title: 'Crucible Mastered', desc: 'Reach daily Soft Cap (4.0h) in a single day.' },
@@ -900,8 +848,18 @@
             setTimeout(() => { toast.classList.add('toast-hiding'); setTimeout(() => toast.remove(), 500); }, duration);
         }
 
-        function evaluateBadges(logs, pRoundsList = []) {
+        // STRICT LOGGED-IN ISOLATION FOR BADGES
+        function evaluateBadges(logs, pRoundsList = [], targetUser = viewedUser) {
             if (!logs) return;
+            const isSelf = (loggedInUser === targetUser);
+
+            // If spectating, render the spectated user's badges read-only
+            if (!isSelf) {
+                const spectatedBadges = spectatorSettings?.unlockedBadges || [];
+                renderBadgeGrid(new Set(spectatedBadges));
+                return;
+            }
+
             userSettings.unlockedBadges = userSettings.unlockedBadges || [];
             const unlockedSet = new Set(userSettings.unlockedBadges), newlyUnlocked = [];
             const workLogs = logs.filter(l => l.type === 'work'), totalWorkHours = workLogs.reduce((acc, l) => acc + (l.hours || 0), 0);
@@ -956,16 +914,14 @@
                 }
             }
 
-            if (newlyUnlocked.length > 0 && loggedInUser === viewedUser) {
+            if (newlyUnlocked.length > 0) {
                 userSettings.unlockedBadges = Array.from(unlockedSet);
                 renderBadgeGrid(unlockedSet);
                 try { db.collection('settings').doc(loggedInUser).set({ unlockedBadges: userSettings.unlockedBadges }, { merge: true }); } catch (e) {}
             } else { renderBadgeGrid(unlockedSet); }
         }
 
-        // 3. OVERHAULED HIGH-VOLUME WEB AUDIO & SOUNDSCAPE SYNTHESIZER
-        let ambientAudioCtx = null, ambientMasterGain = null, ambientCompressor = null, ambientActiveNodes = [], ambientIsPlaying = false, currentSoundscape = 'rain';
-
+        // 3. AUDIO FEEDBACK
         function playTone(type) {
             if (audioMuted) return;
             try {
@@ -979,121 +935,6 @@
                 gain.gain.setValueAtTime(0.25, ctx.currentTime); gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.15);
                 osc.start(); osc.stop(ctx.currentTime + 0.15);
             } catch (e) {}
-        }
-
-        function initAmbientAudio() {
-            if (!ambientAudioCtx) {
-                ambientAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                ambientCompressor = ambientAudioCtx.createDynamicsCompressor();
-                ambientCompressor.threshold.setValueAtTime(-12, ambientAudioCtx.currentTime);
-                ambientCompressor.knee.setValueAtTime(10, ambientAudioCtx.currentTime);
-                ambientCompressor.ratio.setValueAtTime(12, ambientAudioCtx.currentTime);
-                ambientCompressor.attack.setValueAtTime(0.003, ambientAudioCtx.currentTime);
-                ambientCompressor.release.setValueAtTime(0.25, ambientAudioCtx.currentTime);
-
-                ambientMasterGain = ambientAudioCtx.createGain();
-                const sliderVal = (parseFloat(document.getElementById('ambient-vol-slider')?.value) || 70) / 100;
-                ambientMasterGain.gain.setValueAtTime(sliderVal * 1.5, ambientAudioCtx.currentTime);
-                
-                ambientMasterGain.connect(ambientCompressor);
-                ambientCompressor.connect(ambientAudioCtx.destination);
-            }
-        }
-
-        function createNoiseBuffer(durationSecs = 3) {
-            const sampleRate = ambientAudioCtx.sampleRate, buffer = ambientAudioCtx.createBuffer(1, sampleRate * durationSecs, sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-            return buffer;
-        }
-
-        function startAmbientSoundscape(type) {
-            stopAmbientSoundscape(); initAmbientAudio();
-            if (ambientAudioCtx.state === 'suspended') ambientAudioCtx.resume();
-            currentSoundscape = type || 'rain';
-
-            if (currentSoundscape === 'rain') {
-                // Heavy Rain & Thunder
-                const noiseSrc = ambientAudioCtx.createBufferSource(); noiseSrc.buffer = createNoiseBuffer(4); noiseSrc.loop = true;
-                const filter = ambientAudioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 1200;
-                noiseSrc.connect(filter); filter.connect(ambientMasterGain); noiseSrc.start();
-                ambientActiveNodes.push(noiseSrc);
-            } else if (currentSoundscape === 'fire') {
-                // Cozy Hearth & Crackle (Warm low rumble + Procedural Ember Spark Pops)
-                const noiseSrc = ambientAudioCtx.createBufferSource(); noiseSrc.buffer = createNoiseBuffer(3); noiseSrc.loop = true;
-                const filter = ambientAudioCtx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 450; filter.Q.value = 0.8;
-                noiseSrc.connect(filter); filter.connect(ambientMasterGain); noiseSrc.start();
-                ambientActiveNodes.push(noiseSrc);
-
-                // Ember Sparks procedural timer
-                const sparkTimer = setInterval(() => {
-                    if (!ambientIsPlaying) return;
-                    if (Math.random() < 0.65) {
-                        const popOsc = ambientAudioCtx.createOscillator(), popGain = ambientAudioCtx.createGain();
-                        popOsc.type = 'sine'; popOsc.frequency.setValueAtTime(1200 + Math.random() * 2200, ambientAudioCtx.currentTime);
-                        popOsc.frequency.exponentialRampToValueAtTime(150, ambientAudioCtx.currentTime + 0.03);
-                        popGain.gain.setValueAtTime(0.4 + Math.random() * 0.4, ambientAudioCtx.currentTime);
-                        popGain.gain.exponentialRampToValueAtTime(0.001, ambientAudioCtx.currentTime + 0.03);
-                        popOsc.connect(popGain); popGain.connect(ambientMasterGain);
-                        popOsc.start(); popOsc.stop(ambientAudioCtx.currentTime + 0.03);
-                    }
-                }, 120);
-                ambientActiveNodes.push({ stop: () => clearInterval(sparkTimer) });
-            } else if (currentSoundscape === 'cafe') {
-                // Coffee Shop Ambience (Formant filtered murmur)
-                const noiseSrc = ambientAudioCtx.createBufferSource(); noiseSrc.buffer = createNoiseBuffer(3); noiseSrc.loop = true;
-                const filter = ambientAudioCtx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 750; filter.Q.value = 2.0;
-                noiseSrc.connect(filter); filter.connect(ambientMasterGain); noiseSrc.start();
-                ambientActiveNodes.push(noiseSrc);
-            } else if (currentSoundscape === 'cosmos') {
-                // Cosmic Deep Space Binaural Drone
-                [65.41, 98.00, 130.81].forEach((freq, idx) => {
-                    const osc = ambientAudioCtx.createOscillator(), g = ambientAudioCtx.createGain();
-                    osc.type = 'sine'; osc.frequency.value = freq;
-                    g.gain.setValueAtTime(0.3 / (idx + 1), ambientAudioCtx.currentTime);
-                    osc.connect(g); g.connect(ambientMasterGain); osc.start();
-                    ambientActiveNodes.push(osc);
-                });
-            } else if (currentSoundscape === 'wind') {
-                // Mountain breeze with sweeping resonant filter
-                const noiseSrc = ambientAudioCtx.createBufferSource(); noiseSrc.buffer = createNoiseBuffer(4); noiseSrc.loop = true;
-                const filter = ambientAudioCtx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 350; filter.Q.value = 2.5;
-                noiseSrc.connect(filter); filter.connect(ambientMasterGain); noiseSrc.start();
-                ambientActiveNodes.push(noiseSrc);
-            } else if (currentSoundscape === 'ocean') {
-                // Gentle Shore Waves
-                const noiseSrc = ambientAudioCtx.createBufferSource(); noiseSrc.buffer = createNoiseBuffer(5); noiseSrc.loop = true;
-                const filter = ambientAudioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 600;
-                noiseSrc.connect(filter); filter.connect(ambientMasterGain); noiseSrc.start();
-                ambientActiveNodes.push(noiseSrc);
-            }
-
-            ambientIsPlaying = true; updateAmbientBtnUI();
-        }
-
-        function stopAmbientSoundscape() {
-            ambientActiveNodes.forEach(node => { try { node.stop(); } catch(e){} });
-            ambientActiveNodes = []; ambientIsPlaying = false; updateAmbientBtnUI();
-        }
-
-        function toggleAmbientSoundscape() {
-            if (ambientIsPlaying) stopAmbientSoundscape();
-            else startAmbientSoundscape(document.getElementById('ambient-sound-select').value);
-        }
-
-        function changeAmbientSoundscape(val) { currentSoundscape = val; if (ambientIsPlaying) startAmbientSoundscape(val); }
-
-        function updateAmbientVolume(val) {
-            if (ambientMasterGain && ambientAudioCtx) {
-                const vol = (parseFloat(val) || 0) / 100;
-                ambientMasterGain.gain.setValueAtTime(vol * 1.5, ambientAudioCtx.currentTime);
-            }
-        }
-
-        function updateAmbientBtnUI() {
-            const btn = document.getElementById('ambient-toggle-btn'); if (!btn) return;
-            btn.innerText = ambientIsPlaying ? "⏸ Pause Sound" : "▶ Play Sound";
-            btn.className = ambientIsPlaying ? "px-3.5 py-1 rounded bg-amber-500 text-slate-950 text-[11px] font-bold shadow-md transition-all" : "px-3.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 transition-all";
         }
 
         function requestNotificationPermission() { if ("Notification" in window && Notification.permission === "default") Notification.requestPermission(); }
@@ -1153,7 +994,7 @@
         function applyThemeToBody(t) { document.body.setAttribute('data-theme', t || 'gold'); }
         function applyCursorToBody(c) { document.body.setAttribute('data-cursor', c || 'default'); }
 
-        // 4. HOURGLASS POMODORO ENGINE
+        // 4. HOURGLASS POMODORO TIMER
         let myPomoMode = 'focus', myPomoRound = 1, myPomoTime = 1500, myPomoInitialTime = 1500, myPomoIsRunning = false, myPomoInterval = null, currentSessionWasPaused = false;
         let pomoUIRenderInterval = null, pomoSyncUnsubscribe = null, spectatorSettings = null, shadowSpectatorTime = 1500, shadowSpectatorIsRunning = false, shadowSpectatorInterval = null;
 
@@ -1168,23 +1009,20 @@
             try { db.collection('settings').doc(loggedInUser).set({ livePomoState: { mode: myPomoMode, round: myPomoRound, isRunning: myPomoIsRunning, pomoTime: myPomoTime, updatedAtMillis: Date.now() } }, { merge: true }); } catch (e) {}
         }
 
-        function updateAmbientFocusState(isRunning) { document.body.classList.toggle('focus-ambient-active', isRunning && myPomoMode === 'focus'); }
-
         function startMyPomoBackgroundTimer() {
             if (myPomoInterval) clearInterval(myPomoInterval);
-            let ticks = 0; updateAmbientFocusState(true);
+            let ticks = 0;
             myPomoInterval = setInterval(() => {
                 if (!myPomoIsRunning) return;
                 myPomoTime--; ticks++;
                 if (ticks >= 4) { syncMyPomoToCloud(); ticks = 0; }
                 if (myPomoTime <= 0) {
                     myPomoTime = 0; myPomoIsRunning = false; clearInterval(myPomoInterval); playTone('pomoDone'); syncMyPomoToCloud();
-                    updateAmbientFocusState(false);
                     const totalRounds = parseInt(userSettings.pomoRounds) || 4;
                     if (myPomoMode === 'focus') {
                         userSettings.completedPomoHistory = userSettings.completedPomoHistory || [];
                         userSettings.completedPomoHistory.push({ durationSecs: myPomoInitialTime, wasPaused: currentSessionWasPaused, timestamp: Date.now() });
-                        evaluateBadges(currentRawLogsCache, userSettings.completedPomoHistory);
+                        evaluateBadges(currentRawLogsCache, userSettings.completedPomoHistory, loggedInUser);
                         if (myPomoRound < totalRounds) { triggerDesktopNotification("✨ Round Complete!", `Round ${myPomoRound} finished.`); myPomoRound++; setMyPomoMode('short'); }
                         else { triggerDesktopNotification("🎉 All Rounds Complete!", `All ${totalRounds} rounds finished!`); myPomoRound = 1; setMyPomoMode('long'); }
                     } else { triggerDesktopNotification("🔔 Break Complete!", "Ready for next focus round?"); setMyPomoMode('focus'); }
@@ -1193,7 +1031,7 @@
         }
 
         function setMyPomoMode(mode) {
-            myPomoMode = mode; myPomoIsRunning = false; currentSessionWasPaused = false; updateAmbientFocusState(false);
+            myPomoMode = mode; myPomoIsRunning = false; currentSessionWasPaused = false;
             if (myPomoInterval) clearInterval(myPomoInterval);
             const f = parseInt(userSettings.pomoFocus) || 25, s = parseInt(userSettings.pomoShort) || 5, l = parseInt(userSettings.pomoLong) || 15;
             myPomoInitialTime = (mode === 'focus' ? f : (mode === 'short' ? s : l)) * 60;
@@ -1204,11 +1042,11 @@
         function toggleMyPomoTimer() {
             if (loggedInUser !== viewedUser) return;
             requestNotificationPermission();
-            if (myPomoIsRunning) { myPomoIsRunning = false; currentSessionWasPaused = true; clearInterval(myPomoInterval); updateAmbientFocusState(false); }
+            if (myPomoIsRunning) { myPomoIsRunning = false; currentSessionWasPaused = true; clearInterval(myPomoInterval); }
             else { myPomoIsRunning = true; startMyPomoBackgroundTimer(); }
             syncMyPomoToCloud();
         }
-        function resetMyPomoTimer() { if (loggedInUser === viewedUser) { clearInterval(myPomoInterval); myPomoIsRunning = false; myPomoRound = 1; updateAmbientFocusState(false); setMyPomoMode('focus'); } }
+        function resetMyPomoTimer() { if (loggedInUser === viewedUser) { clearInterval(myPomoInterval); myPomoIsRunning = false; myPomoRound = 1; setMyPomoMode('focus'); } }
         function handleClockClick() { if (loggedInUser === viewedUser) toggleMyPomoTimer(); }
 
         async function applyPomoPreset(f, s, l) {
@@ -1411,7 +1249,6 @@
             });
         }
 
-        // SIMULTANEOUS LIVE HEADER STATUS GLOW FOR BOTH USERS
         function initGlobalHeaderGlowListener() {
             if (globalLogsUnsubscribe) globalLogsUnsubscribe();
             const now = new Date(), startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -1430,12 +1267,37 @@
             });
         }
 
-        function getGlowClassForHours(hrs) {
+        // SMOOTH DYNAMIC HOURS-BASED INTERPOLATED GLOW CALCULATOR
+        function applyDynamicAvatarGlow(el, hours) {
             const softCap = userSettings.dailySoftCap || 4;
-            if (hrs >= softCap) return "glow-ring-softcap border-2 border-amber-400";
-            if (hrs >= 2.0) return "glow-ring-baseline border-2 border-emerald-400";
-            if (hrs > 0) return "glow-ring-active border-2 border-blue-400";
-            return "glow-ring-idle border-2 border-slate-700/60";
+            if (hours <= 0) {
+                el.style.boxShadow = "0 0 0 2px rgba(100, 116, 139, 0.4)";
+                el.style.opacity = "0.6";
+                return;
+            }
+            el.style.opacity = "1";
+
+            if (hours < 2.0) {
+                // Phase 1: Slate Blue -> Vibrant Cyan/Blue (0.0h to 2.0h)
+                const p = hours / 2.0;
+                const r = Math.round(59 * p), g = Math.round(130 * p + 100 * (1 - p)), b = 246;
+                const blur = Math.round(8 + p * 10);
+                el.style.boxShadow = `0 0 ${blur}px ${Math.round(2 + p * 3)}px rgba(${r}, ${g}, ${b}, ${0.5 + p * 0.35})`;
+                el.style.borderColor = `rgba(${r}, ${g}, ${b}, 0.8)`;
+            } else if (hours < softCap) {
+                // Phase 2: Vibrant Blue -> Emerald Green -> Warm Amber (2.0h to Soft Cap)
+                const p = (hours - 2.0) / (softCap - 2.0);
+                const r = Math.round(16 + (245 - 16) * p);
+                const g = Math.round(185 + (158 - 185) * p);
+                const b = Math.round(129 + (11 - 129) * p);
+                const blur = Math.round(18 + p * 6);
+                el.style.boxShadow = `0 0 ${blur}px ${Math.round(4 + p * 2)}px rgba(${r}, ${g}, ${b}, ${0.75 + p * 0.2})`;
+                el.style.borderColor = `rgba(${r}, ${g}, ${b}, 0.9)`;
+            } else {
+                // Phase 3: Full Soft Cap Gold/Amber Pulse Aura (4.0h+)
+                el.style.boxShadow = "0 0 24px 6px rgba(245, 158, 11, 0.95)";
+                el.style.borderColor = "rgba(245, 158, 11, 1)";
+            }
         }
 
         function updateAvatarsInHeader() {
@@ -1443,17 +1305,14 @@
             const nImg = document.getElementById('avatar-img-north'), cImg = document.getElementById('avatar-img-cream');
             const nTip = document.getElementById('avatar-tip-north'), cTip = document.getElementById('avatar-tip-cream');
 
-            // Dynamic Tooltip (You) badge
             nTip.innerText = loggedInUser === 'North' ? 'North (You)' : 'North';
             cTip.innerText = loggedInUser === 'Cream' ? 'Cream (You)' : 'Cream';
 
-            // Active spectating ring border indicator
-            nBtn.className = `avatar-btn rounded-full p-0.5 ${viewedUser === 'North' ? 'ring-2 ring-amber-400 scale-105' : 'opacity-80'}`;
-            cBtn.className = `avatar-btn rounded-full p-0.5 ${viewedUser === 'Cream' ? 'ring-2 ring-amber-400 scale-105' : 'opacity-80'}`;
+            nBtn.className = `avatar-btn rounded-full p-0.5 ${viewedUser === 'North' ? 'ring-2 ring-amber-400 scale-105' : ''}`;
+            cBtn.className = `avatar-btn rounded-full p-0.5 ${viewedUser === 'Cream' ? 'ring-2 ring-amber-400 scale-105' : ''}`;
 
-            // Simultaneous live status glow
-            nImg.className = `w-9 h-9 rounded-full bg-slate-800 object-cover ${getGlowClassForHours(northDailyHours)}`;
-            cImg.className = `w-9 h-9 rounded-full bg-slate-800 object-cover ${getGlowClassForHours(creamDailyHours)}`;
+            applyDynamicAvatarGlow(nImg, northDailyHours);
+            applyDynamicAvatarGlow(cImg, creamDailyHours);
         }
 
         function updateSettingsUI() {
@@ -1673,21 +1532,24 @@
                 const isVaulted = userSettings.vaultedMonths?.[`${now.getFullYear()}-${now.getMonth()}`];
                 const pEl = document.getElementById('monthly-payout');
                 pEl.innerText = `฿${Math.round(finalPayout).toLocaleString()}`;
-                pEl.className = isVaulted ? "text-3xl font-extrabold text-amber-400 mt-1 opacity-70 line-through" : "text-3xl font-extrabold text-emerald-400 mt-1";
+                pEl.className = isVaulted ? "text-3xl font-extrabold text-amber-400 mt-1.5 opacity-70 line-through" : "text-3xl font-extrabold text-emerald-400 mt-1.5";
 
                 document.getElementById('today-hours-label').innerText = `${todayHours.toFixed(1)} / ${softCap} hrs`;
                 document.getElementById('daily-bar').style.width = `${Math.min((todayHours / softCap) * 100, 100)}%`;
 
-                const statusEl = document.getElementById('daily-cap-status'), badge = document.getElementById('milestone-2h-badge'), notice = document.getElementById('work-form-softcap-notice');
+                const statusEl = document.getElementById('daily-cap-status'), badge = document.getElementById('milestone-2h-badge'), notice = document.getElementById('work-form-softcap-notice'), yieldPill = document.getElementById('allowance-yield-pill');
                 if (todayHours >= softCap) {
-                    statusEl.innerText = "🍵 Soft Cap Active (25% Yield)"; statusEl.className = "text-xs font-semibold theme-accent-text mt-1";
+                    statusEl.innerText = "🍵 Soft Cap Active (25% Yield)"; statusEl.className = "text-xs font-semibold theme-accent-text";
                     badge.innerText = "✨ Baseline Reached"; badge.className = "text-[10px] font-bold theme-accent-text"; notice?.classList.remove('hidden');
+                    yieldPill.innerText = "🍵 Soft Cap Yield"; yieldPill.className = "text-[10px] font-extrabold px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20";
                 } else if (todayHours >= 2.0) {
-                    statusEl.innerText = `${(softCap - todayHours).toFixed(1)} hrs remaining today`; statusEl.className = "text-xs text-slate-400 mt-1";
+                    statusEl.innerText = `${(softCap - todayHours).toFixed(1)} hrs remaining today`; statusEl.className = "text-xs text-slate-400";
                     badge.innerText = "🎯 2.0h Reached!"; badge.className = "text-[10px] font-bold text-emerald-400"; notice?.classList.add('hidden');
+                    yieldPill.innerText = "⚡ Standard Yield"; yieldPill.className = "text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
                 } else {
-                    statusEl.innerText = `${(softCap - todayHours).toFixed(1)} hrs remaining today`; statusEl.className = "text-xs text-slate-400 mt-1";
+                    statusEl.innerText = `${(softCap - todayHours).toFixed(1)} hrs remaining today`; statusEl.className = "text-xs text-slate-400";
                     badge.innerText = "2.0h Baseline"; badge.className = "text-[10px] font-semibold text-slate-500"; notice?.classList.add('hidden');
+                    yieldPill.innerText = "⚡ Standard Yield"; yieldPill.className = "text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
                 }
 
                 calculateAndRenderPowerMeter(todayLogs);
@@ -1699,7 +1561,8 @@
                 document.getElementById('diary-text').value = todayDiary ? todayDiary.text : '';
                 document.getElementById('diary-status-badge').innerText = todayDiary ? "Today's Reflection Saved ✨" : "Jot down thoughts or wins";
 
-                populateAndFilterLedger(); evaluateBadges(rawLogs, userSettings.completedPomoHistory || []);
+                populateAndFilterLedger(); 
+                evaluateBadges(rawLogs, userSettings.completedPomoHistory || [], viewedUser);
             });
         }
 
