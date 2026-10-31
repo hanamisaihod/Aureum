@@ -46,6 +46,9 @@
             border: 1px solid var(--card-border); 
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             transition: box-shadow 0.25s, border-color 0.3s, transform 0.2s;
+            /* Force GPU layer promotion to prevent Chrome blur redraw lag */
+            will-change: transform;
+            transform: translateZ(0);
         }
         .card:hover {
             box-shadow: 0 12px 36px -8px var(--accent-glow);
@@ -752,10 +755,11 @@
             ]
         };
 
-        // 1. CANVAS FX ENGINE
+        // 1. CANVAS FX ENGINE (IDLE-OPTIMIZED FOR CHROME)
         const canvas = document.getElementById('fx-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
+        let isFxAnimating = false;
 
         function resizeFxCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeFxCanvas);
@@ -774,9 +778,19 @@
                     alpha: 1, decay: Math.random() * 0.03 + 0.02
                 });
             }
+            // Only trigger the animation loop if it's not already running
+            if (!isFxAnimating) {
+                isFxAnimating = true;
+                animateParticles();
+            }
         }
 
         function animateParticles() {
+            if (particles.length === 0) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                isFxAnimating = false;
+                return; // Stop the requestAnimationFrame loop when idle
+            }
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             for (let i = particles.length - 1; i >= 0; i--) {
                 const p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.alpha -= p.decay;
@@ -785,7 +799,6 @@
             }
             requestAnimationFrame(animateParticles);
         }
-        animateParticles();
 
         // 2. MYTHIC RELICS CATALOG & ISOLATED SPECTATOR BADGE ENGINE
         const BADGE_CATALOG = [
