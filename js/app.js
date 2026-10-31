@@ -133,7 +133,7 @@ function updateUserSwitcherUI() {
 }
 
 function switchTab(tab) {
-    ['work', 'pomo', 'health', 'chores', 'forge', 'ledger'].forEach(t => {
+    ['work', 'pomo', 'health', 'chores', 'forge', 'ledger', 'badges'].forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (el) el.classList.add('hidden');
         const nav = document.getElementById(`nav-${t}`);
@@ -408,6 +408,9 @@ function loadUserData() {
 
         populateAndFilterLedger();
     });
+        if (typeof evaluateBadges === 'function') {
+        evaluateBadges(rawLogs, userSettings.completedPomoHistory || []);
+    }
 }
 
 function populateAndFilterLedger() {
