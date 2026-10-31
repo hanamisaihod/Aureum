@@ -425,7 +425,7 @@
             <form onsubmit="saveAllForgeSettings(event)" class="space-y-6 max-w-2xl">
                 <div class="card p-6 rounded-xl">
                     <h2 class="text-lg font-semibold mb-2 text-slate-200">Visual Theme & Avatar Customization</h2>
-                    <p class="text-xs text-slate-400 mb-5">Select color palette and customize profile avatar.</p>
+                    <p class="text-xs text-slate-400 mb-5">Select color palette, adjust FX strengths, and customize profile avatar.</p>
                     
                     <div class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -450,6 +450,24 @@
                                     <input type="text" id="setting-avatar-url" placeholder="https://..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
                                     <button type="button" onclick="applyCustomAvatarUrl()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-200 font-semibold rounded-lg whitespace-nowrap">Apply</button>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- FX STRENGTH CONTROL SLIDERS -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 pt-4 border-t border-slate-700/60">
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="block text-xs text-slate-400 font-medium">3D Card Tilt Strength</label>
+                                    <span id="label-tilt-val" class="text-xs font-mono theme-accent-text font-bold">15%</span>
+                                </div>
+                                <input type="range" id="setting-tilt-strength" min="0" max="100" step="5" value="15" oninput="document.getElementById('label-tilt-val').innerText = this.value + '%'; handleInstantEffectChange();" class="w-full accent-amber-500 bg-slate-900 rounded-lg cursor-pointer">
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="block text-xs text-slate-400 font-medium">Particle Burst Intensity</label>
+                                    <span id="label-particle-val" class="text-xs font-mono theme-accent-text font-bold">15%</span>
+                                </div>
+                                <input type="range" id="setting-particle-intensity" min="0" max="100" step="5" value="15" oninput="document.getElementById('label-particle-val').innerText = this.value + '%'; handleInstantEffectChange();" class="w-full accent-amber-500 bg-slate-900 rounded-lg cursor-pointer">
                             </div>
                         </div>
 
@@ -651,6 +669,7 @@
         let userSettings = {
             monthlyCash: 8000, weeklyHours: 10, dailySoftCap: 4, maxBonusCapPct: 125,
             pomoFocus: 25, pomoShort: 5, pomoLong: 15, pomoRounds: 4, userTheme: 'gold', avatarUrl: '',
+            tiltStrength: 15, particleIntensity: 15, // Defaulted to 15% (85% reduction)
             vaultedMonths: {}, unlockedBadges: [], completedPomoHistory: []
         };
 
@@ -671,7 +690,7 @@
             ]
         };
 
-        // 2. FX ENGINE: CANVAS PARTICLE BURSTS & TILT EFFECT
+        // 2. FX ENGINE: CANVAS PARTICLE BURSTS & TILT EFFECT (SCALABLE STRENGTHS)
         const canvas = document.getElementById('fx-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -684,19 +703,23 @@
         resizeFxCanvas();
 
         function spawnParticleBurst(x, y) {
+            const intensity = (userSettings.particleIntensity !== undefined ? userSettings.particleIntensity : 15) / 100;
+            if (intensity <= 0) return;
+
             const colors = ['#fef08a', '#f59e0b', '#b45309', '#38bdf8', '#10b981'];
-            const count = 35;
+            const count = Math.max(1, Math.round(35 * intensity)); // ~5 particles at 15% intensity
+            
             for (let i = 0; i < count; i++) {
                 const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 6 + 2;
+                const speed = (Math.random() * 5 + 1.5) * (0.4 + intensity * 0.6);
                 particles.push({
                     x: x, y: y,
                     vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed - 1.5,
-                    size: Math.random() * 5 + 3,
+                    vy: Math.sin(angle) * speed - 1.0,
+                    size: (Math.random() * 3.5 + 2) * (0.5 + intensity * 0.5),
                     color: colors[Math.floor(Math.random() * colors.length)],
                     alpha: 1,
-                    decay: Math.random() * 0.025 + 0.015
+                    decay: Math.random() * 0.03 + 0.02
                 });
             }
         }
@@ -727,19 +750,26 @@
         }
         animateParticles();
 
-        // DELEGATED 3D GLASS TILT FOR STAT CARDS & BADGES
+        // DELEGATED 3D GLASS TILT FOR STAT CARDS & BADGES (SCALABLE STRENGTH)
         document.addEventListener('mousemove', (e) => {
             const card = e.target.closest('.card');
             if (!card || card.classList.contains('locked')) return;
+
+            const strength = (userSettings.tiltStrength !== undefined ? userSettings.tiltStrength : 15) / 100;
+            if (strength <= 0) {
+                card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
+                return;
+            }
 
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left - rect.width / 2;
             const y = e.clientY - rect.top - rect.height / 2;
 
-            const rotX = (-y / (rect.height / 2)) * 6;
-            const rotY = (x / (rect.width / 2)) * 6;
+            const maxDeg = 6 * strength; // At 15%, max tilt is 0.9 deg instead of 6 deg
+            const rotX = (-y / (rect.height / 2)) * maxDeg;
+            const rotY = (x / (rect.width / 2)) * maxDeg;
 
-            card.style.transform = `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) translateZ(4px)`;
+            card.style.transform = `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) translateZ(${(3 * strength).toFixed(1)}px)`;
         });
 
         document.addEventListener('mouseout', (e) => {
@@ -1275,6 +1305,13 @@
             document.getElementById('setting-pomo-rounds').value = userSettings.pomoRounds || 4;
             document.getElementById('setting-user-theme').value = userSettings.userTheme || 'gold';
             document.getElementById('setting-avatar-url').value = userSettings.avatarUrl || '';
+            
+            const tilt = userSettings.tiltStrength !== undefined ? userSettings.tiltStrength : 15;
+            const particle = userSettings.particleIntensity !== undefined ? userSettings.particleIntensity : 15;
+            document.getElementById('setting-tilt-strength').value = tilt;
+            document.getElementById('label-tilt-val').innerText = `${tilt}%`;
+            document.getElementById('setting-particle-intensity').value = particle;
+            document.getElementById('label-particle-val').innerText = `${particle}%`;
         }
 
         async function handleLogin(e) {
@@ -1418,6 +1455,16 @@
             const val = document.getElementById('setting-user-theme').value; userSettings.userTheme = val; applyThemeToBody(val);
             if (loggedInUser === viewedUser) await db.collection('settings').doc(loggedInUser).set({ userTheme: val }, { merge: true });
         }
+        async function handleInstantEffectChange() {
+            userSettings.tiltStrength = parseInt(document.getElementById('setting-tilt-strength').value) || 0;
+            userSettings.particleIntensity = parseInt(document.getElementById('setting-particle-intensity').value) || 0;
+            if (loggedInUser === viewedUser) {
+                await db.collection('settings').doc(loggedInUser).set({
+                    tiltStrength: userSettings.tiltStrength,
+                    particleIntensity: userSettings.particleIntensity
+                }, { merge: true });
+            }
+        }
         async function applyCustomAvatarUrl() {
             const url = document.getElementById('setting-avatar-url').value.trim(); if (!url) return;
             userSettings.avatarUrl = url; updateAvatarsInHeader();
@@ -1446,6 +1493,8 @@
             userSettings.pomoRounds = parseInt(document.getElementById('setting-pomo-rounds').value) || 4;
             userSettings.userTheme = document.getElementById('setting-user-theme').value;
             userSettings.avatarUrl = document.getElementById('setting-avatar-url').value.trim();
+            userSettings.tiltStrength = parseInt(document.getElementById('setting-tilt-strength').value) || 0;
+            userSettings.particleIntensity = parseInt(document.getElementById('setting-particle-intensity').value) || 0;
 
             await db.collection('settings').doc(loggedInUser).set(userSettings, { merge: true });
             
