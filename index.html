@@ -4,16 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AUREUM — Autonomous Living & Creative Ledger</title>
-    
-    <!-- External Styles & CDNs -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="css/styles.css">
-
-    <!-- Firebase SDKs (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <style>
+        :root { --bg-main: #0f172a; --card-bg: #1e293b; --card-border: #334155; --accent-primary: #f59e0b; --accent-primary-hover: #d97706; --accent-primary-text: #020617; --accent-glow: rgba(245, 158, 11, 0.25); }
+        body[data-theme="gold"] { --bg-main: #0f172a; --card-bg: #1e293b; --card-border: #334155; --accent-primary: #f59e0b; --accent-primary-hover: #d97706; --accent-primary-text: #020617; --accent-glow: rgba(245, 158, 11, 0.25); }
+        body[data-theme="rose"] { --bg-main: #180e15; --card-bg: #271622; --card-border: #442239; --accent-primary: #f472b6; --accent-primary-hover: #e11d48; --accent-primary-text: #020617; --accent-glow: rgba(244, 114, 182, 0.3); }
+        body[data-theme="emerald"] { --bg-main: #061814; --card-bg: #0f2e27; --card-border: #1b4d41; --accent-primary: #10b981; --accent-primary-hover: #059669; --accent-primary-text: #020617; --accent-glow: rgba(16, 185, 129, 0.3); }
+        body[data-theme="cyber"] { --bg-main: #0b0f19; --card-bg: #151c2e; --card-border: #263352; --accent-primary: #a855f7; --accent-primary-hover: #9333ea; --accent-primary-text: #ffffff; --accent-glow: rgba(168, 85, 247, 0.35); }
+        body[data-theme="sunset"] { --bg-main: #1a100c; --card-bg: #2c1a14; --card-border: #482b20; --accent-primary: #f97316; --accent-primary-hover: #ea580c; --accent-primary-text: #020617; --accent-glow: rgba(249, 115, 22, 0.3); }
+        body[data-theme="amethyst"] { --bg-main: #120d1d; --card-bg: #1e1630; --card-border: #362754; --accent-primary: #c084fc; --accent-primary-hover: #a855f7; --accent-primary-text: #020617; --accent-glow: rgba(192, 132, 252, 0.3); }
+        body[data-theme="ocean"] { --bg-main: #0b1920; --card-bg: #122834; --card-border: #1e4256; --accent-primary: #14b8a6; --accent-primary-hover: #0d9488; --accent-primary-text: #020617; --accent-glow: rgba(20, 184, 166, 0.3); }
+        body[data-theme="crimson"] { --bg-main: #1a0c0e; --card-bg: #2d1317; --card-border: #4a2027; --accent-primary: #ef4444; --accent-primary-hover: #dc2626; --accent-primary-text: #ffffff; --accent-glow: rgba(239, 68, 68, 0.35); }
+        body[data-theme="matcha"] { --bg-main: #121813; --card-bg: #1d271f; --card-border: #314234; --accent-primary: #84cc16; --accent-primary-hover: #65a30d; --accent-primary-text: #020617; --accent-glow: rgba(132, 204, 22, 0.3); }
+        body[data-theme="monochrome"] { --bg-main: #121212; --card-bg: #1e1e1e; --card-border: #333333; --accent-primary: #e2e8f0; --accent-primary-hover: #cbd5e1; --accent-primary-text: #0f172a; --accent-glow: rgba(226, 232, 240, 0.25); }
+
+        body { background-color: var(--bg-main); color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.3s; }
+        .card { background-color: var(--card-bg); border: 1px solid var(--card-border); transition: all 0.3s; }
+        .tab-btn { color: #94a3b8; background-color: transparent; border: 1px solid transparent; transition: all 0.2s; }
+        .tab-btn:hover { color: #f8fafc; background-color: rgba(30, 41, 59, 0.7); }
+        .tab-btn.active { background-color: rgba(245, 158, 11, 0.15) !important; color: var(--accent-primary) !important; border-color: var(--accent-primary) !important; font-weight: 700; box-shadow: 0 0 14px var(--accent-glow); }
+        .theme-accent-bg { background-color: var(--accent-primary) !important; color: var(--accent-primary-text) !important; }
+        .theme-accent-bg:hover { background-color: var(--accent-primary-hover) !important; }
+        .theme-accent-text { color: var(--accent-primary) !important; }
+        .logo-gold { color: var(--accent-primary); letter-spacing: 0.25em; text-shadow: 0 0 12px var(--accent-glow); }
+        .gauge-circle { transition: stroke-dashoffset 0.8s ease-in-out, stroke 0.3s; }
+        .avatar-btn { position: relative; transition: transform 0.2s; }
+        .avatar-btn:hover { transform: scale(1.08); }
+        .avatar-btn .avatar-tooltip { visibility: hidden; opacity: 0; position: absolute; top: 115%; left: 50%; transform: translateX(-50%); background-color: #020617; color: #f8fafc; padding: 4px 10px; border-radius: 6px; border: 1px solid #475569; font-size: 11px; font-weight: 600; white-space: nowrap; transition: opacity 0.2s; pointer-events: none; z-index: 20; }
+        .avatar-btn:hover .avatar-tooltip { visibility: visible; opacity: 1; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* BADGES & TOAST STYLES */
+        .badge-card { background-color: var(--card-bg); border: 1px solid var(--card-border); transition: all 0.3s; }
+        .badge-card.locked { opacity: 0.4; filter: grayscale(0.85); border-color: #334155 !important; }
+        .badge-card.locked:hover { opacity: 0.65; filter: grayscale(0.4); }
+        .badge-tier-bronze { border-color: #d97706 !important; box-shadow: 0 0 12px rgba(217, 119, 6, 0.2); }
+        .badge-tier-silver { border-color: #38bdf8 !important; box-shadow: 0 0 14px rgba(56, 189, 248, 0.25); }
+        .badge-tier-gold { border-color: #f59e0b !important; box-shadow: 0 0 16px rgba(245, 158, 11, 0.35); }
+        .badge-tier-titan { border-color: #10b981 !important; box-shadow: 0 0 18px rgba(16, 185, 129, 0.4); }
+        .badge-tier-aureum { border-color: #a855f7 !important; box-shadow: 0 0 22px rgba(168, 85, 247, 0.5); background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(88, 28, 135, 0.25) 100%); }
+        #badge-toast-container { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 100; display: flex; flex-direction: column-reverse; gap: 0.75rem; pointer-events: none; }
+        .badge-toast { pointer-events: auto; animation: toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes toastSlideIn { from { opacity: 0; transform: translateY(-20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    </style>
 </head>
 <body data-theme="gold" class="p-4 md:p-8 max-w-6xl mx-auto">
 
@@ -47,46 +85,30 @@
             </div>
             
             <div class="flex items-center gap-5">
-                <!-- Avatar Profile Selector -->
                 <div class="flex items-center gap-3 bg-slate-900/90 p-1.5 px-3 rounded-full border border-slate-700/80 shadow-lg">
-                    <button id="user-btn-north" onclick="switchActiveUser('North')" class="avatar-btn rounded-full p-0.5 transition-all">
+                    <button id="user-btn-north" onclick="switchActiveUser('North')" class="avatar-btn rounded-full p-0.5">
                         <img id="avatar-img-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-transparent">
                         <span class="avatar-tooltip" id="avatar-tip-north">North (You)</span>
                     </button>
-                    <button id="user-btn-cream" onclick="switchActiveUser('Cream')" class="avatar-btn rounded-full p-0.5 transition-all">
+                    <button id="user-btn-cream" onclick="switchActiveUser('Cream')" class="avatar-btn rounded-full p-0.5">
                         <img id="avatar-img-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-transparent">
                         <span class="avatar-tooltip" id="avatar-tip-cream">Cream</span>
                     </button>
                 </div>
-
-                <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-sm text-slate-400 hover:text-white px-2.5 py-1.5 bg-slate-800/80 rounded-lg border border-slate-700 transition-all">🔊</button>
+                <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-sm text-slate-400 hover:text-white px-2.5 py-1.5 bg-slate-800/80 rounded-lg border border-slate-700">🔊</button>
                 <button onclick="handleLogout()" class="text-xs text-slate-500 hover:text-slate-300 underline">Sign Out</button>
             </div>
         </header>
 
-        <!-- Dynamic Capsule Navigation Bar -->
+        <!-- Navigation Bar -->
         <nav class="flex items-center gap-2 mb-6 p-1.5 bg-slate-900/80 rounded-2xl border border-slate-800/90 overflow-x-auto no-scrollbar">
-            <button onclick="switchTab('work')" id="nav-work" class="tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap">
-                <span>💼</span> <span>Work Engine</span>
-            </button>
-            <button onclick="switchTab('pomo')" id="nav-pomo" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap">
-                <span>⏱️</span> <span>Pomodoro</span>
-            </button>
-            <button onclick="switchTab('health')" id="nav-health" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap">
-                <span>🍨</span> <span>Snack Log</span>
-            </button>
-            <button onclick="switchTab('chores')" id="nav-chores" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap">
-                <span>🧹</span> <span>House Chores</span>
-            </button>
-            <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap">
-                <span>⚙️</span> <span>Forge</span>
-            </button>
-            <button onclick="switchTab('ledger')" id="nav-ledger" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap">
-                <span>📜</span> <span>Ledger History</span>
-            </button>
-            <button onclick="switchTab('badges')" id="nav-badges" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap">
-                <span>🏆</span> <span>Badges</span>
-            </button>
+            <button onclick="switchTab('work')" id="nav-work" class="tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap"><span>💼</span> <span>Work Engine</span></button>
+            <button onclick="switchTab('pomo')" id="nav-pomo" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⏱️</span> <span>Pomodoro</span></button>
+            <button onclick="switchTab('health')" id="nav-health" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🍨</span> <span>Snack Log</span></button>
+            <button onclick="switchTab('chores')" id="nav-chores" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🧹</span> <span>House Chores</span></button>
+            <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⚙️</span> <span>Forge</span></button>
+            <button onclick="switchTab('ledger')" id="nav-ledger" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>📜</span> <span>Ledger History</span></button>
+            <button onclick="switchTab('badges')" id="nav-badges" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🏆</span> <span>Badges</span></button>
         </nav>
 
         <!-- Read-Only Banner -->
@@ -106,12 +128,10 @@
                 <div>
                     <span class="text-xs uppercase tracking-wider text-slate-400 font-medium">Today's Soft Cap</span>
                     <div class="text-3xl font-extrabold theme-accent-text mt-1" id="today-hours-label">0.0 / 4.0 hrs</div>
-                    
                     <div class="relative w-full bg-slate-900/80 h-3 rounded-full mt-2.5 overflow-hidden border border-slate-700/60 p-0.5">
                         <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-amber-400/60 z-10 pointer-events-none" title="2.0h Baseline Goal"></div>
                         <div id="daily-bar" class="bg-blue-500 h-full rounded-full transition-all duration-700"></div>
                     </div>
-                    
                     <div class="flex justify-between items-center text-xs mt-1">
                         <span id="daily-cap-status" class="text-slate-400">4.0 hrs remaining today</span>
                         <span id="milestone-2h-badge" class="text-[10px] font-semibold text-slate-500">2.0h Target</span>
@@ -142,7 +162,7 @@
                 
                 <div id="work-form-softcap-notice" class="hidden p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
                     <span>🍵</span>
-                    <span><strong>Soft Cap Active:</strong> Reached daily target! Time logged past the cap generates allowance at 25% yield to protect rest.</span>
+                    <span><strong>Soft Cap Active:</strong> Reached daily target! Time logged past cap yields 25% allowance to protect rest.</span>
                 </div>
 
                 <form id="work-form" onsubmit="logWork(event)" class="space-y-6">
@@ -151,23 +171,17 @@
 
                     <div class="max-w-xs">
                         <label class="block text-xs text-slate-400 mb-2 font-medium">Hours Spent</label>
-                        <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
-                            <button type="button" 
-                                onmousedown="startHoldStep('work-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
-                                ontouchstart="startHoldStep('work-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()"
-                                class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold transition-all border-r border-slate-700 select-none">-</button>
+                        <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
+                            <button type="button" onmousedown="startHoldStep('work-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('work-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
                             <input type="number" id="work-time" step="0.25" min="0.25" value="1.00" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                            <button type="button" 
-                                onmousedown="startHoldStep('work-time', 1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
-                                ontouchstart="startHoldStep('work-time', 1, 0.25, 0.25)" ontouchend="stopHoldStep()"
-                                class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold transition-all border-l border-slate-700 select-none">+</button>
+                            <button type="button" onmousedown="startHoldStep('work-time', 1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('work-time', 1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
                             <label class="block text-xs text-slate-400 mb-2 font-medium">Output Quality</label>
-                            <div class="flex items-center bg-slate-900/90 rounded-2xl border border-slate-800 p-1.5 shadow-inner">
+                            <div class="flex items-center bg-slate-900/90 rounded-2xl border border-slate-800 p-1.5">
                                 <button type="button" onmousedown="startHoldStepRating('results', -1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepRating('results', -1)" ontouchend="stopHoldStep()" class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold select-none">◀</button>
                                 <div id="selector-box-results" class="flex-1 px-4 py-2 text-center">
                                     <div class="flex items-center justify-center gap-2 mb-0.5">
@@ -183,7 +197,7 @@
 
                         <div>
                             <label class="block text-xs text-slate-400 mb-2 font-medium">Effort & Friction</label>
-                            <div class="flex items-center bg-slate-900/90 rounded-2xl border border-slate-800 p-1.5 shadow-inner">
+                            <div class="flex items-center bg-slate-900/90 rounded-2xl border border-slate-800 p-1.5">
                                 <button type="button" onmousedown="startHoldStepRating('effort', -1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepRating('effort', -1)" ontouchend="stopHoldStep()" class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold select-none">◀</button>
                                 <div id="selector-box-effort" class="flex-1 px-4 py-2 text-center">
                                     <div class="flex items-center justify-center gap-2 mb-0.5">
@@ -285,7 +299,7 @@
         <div id="tab-health" class="hidden space-y-6">
             <div id="health-form-card" class="card p-6 rounded-xl">
                 <h2 class="text-lg font-semibold mb-1 text-slate-200">Log Sweet / Dessert Intake</h2>
-                <p class="text-xs text-slate-400 mb-4">A cozy spot to track sweet treats. Just for curiosity—doesn't touch points or allowance!</p>
+                <p class="text-xs text-slate-400 mb-4">A cozy spot to track sweet treats. Doesn't alter points or allowance!</p>
                 <form onsubmit="logHealth(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Snack / Dessert Size</label>
@@ -325,11 +339,11 @@
         <div id="tab-chores" class="hidden space-y-6">
             <div id="chore-form-card" class="card p-6 rounded-xl">
                 <h2 class="text-lg font-semibold mb-1 text-slate-200">Log House Chores</h2>
-                <p class="text-xs text-slate-400 mb-4">Keeping the sanctuary glowing. Tracks household hustle without altering cash.</p>
+                <p class="text-xs text-slate-400 mb-4">Keeping the sanctuary glowing. Tracks household tasks without altering cash.</p>
                 <form onsubmit="logChore(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs text-slate-400 mb-2 font-medium">Time Spent (Hours)</label>
-                        <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                        <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
                             <button type="button" onmousedown="startHoldStep('chore-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('chore-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
                             <input type="number" id="chore-time" step="0.25" min="0.25" value="0.50" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
                             <button type="button" onmousedown="startHoldStep('chore-time', 1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('chore-time', 1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
@@ -367,7 +381,7 @@
             <form onsubmit="saveAllForgeSettings(event)" class="space-y-6 max-w-2xl">
                 <div class="card p-6 rounded-xl">
                     <h2 class="text-lg font-semibold mb-2 text-slate-200">Visual Theme & Avatar Customization</h2>
-                    <p class="text-xs text-slate-400 mb-5">Select color palette and customize header profile avatar.</p>
+                    <p class="text-xs text-slate-400 mb-5">Select color palette and customize profile avatar.</p>
                     
                     <div class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -390,7 +404,7 @@
                                 <label class="block text-xs text-slate-400 mb-1">Custom Image URL</label>
                                 <div class="flex gap-2">
                                     <input type="text" id="setting-avatar-url" placeholder="https://..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
-                                    <button type="button" onclick="applyCustomAvatarUrl()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-200 font-semibold rounded-lg transition-all whitespace-nowrap">Apply</button>
+                                    <button type="button" onclick="applyCustomAvatarUrl()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-200 font-semibold rounded-lg whitespace-nowrap">Apply</button>
                                 </div>
                             </div>
                         </div>
@@ -398,13 +412,13 @@
                         <div>
                             <span class="block text-xs text-slate-400 mb-2">Preset Avatars</span>
                             <div class="flex items-center gap-3">
-                                <button type="button" onclick="setAvatarPreset('bottts', 'North')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-400 transition-all flex items-center justify-center">
+                                <button type="button" onclick="setAvatarPreset('bottts', 'North')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-400 flex items-center justify-center">
                                     <img src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North Robot" class="w-8 h-8 rounded-full object-cover">
                                 </button>
-                                <button type="button" onclick="setAvatarPreset('bottts', 'Cream')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-400 transition-all flex items-center justify-center">
+                                <button type="button" onclick="setAvatarPreset('bottts', 'Cream')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-400 flex items-center justify-center">
                                     <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream Robot" class="w-8 h-8 rounded-full object-cover">
                                 </button>
-                                <button type="button" onclick="randomizeAvatar()" class="px-4 py-2 theme-accent-bg text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 shadow-md">
+                                <button type="button" onclick="randomizeAvatar()" class="px-4 py-2 theme-accent-bg text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-md">
                                     <span>🎲</span> <span>Surprise Me</span>
                                 </button>
                             </div>
@@ -418,7 +432,7 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Target Monthly Cash Allowance (฿)</label>
-                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
                                 <button type="button" onmousedown="startHoldStep('setting-monthly-cash', -1, 500, 1000)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-monthly-cash', -1, 500, 1000)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-monthly-cash" min="1000" step="500" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
                                 <button type="button" onmousedown="startHoldStep('setting-monthly-cash', 1, 500, 1000)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-monthly-cash', 1, 500, 1000)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
@@ -427,7 +441,7 @@
 
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Target Weekly Work Hours</label>
-                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
                                 <button type="button" onmousedown="startHoldStep('setting-weekly-hrs', -1, 1, 1, 80)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-weekly-hrs', -1, 1, 1, 80)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-weekly-hrs" min="1" max="80" step="1" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
                                 <button type="button" onmousedown="startHoldStep('setting-weekly-hrs', 1, 1, 1, 80)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-weekly-hrs', 1, 1, 1, 80)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
@@ -436,7 +450,7 @@
 
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Daily Soft Cap (Hours)</label>
-                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
                                 <button type="button" onmousedown="startHoldStep('setting-daily-soft-cap', -1, 0.5, 1, 16)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-daily-soft-cap', -1, 0.5, 1, 16)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-daily-soft-cap" min="1" max="16" step="0.5" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
                                 <button type="button" onmousedown="startHoldStep('setting-daily-soft-cap', 1, 0.5, 1, 16)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-daily-soft-cap', 1, 0.5, 1, 16)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
@@ -445,7 +459,7 @@
 
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Max Bonus Cap (%)</label>
-                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
                                 <button type="button" onmousedown="startHoldStep('setting-bonus-cap', -1, 5, 100, 300)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-bonus-cap', -1, 5, 100, 300)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-bonus-cap" min="100" max="300" step="5" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
                                 <button type="button" onmousedown="startHoldStep('setting-bonus-cap', 1, 5, 100, 300)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-bonus-cap', 1, 5, 100, 300)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
@@ -460,7 +474,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Focus Duration (Minutes)</label>
-                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
                                 <button type="button" onmousedown="startHoldStep('setting-pomo-focus', -1, 1, 1, 180)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-focus', -1, 1, 1, 180)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-pomo-focus" min="1" max="180" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
                                 <button type="button" onmousedown="startHoldStep('setting-pomo-focus', 1, 1, 1, 180)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-focus', 1, 1, 1, 180)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
@@ -469,7 +483,7 @@
 
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Short Break (Minutes)</label>
-                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
                                 <button type="button" onmousedown="startHoldStep('setting-pomo-short', -1, 1, 1, 60)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-short', -1, 1, 1, 60)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-pomo-short" min="1" max="60" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
                                 <button type="button" onmousedown="startHoldStep('setting-pomo-short', 1, 1, 1, 60)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-short', 1, 1, 1, 60)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
@@ -478,7 +492,7 @@
 
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Long Break (Minutes)</label>
-                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
                                 <button type="button" onmousedown="startHoldStep('setting-pomo-long', -1, 1, 1, 120)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-long', -1, 1, 1, 120)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-pomo-long" min="1" max="120" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
                                 <button type="button" onmousedown="startHoldStep('setting-pomo-long', 1, 1, 1, 120)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-long', 1, 1, 1, 120)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
@@ -487,7 +501,7 @@
 
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Target Focus Rounds Before Long Break</label>
-                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
                                 <button type="button" onmousedown="startHoldStep('setting-pomo-rounds', -1, 1, 1, 12)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-rounds', -1, 1, 1, 12)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-pomo-rounds" min="1" max="12" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
                                 <button type="button" onmousedown="startHoldStep('setting-pomo-rounds', 1, 1, 1, 12)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-rounds', 1, 1, 1, 12)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
@@ -497,7 +511,7 @@
                 </div>
 
                 <div class="pt-2">
-                    <button type="submit" class="w-full theme-accent-bg font-bold p-3 rounded-xl text-sm transition-all shadow-xl">Save All Forge Settings</button>
+                    <button type="submit" class="w-full theme-accent-bg font-bold p-3 rounded-xl text-sm shadow-xl">Save All Forge Settings</button>
                 </div>
             </form>
         </div>
@@ -550,38 +564,747 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- TAB 7: BADGES & ACHIEVEMENTS -->
-            <div id="tab-badges" class="hidden space-y-6">
-                <div class="card p-6 rounded-xl">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                        <div>
-                            <h2 class="text-lg font-semibold text-slate-200">Hall of Achievements</h2>
-                            <p class="text-xs text-slate-400 mt-0.5">Track your long-term milestones, focus streaks, and mastery progression.</p>
-                        </div>
-                        <div class="flex items-center gap-3 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-700/80">
-                            <span class="text-xs text-slate-400 font-medium">Unlocked:</span>
-                            <span id="badge-completion-count" class="text-sm font-black theme-accent-text">0 / 22</span>
-                        </div>
+        <!-- TAB 7: BADGES & ACHIEVEMENTS -->
+        <div id="tab-badges" class="hidden space-y-6">
+            <div class="card p-6 rounded-xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-lg font-semibold text-slate-200">Hall of Achievements</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Track your long-term milestones, focus streaks, and mastery progression.</p>
                     </div>
-            
-                    <div id="badge-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        <!-- Populated dynamically by js/badges.js -->
+                    <div class="flex items-center gap-3 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-700/80">
+                        <span class="text-xs text-slate-400 font-medium">Unlocked:</span>
+                        <span id="badge-completion-count" class="text-sm font-black theme-accent-text">0 / 22</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Floating Toast Notification Container -->
-            <div id="badge-toast-container"></div>
-            
+                <div id="badge-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+            </div>
         </div>
+
+        <div id="badge-toast-container"></div>
     </div>
 
-    <!-- Application JavaScript Modules -->
-    <script src="js/config.js"></script>
-    <script src="js/pomo.js"></script>
-    <script src="js/charts.js"></script>
-    <script src="js/badges.js"></script>
-    <script src="js/app.js"></script>
+    <!-- APPLICATION SCRIPT ENGINE -->
+    <script>
+        // 1. CONFIG & INIT
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJ7cVPRiJfiShTKFi___pJ9VZHEcLM47Q",
+            authDomain: "aureum-214d1.firebaseapp.com",
+            projectId: "aureum-214d1",
+            storageBucket: "aureum-214d1.firebasestorage.app",
+            messagingSenderId: "967566110651",
+            appId: "1:967566110651:web:4ee66bc4a6afd271b45e9e"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(), auth = firebase.auth();
+
+        let loggedInUser = 'North', viewedUser = 'North', currentUserUid = null, audioMuted = false;
+        let holdInterval = null, holdTimeout = null;
+
+        let userSettings = {
+            monthlyCash: 8000, weeklyHours: 10, dailySoftCap: 4, maxBonusCapPct: 125,
+            pomoFocus: 25, pomoShort: 5, pomoLong: 15, pomoRounds: 4, userTheme: 'gold', avatarUrl: '',
+            vaultedMonths: {}, unlockedBadges: [], completedPomoHistory: []
+        };
+
+        const RATING_DATA = {
+            results: [
+                { level: 1, icon: '⚡', title: 'Minimal', desc: 'Warmup or light prep' },
+                { level: 2, icon: '🌱', title: 'Fair', desc: 'Modest progress made' },
+                { level: 3, icon: '🎯', title: 'Solid', desc: 'On-target standard pace' },
+                { level: 4, icon: '✨', title: 'High Craft', desc: 'Exceptional output speed' },
+                { level: 5, icon: '👑', title: 'Peak Flow', desc: 'Flawless breakthrough' }
+            ],
+            effort: [
+                { level: 1, icon: '🍃', title: 'Effortless', desc: 'Zero resistance or strain' },
+                { level: 2, icon: '☁️', title: 'Light', desc: 'Mild focus required' },
+                { level: 3, icon: '🔥', title: 'Moderate', desc: 'Standard focus effort' },
+                { level: 4, icon: '⛰️', title: 'Heavy', desc: 'Overcame strong fatigue' },
+                { level: 5, icon: '🌋', title: 'Max Willpower', desc: 'Intense willpower push' }
+            ]
+        };
+
+        // 2. BADGE CATALOG & ENGINE
+        const BADGE_CATALOG = [
+            { id: 'work_1', tier: 'bronze', icon: '🌱', title: "Initiate's First Step", desc: 'Log your very first work session.' },
+            { id: 'work_cap', tier: 'silver', icon: '🍵', title: 'Soft Cap Survivor', desc: 'Reach daily Soft Cap (4.0h) in a single day.' },
+            { id: 'work_100', tier: 'gold', icon: '🎯', title: 'Century Focus', desc: 'Reach 100 total hours logged all-time.' },
+            { id: 'work_1000', tier: 'titan', icon: '🏛️', title: 'Millennium Scholar', desc: 'Reach 1,000 total hours logged all-time.' },
+            { id: 'work_10000', tier: 'aureum', icon: '👑', title: 'Master of the Craft', desc: 'Reach 10,000 total hours logged all-time.' },
+            { id: 'pomo_1', tier: 'bronze', icon: '⏱️', title: 'Clockwork', desc: 'Complete 1 focus Pomodoro session.' },
+            { id: 'pomo_flow', tier: 'silver', icon: '🌊', title: 'Flow State', desc: 'Complete 4 focus rounds in a single day.' },
+            { id: 'pomo_deep', tier: 'silver', icon: '🤿', title: 'Deep Dive', desc: 'Complete a 50+ minute focus session.' },
+            { id: 'pomo_overdrive', tier: 'gold', icon: '🔥', title: 'Overdrive', desc: 'Complete 8 focus rounds in a single day.' },
+            { id: 'pomo_unbroken', tier: 'gold', icon: '🛡️', title: 'Unbroken Void', desc: 'Complete a 50+ minute focus session without pausing.' },
+            { id: 'pomo_marathon', tier: 'titan', icon: '🏃', title: 'Marathon Runner', desc: 'Complete 12 focus rounds in a single day.' },
+            { id: 'pomo_zen', tier: 'titan', icon: '🧘', title: 'Zen Master', desc: 'Complete 4 back-to-back sessions without a pause.' },
+            { id: 'pomo_perfect', tier: 'aureum', icon: '✨', title: 'The Perfect Loop', desc: 'Complete a full 4-round loop with zero pauses.' },
+            { id: 'chore_1', tier: 'bronze', icon: '🧹', title: 'Clean Slate', desc: 'Log your first house chore session.' },
+            { id: 'chore_25', tier: 'silver', icon: '🏰', title: 'Sanctuary Keeper', desc: 'Log 25 total hours of house chores.' },
+            { id: 'chore_100', tier: 'gold', icon: '🌟', title: 'Pillar of the Home', desc: 'Log 100 total hours of house chores.' },
+            { id: 'diary_1', tier: 'bronze', icon: '✍️', title: 'Mindful Moment', desc: 'Save your first daily reflection note.' },
+            { id: 'diary_30', tier: 'silver', icon: '📖', title: 'Journaler', desc: 'Save 30 daily reflection notes all-time.' },
+            { id: 'diary_100', tier: 'gold', icon: '🧠', title: 'Philosopher', desc: 'Save 100 daily reflection notes all-time.' },
+            { id: 'streak_3', tier: 'bronze', icon: '⚡', title: '3-Day Ignition', desc: 'Maintain a 3-day active streak.' },
+            { id: 'streak_7', tier: 'silver', icon: '🚀', title: '7-Day Unstoppable', desc: 'Maintain a 7-day active streak.' },
+            { id: 'streak_30', tier: 'gold', icon: '💎', title: '30-Day Relentless', desc: 'Maintain a 30-day active streak.' },
+            { id: 'streak_100', tier: 'aureum', icon: '🌋', title: 'Monolith of Discipline', desc: 'Maintain a 100-day active streak.' }
+        ];
+
+        function renderBadgeGrid(unlockedSet = new Set()) {
+            const gridEl = document.getElementById('badge-grid');
+            if (!gridEl) return;
+            document.getElementById('badge-completion-count').innerText = `${unlockedSet.size} / ${BADGE_CATALOG.length}`;
+            gridEl.innerHTML = BADGE_CATALOG.map(b => {
+                const isUnlocked = unlockedSet.has(b.id);
+                return `
+                    <div class="badge-card ${isUnlocked ? '' : 'locked'} badge-tier-${b.tier} p-4 rounded-xl flex items-start gap-3 select-none">
+                        <div class="text-3xl p-2 bg-slate-900/80 rounded-xl border border-slate-700/60 shrink-0">${isUnlocked ? b.icon : '🔒'}</div>
+                        <div class="space-y-0.5">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold ${isUnlocked ? 'text-slate-100' : 'text-slate-400'}">${b.title}</span>
+                                <span class="text-[9px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">${b.tier}</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 leading-snug">${b.desc}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showBadgeToast(b) {
+            const container = document.getElementById('badge-toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `badge-toast card p-4 rounded-xl shadow-2xl border-2 badge-tier-${b.tier} flex items-center gap-3 bg-slate-950/90 backdrop-blur-md`;
+            toast.innerHTML = `
+                <div class="text-3xl p-2 bg-slate-900 rounded-xl border border-slate-700 shrink-0">${b.icon}</div>
+                <div>
+                    <div class="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest">🏆 Achievement Unlocked!</div>
+                    <div class="text-sm font-bold text-white">${b.title}</div>
+                    <div class="text-xs text-slate-300">${b.desc}</div>
+                </div>
+            `;
+            container.appendChild(toast);
+            playTone('save');
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 4500);
+        }
+
+        function evaluateBadges(logs, pRoundsList = []) {
+            if (!logs) return;
+            userSettings.unlockedBadges = userSettings.unlockedBadges || [];
+            const unlockedSet = new Set(userSettings.unlockedBadges), newlyUnlocked = [];
+
+            const workLogs = logs.filter(l => l.type === 'work');
+            const totalWorkHours = workLogs.reduce((acc, l) => acc + (l.hours || 0), 0);
+            if (workLogs.length >= 1) unlock('work_1');
+            if (workLogs.some(l => l.hours >= (userSettings.dailySoftCap || 4))) unlock('work_cap');
+            if (totalWorkHours >= 100) unlock('work_100');
+            if (totalWorkHours >= 1000) unlock('work_1000');
+            if (totalWorkHours >= 10000) unlock('work_10000');
+
+            const choreLogs = logs.filter(l => l.type === 'chore');
+            const totalChoreHours = choreLogs.reduce((acc, l) => acc + (l.hours || 0), 0);
+            if (choreLogs.length >= 1) unlock('chore_1');
+            if (totalChoreHours >= 25) unlock('chore_25');
+            if (totalChoreHours >= 100) unlock('chore_100');
+
+            const diaryLogs = logs.filter(l => l.type === 'diary');
+            if (diaryLogs.length >= 1) unlock('diary_1');
+            if (diaryLogs.length >= 30) unlock('diary_30');
+            if (diaryLogs.length >= 100) unlock('diary_100');
+
+            if (pRoundsList.length >= 1) unlock('pomo_1');
+            const pomoByDay = {};
+            pRoundsList.forEach(p => { const key = new Date(p.timestamp).toDateString(); pomoByDay[key] = (pomoByDay[key] || 0) + 1; });
+            const maxPomoDay = Math.max(0, ...Object.values(pomoByDay));
+            if (maxPomoDay >= 4) unlock('pomo_flow');
+            if (maxPomoDay >= 8) unlock('pomo_overdrive');
+            if (maxPomoDay >= 12) unlock('pomo_marathon');
+
+            pRoundsList.forEach(p => {
+                if (p.durationSecs >= 3000) unlock('pomo_deep');
+                if (p.durationSecs >= 3000 && !p.wasPaused) unlock('pomo_unbroken');
+            });
+
+            let cleanStreak = 0;
+            pRoundsList.forEach(p => {
+                if (!p.wasPaused) { cleanStreak++; if (cleanStreak >= 4) unlock('pomo_zen'); }
+                else { cleanStreak = 0; }
+            });
+
+            const activeDates = new Set();
+            logs.forEach(l => {
+                if (!l.timestamp) return;
+                const d = l.timestamp.toDate(), key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+                if ((l.type === 'work' && l.hours >= 1.0) || (l.type === 'chore' && l.hours >= 0.5)) activeDates.add(key);
+            });
+            Object.entries(pomoByDay).forEach(([dayStr, count]) => {
+                if (count >= 2) { const d = new Date(dayStr); activeDates.add(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`); }
+            });
+
+            const sortedDates = Array.from(activeDates).map(s => new Date(s.split('-')[0], s.split('-')[1], s.split('-')[2])).sort((a,b) => a - b);
+            let cur = 0, maxS = 0;
+            for (let i = 0; i < sortedDates.length; i++) {
+                if (i === 0) cur = 1;
+                else { const diff = Math.round((sortedDates[i] - sortedDates[i-1]) / 86400000); cur = diff === 1 ? cur + 1 : 1; }
+                maxS = Math.max(maxS, cur);
+            }
+            if (maxS >= 3) unlock('streak_3');
+            if (maxS >= 7) unlock('streak_7');
+            if (maxS >= 30) unlock('streak_30');
+            if (maxS >= 100) unlock('streak_100');
+
+            function unlock(id) {
+                if (!unlockedSet.has(id)) {
+                    unlockedSet.add(id); newlyUnlocked.push(id);
+                    const b = BADGE_CATALOG.find(x => x.id === id);
+                    if (b) showBadgeToast(b);
+                }
+            }
+
+            if (newlyUnlocked.length > 0 && loggedInUser === viewedUser) {
+                userSettings.unlockedBadges = Array.from(unlockedSet);
+                renderBadgeGrid(unlockedSet);
+                try { db.collection('settings').doc(loggedInUser).set({ unlockedBadges: userSettings.unlockedBadges }, { merge: true }); } catch (e) {}
+            } else { renderBadgeGrid(unlockedSet); }
+        }
+
+        // 3. AUDIO & UI HELPERS
+        function playTone(type) {
+            if (audioMuted) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                if (type === 'save' || type === 'delete') {
+                    const osc = ctx.createOscillator(), gain = ctx.createGain();
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.type = 'sine'; osc.frequency.setValueAtTime(type === 'save' ? 600 : 400, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(type === 'save' ? 1200 : 200, ctx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime); gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                    osc.start(); osc.stop(ctx.currentTime + 0.1);
+                } else if (type === 'pomoDone') {
+                    [0, 0.2, 0.4].forEach(d => {
+                        const osc = ctx.createOscillator(), gain = ctx.createGain();
+                        osc.connect(gain); gain.connect(ctx.destination); osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(880, ctx.currentTime + d); osc.frequency.exponentialRampToValueAtTime(1760, ctx.currentTime + d + 0.15);
+                        gain.gain.setValueAtTime(0.3, ctx.currentTime + d); gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + d + 0.18);
+                        osc.start(ctx.currentTime + d); osc.stop(ctx.currentTime + d + 0.18);
+                    });
+                }
+            } catch (e) {}
+        }
+
+        function requestNotificationPermission() { if ("Notification" in window && Notification.permission === "default") Notification.requestPermission(); }
+        function triggerDesktopNotification(t, b) { if ("Notification" in window && Notification.permission === "granted") new Notification(t, { body: b, icon: "https://fav.farm/✨" }); }
+        function toggleAudioMute() { audioMuted = !audioMuted; document.getElementById('audio-toggle-btn').innerText = audioMuted ? "🔇" : "🔊"; }
+
+        function stepValue(id, delta, step, min, max) {
+            const el = document.getElementById(id); if (!el) return;
+            let val = (parseFloat(el.value) || 0) + (delta * step);
+            if (min !== undefined) val = Math.max(min, val);
+            if (max !== undefined) val = Math.min(max, val);
+            el.value = step < 1 ? val.toFixed(2) : Math.round(val);
+        }
+        function startHoldStep(id, delta, step, min, max) {
+            stopHoldStep(); stepValue(id, delta, step, min, max);
+            holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepValue(id, delta, step, min, max), 80); }, 300);
+        }
+        function stopHoldStep() { clearTimeout(holdTimeout); clearInterval(holdInterval); holdTimeout = null; holdInterval = null; }
+
+        function updateRatingUI(field) {
+            const input = document.getElementById(`work-${field}`); if (!input) return;
+            const val = parseInt(input.value) || 3, d = RATING_DATA[field][val - 1], p = field === 'results' ? 'q' : 'e';
+            document.getElementById(`${p}-icon`).innerText = d.icon;
+            document.getElementById(`${p}-badge`).innerText = `LVL ${d.level}`;
+            document.getElementById(`${p}-title`).innerText = d.title;
+            document.getElementById(`${p}-desc`).innerText = d.desc;
+        }
+        function stepRating(field, delta) {
+            const input = document.getElementById(`work-${field}`);
+            input.value = Math.max(1, Math.min(5, (parseInt(input.value) || 3) + delta));
+            updateRatingUI(field);
+        }
+        function startHoldStepRating(field, delta) {
+            stopHoldStep(); stepRating(field, delta);
+            holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepRating(field, delta), 120); }, 300);
+        }
+
+        function applyThemeToBody(t) { document.body.setAttribute('data-theme', t || 'gold'); }
+
+        // 4. POMODORO ENGINE
+        let myPomoMode = 'focus', myPomoRound = 1, myPomoTime = 1500, myPomoInitialTime = 1500, myPomoIsRunning = false, myPomoInterval = null, currentSessionWasPaused = false;
+        let pomoUIRenderInterval = null, pomoSyncUnsubscribe = null, spectatorSettings = null, shadowSpectatorTime = 1500, shadowSpectatorIsRunning = false, shadowSpectatorInterval = null;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) {
+                e.preventDefault(); if (loggedInUser === viewedUser) toggleMyPomoTimer();
+            }
+        });
+
+        async function syncMyPomoToCloud() {
+            if (!loggedInUser) return;
+            try { db.collection('settings').doc(loggedInUser).set({ livePomoState: { mode: myPomoMode, round: myPomoRound, isRunning: myPomoIsRunning, pomoTime: myPomoTime, updatedAtMillis: Date.now() } }, { merge: true }); } catch (e) {}
+        }
+
+        function startMyPomoBackgroundTimer() {
+            if (myPomoInterval) clearInterval(myPomoInterval);
+            let ticks = 0;
+            myPomoInterval = setInterval(() => {
+                if (!myPomoIsRunning) return;
+                myPomoTime--; ticks++;
+                if (ticks >= 4) { syncMyPomoToCloud(); ticks = 0; }
+                if (myPomoTime <= 0) {
+                    myPomoTime = 0; myPomoIsRunning = false; clearInterval(myPomoInterval); playTone('pomoDone'); syncMyPomoToCloud();
+                    const totalRounds = parseInt(userSettings.pomoRounds) || 4;
+                    if (myPomoMode === 'focus') {
+                        userSettings.completedPomoHistory = userSettings.completedPomoHistory || [];
+                        userSettings.completedPomoHistory.push({ durationSecs: myPomoInitialTime, wasPaused: currentSessionWasPaused, timestamp: Date.now() });
+                        evaluateBadges(currentRawLogsCache, userSettings.completedPomoHistory);
+                        if (myPomoRound < totalRounds) { triggerDesktopNotification("✨ Round Complete!", `Round ${myPomoRound} finished.`); myPomoRound++; setMyPomoMode('short'); }
+                        else { triggerDesktopNotification("🎉 All Rounds Complete!", `All ${totalRounds} rounds finished!`); myPomoRound = 1; setMyPomoMode('long'); }
+                    } else { triggerDesktopNotification("🔔 Break Complete!", "Ready for next focus round?"); setMyPomoMode('focus'); }
+                }
+            }, 1000);
+        }
+
+        function setMyPomoMode(mode) {
+            myPomoMode = mode; myPomoIsRunning = false; currentSessionWasPaused = false;
+            if (myPomoInterval) clearInterval(myPomoInterval);
+            const f = parseInt(userSettings.pomoFocus) || 25, s = parseInt(userSettings.pomoShort) || 5, l = parseInt(userSettings.pomoLong) || 15;
+            myPomoInitialTime = (mode === 'focus' ? f : (mode === 'short' ? s : l)) * 60;
+            myPomoTime = myPomoInitialTime; syncMyPomoToCloud();
+        }
+
+        function handleUserSelectPomoMode(m) { if (loggedInUser === viewedUser) setMyPomoMode(m); }
+        function toggleMyPomoTimer() {
+            if (loggedInUser !== viewedUser) return;
+            requestNotificationPermission();
+            if (myPomoIsRunning) { myPomoIsRunning = false; currentSessionWasPaused = true; clearInterval(myPomoInterval); }
+            else { myPomoIsRunning = true; startMyPomoBackgroundTimer(); }
+            syncMyPomoToCloud();
+        }
+        function resetMyPomoTimer() { if (loggedInUser === viewedUser) { clearInterval(myPomoInterval); myPomoIsRunning = false; myPomoRound = 1; setMyPomoMode('focus'); } }
+        function handleClockClick() { if (loggedInUser === viewedUser) toggleMyPomoTimer(); }
+
+        async function applyPomoPreset(f, s, l) {
+            if (loggedInUser !== viewedUser) return;
+            userSettings.pomoFocus = f; userSettings.pomoShort = s; userSettings.pomoLong = l;
+            document.getElementById('setting-pomo-focus').value = f;
+            document.getElementById('setting-pomo-short').value = s;
+            document.getElementById('setting-pomo-long').value = l;
+            await db.collection('settings').doc(loggedInUser).set({ pomoFocus: f, pomoShort: s, pomoLong: l }, { merge: true });
+            playTone('save'); setMyPomoMode(myPomoMode);
+        }
+
+        async function initAndRecoverMyPomoState() {
+            try {
+                const docSnap = await db.collection('settings').doc(loggedInUser).get();
+                if (docSnap.exists && docSnap.data().livePomoState) {
+                    const d = docSnap.data().livePomoState;
+                    myPomoMode = d.mode || 'focus'; myPomoRound = parseInt(d.round) || 1;
+                    const f = parseInt(userSettings.pomoFocus) || 25, s = parseInt(userSettings.pomoShort) || 5, l = parseInt(userSettings.pomoLong) || 15;
+                    myPomoInitialTime = (myPomoMode === 'focus' ? f : (myPomoMode === 'short' ? s : l)) * 60;
+                    if (d.isRunning && d.updatedAtMillis) {
+                        const rem = (parseInt(d.pomoTime) || myPomoInitialTime) - Math.floor((Date.now() - d.updatedAtMillis) / 1000);
+                        if (rem > 0) { myPomoTime = rem; myPomoIsRunning = true; startMyPomoBackgroundTimer(); }
+                        else { myPomoTime = 0; myPomoIsRunning = false; setMyPomoMode('focus'); }
+                    } else { myPomoTime = d.pomoTime || myPomoInitialTime; myPomoIsRunning = false; syncMyPomoToCloud(); }
+                } else { setMyPomoMode('focus'); }
+            } catch (e) { setMyPomoMode('focus'); }
+        }
+
+        function startShadowSpectatorTimer() {
+            clearInterval(shadowSpectatorInterval);
+            shadowSpectatorInterval = setInterval(() => { if (shadowSpectatorIsRunning && shadowSpectatorTime > 0) shadowSpectatorTime--; }, 1000);
+        }
+
+        function startGlobalUIRenderer() {
+            clearInterval(pomoUIRenderInterval);
+            pomoUIRenderInterval = setInterval(() => {
+                const isSelf = (loggedInUser === viewedUser);
+                let secs = isSelf ? myPomoTime : shadowSpectatorTime, isR = isSelf ? myPomoIsRunning : shadowSpectatorIsRunning, mode = isSelf ? myPomoMode : (spectatorSettings?.livePomoState?.mode || 'focus'), round = isSelf ? myPomoRound : (spectatorSettings?.livePomoState?.round || 1);
+                let f = parseInt((isSelf ? userSettings : spectatorSettings)?.pomoFocus) || 25, s = parseInt((isSelf ? userSettings : spectatorSettings)?.pomoShort) || 5, l = parseInt((isSelf ? userSettings : spectatorSettings)?.pomoLong) || 15, totR = parseInt((isSelf ? userSettings : spectatorSettings)?.pomoRounds) || 4;
+                let initT = (mode === 'focus' ? f : (mode === 'short' ? s : l)) * 60;
+
+                document.getElementById('pomo-mode-focus').innerText = `Focus (${f}m)`;
+                document.getElementById('pomo-mode-short').innerText = `Short (${s}m)`;
+                document.getElementById('pomo-mode-long').innerText = `Long (${l}m)`;
+                document.getElementById('pomo-timer-display').innerText = `${Math.floor(secs / 60).toString().padStart(2, '0')}:${(secs % 60).toString().padStart(2, '0')}`;
+                document.getElementById('pomo-progress-bar').style.width = `${initT > 0 ? (secs / initT) * 100 : 0}%`;
+
+                const statusEl = document.getElementById('pomo-status-label'), toggleBtn = document.getElementById('pomo-toggle-btn');
+                if (isSelf) {
+                    statusEl.innerText = isR ? (mode === 'focus' ? "Focus Active" : "Resting...") : (secs === initT ? "Click Clock or Press Spacebar" : "Paused");
+                    toggleBtn.innerText = isR ? "Pause" : (secs === initT ? (mode === 'focus' ? "Start Focus" : "Start Break") : "Resume");
+                } else {
+                    statusEl.innerText = isR ? `LIVE: ${mode.toUpperCase()}` : "PAUSED / IDLE";
+                }
+
+                ['focus', 'short', 'long'].forEach(m => {
+                    document.getElementById(`pomo-mode-${m}`).className = m === mode ? "px-4 py-1.5 rounded-md font-medium bg-blue-600 text-white" : "px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white";
+                });
+
+                document.getElementById('pomo-round-badge').innerText = `Round ${round} of ${totR}`;
+                const dots = document.getElementById('pomo-round-dots');
+                if (dots.children.length !== totR) { dots.innerHTML = ''; for (let i = 0; i < totR; i++) dots.appendChild(document.createElement('div')); }
+                Array.from(dots.children).forEach((d, i) => d.className = i < round ? "w-2.5 h-2.5 rounded-full theme-accent-bg" : "w-2.5 h-2.5 rounded-full bg-slate-700");
+            }, 100);
+        }
+
+        function attachPomoSpectatorListener() {
+            if (pomoSyncUnsubscribe) pomoSyncUnsubscribe();
+            const isSelf = (loggedInUser === viewedUser);
+            document.getElementById('pomo-spectator-banner').classList.toggle('hidden', isSelf);
+            document.getElementById('pomo-controls-box').classList.toggle('hidden', !isSelf);
+            document.getElementById('pomo-presets-box').classList.toggle('hidden', !isSelf);
+            
+            if (!isSelf) {
+                document.getElementById('pomo-spectator-target').innerText = viewedUser;
+                pomoSyncUnsubscribe = db.collection('settings').doc(viewedUser).onSnapshot(doc => {
+                    if (doc.exists) {
+                        spectatorSettings = doc.data();
+                        if (spectatorSettings.userTheme) applyThemeToBody(spectatorSettings.userTheme);
+                        const live = spectatorSettings.livePomoState;
+                        if (live) {
+                            shadowSpectatorIsRunning = !!live.isRunning;
+                            let dbTime = live.pomoTime !== undefined ? parseInt(live.pomoTime) : 1500;
+                            if (shadowSpectatorIsRunning && live.updatedAtMillis) {
+                                shadowSpectatorTime = Math.max(0, dbTime - Math.floor((Date.now() - live.updatedAtMillis) / 1000));
+                                startShadowSpectatorTimer();
+                            } else { shadowSpectatorTime = dbTime; clearInterval(shadowSpectatorInterval); }
+                        }
+                    }
+                });
+            }
+        }
+
+        // 5. CHARTS ENGINE
+        let charts = {}, chartTimeframes = { work: 'daily', health: 'daily', chore: 'daily' }, workChartMode = 'bar';
+        function initCharts() {
+            const opts = { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }, y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } } }, plugins: { legend: { display: false } } };
+            
+            charts['work'] = new Chart(document.getElementById('workChart').getContext('2d'), {
+                type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: '#10b981', borderColor: '#10b981', borderRadius: 4 }] },
+                options: { ...opts, onClick: async (evt, els) => {
+                    if (chartTimeframes['work'] === 'monthly' && els.length > 0) {
+                        const mKey = `${new Date().getFullYear()}-${els[0].index}`;
+                        userSettings.vaultedMonths = userSettings.vaultedMonths || {};
+                        userSettings.vaultedMonths[mKey] = !userSettings.vaultedMonths[mKey];
+                        await db.collection('settings').doc(viewedUser).set({ vaultedMonths: userSettings.vaultedMonths }, { merge: true });
+                        playTone('save');
+                    }
+                }}
+            });
+
+            ['health', 'chore'].forEach(t => {
+                charts[t] = new Chart(document.getElementById(`${t}Chart`).getContext('2d'), {
+                    type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: t === 'health' ? '#10b981' : '#f59e0b', borderRadius: 4 }] }, options: opts
+                });
+            });
+        }
+
+        function setWorkChartMode(m) { workChartMode = m; if (charts['work']) { charts['work'].config.type = m === 'area' ? 'line' : m; charts['work'].data.datasets[0].fill = (m === 'area'); charts['work'].update(); } }
+        function setChartRange(t, r) { chartTimeframes[t] = r; updateChartTimeframeUI(t, r); loadUserData(); }
+        function updateChartTimeframeUI(t, r) {
+            ['daily', 'weekly', 'monthly', 'yearly'].forEach(x => {
+                const btn = document.getElementById(`btn-${t}-${x}`);
+                if (btn) btn.className = x === r ? "px-3 py-1 rounded bg-blue-600 text-white font-medium" : "px-3 py-1 rounded text-slate-400 hover:text-white";
+            });
+        }
+
+        function updateGoalGauge(cash, target) {
+            const pct = Math.min(Math.round((cash / target) * 100), 100);
+            document.getElementById('gauge-percent-text').innerText = `${Math.round((cash / target) * 100)}%`;
+            document.getElementById('gauge-circle-path').style.strokeDashoffset = 100 - pct;
+            const badge = document.getElementById('gauge-tier-badge'), sub = document.getElementById('gauge-tier-sub');
+            if (pct >= 100) { badge.innerText = "✨ Goal Mastered"; sub.innerText = "Maximum base crushed!"; }
+            else if (pct >= 75) { badge.innerText = "🥇 Gold Tier"; sub.innerText = "Final stretch to target base!"; }
+            else if (pct >= 50) { badge.innerText = "🥈 Silver Tier"; sub.innerText = "Halfway benchmark unlocked"; }
+            else if (pct >= 25) { badge.innerText = "🥉 Bronze Tier"; sub.innerText = "Building strong momentum"; }
+            else { badge.innerText = "🌱 Initiate"; sub.innerText = `${pct}% reached`; }
+        }
+
+        function updateChartData(type, logs, pointRate, maxCash) {
+            const range = chartTimeframes[type], now = new Date();
+            let labels = [], values = [];
+
+            if (range === 'daily') { for (let i = 13; i >= 0; i--) { const d = new Date(); d.setDate(now.getDate() - i); labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })); values.push(0); } }
+            else if (range === 'weekly') { for (let i = 7; i >= 0; i--) { const d = new Date(); d.setDate(now.getDate() - (i * 7)); labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })); values.push(0); } }
+            else if (range === 'monthly') { labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; values = new Array(12).fill(0); }
+            else { labels = ['2025','2026','2027']; values = [0,0,0]; }
+
+            logs.forEach(l => { values[values.length - 1] += (type === 'work' ? (l.points || 0) * pointRate : (type === 'health' ? (l.level || 0) : (l.hours || 0))); });
+            if (type === 'work') values = values.map(v => Math.min(v, maxCash));
+
+            charts[type].data.labels = labels;
+            if (type === 'work' && range === 'monthly') {
+                charts[type].data.datasets[0].backgroundColor = labels.map((_, i) => userSettings.vaultedMonths?.[`${now.getFullYear()}-${i}`] ? '#f59e0b' : '#10b981');
+            } else {
+                charts[type].data.datasets[0].backgroundColor = type === 'work' ? '#10b981' : (type === 'health' ? '#10b981' : '#f59e0b');
+            }
+            charts[type].data.datasets[0].data = values;
+            charts[type].update();
+        }
+
+        // 6. FIRESTORE CRUD & APP LOGIC
+        let currentTodayHoursLogged = 0, currentRawLogsCache = [], settingsUnsubscribe = null;
+
+        auth.onAuthStateChanged(async u => {
+            if (u) {
+                currentUserUid = u.uid;
+                document.getElementById('login-modal').classList.add('hidden');
+                document.getElementById('app-content').classList.remove('hidden');
+                loggedInUser = (u.uid === "ioxjbBLDH0NDLDWVoYCjq8p3PYU2" || u.email?.toLowerCase().includes("cream")) ? 'Cream' : 'North';
+                viewedUser = loggedInUser;
+                initRealtimeSettingsListener();
+                await initAndRecoverMyPomoState();
+                updateUserSwitcherUI(); initCharts(); loadUserData();
+                updateRatingUI('results'); updateRatingUI('effort');
+                startGlobalUIRenderer(); attachPomoSpectatorListener();
+            } else {
+                document.getElementById('login-modal').classList.remove('hidden');
+                document.getElementById('app-content').classList.add('hidden');
+            }
+        });
+
+        function initRealtimeSettingsListener() {
+            if (settingsUnsubscribe) settingsUnsubscribe();
+            settingsUnsubscribe = db.collection('settings').doc(viewedUser).onSnapshot(doc => {
+                if (doc.exists) userSettings = { ...userSettings, ...doc.data() };
+                applyThemeToBody(userSettings.userTheme); updateSettingsUI(); updateAvatarsInHeader();
+                if (currentRawLogsCache.length > 0) loadUserData();
+            });
+        }
+
+        function updateAvatarsInHeader() {
+            const nImg = document.getElementById('avatar-img-north'), cImg = document.getElementById('avatar-img-cream');
+            if (viewedUser === 'North' && userSettings.avatarUrl) nImg.src = userSettings.avatarUrl;
+            if (viewedUser === 'Cream' && userSettings.avatarUrl) cImg.src = userSettings.avatarUrl;
+            nImg.className = viewedUser === 'North' ? "w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.5)]" : "w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-transparent opacity-60";
+            cImg.className = viewedUser === 'Cream' ? "w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.5)]" : "w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-transparent opacity-60";
+        }
+
+        function updateSettingsUI() {
+            document.getElementById('label-weekly-hrs').innerText = userSettings.weeklyHours;
+            document.getElementById('label-monthly-cash').innerText = userSettings.monthlyCash.toLocaleString();
+            document.getElementById('setting-monthly-cash').value = userSettings.monthlyCash;
+            document.getElementById('setting-weekly-hrs').value = userSettings.weeklyHours;
+            document.getElementById('setting-daily-soft-cap').value = userSettings.dailySoftCap || 4;
+            document.getElementById('setting-bonus-cap').value = userSettings.maxBonusCapPct;
+            document.getElementById('setting-pomo-focus').value = userSettings.pomoFocus || 25;
+            document.getElementById('setting-pomo-short').value = userSettings.pomoShort || 5;
+            document.getElementById('setting-pomo-long').value = userSettings.pomoLong || 15;
+            document.getElementById('setting-pomo-rounds').value = userSettings.pomoRounds || 4;
+            document.getElementById('setting-user-theme').value = userSettings.userTheme || 'gold';
+            document.getElementById('setting-avatar-url').value = userSettings.avatarUrl || '';
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            try {
+                await auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value);
+                document.getElementById('login-error').classList.add('hidden');
+            } catch (err) {
+                document.getElementById('login-error').innerText = "Incorrect email or password.";
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+        function handleLogout() { auth.signOut(); }
+
+        function switchActiveUser(target) { viewedUser = target; initRealtimeSettingsListener(); updateUserSwitcherUI(); attachPomoSpectatorListener(); loadUserData(); }
+        function updateUserSwitcherUI() {
+            const isSelf = loggedInUser === viewedUser;
+            ['work-form-card', 'diary-form-card', 'health-form-card', 'chore-form-card'].forEach(id => document.getElementById(id).style.display = isSelf ? 'block' : 'none');
+            document.querySelectorAll('#tab-forge input, #tab-forge select').forEach(i => { i.disabled = !isSelf; i.classList.toggle('opacity-50', !isSelf); });
+            document.querySelectorAll('#tab-forge button').forEach(b => b.style.display = isSelf ? 'inline-block' : 'none');
+            document.getElementById('read-only-banner').classList.toggle('hidden', isSelf);
+            if (!isSelf) document.getElementById('view-target-name').innerText = viewedUser;
+            updateAvatarsInHeader();
+        }
+
+        function switchTab(t) {
+            ['work', 'pomo', 'health', 'chores', 'forge', 'ledger', 'badges'].forEach(x => {
+                document.getElementById(`tab-${x}`)?.classList.add('hidden');
+                const nav = document.getElementById(`nav-${x}`);
+                if (nav) nav.className = x === t ? "tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap" : "tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap";
+            });
+            document.getElementById(`tab-${t}`)?.classList.remove('hidden');
+            if (t === 'pomo') attachPomoSpectatorListener();
+        }
+
+        async function logWork(e) {
+            e.preventDefault();
+            const T = parseFloat(document.getElementById('work-time').value), R = parseFloat(document.getElementById('work-results').value), E = parseFloat(document.getElementById('work-effort').value);
+            const softCap = userSettings.dailySoftCap || 4, baseRate = (R + E) / 2;
+            const normH = Math.min(T, Math.max(0, softCap - currentTodayHoursLogged)), overH = T - normH;
+            const pts = (normH * baseRate) + (overH * baseRate * 0.25);
+
+            await db.collection('logs').add({ type: 'work', user: loggedInUser, hours: T, normalHours: normH, overCapHours: overH, results: R, effort: E, points: pts, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+            playTone('save'); loadUserData();
+        }
+
+        async function logHealth(e) {
+            e.preventDefault();
+            await db.collection('logs').add({ type: 'health', user: loggedInUser, level: parseInt(document.getElementById('health-level').value), note: document.getElementById('health-note').value, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+            playTone('save'); document.getElementById('health-note').value = ''; loadUserData();
+        }
+
+        async function logChore(e) {
+            e.preventDefault();
+            await db.collection('logs').add({ type: 'chore', user: loggedInUser, hours: parseFloat(document.getElementById('chore-time').value), note: document.getElementById('chore-note').value, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+            playTone('save'); document.getElementById('chore-note').value = ''; loadUserData();
+        }
+
+        async function deleteLogEntry(id) { if (loggedInUser === viewedUser) { await db.collection('logs').doc(id).delete(); playTone('delete'); } }
+        async function saveDailyDiary(e) {
+            e.preventDefault(); const text = document.getElementById('diary-text').value.trim(); if (!text) return;
+            await db.collection('logs').add({ type: 'diary', user: loggedInUser, text: text, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+            playTone('save'); loadUserData();
+        }
+
+        async function handleInstantThemeChange() {
+            const val = document.getElementById('setting-user-theme').value; userSettings.userTheme = val; applyThemeToBody(val);
+            if (loggedInUser === viewedUser) await db.collection('settings').doc(loggedInUser).set({ userTheme: val }, { merge: true });
+        }
+        async function applyCustomAvatarUrl() {
+            const url = document.getElementById('setting-avatar-url').value.trim(); if (!url) return;
+            userSettings.avatarUrl = url; updateAvatarsInHeader();
+            if (loggedInUser === viewedUser) await db.collection('settings').doc(loggedInUser).set({ avatarUrl: url }, { merge: true });
+        }
+        async function setAvatarPreset(style, seed) {
+            const url = `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}`; document.getElementById('setting-avatar-url').value = url; userSettings.avatarUrl = url; updateAvatarsInHeader();
+            if (loggedInUser === viewedUser) await db.collection('settings').doc(loggedInUser).set({ avatarUrl: url }, { merge: true });
+        }
+        async function randomizeAvatar() {
+            const styles = ['bottts', 'adventurer', 'lorelei', 'avataaars', 'personas', 'micah'];
+            const url = `https://api.dicebear.com/7.x/${styles[Math.floor(Math.random()*styles.length)]}/svg?seed=${Math.random().toString(36).substring(7)}`;
+            document.getElementById('setting-avatar-url').value = url; userSettings.avatarUrl = url; updateAvatarsInHeader();
+            if (loggedInUser === viewedUser) await db.collection('settings').doc(loggedInUser).set({ avatarUrl: url }, { merge: true });
+        }
+
+        async function saveAllForgeSettings(e) {
+            if (e) e.preventDefault();
+            userSettings.monthlyCash = parseFloat(document.getElementById('setting-monthly-cash').value) || 8000;
+            userSettings.weeklyHours = parseFloat(document.getElementById('setting-weekly-hrs').value) || 10;
+            userSettings.dailySoftCap = parseFloat(document.getElementById('setting-daily-soft-cap').value) || 4;
+            userSettings.maxBonusCapPct = parseFloat(document.getElementById('setting-bonus-cap').value) || 125;
+            userSettings.pomoFocus = parseInt(document.getElementById('setting-pomo-focus').value) || 25;
+            userSettings.pomoShort = parseInt(document.getElementById('setting-pomo-short').value) || 5;
+            userSettings.pomoLong = parseInt(document.getElementById('setting-pomo-long').value) || 15;
+            userSettings.pomoRounds = parseInt(document.getElementById('setting-pomo-rounds').value) || 4;
+            userSettings.userTheme = document.getElementById('setting-user-theme').value;
+            userSettings.avatarUrl = document.getElementById('setting-avatar-url').value.trim();
+
+            await db.collection('settings').doc(loggedInUser).set(userSettings, { merge: true });
+            playTone('save'); updateSettingsUI(); loadUserData(); setMyPomoMode('focus');
+        }
+
+        function loadUserData() {
+            db.collection('logs').where('user', '==', viewedUser).onSnapshot(snapshot => {
+                let rawLogs = [], monthlyPoints = 0, todayHours = 0;
+                const now = new Date(), startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+                snapshot.forEach(doc => {
+                    const d = doc.data(); d.id = doc.id; rawLogs.push(d);
+                    if (d.type === 'work' && d.timestamp) {
+                        const lDate = d.timestamp.toDate();
+                        if (lDate.getFullYear() === now.getFullYear() && lDate.getMonth() === now.getMonth()) monthlyPoints += (d.points || 0);
+                        if (lDate >= startToday) todayHours += (d.hours || 0);
+                    }
+                });
+
+                rawLogs.sort((a,b) => (b.timestamp?.toDate().getTime() || 0) - (a.timestamp?.toDate().getTime() || 0));
+                currentTodayHoursLogged = todayHours; currentRawLogsCache = rawLogs;
+
+                const targetPts = userSettings.weeklyHours * 12, pointRate = userSettings.monthlyCash / targetPts, maxCash = userSettings.monthlyCash * (userSettings.maxBonusCapPct / 100);
+                const finalPayout = Math.min(monthlyPoints * pointRate, maxCash), softCap = userSettings.dailySoftCap || 4;
+
+                const isVaulted = userSettings.vaultedMonths?.[`${now.getFullYear()}-${now.getMonth()}`];
+                const pEl = document.getElementById('monthly-payout');
+                pEl.innerText = `฿${Math.round(finalPayout).toLocaleString()}`;
+                pEl.className = isVaulted ? "text-3xl font-extrabold text-amber-400 mt-1 opacity-70 line-through" : "text-3xl font-extrabold text-emerald-400 mt-1";
+
+                document.getElementById('today-hours-label').innerText = `${todayHours.toFixed(1)} / ${softCap} hrs`;
+                document.getElementById('daily-bar').style.width = `${Math.min((todayHours / softCap) * 100, 100)}%`;
+
+                const statusEl = document.getElementById('daily-cap-status'), badge = document.getElementById('milestone-2h-badge'), notice = document.getElementById('work-form-softcap-notice');
+                if (todayHours >= softCap) {
+                    statusEl.innerText = "🍵 Soft Cap Active (25% Yield)"; statusEl.className = "text-xs font-semibold theme-accent-text mt-1";
+                    badge.innerText = "✨ Baseline Mastered"; badge.className = "text-[10px] font-bold theme-accent-text"; notice?.classList.remove('hidden');
+                } else if (todayHours >= 2.0) {
+                    statusEl.innerText = `${(softCap - todayHours).toFixed(1)} hrs remaining today`; statusEl.className = "text-xs text-slate-400 mt-1";
+                    badge.innerText = "🎯 2.0h Reached!"; badge.className = "text-[10px] font-bold text-emerald-400"; notice?.classList.add('hidden');
+                } else {
+                    statusEl.innerText = `${(softCap - todayHours).toFixed(1)} hrs remaining today`; statusEl.className = "text-xs text-slate-400 mt-1";
+                    badge.innerText = "2.0h Target"; badge.className = "text-[10px] font-semibold text-slate-500"; notice?.classList.add('hidden');
+                }
+
+                updateGoalGauge(finalPayout, userSettings.monthlyCash);
+                ['work', 'health', 'chore'].forEach(t => updateChartData(t, rawLogs.filter(l => l.type === t), pointRate, maxCash));
+
+                const todayDiary = rawLogs.find(l => l.type === 'diary' && l.timestamp && l.timestamp.toDate() >= startToday);
+                document.getElementById('diary-text').value = todayDiary ? todayDiary.text : '';
+                document.getElementById('diary-status-badge').innerText = todayDiary ? "Today's Note Saved ✨" : "Jot down thoughts or wins";
+
+                populateAndFilterLedger();
+                evaluateBadges(rawLogs, userSettings.completedPomoHistory || []);
+            });
+        }
+
+        function populateAndFilterLedger() {
+            const select = document.getElementById('ledger-month-select'); if (!select) return;
+            const prev = select.value || 'current', monthSet = new Set(), now = new Date(), curKey = `${now.getFullYear()}-${now.getMonth()}`;
+            currentRawLogsCache.forEach(l => { if (l.timestamp) { const d = l.timestamp.toDate(); monthSet.add(`${d.getFullYear()}-${d.getMonth()}`); } });
+            monthSet.add(curKey);
+
+            const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            let opts = `<option value="current">Current Month (${names[now.getMonth()]} ${now.getFullYear()})</option>`;
+            Array.from(monthSet).sort().reverse().forEach(k => { if (k !== curKey) { const [y,m] = k.split('-'); opts += `<option value="${k}">${names[m]} ${y}</option>`; } });
+            opts += `<option value="all">All Time Records</option>`;
+            select.innerHTML = opts; select.value = Array.from(select.options).some(o => o.value === prev) ? prev : 'current';
+            applyLedgerFilter();
+        }
+
+        function applyLedgerFilter() {
+            const val = document.getElementById('ledger-month-select')?.value || 'current', now = new Date();
+            let logs = currentRawLogsCache;
+            if (val === 'current') logs = currentRawLogsCache.filter(l => l.timestamp && l.timestamp.toDate().getFullYear() === now.getFullYear() && l.timestamp.toDate().getMonth() === now.getMonth());
+            else if (val !== 'all') { const [y,m] = val.split('-').map(Number); logs = currentRawLogsCache.filter(l => l.timestamp && l.timestamp.toDate().getFullYear() === y && l.timestamp.toDate().getMonth() === m); }
+            renderLedgerLists(logs);
+        }
+
+        function renderLedgerLists(logs) {
+            const isSelf = loggedInUser === viewedUser;
+            const render = (id, items, empty, fmt) => {
+                const el = document.getElementById(id);
+                if (items.length === 0) { el.innerHTML = `<div class="text-xs text-slate-500 py-2">${empty}</div>`; }
+                else {
+                    el.innerHTML = items.map(l => `
+                        <div class="p-2.5 bg-slate-800/70 border border-slate-700/60 rounded-lg text-xs space-y-1">
+                            <div class="flex justify-between text-slate-400">
+                                <span>${l.timestamp ? l.timestamp.toDate().toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : 'Just now'}</span>
+                                ${isSelf ? `<button onclick="deleteLogEntry('${l.id}')" class="text-[10px] text-red-400 font-semibold px-2 py-0.5 rounded bg-red-500/10">Delete</button>` : ''}
+                            </div>
+                            ${fmt(l)}
+                        </div>
+                    `).join('');
+                }
+            };
+
+            const w = logs.filter(l => l.type === 'work'), h = logs.filter(l => l.type === 'health'), c = logs.filter(l => l.type === 'chore'), d = logs.filter(l => l.type === 'diary');
+            document.getElementById('ledger-count-work').innerText = `${w.length} entries`;
+            document.getElementById('ledger-count-health').innerText = `${h.length} entries`;
+            document.getElementById('ledger-count-chore').innerText = `${c.length} entries`;
+            document.getElementById('ledger-count-diary').innerText = `${d.length} entries`;
+
+            render('ledger-list-work', w, 'No work logs.', l => `<div class="flex justify-between font-medium"><span class="text-slate-200">${l.hours} hrs (${l.results}/${l.effort})</span><span class="text-emerald-400 font-bold">฿${Math.round(l.points * (userSettings.monthlyCash / (userSettings.weeklyHours * 12))).toLocaleString()}</span></div>`);
+            render('ledger-list-health', h, 'No snack logs.', l => `<div class="flex justify-between font-medium"><span class="text-emerald-300">Level ${l.level}</span><span class="text-slate-300 italic truncate max-w-[100px]">${l.note || 'No note'}</span></div>`);
+            render('ledger-list-chore', c, 'No chore logs.', l => `<div class="flex justify-between font-medium"><span class="theme-accent-text font-bold">${l.hours} hrs</span><span class="text-slate-300 italic truncate max-w-[100px]">${l.note || 'No details'}</span></div>`);
+            render('ledger-list-diary', d, 'No reflections.', l => `<div class="text-slate-200 italic leading-snug break-words">"${l.text}"</div>`);
+        }
+    </script>
 </body>
 </html>
