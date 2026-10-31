@@ -139,6 +139,118 @@
             🔒 Viewing <strong><span id="view-target-name"></span>'s</strong> space in View-Only mode. Log deletion and settings are restricted.
         </div>
 
+        <!-- TAB 1: CRUCIBLE (LAYOUT RESTORED) -->
+        <div id="tab-crucible" class="space-y-6">
+            <!-- 1. TOP STATS GRID -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                <!-- Card 1: Allowance Earned -->
+                <div id="payout-card-box" class="card p-6 rounded-xl flex flex-col justify-between text-center md:text-left min-h-[145px]">
+                    <div class="my-auto">
+                        <div class="flex items-center justify-between md:justify-start gap-2">
+                            <span class="text-xs uppercase tracking-wider text-slate-400 font-medium">Allowance Earned</span>
+                            <span id="allowance-yield-pill" class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">⚡ Standard Yield</span>
+                        </div>
+                        <div class="text-3xl font-extrabold text-emerald-400 mt-1.5" id="monthly-payout">฿0</div>
+                    </div>
+                    <div class="text-xs text-slate-500 pt-3 border-t border-slate-800/80 mt-2">Target Base: ฿<span id="label-monthly-cash">8,000</span> (<span id="label-weekly-hrs">10</span> hrs/wk)</div>
+                </div>
+
+                <!-- Card 2: Today's Work Cap -->
+                <div class="card p-6 rounded-xl flex flex-col justify-between text-center md:text-left min-h-[145px]">
+                    <div>
+                        <span class="text-xs uppercase tracking-wider text-slate-400 font-medium">Today's Work Cap</span>
+                        <div class="text-3xl font-extrabold theme-accent-text mt-1" id="today-hours-label">0.0 / 4.0 hrs</div>
+                        <div class="relative w-full bg-slate-900/80 h-3 rounded-full mt-3 overflow-hidden border border-slate-700/60 p-0.5">
+                            <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-amber-400/60 z-10 pointer-events-none" title="2.0h Daily Baseline"></div>
+                            <div id="daily-bar" class="bg-blue-500 h-full rounded-full transition-all duration-700"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center text-xs pt-3 border-t border-slate-800/80 mt-2">
+                        <span id="daily-cap-status" class="text-slate-400">4.0 hrs remaining today</span>
+                        <span id="milestone-2h-badge" class="text-[10px] font-semibold text-slate-500">2.0h Baseline</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: Monthly Goal Gauge -->
+                <div class="card p-6 rounded-xl flex items-center justify-between gap-4 min-h-[145px]">
+                    <div class="relative w-16 h-16 flex-shrink-0 flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            <path class="text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path id="gauge-circle-path" class="gauge-circle theme-accent-text" stroke-dasharray="100, 100" stroke-dashoffset="100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                        <span id="gauge-percent-text" class="absolute text-xs font-black text-slate-200">0%</span>
+                    </div>
+                    <div class="flex-1 text-right md:text-left">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Monthly Goal</span>
+       5, 158, 11, 0.35); }
+        .badge-tier-titan { border-color: #10b981 !important; box-shadow: 0 0 18px rgba(16, 185, 129, 0.4); }
+        .badge-tier-aureum { border-color: #a855f7 !important; box-shadow: 0 0 22px rgba(168, 85, 247, 0.5); background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(88, 28, 135, 0.25) 100%); }
+        
+        #badge-toast-container { position: fixed; bottom: 1.5rem; left: 1.5rem; z-index: 100; display: flex; flex-direction: column; gap: 0.75rem; pointer-events: none; }
+        .badge-toast { pointer-events: auto; animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; transition: opacity 0.5s ease, transform 0.5s ease; will-change: transform, opacity; }
+        .badge-toast.toast-hiding { opacity: 0 !important; transform: translateY(20px) scale(0.9) !important; }
+        @keyframes toastSlideIn { from { opacity: 0; transform: translateY(25px) scale(0.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    </style>
+</head>
+<body data-theme="gold" data-cursor="default" class="p-4 md:p-8 max-w-6xl mx-auto relative min-h-screen">
+
+    <canvas id="fx-canvas" class="fixed inset-0 pointer-events-none z-[200]"></canvas>
+
+    <div id="login-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="card p-8 rounded-xl max-w-md w-full shadow-2xl">
+            <h1 class="text-2xl font-black logo-gold mb-1 uppercase">AUREUM</h1>
+            <p class="text-xs text-slate-400 mb-6">Sign in to open your shared workspace.</p>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1 font-medium">Email</label>
+                    <input type="email" id="login-email" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1 font-medium">Password</label>
+                    <input type="password" id="login-password" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                </div>
+                <button type="submit" class="w-full theme-accent-bg font-semibold p-2.5 rounded-lg text-sm transition-all mt-2">Sign In</button>
+            </form>
+            <p id="login-error" class="text-xs text-red-400 mt-3 hidden text-center"></p>
+        </div>
+    </div>
+
+    <div id="app-content" class="hidden">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-6 pb-4 border-b border-slate-700/80 gap-4">
+            <div>
+                <h1 class="text-3xl font-black logo-gold uppercase">AUREUM</h1>
+                <p class="text-xs text-slate-400 tracking-wide mt-0.5">Autonomous Living & Creative Ledger</p>
+            </div>
+            
+            <div class="flex items-center gap-5">
+                <div class="flex items-center gap-3 bg-slate-900/90 p-1.5 px-3 rounded-full border border-slate-700/80 shadow-lg">
+                    <button id="user-btn-north" onclick="switchActiveUser('North')" class="avatar-btn rounded-full p-0.5">
+                        <img id="avatar-img-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="w-9 h-9 rounded-full bg-slate-800 object-cover transition-all">
+                        <span class="avatar-tooltip" id="avatar-tip-north">North</span>
+                    </button>
+                    <button id="user-btn-cream" onclick="switchActiveUser('Cream')" class="avatar-btn rounded-full p-0.5">
+                        <img id="avatar-img-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="w-9 h-9 rounded-full bg-slate-800 object-cover transition-all">
+                        <span class="avatar-tooltip" id="avatar-tip-cream">Cream</span>
+                    </button>
+                </div>
+                <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-sm text-slate-400 hover:text-white px-2.5 py-1.5 bg-slate-800/80 rounded-lg border border-slate-700">🔊</button>
+                <button onclick="handleLogout()" class="text-xs text-slate-500 hover:text-slate-300 underline">Sign Out</button>
+            </div>
+        </header>
+
+        <nav class="flex items-center gap-2 mb-6 p-1.5 bg-slate-900/80 rounded-2xl border border-slate-800/90 overflow-x-auto no-scrollbar">
+            <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap"><span>⚗️</span> <span>Crucible</span></button>
+            <button onclick="switchTab('hourglass')" id="nav-hourglass" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⏳</span> <span>Hourglass</span></button>
+            <button onclick="switchTab('sanctuary')" id="nav-sanctuary" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🌿</span> <span>Sanctuary</span></button>
+            <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⚙️</span> <span>Forge</span></button>
+            <button onclick="switchTab('chronicles')" id="nav-chronicles" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>📜</span> <span>Chronicles</span></button>
+            <button onclick="switchTab('relics')" id="nav-relics" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🏺</span> <span>Relics</span></button>
+        </nav>
+
+        <div id="read-only-banner" class="hidden card p-3 mb-6 rounded-xl text-center text-slate-400 text-sm">
+            🔒 Viewing <strong><span id="view-target-name"></span>'s</strong> space in View-Only mode. Log deletion and settings are restricted.
+        </div>
+
         <!-- TAB 1: CRUCIBLE -->
         <div id="tab-crucible" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
