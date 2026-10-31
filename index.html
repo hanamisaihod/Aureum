@@ -697,11 +697,25 @@
             if (!logs) return;
             userSettings.unlockedBadges = userSettings.unlockedBadges || [];
             const unlockedSet = new Set(userSettings.unlockedBadges), newlyUnlocked = [];
-
+            
+            // 1. Work Stats (Evaluates both single-entry and cumulative daily totals)
             const workLogs = logs.filter(l => l.type === 'work');
             const totalWorkHours = workLogs.reduce((acc, l) => acc + (l.hours || 0), 0);
+            
+            // Group work hours by calendar date
+            const workHoursByDay = {};
+            workLogs.forEach(l => {
+                if (!l.timestamp) return;
+                const d = l.timestamp.toDate ? l.timestamp.toDate() : new Date(l.timestamp);
+                const dateKey = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+                workHoursByDay[dateKey] = (workHoursByDay[dateKey] || 0) + (l.hours || 0);
+            });
+            
+            const softCapTarget = userSettings.dailySoftCap || 4;
+            const hitSoftCap = Object.values(workHoursByDay).some(dailyHrs => dailyHrs >= softCapTarget);
+            
             if (workLogs.length >= 1) unlock('work_1');
-            if (workLogs.some(l => l.hours >= (userSettings.dailySoftCap || 4))) unlock('work_cap');
+            if (hitSoftCap) unlock('work_cap'); // Unlocks if cumulative daily hours >= Soft Cap
             if (totalWorkHours >= 100) unlock('work_100');
             if (totalWorkHours >= 1000) unlock('work_1000');
             if (totalWorkHours >= 10000) unlock('work_10000');
