@@ -5,15 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AUREUM — Autonomous Living & Creative Ledger</title>
     
-    <!-- PWA & Mobile Home Screen Icon Configuration (Gold 'A' Theme) -->
+    <!-- PWA & Theme Meta Configuration -->
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AUREUM">
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23fef08a%22%2F%3E%3Cstop%20offset%3D%2250%25%22%20stop-color%3D%22%23f59e0b%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23b45309%22%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%22b%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%220%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231e293b%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23020617%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22110%22%20fill%3D%22url(%23b)%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%2214%22%20width%3D%22484%22%20height%3D%22484%22%20rx%3D%2296%22%20fill%3D%22none%22%20stroke%3D%22url(%23g)%22%20stroke-width%3D%2210%22%20stroke-opacity%3D%220.45%22%2F%3E%3Cpolygon%20points%3D%22256%2C80%20276%2C118%20256%2C108%20236%2C118%22%20fill%3D%22url(%23g)%22%2F%3E%3Cpath%20d%3D%22M%20256%2C122%20L%20378%2C412%20L%20316%2C412%20L%20286%2C336%20L%20226%2C336%20L%20196%2C412%20L%20134%2C412%20Z%20M%20256%2C212%20L%20240%2C276%20L%20272%2C276%20Z%22%20fill%3D%22url(%23g)%22%2F%3E%3C%2Fsvg%3E">
-    <link rel="apple-touch-icon" href="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23fef08a%22%2F%3E%3Cstop%20offset%3D%2250%25%22%20stop-color%3D%22%23f59e0b%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23b45309%22%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%22b%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%220%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231e293b%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23020617%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22110%22%20fill%3D%22url(%23b)%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%2214%22%20width%3D%22484%22%20height%3D%22484%22%20rx%3D%2296%22%20fill%3D%22none%22%20stroke%3D%22url(%23g)%22%20stroke-width%3D%2210%22%20stroke-opacity%3D%220.45%22%2F%3E%3Cpolygon%20points%3D%22256%2C80%20276%2C118%20256%2C108%20236%2C118%22%20fill%3D%22url(%23g)%22%2F%3E%3Cpath%20d%3D%22M%20256%2C122%20L%20378%2C412%20L%20316%2C412%20L%20286%2C336%20L%20226%2C336%20L%20196%2C412%20L%20134%2C412%20Z%20M%20256%2C212%20L%20240%2C276%20L%20272%2C276%20Z%22%20fill%3D%22url(%23g)%22%2F%3E%3C%2Fsvg%3E">
-    <link rel="manifest" href="data:application/manifest+json;charset=UTF-8,%7B%22name%22%3A%22AUREUM%22%2C%22short_name%22%3A%22AUREUM%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bcharset%3DUTF-8%2C%253Csvg%2520xmlns%253D%2522http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg%2522%2520viewBox%253D%25220%25200%2520512%2520512%2522%253E%253Cdefs%253E%253ClinearGradient%2520id%253D%2522g%2522%2520x1%253D%25220%2525%2522%2520y1%253D%25220%2525%2522%2520x2%253D%2522100%2525%2522%2520y2%3D%2522100%2525%2522%253E%253Cstop%2520offset%253D%25220%2525%2522%2520stop-color%253D%2522%2523fef08a%2522%252F%253E%253Cstop%2520offset%253D%252250%2525%2522%2520stop-color%253D%2522%2523f59e0b%2522%252F%253E%253Cstop%2520offset%253D%2522100%2525%2522%2520stop-color%253D%2522%2523b45309%2522%252F%253E%253C%252FlinearGradient%253E%253ClinearGradient%2520id%253D%2522b%2522%2520x1%253D%25220%2525%2522%2520y1%253D%25220%2525%2522%2520x2%253D%25220%2525%2522%2520y2%3D%2522100%2525%2522%253E%253Cstop%2520offset%253D%25220%2525%2522%2520stop-color%253D%2522%25231e293b%2522%252F%253E%253Cstop%2520offset%253D%2522100%2525%2522%2520stop-color%253D%2522%2523020617%2522%252F%253E%253C%252Fdefs%253E%253Crect%2520width%253D%2522512%2522%2520height%253D%2522512%2522%2520rx%253D%2522110%2522%2520fill%253D%2522url(%2523b)%2522%252F%253E%253Crect%2520x%253D%252214%2522%2520y%253D%252214%2522%2520width%253D%2522484%2522%2520height%253D%2522484%2522%2520rx%253D%252296%2522%2520fill%253D%2522none%2522%2520stroke%253D%2522url(%2523g)%2522%2520stroke-width%3D%252210%2522%2520stroke-opacity%3D%25220.45%2522%252F%253E%253Cpolygon%2520points%253D%2522256%252C80%2520276%252C118%2520256%252C108%2520236%252C118%2522%2520fill%253D%2522url(%2523g)%2522%252F%253E%253Cpath%2520d%253D%2522M%2520256%252C122%2520L%2520378%252C412%2520L%2520316%252C412%2520L%2520286%252C336%2520L%2520226%252C336%2520L%2520196%252C412%2520L%2520134%252C412%2520Z%2520M%2520256%252C212%2520L%2520240%252C276%2520L%2520272%252C276%2520Z%2522%2520fill%253D%2522url(%2523g)%2522%252F%253E%253C%252Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -34,7 +32,7 @@
         body[data-theme="matcha"] { --bg-main: #121813; --card-bg: rgba(29, 39, 31, 0.7); --card-border: rgba(132, 204, 22, 0.15); --accent-primary: #84cc16; --accent-primary-hover: #65a30d; --accent-primary-text: #020617; --accent-glow: rgba(132, 204, 22, 0.3); }
         body[data-theme="monochrome"] { --bg-main: #121212; --card-bg: rgba(30, 30, 30, 0.7); --card-border: rgba(255, 255, 255, 0.1); --accent-primary: #e2e8f0; --accent-primary-hover: #cbd5e1; --accent-primary-text: #0f172a; --accent-glow: rgba(226, 232, 240, 0.25); }
 
-        /* CUSTOM CURSOR STYLES */
+        /* CUSTOM CURSORS */
         body[data-cursor="gold"] { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><polygon points='3,3 21,11 13,13 11,21' fill='%23f59e0b' stroke='%23020617' stroke-width='1.5'/></svg>"), auto; }
         body[data-cursor="sparkle"] { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M12,2 L14.5,9.5 L22,12 L14.5,14.5 L12,22 L9.5,14.5 L2,12 L9.5,9.5 Z' fill='%2338bdf8' stroke='%23020617' stroke-width='1.5'/></svg>"), auto; }
         body[data-cursor="quill"] { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M2,22 L8,20 L20,4 C20,4 22,2 18,2 C14,2 12,4 12,4 L4,16 Z' fill='%23c084fc' stroke='%23020617' stroke-width='1.5'/></svg>"), auto; }
@@ -43,7 +41,6 @@
         body { background-color: var(--bg-main); color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.3s; }
         button, input, select { touch-action: manipulation; }
 
-        /* CRISP GLASSMORPHISM CARDS */
         .card { 
             background: var(--card-bg); 
             backdrop-filter: blur(14px); 
@@ -67,43 +64,38 @@
         .gauge-circle { transition: stroke-dashoffset 0.8s ease-in-out, stroke 0.3s; }
         .avatar-btn { position: relative; transition: transform 0.2s; }
         .avatar-btn:hover { transform: scale(1.08); }
+        .avatar-btn.active-spectate { ring: 2px; ring-color: var(--accent-primary); transform: scale(1.05); }
         .avatar-btn .avatar-tooltip { visibility: hidden; opacity: 0; position: absolute; top: 115%; left: 50%; transform: translateX(-50%); background-color: #020617; color: #f8fafc; padding: 4px 10px; border-radius: 6px; border: 1px solid #475569; font-size: 11px; font-weight: 600; white-space: nowrap; transition: opacity 0.2s; pointer-events: none; z-index: 20; }
         .avatar-btn:hover .avatar-tooltip { visibility: visible; opacity: 1; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         /* AMBIENT HEADER STATUS GLOW RINGS */
-        .glow-ring-idle { box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.4); }
-        .glow-ring-active { box-shadow: 0 0 12px 3px rgba(59, 130, 246, 0.6); animation: ringPulse 3s ease-in-out infinite alternate; }
-        .glow-ring-baseline { box-shadow: 0 0 18px 4px rgba(16, 185, 129, 0.7); animation: ringPulse 2.5s ease-in-out infinite alternate; }
-        .glow-ring-softcap { box-shadow: 0 0 22px 5px rgba(245, 158, 11, 0.85); animation: ringPulse 2s ease-in-out infinite alternate; }
+        .glow-ring-idle { box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.4); opacity: 0.6; }
+        .glow-ring-active { box-shadow: 0 0 12px 3px rgba(59, 130, 246, 0.7); opacity: 1; animation: ringPulse 3s ease-in-out infinite alternate; }
+        .glow-ring-baseline { box-shadow: 0 0 18px 4px rgba(16, 185, 129, 0.85); opacity: 1; animation: ringPulse 2.5s ease-in-out infinite alternate; }
+        .glow-ring-softcap { box-shadow: 0 0 22px 5px rgba(245, 158, 11, 0.95); opacity: 1; animation: ringPulse 2s ease-in-out infinite alternate; }
 
         @keyframes ringPulse {
             0% { transform: scale(1); filter: brightness(1); }
-            100% { transform: scale(1.04); filter: brightness(1.25); }
+            100% { transform: scale(1.05); filter: brightness(1.25); }
         }
 
-        /* POWER LEVEL BAR GLOW ANIMATION */
+        /* POWER LEVEL BAR GLOW */
         .power-bar-fill {
             background: linear-gradient(90deg, #38bdf8 0%, #10b981 50%, #f59e0b 80%, #a855f7 100%);
             box-shadow: 0 0 14px var(--accent-glow);
             transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* LIVE FOCUS ATMOSPHERE GLOW PULSE */
-        body.focus-ambient-active {
-            animation: focusAmbientPulse 4s ease-in-out infinite alternate;
-        }
-        @keyframes focusAmbientPulse {
-            0% { box-shadow: inset 0 0 40px rgba(59, 130, 246, 0.12); }
-            100% { box-shadow: inset 0 0 100px var(--accent-glow); }
-        }
+        /* LIVE FOCUS ATMOSPHERE GLOW */
+        body.focus-ambient-active { animation: focusAmbientPulse 4s ease-in-out infinite alternate; }
+        @keyframes focusAmbientPulse { 0% { box-shadow: inset 0 0 40px rgba(59, 130, 246, 0.12); } 100% { box-shadow: inset 0 0 100px var(--accent-glow); } }
 
         /* BADGES / RELICS & TOAST ANIMATIONS */
         .badge-card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--card-border); transition: all 0.25s ease-out; }
         .badge-card:hover:not(.locked) { transform: translateY(-2px); }
         .badge-card.locked { opacity: 0.35; filter: grayscale(0.9); border-color: rgba(255, 255, 255, 0.05) !important; }
-        .badge-card.locked:hover { opacity: 0.6; filter: grayscale(0.5); }
         .badge-tier-bronze { border-color: #d97706 !important; box-shadow: 0 0 12px rgba(217, 119, 6, 0.2); }
         .badge-tier-silver { border-color: #38bdf8 !important; box-shadow: 0 0 14px rgba(56, 189, 248, 0.25); }
         .badge-tier-gold { border-color: #f59e0b !important; box-shadow: 0 0 16px rgba(245, 158, 11, 0.35); }
@@ -118,7 +110,7 @@
 </head>
 <body data-theme="gold" data-cursor="default" class="p-4 md:p-8 max-w-6xl mx-auto relative min-h-screen">
 
-    <!-- FX CANVAS OVERLAY (PARTICLE BURSTS) -->
+    <!-- FX CANVAS OVERLAY -->
     <canvas id="fx-canvas" class="fixed inset-0 pointer-events-none z-[200]"></canvas>
 
     <!-- LOGIN OVERLAY -->
@@ -151,11 +143,11 @@
             </div>
             
             <div class="flex items-center gap-5">
-                <!-- AMBIENT HEADER STATUS GLOW AVATARS -->
+                <!-- DYNAMIC HEADER AVATARS WITH SIMULTANEOUS STATUS GLOW -->
                 <div class="flex items-center gap-3 bg-slate-900/90 p-1.5 px-3 rounded-full border border-slate-700/80 shadow-lg">
                     <button id="user-btn-north" onclick="switchActiveUser('North')" class="avatar-btn rounded-full p-0.5">
                         <img id="avatar-img-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="w-9 h-9 rounded-full bg-slate-800 object-cover transition-all">
-                        <span class="avatar-tooltip" id="avatar-tip-north">North (You)</span>
+                        <span class="avatar-tooltip" id="avatar-tip-north">North</span>
                     </button>
                     <button id="user-btn-cream" onclick="switchActiveUser('Cream')" class="avatar-btn rounded-full p-0.5">
                         <img id="avatar-img-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="w-9 h-9 rounded-full bg-slate-800 object-cover transition-all">
@@ -167,7 +159,7 @@
             </div>
         </header>
 
-        <!-- Main Tabs Navigation Bar -->
+        <!-- Navigation Bar -->
         <nav class="flex items-center gap-2 mb-6 p-1.5 bg-slate-900/80 rounded-2xl border border-slate-800/90 overflow-x-auto no-scrollbar">
             <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap"><span>⚗️</span> <span>Crucible</span></button>
             <button onclick="switchTab('hourglass')" id="nav-hourglass" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⏳</span> <span>Hourglass</span></button>
@@ -177,45 +169,50 @@
             <button onclick="switchTab('relics')" id="nav-relics" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🏺</span> <span>Relics</span></button>
         </nav>
 
-        <!-- Read-Only Mode Banner -->
+        <!-- Read-Only Banner -->
         <div id="read-only-banner" class="hidden card p-3 mb-6 rounded-xl text-center text-slate-400 text-sm">
             🔒 Viewing <strong><span id="view-target-name"></span>'s</strong> space in View-Only mode. Log deletion and settings are restricted.
         </div>
 
         <!-- TAB 1: CRUCIBLE (WORK LOGGING & ALLOWANCE) -->
         <div id="tab-crucible" class="space-y-6">
-            <div class="card p-6 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left items-center">
-                <div id="payout-card-box">
-                    <span class="text-xs uppercase tracking-wider text-slate-400 block font-medium">Allowance Earned</span>
-                    <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="monthly-payout">฿0</div>
-                    <div class="text-xs text-slate-500 mt-1">Target Base: ฿<span id="label-monthly-cash">8,000</span> (<span id="label-weekly-hrs">10</span> hrs/wk)</div>
+            <!-- RE-BALANCED EQUAL-SPACED METRIC CARDS GRID -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                <div id="payout-card-box" class="card p-6 rounded-xl flex flex-col justify-between text-center md:text-left">
+                    <div>
+                        <span class="text-xs uppercase tracking-wider text-slate-400 block font-medium">Allowance Earned</span>
+                        <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="monthly-payout">฿0</div>
+                    </div>
+                    <div class="text-xs text-slate-500 mt-3 pt-3 border-t border-slate-800">Target Base: ฿<span id="label-monthly-cash">8,000</span> (<span id="label-weekly-hrs">10</span> hrs/wk)</div>
                 </div>
 
-                <div>
-                    <span class="text-xs uppercase tracking-wider text-slate-400 font-medium">Today's Work Cap</span>
-                    <div class="text-3xl font-extrabold theme-accent-text mt-1" id="today-hours-label">0.0 / 4.0 hrs</div>
-                    <div class="relative w-full bg-slate-900/80 h-3 rounded-full mt-2.5 overflow-hidden border border-slate-700/60 p-0.5">
-                        <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-amber-400/60 z-10 pointer-events-none" title="2.0h Daily Baseline"></div>
-                        <div id="daily-bar" class="bg-blue-500 h-full rounded-full transition-all duration-700"></div>
+                <div class="card p-6 rounded-xl flex flex-col justify-between text-center md:text-left">
+                    <div>
+                        <span class="text-xs uppercase tracking-wider text-slate-400 font-medium">Today's Work Cap</span>
+                        <div class="text-3xl font-extrabold theme-accent-text mt-1" id="today-hours-label">0.0 / 4.0 hrs</div>
+                        <div class="relative w-full bg-slate-900/80 h-3 rounded-full mt-3 overflow-hidden border border-slate-700/60 p-0.5">
+                            <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-amber-400/60 z-10 pointer-events-none" title="2.0h Daily Baseline"></div>
+                            <div id="daily-bar" class="bg-blue-500 h-full rounded-full transition-all duration-700"></div>
+                        </div>
                     </div>
-                    <div class="flex justify-between items-center text-xs mt-1">
+                    <div class="flex justify-between items-center text-xs mt-3 pt-3 border-t border-slate-800">
                         <span id="daily-cap-status" class="text-slate-400">4.0 hrs remaining today</span>
                         <span id="milestone-2h-badge" class="text-[10px] font-semibold text-slate-500">2.0h Baseline</span>
                     </div>
                 </div>
 
-                <div class="flex items-center justify-center md:justify-start gap-4 p-3 bg-slate-900/50 rounded-xl border border-slate-800/80">
-                    <div class="relative w-14 h-14 flex-shrink-0 flex items-center justify-center">
+                <div class="card p-6 rounded-xl flex items-center justify-between gap-4">
+                    <div class="relative w-16 h-16 flex-shrink-0 flex items-center justify-center">
                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                             <path class="text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             <path id="gauge-circle-path" class="gauge-circle theme-accent-text" stroke-dasharray="100, 100" stroke-dashoffset="100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         </svg>
                         <span id="gauge-percent-text" class="absolute text-xs font-black text-slate-200">0%</span>
                     </div>
-                    <div>
-                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Monthly Goal Progress</span>
-                        <span id="gauge-tier-badge" class="text-xs font-extrabold theme-accent-text block mt-0.5">Initiate</span>
-                        <span id="gauge-tier-sub" class="text-[10px] text-slate-500 block">0% reached</span>
+                    <div class="flex-1 text-right md:text-left">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Monthly Goal</span>
+                        <span id="gauge-tier-badge" class="text-sm font-extrabold theme-accent-text block mt-0.5">Initiate</span>
+                        <span id="gauge-tier-sub" class="text-xs text-slate-500 block mt-0.5">0% reached</span>
                     </div>
                 </div>
             </div>
@@ -320,7 +317,7 @@
             </div>
         </div>
 
-        <!-- TAB 2: HOURGLASS (POMODORO FOCUS TIMER + AMBIENT SOUNDSCAPES) -->
+        <!-- TAB 2: HOURGLASS (POMODORO & ENHANCED AUDIO ENGINE) -->
         <div id="tab-hourglass" class="hidden space-y-6 max-w-xl mx-auto">
             <div class="card p-8 rounded-xl text-center space-y-6 shadow-xl relative">
                 <div id="pomo-spectator-banner" class="hidden p-2.5 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 font-medium">
@@ -354,28 +351,30 @@
                     <div id="pomo-progress-bar" class="theme-accent-bg h-full rounded-full transition-all duration-1000 w-full"></div>
                 </div>
 
-                <!-- AMBIENT SOUNDSCAPE GENERATOR PLAYER -->
+                <!-- OVERHAULED AUDIBLE SOUNDSCAPE GENERATOR -->
                 <div class="p-4 bg-slate-900/70 border border-slate-800 rounded-xl space-y-3">
                     <div class="flex justify-between items-center text-xs">
                         <span class="text-slate-400 font-semibold flex items-center gap-1.5">
-                            <span>🎧</span> <span>Focus Soundscape</span>
+                            <span>🎧</span> <span>Focus Atmosphere</span>
                         </span>
-                        <button onclick="toggleAmbientSoundscape()" id="ambient-toggle-btn" class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 transition-all">
+                        <button onclick="toggleAmbientSoundscape()" id="ambient-toggle-btn" class="px-3.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 transition-all">
                             ▶ Play Sound
                         </button>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3 items-center">
                         <select id="ambient-sound-select" onchange="changeAmbientSoundscape(this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none font-medium">
-                            <option value="rain">🌧️ Soft Rain & Drops</option>
-                            <option value="fire">🔥 Cozy Fireplace Crackle</option>
-                            <option value="cosmos">🌌 Deep Cosmos Drone</option>
-                            <option value="wind">🍃 Gentle Mountain Wind</option>
+                            <option value="rain">🌧️ Heavy Rain & Thunder</option>
+                            <option value="fire">🔥 Cozy Hearth & Crackle</option>
+                            <option value="cafe">☕ Coffee Shop Ambience</option>
+                            <option value="cosmos">🌌 Cosmic Deep Space</option>
+                            <option value="wind">🍃 Mountain Breeze</option>
+                            <option value="ocean">🌊 Gentle Shore Waves</option>
                         </select>
 
                         <div class="flex items-center gap-2 bg-slate-800/60 p-1.5 px-3 rounded-lg border border-slate-700/60">
                             <span class="text-[11px] text-slate-400">Vol</span>
-                            <input type="range" id="ambient-vol-slider" min="0" max="100" value="50" oninput="updateAmbientVolume(this.value)" class="w-full accent-amber-500 cursor-pointer">
+                            <input type="range" id="ambient-vol-slider" min="0" max="100" value="70" oninput="updateAmbientVolume(this.value)" class="w-full accent-amber-500 cursor-pointer">
                         </div>
                     </div>
                 </div>
@@ -387,97 +386,103 @@
             </div>
         </div>
 
-        <!-- TAB 3: SANCTUARY (FITNESS, CHORES & SNACKS) -->
+        <!-- TAB 3: SANCTUARY (Y-AXIS PERFECTLY ALIGNED SAVE BUTTONS) -->
         <div id="tab-sanctuary" class="hidden space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- 🏃 Workout / Fitness Card -->
-                <div id="workout-form-card" class="card p-6 rounded-xl space-y-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+                <!-- 🏃 Fitness Card -->
+                <div id="workout-form-card" class="card p-6 rounded-xl flex flex-col justify-between h-full">
                     <div>
-                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>🏃</span> <span>Fitness Log</span></h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Log exercise & workout sessions.</p>
+                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2 mb-1"><span>🏃</span> <span>Fitness Log</span></h2>
+                        <p class="text-xs text-slate-400 mb-4">Log exercise & workout sessions.</p>
                     </div>
-                    <form onsubmit="logWorkout(event)" class="space-y-4">
+                    <form onsubmit="logWorkout(event)" class="flex flex-col flex-1 justify-between space-y-4">
                         <input type="hidden" id="workout-strain" value="3">
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1 font-medium">Time Spent (Hours)</label>
-                            <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
-                                <button type="button" onmousedown="startHoldStep('workout-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('workout-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
-                                <input type="number" id="workout-time" step="0.25" min="0.25" value="0.75" required class="w-full text-center bg-transparent py-1.5 text-xs text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                <button type="button" onmousedown="startHoldStep('workout-time', 1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('workout-time', 1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1 font-medium">Effort & Intensity</label>
-                            <div class="flex items-center bg-slate-900/90 rounded-xl border border-slate-800 p-1">
-                                <button type="button" onmousedown="startHoldStepWorkoutStrain(-1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(-1)" ontouchend="stopHoldStep()" class="px-2.5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none">◀</button>
-                                <div id="selector-box-workout" class="flex-1 px-2 py-1 text-center">
-                                    <div class="flex items-center justify-center gap-1.5">
-                                        <span id="w-icon" class="text-xl">🔥</span>
-                                        <span id="w-badge" class="text-[10px] font-bold theme-accent-text uppercase">LVL 3</span>
-                                    </div>
-                                    <div id="w-title" class="text-xs font-bold text-slate-100 mt-0.5">Moderate Effort</div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium">Time Spent (Hours)</label>
+                                <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
+                                    <button type="button" onmousedown="startHoldStep('workout-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('workout-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
+                                    <input type="number" id="workout-time" step="0.25" min="0.25" value="0.75" required class="w-full text-center bg-transparent py-1.5 text-xs text-white font-mono font-bold focus:outline-none [appearance:textfield]">
+                                    <button type="button" onmousedown="startHoldStep('workout-time', 1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('workout-time', 1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
                                 </div>
-                                <button type="button" onmousedown="startHoldStepWorkoutStrain(1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(1)" ontouchend="stopHoldStep()" class="px-2.5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none">▶</button>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium">Effort & Intensity</label>
+                                <div class="flex items-center bg-slate-900/90 rounded-xl border border-slate-800 p-1">
+                                    <button type="button" onmousedown="startHoldStepWorkoutStrain(-1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(-1)" ontouchend="stopHoldStep()" class="px-2.5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none">◀</button>
+                                    <div id="selector-box-workout" class="flex-1 px-2 py-1 text-center">
+                                        <div class="flex items-center justify-center gap-1.5">
+                                            <span id="w-icon" class="text-xl">🔥</span>
+                                            <span id="w-badge" class="text-[10px] font-bold theme-accent-text uppercase">LVL 3</span>
+                                        </div>
+                                        <div id="w-title" class="text-xs font-bold text-slate-100 mt-0.5">Moderate Effort</div>
+                                    </div>
+                                    <button type="button" onmousedown="startHoldStepWorkoutStrain(1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(1)" ontouchend="stopHoldStep()" class="px-2.5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none">▶</button>
+                                </div>
                             </div>
                         </div>
 
-                        <button type="submit" class="w-full theme-accent-bg font-bold p-2.5 rounded-xl text-xs transition-all shadow-md">Save Workout</button>
+                        <button type="submit" class="w-full mt-auto theme-accent-bg font-bold p-2.5 rounded-xl text-xs transition-all shadow-md">Save Workout</button>
                     </form>
                 </div>
 
-                <!-- 🧹 Chores Card -->
-                <div id="chore-form-card" class="card p-6 rounded-xl space-y-4">
+                <!-- 🧹 House Chores Card -->
+                <div id="chore-form-card" class="card p-6 rounded-xl flex flex-col justify-between h-full">
                     <div>
-                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>🧹</span> <span>House Chores</span></h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Log household tasks & cleaning.</p>
+                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2 mb-1"><span>🧹</span> <span>House Chores</span></h2>
+                        <p class="text-xs text-slate-400 mb-4">Log household tasks & cleaning.</p>
                     </div>
-                    <form onsubmit="logChore(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1 font-medium">Time Spent (Hours)</label>
-                            <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
-                                <button type="button" onmousedown="startHoldStep('chore-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('chore-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
-                                <input type="number" id="chore-time" step="0.25" min="0.25" value="0.50" required class="w-full text-center bg-transparent py-1.5 text-xs text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                <button type="button" onmousedown="startHoldStep('chore-time', 1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('chore-time', 1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
+                    <form onsubmit="logChore(event)" class="flex flex-col flex-1 justify-between space-y-4">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium">Time Spent (Hours)</label>
+                                <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
+                                    <button type="button" onmousedown="startHoldStep('chore-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('chore-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
+                                    <input type="number" id="chore-time" step="0.25" min="0.25" value="0.50" required class="w-full text-center bg-transparent py-1.5 text-xs text-white font-mono font-bold focus:outline-none [appearance:textfield]">
+                                    <button type="button" onmousedown="startHoldStep('chore-time', 1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('chore-time', 1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium">Task Details</label>
+                                <input type="text" id="chore-note" placeholder="e.g. Laundry, dishes, vacuuming..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none">
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1 font-medium">Task Details</label>
-                            <input type="text" id="chore-note" placeholder="e.g. Laundry, dishes, vacuuming..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none">
-                        </div>
-
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold p-2.5 rounded-xl text-xs transition-all shadow-md">Save Chore</button>
+                        <button type="submit" class="w-full mt-auto bg-blue-600 hover:bg-blue-500 text-white font-bold p-2.5 rounded-xl text-xs transition-all shadow-md">Save Chore</button>
                     </form>
                 </div>
 
                 <!-- 🍨 Snacks & Treats Card -->
-                <div id="health-form-card" class="card p-6 rounded-xl space-y-4">
+                <div id="health-form-card" class="card p-6 rounded-xl flex flex-col justify-between h-full">
                     <div>
-                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>🍨</span> <span>Snacks & Treats</span></h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Track sweet treats & refreshments.</p>
+                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2 mb-1"><span>🍨</span> <span>Snacks & Treats</span></h2>
+                        <p class="text-xs text-slate-400 mb-4">Track sweet treats & refreshments.</p>
                     </div>
-                    <form onsubmit="logHealth(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1 font-medium">Portion Size</label>
-                            <select id="health-level" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none">
-                                <option value="1">Level 1 (Small / Light)</option>
-                                <option value="2">Level 2 (Medium / Standard)</option>
-                                <option value="3">Level 3 (Large / Heavy)</option>
-                            </select>
+                    <form onsubmit="logHealth(event)" class="flex flex-col flex-1 justify-between space-y-4">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium">Portion Size</label>
+                                <select id="health-level" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none">
+                                    <option value="1">Level 1 (Small / Light)</option>
+                                    <option value="2">Level 2 (Medium / Standard)</option>
+                                    <option value="3">Level 3 (Large / Heavy)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium">Snack / Dessert Name</label>
+                                <input type="text" id="health-note" placeholder="e.g. Ice cream, matcha, boba..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none">
+                            </div>
                         </div>
 
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1 font-medium">Snack / Dessert Name</label>
-                            <input type="text" id="health-note" placeholder="e.g. Ice cream, matcha, boba..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none">
-                        </div>
-
-                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-2.5 rounded-xl text-xs transition-all shadow-md">Save Snack</button>
+                        <button type="submit" class="w-full mt-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-2.5 rounded-xl text-xs transition-all shadow-md">Save Snack</button>
                     </form>
                 </div>
             </div>
 
-            <!-- Sanctuary Activity Trends Chart -->
+            <!-- Analytics Chart -->
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div class="flex items-center gap-3">
@@ -663,9 +668,8 @@
             </form>
         </div>
 
-        <!-- TAB 5: CHRONICLES (LEDGER HISTORY & POWER LEVEL BAR) -->
+        <!-- TAB 5: CHRONICLES -->
         <div id="tab-chronicles" class="hidden space-y-6">
-            <!-- DAILY POWER LEVEL METER PILL -->
             <div class="card p-6 rounded-xl border border-slate-700/80 space-y-3">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div class="flex items-center gap-3">
@@ -681,9 +685,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="power-breakdown-tags" class="flex flex-wrap gap-2 text-[11px] font-semibold text-slate-300">
-                        <!-- Populated by JS -->
-                    </div>
+                    <div id="power-breakdown-tags" class="flex flex-wrap gap-2 text-[11px] font-semibold text-slate-300"></div>
                 </div>
 
                 <div class="relative w-full bg-slate-900/90 h-3.5 rounded-full overflow-hidden border border-slate-700/80 p-0.5">
@@ -731,7 +733,7 @@
             </div>
         </div>
 
-        <!-- TAB 6: RELICS (ACHIEVEMENTS) -->
+        <!-- TAB 6: RELICS -->
         <div id="tab-relics" class="hidden space-y-6">
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -754,7 +756,6 @@
 
     <!-- APPLICATION SCRIPT ENGINE -->
     <script>
-        // 1. CONFIG & INIT
         const firebaseConfig = {
             apiKey: "AIzaSyAJ7cVPRiJfiShTKFi___pJ9VZHEcLM47Q",
             authDomain: "aureum-214d1.firebaseapp.com",
@@ -772,8 +773,7 @@
         let userSettings = {
             monthlyCash: 8000, weeklyHours: 10, dailySoftCap: 4, maxBonusCapPct: 125,
             pomoFocus: 25, pomoShort: 5, pomoLong: 15, pomoRounds: 4, userTheme: 'gold', userCursor: 'default', avatarUrl: '',
-            particleIntensity: 15,
-            vaultedMonths: {}, unlockedBadges: [], completedPomoHistory: []
+            particleIntensity: 15, vaultedMonths: {}, unlockedBadges: [], completedPomoHistory: []
         };
 
         const RATING_DATA = {
@@ -800,36 +800,26 @@
             ]
         };
 
-        // 2. FX ENGINE: CANVAS PARTICLE BURSTS
+        // 1. CANVAS FX ENGINE
         const canvas = document.getElementById('fx-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
 
-        function resizeFxCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
+        function resizeFxCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeFxCanvas);
         resizeFxCanvas();
 
         function spawnParticleBurst(x, y) {
             const intensity = (userSettings.particleIntensity !== undefined ? userSettings.particleIntensity : 15) / 100;
             if (intensity <= 0) return;
-
             const colors = ['#fef08a', '#f59e0b', '#b45309', '#38bdf8', '#10b981'];
             const count = Math.max(1, Math.round(35 * intensity));
-            
             for (let i = 0; i < count; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const speed = (Math.random() * 5 + 1.5) * (0.4 + intensity * 0.6);
+                const angle = Math.random() * Math.PI * 2, speed = (Math.random() * 5 + 1.5) * (0.4 + intensity * 0.6);
                 particles.push({
-                    x: x, y: y,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed - 1.0,
-                    size: (Math.random() * 3.5 + 2) * (0.5 + intensity * 0.5),
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    alpha: 1,
-                    decay: Math.random() * 0.03 + 0.02
+                    x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 1.0,
+                    size: (Math.random() * 3.5 + 2) * (0.5 + intensity * 0.5), color: colors[Math.floor(Math.random() * colors.length)],
+                    alpha: 1, decay: Math.random() * 0.03 + 0.02
                 });
             }
         }
@@ -837,39 +827,21 @@
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             for (let i = particles.length - 1; i >= 0; i--) {
-                const p = particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += 0.12;
-                p.alpha -= p.decay;
-
-                if (p.alpha <= 0) {
-                    particles.splice(i, 1);
-                    continue;
-                }
-
-                ctx.save();
-                ctx.globalAlpha = p.alpha;
-                ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
+                const p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.alpha -= p.decay;
+                if (p.alpha <= 0) { particles.splice(i, 1); continue; }
+                ctx.save(); ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); ctx.restore();
             }
             requestAnimationFrame(animateParticles);
         }
         animateParticles();
 
-        // 3. MYTHIC RELICS CATALOG & ENGINE
+        // 2. MYTHIC RELICS CATALOG & ENGINE
         const BADGE_CATALOG = [
-            // Crucible (Work)
             { id: 'work_1', tier: 'bronze', icon: '🌱', title: "Spark of Endeavor", desc: 'Log your very first work session.' },
             { id: 'work_cap', tier: 'silver', icon: '🍵', title: 'Crucible Mastered', desc: 'Reach daily Soft Cap (4.0h) in a single day.' },
             { id: 'work_100', tier: 'gold', icon: '🎯', title: 'Century Ore', desc: 'Reach 100 total hours logged all-time.' },
             { id: 'work_1000', tier: 'titan', icon: '🏛️', title: "Alchemist's Vault", desc: 'Reach 1,000 total hours logged all-time.' },
             { id: 'work_10000', tier: 'aureum', icon: '👑', title: "Philosopher's Touch", desc: 'Reach 10,000 total hours logged all-time.' },
-            
-            // Hourglass (Pomodoro)
             { id: 'pomo_1', tier: 'bronze', icon: '⏱️', title: 'Chrono Ignition', desc: 'Complete 1 focus Hourglass session.' },
             { id: 'pomo_flow', tier: 'silver', icon: '🌊', title: 'Temporal Stream', desc: 'Complete 4 focus rounds in a single day.' },
             { id: 'pomo_deep', tier: 'silver', icon: '🤿', title: 'Abyssal Focus', desc: 'Complete a 50+ minute focus session.' },
@@ -878,8 +850,6 @@
             { id: 'pomo_marathon', tier: 'titan', icon: '🏃', title: 'Timeless Marathon', desc: 'Complete 12 focus rounds in a single day.' },
             { id: 'pomo_zen', tier: 'titan', icon: '🧘', title: 'Zenith Loop', desc: 'Complete 4 back-to-back sessions without a pause.' },
             { id: 'pomo_perfect', tier: 'aureum', icon: '✨', title: 'Eternity Loop', desc: 'Complete a full 4-round loop with zero pauses.' },
-
-            // Sanctuary (Fitness, Chores, Snacks & Scrolls)
             { id: 'workout_1', tier: 'bronze', icon: '🏃', title: "Warrior's Rite", desc: 'Log your first fitness workout.' },
             { id: 'chore_1', tier: 'bronze', icon: '🧹', title: 'Ward of the Keep', desc: 'Log your first house chore.' },
             { id: 'chore_25', tier: 'silver', icon: '🏰', title: 'Sanctuary Warden', desc: 'Log 25 total hours of house chores.' },
@@ -887,8 +857,6 @@
             { id: 'diary_1', tier: 'bronze', icon: '✍️', title: 'Mindful Scroll', desc: 'Save your first daily reflection note.' },
             { id: 'diary_30', tier: 'silver', icon: '📖', title: "Chronicler's Parchment", desc: 'Save 30 daily reflection notes all-time.' },
             { id: 'diary_100', tier: 'gold', icon: '🧠', title: 'High Tome of Wisdom', desc: 'Save 100 daily reflection notes all-time.' },
-
-            // Streaks
             { id: 'streak_3', tier: 'bronze', icon: '⚡', title: 'Tri-Flame Ignition', desc: 'Maintain a 3-day active streak.' },
             { id: 'streak_7', tier: 'silver', icon: '🚀', title: 'Unyielding Crest', desc: 'Maintain a 7-day active streak.' },
             { id: 'streak_30', tier: 'gold', icon: '💎', title: 'Obsidian Solace', desc: 'Maintain a 30-day active streak.' },
@@ -896,13 +864,12 @@
         ];
 
         function renderBadgeGrid(unlockedSet = new Set()) {
-            const gridEl = document.getElementById('badge-grid');
-            if (!gridEl) return;
+            const gridEl = document.getElementById('badge-grid'); if (!gridEl) return;
             document.getElementById('badge-completion-count').innerText = `${unlockedSet.size} / ${BADGE_CATALOG.length}`;
             gridEl.innerHTML = BADGE_CATALOG.map(b => {
                 const isUnlocked = unlockedSet.has(b.id);
                 return `
-                    <div class="badge-card ${isUnlocked ? '' : 'locked'} badge-tier-${b.tier} p-4 rounded-xl flex items-start gap-3 select-none cursor-pointer">
+                    <div class="badge-card ${isUnlocked ? '' : 'locked'} badge-tier-${b.tier} p-4 rounded-xl flex items-start gap-3 select-none">
                         <div class="text-3xl p-2 bg-slate-900/80 rounded-xl border border-slate-700/60 shrink-0">${isUnlocked ? b.icon : '🔒'}</div>
                         <div class="space-y-0.5">
                             <div class="flex items-center gap-2">
@@ -917,8 +884,7 @@
         }
 
         function showToast({ title, subtitle, icon, tier = 'gold', duration = 3800, originEvt }) {
-            const container = document.getElementById('badge-toast-container');
-            if (!container) return;
+            const container = document.getElementById('badge-toast-container'); if (!container) return;
             const toast = document.createElement('div');
             toast.className = `badge-toast card p-4 rounded-xl shadow-2xl border-2 badge-tier-${tier} flex items-center gap-3 bg-slate-950/90 backdrop-blur-md`;
             toast.innerHTML = `
@@ -928,61 +894,35 @@
                     <div class="text-xs text-slate-200 mt-0.5 font-medium leading-snug">${subtitle}</div>
                 </div>
             `;
-            container.appendChild(toast);
-            playTone('save');
-
-            const burstX = originEvt?.clientX || window.innerWidth - 120;
-            const burstY = originEvt?.clientY || 80;
+            container.appendChild(toast); playTone('save');
+            const burstX = originEvt?.clientX || window.innerWidth - 120, burstY = originEvt?.clientY || 80;
             spawnParticleBurst(burstX, burstY);
-
-            setTimeout(() => {
-                toast.style.animation = 'none';
-                void toast.offsetHeight;
-                toast.classList.add('toast-hiding');
-                setTimeout(() => toast.remove(), 500);
-            }, duration);
-        }
-
-        function showBadgeToast(b) {
-            showToast({
-                title: '🏺 Relic Unlocked!',
-                subtitle: `<strong>${b.title}</strong> — ${b.desc}`,
-                icon: b.icon,
-                tier: b.tier,
-                duration: 4500
-            });
+            setTimeout(() => { toast.classList.add('toast-hiding'); setTimeout(() => toast.remove(), 500); }, duration);
         }
 
         function evaluateBadges(logs, pRoundsList = []) {
             if (!logs) return;
             userSettings.unlockedBadges = userSettings.unlockedBadges || [];
             const unlockedSet = new Set(userSettings.unlockedBadges), newlyUnlocked = [];
-
-            const workLogs = logs.filter(l => l.type === 'work');
-            const totalWorkHours = workLogs.reduce((acc, l) => acc + (l.hours || 0), 0);
+            const workLogs = logs.filter(l => l.type === 'work'), totalWorkHours = workLogs.reduce((acc, l) => acc + (l.hours || 0), 0);
             
             const workHoursByDay = {};
             workLogs.forEach(l => {
                 if (!l.timestamp) return;
                 const d = l.timestamp.toDate ? l.timestamp.toDate() : new Date(l.timestamp);
-                const dateKey = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-                workHoursByDay[dateKey] = (workHoursByDay[dateKey] || 0) + (l.hours || 0);
+                const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+                workHoursByDay[key] = (workHoursByDay[key] || 0) + (l.hours || 0);
             });
 
-            const softCapTarget = userSettings.dailySoftCap || 4;
-            const hitSoftCap = Object.values(workHoursByDay).some(dailyHrs => dailyHrs >= softCapTarget);
-
             if (workLogs.length >= 1) unlock('work_1');
-            if (hitSoftCap) unlock('work_cap');
+            if (Object.values(workHoursByDay).some(dailyHrs => dailyHrs >= (userSettings.dailySoftCap || 4))) unlock('work_cap');
             if (totalWorkHours >= 100) unlock('work_100');
             if (totalWorkHours >= 1000) unlock('work_1000');
             if (totalWorkHours >= 10000) unlock('work_10000');
 
-            const workoutLogs = logs.filter(l => l.type === 'workout');
-            if (workoutLogs.length >= 1) unlock('workout_1');
+            if (logs.some(l => l.type === 'workout')) unlock('workout_1');
 
-            const choreLogs = logs.filter(l => l.type === 'chore');
-            const totalChoreHours = choreLogs.reduce((acc, l) => acc + (l.hours || 0), 0);
+            const choreLogs = logs.filter(l => l.type === 'chore'), totalChoreHours = choreLogs.reduce((acc, l) => acc + (l.hours || 0), 0);
             if (choreLogs.length >= 1) unlock('chore_1');
             if (totalChoreHours >= 25) unlock('chore_25');
             if (totalChoreHours >= 100) unlock('chore_100');
@@ -1006,38 +946,13 @@
             });
 
             let cleanStreak = 0;
-            pRoundsList.forEach(p => {
-                if (!p.wasPaused) { cleanStreak++; if (cleanStreak >= 4) unlock('pomo_zen'); }
-                else { cleanStreak = 0; }
-            });
-
-            const activeDates = new Set();
-            logs.forEach(l => {
-                if (!l.timestamp) return;
-                const d = l.timestamp.toDate(), key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-                if ((l.type === 'work' && l.hours >= 1.0) || (l.type === 'chore' && l.hours >= 0.5) || (l.type === 'workout' && l.hours >= 0.25)) activeDates.add(key);
-            });
-            Object.entries(pomoByDay).forEach(([dayStr, count]) => {
-                if (count >= 2) { const d = new Date(dayStr); activeDates.add(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`); }
-            });
-
-            const sortedDates = Array.from(activeDates).map(s => new Date(s.split('-')[0], s.split('-')[1], s.split('-')[2])).sort((a,b) => a - b);
-            let cur = 0, maxS = 0;
-            for (let i = 0; i < sortedDates.length; i++) {
-                if (i === 0) cur = 1;
-                else { const diff = Math.round((sortedDates[i] - sortedDates[i-1]) / 86400000); cur = diff === 1 ? cur + 1 : 1; }
-                maxS = Math.max(maxS, cur);
-            }
-            if (maxS >= 3) unlock('streak_3');
-            if (maxS >= 7) unlock('streak_7');
-            if (maxS >= 30) unlock('streak_30');
-            if (maxS >= 100) unlock('streak_100');
+            pRoundsList.forEach(p => { if (!p.wasPaused) { cleanStreak++; if (cleanStreak >= 4) unlock('pomo_zen'); } else { cleanStreak = 0; } });
 
             function unlock(id) {
                 if (!unlockedSet.has(id)) {
                     unlockedSet.add(id); newlyUnlocked.push(id);
                     const b = BADGE_CATALOG.find(x => x.id === id);
-                    if (b) showBadgeToast(b);
+                    if (b) showToast({ title: '🏺 Relic Unlocked!', subtitle: `<strong>${b.title}</strong> — ${b.desc}`, icon: b.icon, tier: b.tier, duration: 4500 });
                 }
             }
 
@@ -1048,104 +963,117 @@
             } else { renderBadgeGrid(unlockedSet); }
         }
 
-        // 4. AUDIO & PROCEDURAL AMBIENT SOUNDSCAPE ENGINE (WEB AUDIO API)
-        let ambientAudioCtx = null, ambientSourceNode = null, ambientGainNode = null, ambientIsPlaying = false, currentSoundscape = 'rain';
+        // 3. OVERHAULED HIGH-VOLUME WEB AUDIO & SOUNDSCAPE SYNTHESIZER
+        let ambientAudioCtx = null, ambientMasterGain = null, ambientCompressor = null, ambientActiveNodes = [], ambientIsPlaying = false, currentSoundscape = 'rain';
 
         function playTone(type) {
             if (audioMuted) return;
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                if (type === 'save' || type === 'delete') {
-                    const osc = ctx.createOscillator(), gain = ctx.createGain();
-                    osc.connect(gain); gain.connect(ctx.destination);
-                    osc.type = 'sine'; osc.frequency.setValueAtTime(type === 'save' ? 600 : 400, ctx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(type === 'save' ? 1200 : 200, ctx.currentTime + 0.1);
-                    gain.gain.setValueAtTime(0.15, ctx.currentTime); gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-                    osc.start(); osc.stop(ctx.currentTime + 0.1);
-                } else if (type === 'pomoDone') {
-                    [0, 0.2, 0.4].forEach(d => {
-                        const osc = ctx.createOscillator(), gain = ctx.createGain();
-                        osc.connect(gain); gain.connect(ctx.destination); osc.type = 'triangle';
-                        osc.frequency.setValueAtTime(880, ctx.currentTime + d); osc.frequency.exponentialRampToValueAtTime(1760, ctx.currentTime + d + 0.15);
-                        gain.gain.setValueAtTime(0.3, ctx.currentTime + d); gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + d + 0.18);
-                        osc.start(ctx.currentTime + d); osc.stop(ctx.currentTime + d + 0.18);
-                    });
-                }
+                const osc = ctx.createOscillator(), gain = ctx.createGain();
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.type = type === 'pomoDone' ? 'triangle' : 'sine';
+                osc.frequency.setValueAtTime(type === 'save' ? 600 : (type === 'delete' ? 400 : 880), ctx.currentTime);
+                if (type === 'save') osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
+                else if (type === 'delete') osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.25, ctx.currentTime); gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+                osc.start(); osc.stop(ctx.currentTime + 0.15);
             } catch (e) {}
         }
 
         function initAmbientAudio() {
-            if (!ambientAudioCtx) ambientAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (!ambientAudioCtx) {
+                ambientAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                ambientCompressor = ambientAudioCtx.createDynamicsCompressor();
+                ambientCompressor.threshold.setValueAtTime(-12, ambientAudioCtx.currentTime);
+                ambientCompressor.knee.setValueAtTime(10, ambientAudioCtx.currentTime);
+                ambientCompressor.ratio.setValueAtTime(12, ambientAudioCtx.currentTime);
+                ambientCompressor.attack.setValueAtTime(0.003, ambientAudioCtx.currentTime);
+                ambientCompressor.release.setValueAtTime(0.25, ambientAudioCtx.currentTime);
+
+                ambientMasterGain = ambientAudioCtx.createGain();
+                const sliderVal = (parseFloat(document.getElementById('ambient-vol-slider')?.value) || 70) / 100;
+                ambientMasterGain.gain.setValueAtTime(sliderVal * 1.5, ambientAudioCtx.currentTime);
+                
+                ambientMasterGain.connect(ambientCompressor);
+                ambientCompressor.connect(ambientAudioCtx.destination);
+            }
+        }
+
+        function createNoiseBuffer(durationSecs = 3) {
+            const sampleRate = ambientAudioCtx.sampleRate, buffer = ambientAudioCtx.createBuffer(1, sampleRate * durationSecs, sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+            return buffer;
         }
 
         function startAmbientSoundscape(type) {
-            stopAmbientSoundscape();
-            initAmbientAudio();
+            stopAmbientSoundscape(); initAmbientAudio();
             if (ambientAudioCtx.state === 'suspended') ambientAudioCtx.resume();
-
             currentSoundscape = type || 'rain';
-            const sampleRate = ambientAudioCtx.sampleRate, bufferSize = 2 * sampleRate;
-            const noiseBuffer = ambientAudioCtx.createBuffer(1, bufferSize, sampleRate);
-            const output = noiseBuffer.getChannelData(0);
 
             if (currentSoundscape === 'rain') {
-                let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-                for (let i = 0; i < bufferSize; i++) {
-                    let white = Math.random() * 2 - 1;
-                    b0 = 0.99886 * b0 + white * 0.0555179; b1 = 0.99332 * b1 + white * 0.0750759;
-                    b2 = 0.96900 * b2 + white * 0.1538520; b3 = 0.86650 * b3 + white * 0.3104856;
-                    b4 = 0.55000 * b4 + white * 0.5329522; b5 = -0.7616 * b5 - white * 0.0168980;
-                    output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.04;
-                    b6 = white * 0.115926;
-                }
-                ambientSourceNode = ambientAudioCtx.createBufferSource();
-                ambientSourceNode.buffer = noiseBuffer; ambientSourceNode.loop = true;
-                const filter = ambientAudioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 1000;
-                ambientGainNode = ambientAudioCtx.createGain();
-                const vol = (parseFloat(document.getElementById('ambient-vol-slider')?.value) || 50) / 100;
-                ambientGainNode.gain.value = vol * 0.25;
-                ambientSourceNode.connect(filter); filter.connect(ambientGainNode); ambientGainNode.connect(ambientAudioCtx.destination);
-                ambientSourceNode.start(); ambientIsPlaying = true;
+                // Heavy Rain & Thunder
+                const noiseSrc = ambientAudioCtx.createBufferSource(); noiseSrc.buffer = createNoiseBuffer(4); noiseSrc.loop = true;
+                const filter = ambientAudioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 1200;
+                noiseSrc.connect(filter); filter.connect(ambientMasterGain); noiseSrc.start();
+                ambientActiveNodes.push(noiseSrc);
             } else if (currentSoundscape === 'fire') {
-                let lastOut = 0.0;
-                for (let i = 0; i < bufferSize; i++) {
-                    let white = Math.random() * 2 - 1;
-                    output[i] = (lastOut + (0.02 * white)) / 1.02; lastOut = output[i]; output[i] *= 2.5;
-                }
-                ambientSourceNode = ambientAudioCtx.createBufferSource();
-                ambientSourceNode.buffer = noiseBuffer; ambientSourceNode.loop = true;
-                ambientGainNode = ambientAudioCtx.createGain();
-                const vol = (parseFloat(document.getElementById('ambient-vol-slider')?.value) || 50) / 100;
-                ambientGainNode.gain.value = vol * 0.3;
-                ambientSourceNode.connect(ambientGainNode); ambientGainNode.connect(ambientAudioCtx.destination);
-                ambientSourceNode.start(); ambientIsPlaying = true;
+                // Cozy Hearth & Crackle (Warm low rumble + Procedural Ember Spark Pops)
+                const noiseSrc = ambientAudioCtx.createBufferSource(); noiseSrc.buffer = createNoiseBuffer(3); noiseSrc.loop = true;
+                const filter = ambientAudioCtx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 450; filter.Q.value = 0.8;
+                noiseSrc.connect(filter); filter.connect(ambientMasterGain); noiseSrc.start();
+                ambientActiveNodes.push(noiseSrc);
+
+                // Ember Sparks procedural timer
+                const sparkTimer = setInterval(() => {
+                    if (!ambientIsPlaying) return;
+                    if (Math.random() < 0.65) {
+                        const popOsc = ambientAudioCtx.createOscillator(), popGain = ambientAudioCtx.createGain();
+                        popOsc.type = 'sine'; popOsc.frequency.setValueAtTime(1200 + Math.random() * 2200, ambientAudioCtx.currentTime);
+                        popOsc.frequency.exponentialRampToValueAtTime(150, ambientAudioCtx.currentTime + 0.03);
+                        popGain.gain.setValueAtTime(0.4 + Math.random() * 0.4, ambientAudioCtx.currentTime);
+                        popGain.gain.exponentialRampToValueAtTime(0.001, ambientAudioCtx.currentTime + 0.03);
+                        popOsc.connect(popGain); popGain.connect(ambientMasterGain);
+                        popOsc.start(); popOsc.stop(ambientAudioCtx.currentTime + 0.03);
+                    }
+                }, 120);
+                ambientActiveNodes.push({ stop: () => clearInterval(sparkTimer) });
+            } else if (currentSoundscape === 'cafe') {
+                // Coffee Shop Ambience (Formant filtered murmur)
+                const noiseSrc = ambientAudioCtx.createBufferSource(); noiseSrc.buffer = createNoiseBuffer(3); noiseSrc.loop = true;
+                const filter = ambientAudioCtx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 750; filter.Q.value = 2.0;
+                noiseSrc.connect(filter); filter.connect(ambientMasterGain); noiseSrc.start();
+                ambientActiveNodes.push(noiseSrc);
             } else if (currentSoundscape === 'cosmos') {
-                const osc = ambientAudioCtx.createOscillator(), osc2 = ambientAudioCtx.createOscillator();
-                osc.type = 'sine'; osc.frequency.value = 65.41;
-                osc2.type = 'sine'; osc2.frequency.value = 98.00;
-                ambientGainNode = ambientAudioCtx.createGain();
-                const vol = (parseFloat(document.getElementById('ambient-vol-slider')?.value) || 50) / 100;
-                ambientGainNode.gain.value = vol * 0.15;
-                osc.connect(ambientGainNode); osc2.connect(ambientGainNode); ambientGainNode.connect(ambientAudioCtx.destination);
-                osc.start(); osc2.start();
-                ambientSourceNode = { stop: () => { osc.stop(); osc2.stop(); } }; ambientIsPlaying = true;
+                // Cosmic Deep Space Binaural Drone
+                [65.41, 98.00, 130.81].forEach((freq, idx) => {
+                    const osc = ambientAudioCtx.createOscillator(), g = ambientAudioCtx.createGain();
+                    osc.type = 'sine'; osc.frequency.value = freq;
+                    g.gain.setValueAtTime(0.3 / (idx + 1), ambientAudioCtx.currentTime);
+                    osc.connect(g); g.connect(ambientMasterGain); osc.start();
+                    ambientActiveNodes.push(osc);
+                });
             } else if (currentSoundscape === 'wind') {
-                for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
-                ambientSourceNode = ambientAudioCtx.createBufferSource();
-                ambientSourceNode.buffer = noiseBuffer; ambientSourceNode.loop = true;
-                const filter = ambientAudioCtx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 400; filter.Q.value = 3.0;
-                ambientGainNode = ambientAudioCtx.createGain();
-                const vol = (parseFloat(document.getElementById('ambient-vol-slider')?.value) || 50) / 100;
-                ambientGainNode.gain.value = vol * 0.25;
-                ambientSourceNode.connect(filter); filter.connect(ambientGainNode); ambientGainNode.connect(ambientAudioCtx.destination);
-                ambientSourceNode.start(); ambientIsPlaying = true;
+                // Mountain breeze with sweeping resonant filter
+                const noiseSrc = ambientAudioCtx.createBufferSource(); noiseSrc.buffer = createNoiseBuffer(4); noiseSrc.loop = true;
+                const filter = ambientAudioCtx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 350; filter.Q.value = 2.5;
+                noiseSrc.connect(filter); filter.connect(ambientMasterGain); noiseSrc.start();
+                ambientActiveNodes.push(noiseSrc);
+            } else if (currentSoundscape === 'ocean') {
+                // Gentle Shore Waves
+                const noiseSrc = ambientAudioCtx.createBufferSource(); noiseSrc.buffer = createNoiseBuffer(5); noiseSrc.loop = true;
+                const filter = ambientAudioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 600;
+                noiseSrc.connect(filter); filter.connect(ambientMasterGain); noiseSrc.start();
+                ambientActiveNodes.push(noiseSrc);
             }
-            updateAmbientBtnUI();
+
+            ambientIsPlaying = true; updateAmbientBtnUI();
         }
 
         function stopAmbientSoundscape() {
-            if (ambientSourceNode) { try { ambientSourceNode.stop(); } catch(e){} ambientSourceNode = null; }
-            ambientIsPlaying = false; updateAmbientBtnUI();
+            ambientActiveNodes.forEach(node => { try { node.stop(); } catch(e){} });
+            ambientActiveNodes = []; ambientIsPlaying = false; updateAmbientBtnUI();
         }
 
         function toggleAmbientSoundscape() {
@@ -1153,23 +1081,19 @@
             else startAmbientSoundscape(document.getElementById('ambient-sound-select').value);
         }
 
-        function changeAmbientSoundscape(val) {
-            currentSoundscape = val; if (ambientIsPlaying) startAmbientSoundscape(val);
-        }
+        function changeAmbientSoundscape(val) { currentSoundscape = val; if (ambientIsPlaying) startAmbientSoundscape(val); }
 
         function updateAmbientVolume(val) {
-            if (ambientGainNode && ambientAudioCtx) {
+            if (ambientMasterGain && ambientAudioCtx) {
                 const vol = (parseFloat(val) || 0) / 100;
-                ambientGainNode.gain.setValueAtTime(vol * 0.25, ambientAudioCtx.currentTime);
+                ambientMasterGain.gain.setValueAtTime(vol * 1.5, ambientAudioCtx.currentTime);
             }
         }
 
         function updateAmbientBtnUI() {
-            const btn = document.getElementById('ambient-toggle-btn');
-            if (btn) {
-                btn.innerText = ambientIsPlaying ? "⏸ Pause Sound" : "▶ Play Sound";
-                btn.className = ambientIsPlaying ? "px-3 py-1 rounded bg-amber-500 text-slate-950 text-[11px] font-bold shadow-md transition-all" : "px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 transition-all";
-            }
+            const btn = document.getElementById('ambient-toggle-btn'); if (!btn) return;
+            btn.innerText = ambientIsPlaying ? "⏸ Pause Sound" : "▶ Play Sound";
+            btn.className = ambientIsPlaying ? "px-3.5 py-1 rounded bg-amber-500 text-slate-950 text-[11px] font-bold shadow-md transition-all" : "px-3.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 transition-all";
         }
 
         function requestNotificationPermission() { if ("Notification" in window && Notification.permission === "default") Notification.requestPermission(); }
@@ -1185,10 +1109,7 @@
         }
 
         function startHoldStep(id, delta, step, min, max, e) {
-            const evt = e || window.event;
-            if (evt && evt.type === 'touchstart' && evt.cancelable) {
-                evt.preventDefault();
-            }
+            const evt = e || window.event; if (evt && evt.type === 'touchstart' && evt.cancelable) evt.preventDefault();
             stopHoldStep(); stepValue(id, delta, step, min, max);
             holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepValue(id, delta, step, min, max), 80); }, 300);
         }
@@ -1204,14 +1125,10 @@
         }
         function stepRating(field, delta) {
             const input = document.getElementById(`work-${field}`);
-            input.value = Math.max(1, Math.min(5, (parseInt(input.value) || 3) + delta));
-            updateRatingUI(field);
+            input.value = Math.max(1, Math.min(5, (parseInt(input.value) || 3) + delta)); updateRatingUI(field);
         }
         function startHoldStepRating(field, delta, e) {
-            const evt = e || window.event;
-            if (evt && evt.type === 'touchstart' && evt.cancelable) {
-                evt.preventDefault();
-            }
+            const evt = e || window.event; if (evt && evt.type === 'touchstart' && evt.cancelable) evt.preventDefault();
             stopHoldStep(); stepRating(field, delta);
             holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepRating(field, delta), 120); }, 300);
         }
@@ -1225,14 +1142,10 @@
         }
         function stepWorkoutStrain(delta) {
             const input = document.getElementById('workout-strain');
-            input.value = Math.max(1, Math.min(5, (parseInt(input.value) || 3) + delta));
-            updateWorkoutStrainUI();
+            input.value = Math.max(1, Math.min(5, (parseInt(input.value) || 3) + delta)); updateWorkoutStrainUI();
         }
         function startHoldStepWorkoutStrain(delta, e) {
-            const evt = e || window.event;
-            if (evt && evt.type === 'touchstart' && evt.cancelable) {
-                evt.preventDefault();
-            }
+            const evt = e || window.event; if (evt && evt.type === 'touchstart' && evt.cancelable) evt.preventDefault();
             stopHoldStep(); stepWorkoutStrain(delta);
             holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepWorkoutStrain(delta), 120); }, 300);
         }
@@ -1240,7 +1153,7 @@
         function applyThemeToBody(t) { document.body.setAttribute('data-theme', t || 'gold'); }
         function applyCursorToBody(c) { document.body.setAttribute('data-cursor', c || 'default'); }
 
-        // 5. HOURGLASS POMODORO ENGINE
+        // 4. HOURGLASS POMODORO ENGINE
         let myPomoMode = 'focus', myPomoRound = 1, myPomoTime = 1500, myPomoInitialTime = 1500, myPomoIsRunning = false, myPomoInterval = null, currentSessionWasPaused = false;
         let pomoUIRenderInterval = null, pomoSyncUnsubscribe = null, spectatorSettings = null, shadowSpectatorTime = 1500, shadowSpectatorIsRunning = false, shadowSpectatorInterval = null;
 
@@ -1255,14 +1168,11 @@
             try { db.collection('settings').doc(loggedInUser).set({ livePomoState: { mode: myPomoMode, round: myPomoRound, isRunning: myPomoIsRunning, pomoTime: myPomoTime, updatedAtMillis: Date.now() } }, { merge: true }); } catch (e) {}
         }
 
-        function updateAmbientFocusState(isRunning) {
-            document.body.classList.toggle('focus-ambient-active', isRunning && myPomoMode === 'focus');
-        }
+        function updateAmbientFocusState(isRunning) { document.body.classList.toggle('focus-ambient-active', isRunning && myPomoMode === 'focus'); }
 
         function startMyPomoBackgroundTimer() {
             if (myPomoInterval) clearInterval(myPomoInterval);
-            let ticks = 0;
-            updateAmbientFocusState(true);
+            let ticks = 0; updateAmbientFocusState(true);
             myPomoInterval = setInterval(() => {
                 if (!myPomoIsRunning) return;
                 myPomoTime--; ticks++;
@@ -1283,8 +1193,7 @@
         }
 
         function setMyPomoMode(mode) {
-            myPomoMode = mode; myPomoIsRunning = false; currentSessionWasPaused = false;
-            updateAmbientFocusState(false);
+            myPomoMode = mode; myPomoIsRunning = false; currentSessionWasPaused = false; updateAmbientFocusState(false);
             if (myPomoInterval) clearInterval(myPomoInterval);
             const f = parseInt(userSettings.pomoFocus) || 25, s = parseInt(userSettings.pomoShort) || 5, l = parseInt(userSettings.pomoLong) || 15;
             myPomoInitialTime = (mode === 'focus' ? f : (mode === 'short' ? s : l)) * 60;
@@ -1295,12 +1204,8 @@
         function toggleMyPomoTimer() {
             if (loggedInUser !== viewedUser) return;
             requestNotificationPermission();
-            if (myPomoIsRunning) { 
-                myPomoIsRunning = false; currentSessionWasPaused = true; clearInterval(myPomoInterval); 
-                updateAmbientFocusState(false);
-            } else { 
-                myPomoIsRunning = true; startMyPomoBackgroundTimer(); 
-            }
+            if (myPomoIsRunning) { myPomoIsRunning = false; currentSessionWasPaused = true; clearInterval(myPomoInterval); updateAmbientFocusState(false); }
+            else { myPomoIsRunning = true; startMyPomoBackgroundTimer(); }
             syncMyPomoToCloud();
         }
         function resetMyPomoTimer() { if (loggedInUser === viewedUser) { clearInterval(myPomoInterval); myPomoIsRunning = false; myPomoRound = 1; updateAmbientFocusState(false); setMyPomoMode('focus'); } }
@@ -1309,9 +1214,7 @@
         async function applyPomoPreset(f, s, l) {
             if (loggedInUser !== viewedUser) return;
             userSettings.pomoFocus = f; userSettings.pomoShort = s; userSettings.pomoLong = l;
-            document.getElementById('setting-pomo-focus').value = f;
-            document.getElementById('setting-pomo-short').value = s;
-            document.getElementById('setting-pomo-long').value = l;
+            document.getElementById('setting-pomo-focus').value = f; document.getElementById('setting-pomo-short').value = s; document.getElementById('setting-pomo-long').value = l;
             await db.collection('settings').doc(loggedInUser).set({ pomoFocus: f, pomoShort: s, pomoLong: l }, { merge: true });
             playTone('save'); setMyPomoMode(myPomoMode);
         }
@@ -1399,7 +1302,7 @@
             }
         }
 
-        // 6. CHARTS ENGINE
+        // 5. CHARTS ENGINE
         let charts = {}, chartTimeframes = { work: 'daily', sanctuary: 'daily' }, workChartMode = 'bar', sanctuaryChartSubmode = 'workout';
         
         function initCharts() {
@@ -1425,7 +1328,6 @@
 
         function setWorkChartMode(m) { workChartMode = m; if (charts['work']) { charts['work'].config.type = m === 'area' ? 'line' : m; charts['work'].data.datasets[0].fill = (m === 'area'); charts['work'].update(); } }
         function setSanctuaryChartMode(m) { sanctuaryChartSubmode = m; loadUserData(); }
-
         function setChartRange(t, r) { chartTimeframes[t] = r; updateChartTimeframeUI(t, r); loadUserData(); }
         function updateChartTimeframeUI(t, r) {
             ['daily', 'weekly', 'monthly', 'yearly'].forEach(x => {
@@ -1474,8 +1376,9 @@
             }
         }
 
-        // 7. FIRESTORE CRUD & APP LOGIC
-        let currentTodayHoursLogged = 0, currentRawLogsCache = [], settingsUnsubscribe = null;
+        // 6. FIRESTORE CRUD & APPLICATION LOGIC
+        let currentTodayHoursLogged = 0, currentRawLogsCache = [], settingsUnsubscribe = null, globalLogsUnsubscribe = null;
+        let northDailyHours = 0, creamDailyHours = 0;
 
         auth.onAuthStateChanged(async u => {
             if (u) {
@@ -1484,7 +1387,9 @@
                 document.getElementById('app-content').classList.remove('hidden');
                 loggedInUser = (u.uid === "ioxjbBLDH0NDLDWVoYCjq8p3PYU2" || u.email?.toLowerCase().includes("cream")) ? 'Cream' : 'North';
                 viewedUser = loggedInUser;
+                
                 initRealtimeSettingsListener();
+                initGlobalHeaderGlowListener();
                 await initAndRecoverMyPomoState();
                 updateUserSwitcherUI(); initCharts(); loadUserData();
                 updateRatingUI('results'); updateRatingUI('effort'); updateWorkoutStrainUI();
@@ -1506,24 +1411,49 @@
             });
         }
 
-        function updateAvatarsInHeader(todayWorkHrs = currentTodayHoursLogged) {
-            const nImg = document.getElementById('avatar-img-north'), cImg = document.getElementById('avatar-img-cream');
-            if (viewedUser === 'North' && userSettings.avatarUrl) nImg.src = userSettings.avatarUrl;
-            if (viewedUser === 'Cream' && userSettings.avatarUrl) cImg.src = userSettings.avatarUrl;
+        // SIMULTANEOUS LIVE HEADER STATUS GLOW FOR BOTH USERS
+        function initGlobalHeaderGlowListener() {
+            if (globalLogsUnsubscribe) globalLogsUnsubscribe();
+            const now = new Date(), startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             
-            const softCap = userSettings.dailySoftCap || 4;
-            let glowClass = "glow-ring-idle border-2 border-slate-700 opacity-60";
-            if (todayWorkHrs >= softCap) glowClass = "glow-ring-softcap border-2 border-amber-400 opacity-100";
-            else if (todayWorkHrs >= 2.0) glowClass = "glow-ring-baseline border-2 border-emerald-400 opacity-100";
-            else if (todayWorkHrs > 0) glowClass = "glow-ring-active border-2 border-blue-400 opacity-100";
+            globalLogsUnsubscribe = db.collection('logs').where('type', '==', 'work').onSnapshot(snapshot => {
+                let nH = 0, cH = 0;
+                snapshot.forEach(doc => {
+                    const d = doc.data();
+                    if (d.timestamp && d.timestamp.toDate() >= startToday) {
+                        if (d.user === 'North') nH += (d.hours || 0);
+                        else if (d.user === 'Cream') cH += (d.hours || 0);
+                    }
+                });
+                northDailyHours = nH; creamDailyHours = cH;
+                updateAvatarsInHeader();
+            });
+        }
 
-            if (viewedUser === 'North') {
-                nImg.className = `w-9 h-9 rounded-full bg-slate-800 object-cover ${glowClass}`;
-                cImg.className = "w-9 h-9 rounded-full bg-slate-800 object-cover glow-ring-idle border-2 border-transparent opacity-60";
-            } else {
-                cImg.className = `w-9 h-9 rounded-full bg-slate-800 object-cover ${glowClass}`;
-                nImg.className = "w-9 h-9 rounded-full bg-slate-800 object-cover glow-ring-idle border-2 border-transparent opacity-60";
-            }
+        function getGlowClassForHours(hrs) {
+            const softCap = userSettings.dailySoftCap || 4;
+            if (hrs >= softCap) return "glow-ring-softcap border-2 border-amber-400";
+            if (hrs >= 2.0) return "glow-ring-baseline border-2 border-emerald-400";
+            if (hrs > 0) return "glow-ring-active border-2 border-blue-400";
+            return "glow-ring-idle border-2 border-slate-700/60";
+        }
+
+        function updateAvatarsInHeader() {
+            const nBtn = document.getElementById('user-btn-north'), cBtn = document.getElementById('user-btn-cream');
+            const nImg = document.getElementById('avatar-img-north'), cImg = document.getElementById('avatar-img-cream');
+            const nTip = document.getElementById('avatar-tip-north'), cTip = document.getElementById('avatar-tip-cream');
+
+            // Dynamic Tooltip (You) badge
+            nTip.innerText = loggedInUser === 'North' ? 'North (You)' : 'North';
+            cTip.innerText = loggedInUser === 'Cream' ? 'Cream (You)' : 'Cream';
+
+            // Active spectating ring border indicator
+            nBtn.className = `avatar-btn rounded-full p-0.5 ${viewedUser === 'North' ? 'ring-2 ring-amber-400 scale-105' : 'opacity-80'}`;
+            cBtn.className = `avatar-btn rounded-full p-0.5 ${viewedUser === 'Cream' ? 'ring-2 ring-amber-400 scale-105' : 'opacity-80'}`;
+
+            // Simultaneous live status glow
+            nImg.className = `w-9 h-9 rounded-full bg-slate-800 object-cover ${getGlowClassForHours(northDailyHours)}`;
+            cImg.className = `w-9 h-9 rounded-full bg-slate-800 object-cover ${getGlowClassForHours(creamDailyHours)}`;
         }
 
         function updateSettingsUI() {
@@ -1540,7 +1470,6 @@
             document.getElementById('setting-user-theme').value = userSettings.userTheme || 'gold';
             document.getElementById('setting-user-cursor').value = userSettings.userCursor || 'default';
             document.getElementById('setting-avatar-url').value = userSettings.avatarUrl || '';
-            
             const particle = userSettings.particleIntensity !== undefined ? userSettings.particleIntensity : 15;
             document.getElementById('setting-particle-intensity').value = particle;
             document.getElementById('label-particle-val').innerText = `${particle}%`;
@@ -1587,118 +1516,60 @@
             const softCap = userSettings.dailySoftCap || 4, baseRate = (R + E) / 2;
             const normH = Math.min(T, Math.max(0, softCap - currentTodayHoursLogged)), overH = T - normH;
             const pts = (normH * baseRate) + (overH * baseRate * 0.25);
-
-            const targetPts = (userSettings.weeklyHours || 10) * 12;
-            const pointRate = targetPts > 0 ? (userSettings.monthlyCash / targetPts) : 0;
+            const targetPts = (userSettings.weeklyHours || 10) * 12, pointRate = targetPts > 0 ? (userSettings.monthlyCash / targetPts) : 0;
             const maxCash = userSettings.monthlyCash * ((userSettings.maxBonusCapPct || 125) / 100);
 
-            const now = new Date();
-            let currentMonthlyPts = 0;
+            const now = new Date(); let currentMonthlyPts = 0;
             currentRawLogsCache.forEach(l => {
                 if (l.type === 'work' && l.timestamp) {
                     const d = l.timestamp.toDate ? l.timestamp.toDate() : new Date(l.timestamp);
-                    if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
-                        currentMonthlyPts += (l.points || 0);
-                    }
+                    if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) currentMonthlyPts += (l.points || 0);
                 }
             });
 
-            const cashBefore = Math.min(currentMonthlyPts * pointRate, maxCash);
-            const cashAfter = Math.min((currentMonthlyPts + pts) * pointRate, maxCash);
+            const cashBefore = Math.min(currentMonthlyPts * pointRate, maxCash), cashAfter = Math.min((currentMonthlyPts + pts) * pointRate, maxCash);
             const netCashEarned = Math.max(0, cashAfter - cashBefore);
 
             await db.collection('logs').add({ type: 'work', user: loggedInUser, hours: T, normalHours: normH, overCapHours: overH, results: R, effort: E, points: pts, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            
-            showToast({
-                title: '⚗️ Work Session Saved',
-                subtitle: `<strong>+฿${Math.round(netCashEarned).toLocaleString()} Earned</strong> (${T}h logged @ Lvl ${R}/${E})`,
-                icon: '🎯',
-                tier: 'gold',
-                originEvt: e
-            });
-
+            showToast({ title: '⚗️ Work Session Saved', subtitle: `<strong>+฿${Math.round(netCashEarned).toLocaleString()} Earned</strong> (${T}h logged @ Lvl ${R}/${E})`, icon: '🎯', tier: 'gold', originEvt: e });
             loadUserData();
         }
 
         async function logWorkout(e) {
             e.preventDefault();
-            const hrs = parseFloat(document.getElementById('workout-time').value);
-            const strain = parseInt(document.getElementById('workout-strain').value);
-
+            const hrs = parseFloat(document.getElementById('workout-time').value), strain = parseInt(document.getElementById('workout-strain').value);
             await db.collection('logs').add({ type: 'workout', user: loggedInUser, hours: hrs, strain: strain, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            
-            showToast({
-                title: '🏃 Fitness Workout Logged',
-                subtitle: `${hrs}h workout session saved at Level ${strain} effort!`,
-                icon: '🔥',
-                tier: 'gold',
-                originEvt: e
-            });
-
+            showToast({ title: '🏃 Fitness Workout Logged', subtitle: `${hrs}h workout session saved at Level ${strain} effort!`, icon: '🔥', tier: 'gold', originEvt: e });
             loadUserData();
         }
 
         async function logHealth(e) {
             e.preventDefault();
-            const lvl = parseInt(document.getElementById('health-level').value);
-            const note = document.getElementById('health-note').value.trim();
-
+            const lvl = parseInt(document.getElementById('health-level').value), note = document.getElementById('health-note').value.trim();
             await db.collection('logs').add({ type: 'health', user: loggedInUser, level: lvl, note: note, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            
-            showToast({
-                title: '🍨 Snack Logged',
-                subtitle: `Level ${lvl} treat recorded${note ? `: "${note}"` : ''}`,
-                icon: '🍦',
-                tier: 'emerald',
-                originEvt: e
-            });
-
-            document.getElementById('health-note').value = ''; 
-            loadUserData();
+            showToast({ title: '🍨 Snack Logged', subtitle: `Level ${lvl} treat recorded${note ? `: "${note}"` : ''}`, icon: '🍦', tier: 'emerald', originEvt: e });
+            document.getElementById('health-note').value = ''; loadUserData();
         }
 
         async function logChore(e) {
             e.preventDefault();
-            const hrs = parseFloat(document.getElementById('chore-time').value);
-            const note = document.getElementById('chore-note').value.trim();
-
+            const hrs = parseFloat(document.getElementById('chore-time').value), note = document.getElementById('chore-note').value.trim();
             await db.collection('logs').add({ type: 'chore', user: loggedInUser, hours: hrs, note: note, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            
-            showToast({
-                title: '🧹 Chore Logged',
-                subtitle: `${hrs}h house chore saved${note ? `: "${note}"` : ''}`,
-                icon: '🏰',
-                tier: 'silver',
-                originEvt: e
-            });
-
-            document.getElementById('chore-note').value = ''; 
-            loadUserData();
+            showToast({ title: '🧹 Chore Logged', subtitle: `${hrs}h house chore saved${note ? `: "${note}"` : ''}`, icon: '🏰', tier: 'silver', originEvt: e });
+            document.getElementById('chore-note').value = ''; loadUserData();
         }
 
         async function deleteLogEntry(id) { 
             if (loggedInUser === viewedUser) { 
-                await db.collection('logs').doc(id).delete(); 
-                playTone('delete'); 
+                await db.collection('logs').doc(id).delete(); playTone('delete'); 
                 showToast({ title: '🗑️ Entry Deleted', subtitle: 'Log record removed from Firestore.', icon: '📜', tier: 'bronze', duration: 2500 });
             } 
         }
 
         async function saveDailyDiary(e) {
-            e.preventDefault(); 
-            const text = document.getElementById('diary-text').value.trim(); 
-            if (!text) return;
-
+            e.preventDefault(); const text = document.getElementById('diary-text').value.trim(); if (!text) return;
             await db.collection('logs').add({ type: 'diary', user: loggedInUser, text: text, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            
-            showToast({
-                title: '📖 Reflection Saved',
-                subtitle: 'Daily reflection updated!',
-                icon: '✍️',
-                tier: 'titan',
-                originEvt: e
-            });
-
+            showToast({ title: '📖 Reflection Saved', subtitle: 'Daily reflection updated!', icon: '✍️', tier: 'titan', originEvt: e });
             loadUserData();
         }
 
@@ -1712,11 +1583,7 @@
         }
         async function handleInstantEffectChange() {
             userSettings.particleIntensity = parseInt(document.getElementById('setting-particle-intensity').value) || 0;
-            if (loggedInUser === viewedUser) {
-                await db.collection('settings').doc(loggedInUser).set({
-                    particleIntensity: userSettings.particleIntensity
-                }, { merge: true });
-            }
+            if (loggedInUser === viewedUser) await db.collection('settings').doc(loggedInUser).set({ particleIntensity: userSettings.particleIntensity }, { merge: true });
         }
         async function applyCustomAvatarUrl() {
             const url = document.getElementById('setting-avatar-url').value.trim(); if (!url) return;
@@ -1750,7 +1617,6 @@
             userSettings.particleIntensity = parseInt(document.getElementById('setting-particle-intensity').value) || 0;
 
             await db.collection('settings').doc(loggedInUser).set(userSettings, { merge: true });
-            
             showToast({ title: '⚙️ Settings Saved', subtitle: 'All Forge options saved successfully.', icon: '🔧', tier: 'gold', duration: 3000, originEvt: e });
             updateSettingsUI(); loadUserData(); setMyPomoMode('focus');
         }
@@ -1764,25 +1630,18 @@
                 else if (l.type === 'health') snackC += 1;
             });
 
-            // Calculate Power Level Points
             const pwrScore = Math.round((workH * 100) + (workoutH * 120) + (choreH * 80) + (snackC * 15));
             document.getElementById('power-score-val').innerText = pwrScore.toLocaleString();
+            document.getElementById('power-level-bar').style.width = `${Math.min(100, Math.round((pwrScore / 800) * 100))}%`;
 
-            const targetCap = 800;
-            const barPct = Math.min(100, Math.round((pwrScore / targetCap) * 100));
-            document.getElementById('power-level-bar').style.width = `${barPct}%`;
-
-            const rankIcon = document.getElementById('power-rank-icon');
-            const rankTitle = document.getElementById('power-rank-title');
-            
+            const rankIcon = document.getElementById('power-rank-icon'), rankTitle = document.getElementById('power-rank-title');
             if (pwrScore >= 900) { rankIcon.innerText = '👑'; rankTitle.innerText = 'Ascended Overlord'; rankTitle.className = "text-xs font-extrabold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40"; }
             else if (pwrScore >= 600) { rankIcon.innerText = '🔥'; rankTitle.innerText = 'Mythic Champion'; rankTitle.className = "text-xs font-extrabold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40"; }
             else if (pwrScore >= 350) { rankIcon.innerText = '🛡️'; rankTitle.innerText = 'Radiant Vanguard'; rankTitle.className = "text-xs font-extrabold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"; }
             else if (pwrScore >= 150) { rankIcon.innerText = '⚡'; rankTitle.innerText = 'Awakened Flame'; rankTitle.className = "text-xs font-extrabold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/40"; }
             else { rankIcon.innerText = '🪨'; rankTitle.innerText = 'Dormant Spark'; rankTitle.className = "text-xs font-extrabold px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700"; }
 
-            const tagsContainer = document.getElementById('power-breakdown-tags');
-            tagsContainer.innerHTML = `
+            document.getElementById('power-breakdown-tags').innerHTML = `
                 <span class="px-2 py-1 bg-slate-900/90 rounded-md border border-amber-500/30 text-amber-300">⚗️ ${workH.toFixed(1)}h Work</span>
                 <span class="px-2 py-1 bg-slate-900/90 rounded-md border border-emerald-500/30 text-emerald-300">🏃 ${workoutH.toFixed(1)}h Fitness</span>
                 <span class="px-2 py-1 bg-slate-900/90 rounded-md border border-sky-500/30 text-sky-300">🧹 ${choreH.toFixed(1)}h Chores</span>
@@ -1798,7 +1657,6 @@
                 snapshot.forEach(doc => {
                     const d = doc.data(); d.id = doc.id; rawLogs.push(d);
                     if (d.timestamp && d.timestamp.toDate() >= startToday) todayLogs.push(d);
-
                     if (d.type === 'work' && d.timestamp) {
                         const lDate = d.timestamp.toDate();
                         if (lDate.getFullYear() === now.getFullYear() && lDate.getMonth() === now.getMonth()) monthlyPoints += (d.points || 0);
@@ -1832,7 +1690,6 @@
                     badge.innerText = "2.0h Baseline"; badge.className = "text-[10px] font-semibold text-slate-500"; notice?.classList.add('hidden');
                 }
 
-                updateAvatarsInHeader(todayHours);
                 calculateAndRenderPowerMeter(todayLogs);
                 updateGoalGauge(finalPayout, userSettings.monthlyCash);
                 updateChartData('work', rawLogs.filter(l => l.type === 'work'), pointRate, maxCash);
@@ -1842,8 +1699,7 @@
                 document.getElementById('diary-text').value = todayDiary ? todayDiary.text : '';
                 document.getElementById('diary-status-badge').innerText = todayDiary ? "Today's Reflection Saved ✨" : "Jot down thoughts or wins";
 
-                populateAndFilterLedger();
-                evaluateBadges(rawLogs, userSettings.completedPomoHistory || []);
+                populateAndFilterLedger(); evaluateBadges(rawLogs, userSettings.completedPomoHistory || []);
             });
         }
 
@@ -1887,22 +1743,17 @@
                 }
             };
 
-            const w = logs.filter(l => l.type === 'work');
-            const s = logs.filter(l => ['workout', 'chore', 'health'].includes(l.type));
-            const d = logs.filter(l => l.type === 'diary');
-
+            const w = logs.filter(l => l.type === 'work'), s = logs.filter(l => ['workout', 'chore', 'health'].includes(l.type)), d = logs.filter(l => l.type === 'diary');
             document.getElementById('ledger-count-work').innerText = `${w.length} entries`;
             document.getElementById('ledger-count-sanctuary').innerText = `${s.length} entries`;
             document.getElementById('ledger-count-diary').innerText = `${d.length} entries`;
 
             render('ledger-list-work', w, 'No work logs.', l => `<div class="flex justify-between font-medium"><span class="text-slate-200">${l.hours} hrs (${l.results}/${l.effort})</span><span class="text-emerald-400 font-bold">฿${Math.round(l.points * (userSettings.monthlyCash / (userSettings.weeklyHours * 12))).toLocaleString()}</span></div>`);
-            
             render('ledger-list-sanctuary', s, 'No entries found.', l => {
                 if (l.type === 'workout') return `<div class="flex justify-between font-medium"><span class="text-amber-300">🏃 Fitness (${l.hours}h)</span><span class="text-slate-400 font-bold">Effort Lvl ${l.strain || 3}</span></div>`;
                 if (l.type === 'chore') return `<div class="flex justify-between font-medium"><span class="text-sky-300">🧹 House Chore (${l.hours}h)</span><span class="text-slate-300 italic truncate max-w-[100px]">${l.note || 'No note'}</span></div>`;
                 return `<div class="flex justify-between font-medium"><span class="text-emerald-300">🍨 Snack (Lvl ${l.level})</span><span class="text-slate-300 italic truncate max-w-[100px]">${l.note || 'No note'}</span></div>`;
             });
-            
             render('ledger-list-diary', d, 'No reflections.', l => `<div class="text-slate-200 italic leading-snug break-words">"${l.text}"</div>`);
         }
     </script>
