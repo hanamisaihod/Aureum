@@ -19,17 +19,17 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <style>
-        :root { --bg-main: #0f172a; --card-bg: rgba(30, 41, 59, 0.7); --card-border: rgba(255, 255, 255, 0.08); --accent-primary: #f59e0b; --accent-primary-hover: #d97706; --accent-primary-text: #020617; --accent-glow: rgba(245, 158, 11, 0.25); }
-        body[data-theme="gold"] { --bg-main: #0f172a; --card-bg: rgba(30, 41, 59, 0.7); --card-border: rgba(255, 255, 255, 0.08); --accent-primary: #f59e0b; --accent-primary-hover: #d97706; --accent-primary-text: #020617; --accent-glow: rgba(245, 158, 11, 0.25); }
-        body[data-theme="rose"] { --bg-main: #180e15; --card-bg: rgba(39, 22, 34, 0.7); --card-border: rgba(244, 114, 182, 0.15); --accent-primary: #f472b6; --accent-primary-hover: #e11d48; --accent-primary-text: #020617; --accent-glow: rgba(244, 114, 182, 0.3); }
-        body[data-theme="emerald"] { --bg-main: #061814; --card-bg: rgba(15, 46, 39, 0.7); --card-border: rgba(16, 185, 129, 0.15); --accent-primary: #10b981; --accent-primary-hover: #059669; --accent-primary-text: #020617; --accent-glow: rgba(16, 185, 129, 0.3); }
-        body[data-theme="cyber"] { --bg-main: #0b0f19; --card-bg: rgba(21, 28, 46, 0.7); --card-border: rgba(168, 85, 247, 0.15); --accent-primary: #a855f7; --accent-primary-hover: #9333ea; --accent-primary-text: #ffffff; --accent-glow: rgba(168, 85, 247, 0.35); }
-        body[data-theme="sunset"] { --bg-main: #1a100c; --card-bg: rgba(44, 26, 20, 0.7); --card-border: rgba(249, 115, 22, 0.15); --accent-primary: #f97316; --accent-primary-hover: #ea580c; --accent-primary-text: #020617; --accent-glow: rgba(249, 115, 22, 0.3); }
-        body[data-theme="amethyst"] { --bg-main: #120d1d; --card-bg: rgba(30, 22, 48, 0.7); --card-border: rgba(192, 132, 252, 0.15); --accent-primary: #c084fc; --accent-primary-hover: #a855f7; --accent-primary-text: #020617; --accent-glow: rgba(192, 132, 252, 0.3); }
-        body[data-theme="ocean"] { --bg-main: #0b1920; --card-bg: rgba(18, 40, 52, 0.7); --card-border: rgba(20, 184, 166, 0.15); --accent-primary: #14b8a6; --accent-primary-hover: #0d9488; --accent-primary-text: #020617; --accent-glow: rgba(20, 184, 166, 0.3); }
-        body[data-theme="crimson"] { --bg-main: #1a0c0e; --card-bg: rgba(45, 19, 23, 0.7); --card-border: rgba(239, 68, 68, 0.15); --accent-primary: #ef4444; --accent-primary-hover: #dc2626; --accent-primary-text: #ffffff; --accent-glow: rgba(239, 68, 68, 0.35); }
-        body[data-theme="matcha"] { --bg-main: #121813; --card-bg: rgba(29, 39, 31, 0.7); --card-border: rgba(132, 204, 22, 0.15); --accent-primary: #84cc16; --accent-primary-hover: #65a30d; --accent-primary-text: #020617; --accent-glow: rgba(132, 204, 22, 0.3); }
-        body[data-theme="monochrome"] { --bg-main: #121212; --card-bg: rgba(30, 30, 30, 0.7); --card-border: rgba(255, 255, 255, 0.1); --accent-primary: #e2e8f0; --accent-primary-hover: #cbd5e1; --accent-primary-text: #0f172a; --accent-glow: rgba(226, 232, 240, 0.25); }
+        :root { --bg-main: #0f172a; --card-bg: rgba(15, 23, 42, 0.92); --card-border: rgba(255, 255, 255, 0.08); --accent-primary: #f59e0b; --accent-primary-hover: #d97706; --accent-primary-text: #020617; --accent-glow: rgba(245, 158, 11, 0.25); }
+        body[data-theme="gold"] { --bg-main: #0f172a; --card-bg: rgba(15, 23, 42, 0.92); --card-border: rgba(255, 255, 255, 0.08); --accent-primary: #f59e0b; --accent-primary-hover: #d97706; --accent-primary-text: #020617; --accent-glow: rgba(245, 158, 11, 0.25); }
+        body[data-theme="rose"] { --bg-main: #180e15; --card-bg: rgba(30, 16, 26, 0.92); --card-border: rgba(244, 114, 182, 0.15); --accent-primary: #f472b6; --accent-primary-hover: #e11d48; --accent-primary-text: #020617; --accent-glow: rgba(244, 114, 182, 0.3); }
+        body[data-theme="emerald"] { --bg-main: #061814; --card-bg: rgba(10, 32, 27, 0.92); --card-border: rgba(16, 185, 129, 0.15); --accent-primary: #10b981; --accent-primary-hover: #059669; --accent-primary-text: #020617; --accent-glow: rgba(16, 185, 129, 0.3); }
+        body[data-theme="cyber"] { --bg-main: #0b0f19; --card-bg: rgba(15, 20, 34, 0.92); --card-border: rgba(168, 85, 247, 0.15); --accent-primary: #a855f7; --accent-primary-hover: #9333ea; --accent-primary-text: #ffffff; --accent-glow: rgba(168, 85, 247, 0.35); }
+        body[data-theme="sunset"] { --bg-main: #1a100c; --card-bg: rgba(34, 20, 15, 0.92); --card-border: rgba(249, 115, 22, 0.15); --accent-primary: #f97316; --accent-primary-hover: #ea580c; --accent-primary-text: #020617; --accent-glow: rgba(249, 115, 22, 0.3); }
+        body[data-theme="amethyst"] { --bg-main: #120d1d; --card-bg: rgba(22, 16, 36, 0.92); --card-border: rgba(192, 132, 252, 0.15); --accent-primary: #c084fc; --accent-primary-hover: #a855f7; --accent-primary-text: #020617; --accent-glow: rgba(192, 132, 252, 0.3); }
+        body[data-theme="ocean"] { --bg-main: #0b1920; --card-bg: rgba(12, 28, 36, 0.92); --card-border: rgba(20, 184, 166, 0.15); --accent-primary: #14b8a6; --accent-primary-hover: #0d9488; --accent-primary-text: #020617; --accent-glow: rgba(20, 184, 166, 0.3); }
+        body[data-theme="crimson"] { --bg-main: #1a0c0e; --card-bg: rgba(34, 14, 17, 0.92); --card-border: rgba(239, 68, 68, 0.15); --accent-primary: #ef4444; --accent-primary-hover: #dc2626; --accent-primary-text: #ffffff; --accent-glow: rgba(239, 68, 68, 0.35); }
+        body[data-theme="matcha"] { --bg-main: #121813; --card-bg: rgba(20, 28, 22, 0.92); --card-border: rgba(132, 204, 22, 0.15); --accent-primary: #84cc16; --accent-primary-hover: #65a30d; --accent-primary-text: #020617; --accent-glow: rgba(132, 204, 22, 0.3); }
+        body[data-theme="monochrome"] { --bg-main: #121212; --card-bg: rgba(24, 24, 24, 0.92); --card-border: rgba(255, 255, 255, 0.1); --accent-primary: #e2e8f0; --accent-primary-hover: #cbd5e1; --accent-primary-text: #0f172a; --accent-glow: rgba(226, 232, 240, 0.25); }
 
         body[data-cursor="gold"] { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><polygon points='3,3 21,11 13,13 11,21' fill='%23f59e0b' stroke='%23020617' stroke-width='1.5'/></svg>"), auto; }
         body[data-cursor="sparkle"] { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M12,2 L14.5,9.5 L22,12 L14.5,14.5 L12,22 L9.5,14.5 L2,12 L9.5,9.5 Z' fill='%2338bdf8' stroke='%23020617' stroke-width='1.5'/></svg>"), auto; }
@@ -40,17 +40,14 @@
         button, input, select { touch-action: manipulation; }
 
         .card { 
-            background: rgba(15, 23, 42, 0.92); 
+            background: var(--card-bg); 
             border: 1px solid var(--card-border); 
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             transition: box-shadow 0.25s, border-color 0.3s, transform 0.2s;
             will-change: transform;
             transform: translateZ(0);
         }
-        .card:hover {
-            box-shadow: 0 12px 36px -8px var(--accent-glow);
-            border-color: rgba(255, 255, 255, 0.18);
-        }
+        .card:hover { box-shadow: 0 12px 36px -8px var(--accent-glow); border-color: rgba(255, 255, 255, 0.18); }
 
         .tab-btn { color: #94a3b8; background-color: transparent; border: 1px solid transparent; transition: all 0.2s; }
         .tab-btn:hover { color: #f8fafc; background-color: rgba(30, 41, 59, 0.7); }
@@ -67,13 +64,8 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .power-bar-fill {
-            background: linear-gradient(90deg, #38bdf8 0%, #10b981 50%, #f59e0b 80%, #a855f7 100%);
-            box-shadow: 0 0 14px var(--accent-glow);
-            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .badge-card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--card-border); transition: all 0.25s ease-out; }
+        .power-bar-fill { background: linear-gradient(90deg, #38bdf8 0%, #10b981 50%, #f59e0b 80%, #a855f7 100%); box-shadow: 0 0 14px var(--accent-glow); transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .badge-card { background: var(--card-bg); border: 1px solid var(--card-border); transition: all 0.25s ease-out; }
         .badge-card:hover:not(.locked) { transform: translateY(-2px); }
         .badge-card.locked { opacity: 0.35; filter: grayscale(0.9); border-color: rgba(255, 255, 255, 0.05) !important; }
         .badge-tier-bronze { border-color: #d97706 !important; box-shadow: 0 0 12px rgba(217, 119, 6, 0.2); }
@@ -82,9 +74,8 @@
         .badge-tier-titan { border-color: #10b981 !important; box-shadow: 0 0 18px rgba(16, 185, 129, 0.4); }
         .badge-tier-aureum { border-color: #a855f7 !important; box-shadow: 0 0 22px rgba(168, 85, 247, 0.5); background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(88, 28, 135, 0.25) 100%); }
         
-        /* BOTTOM-LEFT TOAST ANCHOR CONTAINER */
         #badge-toast-container { position: fixed; bottom: 1.5rem; left: 1.5rem; z-index: 100; display: flex; flex-direction: column; gap: 0.75rem; pointer-events: none; }
-        .badge-toast { pointer-events: auto; animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; transition: opacity 0.5s ease, transform 0.5s ease; }
+        .badge-toast { pointer-events: auto; animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; transition: opacity 0.5s ease, transform 0.5s ease; will-change: transform, opacity; }
         .badge-toast.toast-hiding { opacity: 0 !important; transform: translateY(20px) scale(0.9) !important; }
         @keyframes toastSlideIn { from { opacity: 0; transform: translateY(25px) scale(0.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
     </style>
@@ -211,9 +202,9 @@
                     <div class="max-w-xs">
                         <label class="block text-xs text-slate-400 mb-2 font-medium">Time Spent (Hours)</label>
                         <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
-                            <button type="button" onmousedown="startHoldStep('work-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('work-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
+                            <button type="button" onmousedown="startHold('value', 'work-time', -1, 0.25, 0.25)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'work-time', -1, 0.25, 0.25, event)" ontouchend="stopHold()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
                             <input type="number" id="work-time" step="0.25" min="0.25" value="1.00" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                            <button type="button" onmousedown="startHoldStep('work-time', 1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('work-time', 1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
+                            <button type="button" onmousedown="startHold('value', 'work-time', 1, 0.25, 0.25)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'work-time', 1, 0.25, 0.25, event)" ontouchend="stopHold()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
                         </div>
                     </div>
 
@@ -221,7 +212,7 @@
                         <div>
                             <label class="block text-xs text-slate-400 mb-2 font-medium">Work Quality</label>
                             <div class="flex items-center bg-slate-900/90 rounded-2xl border border-slate-800 p-1.5">
-                                <button type="button" onmousedown="startHoldStepRating('results', -1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepRating('results', -1)" ontouchend="stopHoldStep()" class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold select-none">◀</button>
+                                <button type="button" onmousedown="startHold('rating', 'results', -1)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('rating', 'results', -1, null, null, event)" ontouchend="stopHold()" class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold select-none">◀</button>
                                 <div id="selector-box-results" class="flex-1 px-4 py-2 text-center">
                                     <div class="flex items-center justify-center gap-2 mb-0.5">
                                         <span id="q-icon" class="text-2xl">🎯</span>
@@ -230,14 +221,14 @@
                                     <div id="q-title" class="text-sm font-bold text-slate-100">Solid Output</div>
                                     <div id="q-desc" class="text-[11px] text-slate-400 mt-0.5">Standard steady progress</div>
                                 </div>
-                                <button type="button" onmousedown="startHoldStepRating('results', 1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepRating('results', 1)" ontouchend="stopHoldStep()" class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold select-none">▶</button>
+                                <button type="button" onmousedown="startHold('rating', 'results', 1)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('rating', 'results', 1, null, null, event)" ontouchend="stopHold()" class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold select-none">▶</button>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs text-slate-400 mb-2 font-medium">Work Effort</label>
                             <div class="flex items-center bg-slate-900/90 rounded-2xl border border-slate-800 p-1.5">
-                                <button type="button" onmousedown="startHoldStepRating('effort', -1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepRating('effort', -1)" ontouchend="stopHoldStep()" class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold select-none">◀</button>
+                                <button type="button" onmousedown="startHold('rating', 'effort', -1)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('rating', 'effort', -1, null, null, event)" ontouchend="stopHold()" class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold select-none">◀</button>
                                 <div id="selector-box-effort" class="flex-1 px-4 py-2 text-center">
                                     <div class="flex items-center justify-center gap-2 mb-0.5">
                                         <span id="e-icon" class="text-2xl">🔥</span>
@@ -246,7 +237,7 @@
                                     <div id="e-title" class="text-sm font-bold text-slate-100">Moderate Strain</div>
                                     <div id="e-desc" class="text-[11px] text-slate-400 mt-0.5">Standard focus effort</div>
                                 </div>
-                                <button type="button" onmousedown="startHoldStepRating('effort', 1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepRating('effort', 1)" ontouchend="stopHoldStep()" class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold select-none">▶</button>
+                                <button type="button" onmousedown="startHold('rating', 'effort', 1)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('rating', 'effort', 1, null, null, event)" ontouchend="stopHold()" class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold select-none">▶</button>
                             </div>
                         </div>
                     </div>
@@ -346,21 +337,19 @@
                     <form onsubmit="logWorkout(event)" class="relative h-[196px] mt-2">
                         <input type="hidden" id="workout-strain" value="3">
                         
-                        <!-- Slot 1: Time Input -->
                         <div class="absolute top-0 left-0 right-0 h-[64px]">
                             <label class="block text-xs text-slate-400 mb-1 font-medium">Time Spent (Hours)</label>
                             <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden h-[40px]">
-                                <button type="button" onmousedown="startHoldStep('workout-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('workout-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
+                                <button type="button" onmousedown="startHold('value', 'workout-time', -1, 0.25, 0.25)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'workout-time', -1, 0.25, 0.25, event)" ontouchend="stopHold()" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="workout-time" step="0.25" min="0.25" value="0.75" required class="w-full text-center bg-transparent text-xs text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                <button type="button" onmousedown="startHoldStep('workout-time', 1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('workout-time', 1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
+                                <button type="button" onmousedown="startHold('value', 'workout-time', 1, 0.25, 0.25)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'workout-time', 1, 0.25, 0.25, event)" ontouchend="stopHold()" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
                             </div>
                         </div>
 
-                        <!-- Slot 2: Level Stepper -->
                         <div class="absolute top-[76px] left-0 right-0 h-[64px]">
                             <label class="block text-xs text-slate-400 mb-1 font-medium">Effort & Intensity</label>
                             <div class="flex items-center bg-slate-900/90 rounded-xl border border-slate-700 p-1 h-[40px]">
-                                <button type="button" onmousedown="startHoldStepWorkoutStrain(-1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(-1)" ontouchend="stopHoldStep()" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none flex items-center justify-center">◀</button>
+                                <button type="button" onmousedown="startHold('strain', 'workout-strain', -1)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('strain', 'workout-strain', -1, null, null, event)" ontouchend="stopHold()" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none flex items-center justify-center">◀</button>
                                 <div id="selector-box-workout" class="flex-1 text-center">
                                     <span class="text-xs font-semibold text-slate-100 flex items-center justify-center gap-1.5">
                                         <span id="w-icon">🔥</span>
@@ -369,11 +358,10 @@
                                         <span id="w-title">Moderate Effort</span>
                                     </span>
                                 </div>
-                                <button type="button" onmousedown="startHoldStepWorkoutStrain(1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(1)" ontouchend="stopHoldStep()" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none flex items-center justify-center">▶</button>
+                                <button type="button" onmousedown="startHold('strain', 'workout-strain', 1)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('strain', 'workout-strain', 1, null, null, event)" ontouchend="stopHold()" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none flex items-center justify-center">▶</button>
                             </div>
                         </div>
 
-                        <!-- Slot 3: Save Button -->
                         <button type="submit" class="absolute top-[152px] left-0 right-0 h-[44px] theme-accent-bg font-bold rounded-xl text-xs transition-all shadow-md">Save Workout</button>
                     </form>
                 </div>
@@ -385,23 +373,20 @@
                         <p class="text-xs text-slate-400 mt-0.5">Log household tasks & cleaning.</p>
                     </div>
                     <form onsubmit="logChore(event)" class="relative h-[196px] mt-2">
-                        <!-- Slot 1: Time Input -->
                         <div class="absolute top-0 left-0 right-0 h-[64px]">
                             <label class="block text-xs text-slate-400 mb-1 font-medium">Time Spent (Hours)</label>
                             <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden h-[40px]">
-                                <button type="button" onmousedown="startHoldStep('chore-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('chore-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
+                                <button type="button" onmousedown="startHold('value', 'chore-time', -1, 0.25, 0.25)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'chore-time', -1, 0.25, 0.25, event)" ontouchend="stopHold()" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="chore-time" step="0.25" min="0.25" value="0.50" required class="w-full text-center bg-transparent text-xs text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                <button type="button" onmousedown="startHoldStep('chore-time', 1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('chore-time', 1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
+                                <button type="button" onmousedown="startHold('value', 'chore-time', 1, 0.25, 0.25)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'chore-time', 1, 0.25, 0.25, event)" ontouchend="stopHold()" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
                             </div>
                         </div>
 
-                        <!-- Slot 2: Task Note Input -->
                         <div class="absolute top-[76px] left-0 right-0 h-[64px]">
                             <label class="block text-xs text-slate-400 mb-1 font-medium">Task Details</label>
                             <input type="text" id="chore-note" placeholder="e.g. Laundry, dishes, vacuuming..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 h-[40px] text-xs text-white focus:outline-none">
                         </div>
 
-                        <!-- Slot 3: Save Button -->
                         <button type="submit" class="absolute top-[152px] left-0 right-0 h-[44px] bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs transition-all shadow-md">Save Chore</button>
                     </form>
                 </div>
@@ -413,7 +398,6 @@
                         <p class="text-xs text-slate-400 mt-0.5">Track sweet treats & refreshments.</p>
                     </div>
                     <form onsubmit="logHealth(event)" class="relative h-[196px] mt-2">
-                        <!-- Slot 1: Portion Select -->
                         <div class="absolute top-0 left-0 right-0 h-[64px]">
                             <label class="block text-xs text-slate-400 mb-1 font-medium">Portion Size</label>
                             <select id="health-level" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 h-[40px] text-xs text-white focus:outline-none">
@@ -423,13 +407,11 @@
                             </select>
                         </div>
 
-                        <!-- Slot 2: Dessert Note Input -->
                         <div class="absolute top-[76px] left-0 right-0 h-[64px]">
                             <label class="block text-xs text-slate-400 mb-1 font-medium">Snack / Dessert Name</label>
                             <input type="text" id="health-note" placeholder="e.g. Ice cream, matcha, boba..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 h-[40px] text-xs text-white focus:outline-none">
                         </div>
 
-                        <!-- Slot 3: Save Button -->
                         <button type="submit" class="absolute top-[152px] left-0 right-0 h-[44px] bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition-all shadow-md">Save Snack</button>
                     </form>
                 </div>
@@ -457,7 +439,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- TAB 4: FORGE SETTINGS -->
         <div id="tab-forge" class="hidden space-y-6">
             <form onsubmit="saveAllForgeSettings(event)" class="space-y-6 max-w-2xl">
@@ -537,36 +519,36 @@
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Target Monthly Cash Allowance (฿)</label>
                             <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
-                                <button type="button" onmousedown="startHoldStep('setting-monthly-cash', -1, 500, 1000)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-monthly-cash', -1, 500, 1000)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-monthly-cash', -1, 500, 1000)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-monthly-cash', -1, 500, 1000, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-monthly-cash" min="1000" step="500" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                <button type="button" onmousedown="startHoldStep('setting-monthly-cash', 1, 500, 1000)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-monthly-cash', 1, 500, 1000)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-monthly-cash', 1, 500, 1000)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-monthly-cash', 1, 500, 1000, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Target Weekly Work Hours</label>
                             <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
-                                <button type="button" onmousedown="startHoldStep('setting-weekly-hrs', -1, 1, 1, 80)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-weekly-hrs', -1, 1, 1, 80)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-weekly-hrs', -1, 1, 1, 80)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-weekly-hrs', -1, 1, 1, 80, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-weekly-hrs" min="1" max="80" step="1" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                <button type="button" onmousedown="startHoldStep('setting-weekly-hrs', 1, 1, 1, 80)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-weekly-hrs', 1, 1, 1, 80)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-weekly-hrs', 1, 1, 1, 80)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-weekly-hrs', 1, 1, 1, 80, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Daily Work Soft Cap (Hours)</label>
                             <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
-                                <button type="button" onmousedown="startHoldStep('setting-daily-soft-cap', -1, 0.5, 1, 16)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-daily-soft-cap', -1, 0.5, 1, 16)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-daily-soft-cap', -1, 0.5, 1, 16)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-daily-soft-cap', -1, 0.5, 1, 16, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-daily-soft-cap" min="1" max="16" step="0.5" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                <button type="button" onmousedown="startHoldStep('setting-daily-soft-cap', 1, 0.5, 1, 16)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-daily-soft-cap', 1, 0.5, 1, 16)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-daily-soft-cap', 1, 0.5, 1, 16)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-daily-soft-cap', 1, 0.5, 1, 16, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Max Bonus Cap (%)</label>
                             <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
-                                <button type="button" onmousedown="startHoldStep('setting-bonus-cap', -1, 5, 100, 300)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-bonus-cap', -1, 5, 100, 300)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-bonus-cap', -1, 5, 100, 300)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-bonus-cap', -1, 5, 100, 300, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-bonus-cap" min="100" max="300" step="5" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                <button type="button" onmousedown="startHoldStep('setting-bonus-cap', 1, 5, 100, 300)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-bonus-cap', 1, 5, 100, 300)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-bonus-cap', 1, 5, 100, 300)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-bonus-cap', 1, 5, 100, 300, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
                             </div>
                         </div>
                     </div>
@@ -579,36 +561,36 @@
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Focus Duration (Minutes)</label>
                             <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
-                                <button type="button" onmousedown="startHoldStep('setting-pomo-focus', -1, 1, 1, 180)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-focus', -1, 1, 1, 180)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-pomo-focus', -1, 1, 1, 180)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-pomo-focus', -1, 1, 1, 180, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-pomo-focus" min="1" max="180" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                <button type="button" onmousedown="startHoldStep('setting-pomo-focus', 1, 1, 1, 180)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-focus', 1, 1, 1, 180)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-pomo-focus', 1, 1, 1, 180)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-pomo-focus', 1, 1, 1, 180, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Short Break (Minutes)</label>
                             <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
-                                <button type="button" onmousedown="startHoldStep('setting-pomo-short', -1, 1, 1, 60)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-short', -1, 1, 1, 60)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-pomo-short', -1, 1, 1, 60)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-pomo-short', -1, 1, 1, 60, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-pomo-short" min="1" max="60" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                <button type="button" onmousedown="startHoldStep('setting-pomo-short', 1, 1, 1, 60)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-short', 1, 1, 1, 60)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-pomo-short', 1, 1, 1, 60)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-pomo-short', 1, 1, 1, 60, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Long Break (Minutes)</label>
                             <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
-                                <button type="button" onmousedown="startHoldStep('setting-pomo-long', -1, 1, 1, 120)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-long', -1, 1, 1, 120)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-pomo-long', -1, 1, 1, 120)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-pomo-long', -1, 1, 1, 120, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-pomo-long" min="1" max="120" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                <button type="button" onmousedown="startHoldStep('setting-pomo-long', 1, 1, 1, 120)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-long', 1, 1, 1, 120)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-pomo-long', 1, 1, 1, 120)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-pomo-long', 1, 1, 1, 120, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Rounds Before Long Break</label>
                             <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
-                                <button type="button" onmousedown="startHoldStep('setting-pomo-rounds', -1, 1, 1, 12)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-rounds', -1, 1, 1, 12)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-pomo-rounds', -1, 1, 1, 12)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-pomo-rounds', -1, 1, 1, 12, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-pomo-rounds" min="1" max="12" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                <button type="button" onmousedown="startHoldStep('setting-pomo-rounds', 1, 1, 1, 12)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('setting-pomo-rounds', 1, 1, 1, 12)" ontouchend="stopHoldStep()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
+                                <button type="button" onmousedown="startHold('value', 'setting-pomo-rounds', 1, 1, 1, 12)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-pomo-rounds', 1, 1, 1, 12, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
                             </div>
                         </div>
                     </div>
@@ -695,7 +677,7 @@
                     </div>
                     <div class="flex items-center gap-3 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-700/80">
                         <span class="text-xs text-slate-400 font-medium">Unlocked:</span>
-                        <span id="badge-completion-count" class="text-sm font-black theme-accent-text">0 / 23</span>
+                        <span id="badge-completion-count" class="text-sm font-black theme-accent-text">0 / 24</span>
                     </div>
                 </div>
 
@@ -752,11 +734,10 @@
             ]
         };
 
-        // 1. CANVAS FX ENGINE (IDLE-OPTIMIZED FOR CHROME)
+        // 1. CANVAS FX ENGINE (IDLE-OPTIMIZED)
         const canvas = document.getElementById('fx-canvas');
         const ctx = canvas.getContext('2d');
-        let particles = [];
-        let isFxAnimating = false;
+        let particles = [], isFxAnimating = false;
 
         function resizeFxCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeFxCanvas);
@@ -775,19 +756,11 @@
                     alpha: 1, decay: Math.random() * 0.03 + 0.02
                 });
             }
-            // Only trigger the animation loop if it's not already running
-            if (!isFxAnimating) {
-                isFxAnimating = true;
-                animateParticles();
-            }
+            if (!isFxAnimating) { isFxAnimating = true; animateParticles(); }
         }
 
         function animateParticles() {
-            if (particles.length === 0) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                isFxAnimating = false;
-                return; // Stop the requestAnimationFrame loop when idle
-            }
+            if (particles.length === 0) { ctx.clearRect(0, 0, canvas.width, canvas.height); isFxAnimating = false; return; }
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             for (let i = particles.length - 1; i >= 0; i--) {
                 const p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.alpha -= p.decay;
@@ -797,7 +770,7 @@
             requestAnimationFrame(animateParticles);
         }
 
-        // 2. MYTHIC RELICS CATALOG & ISOLATED SPECTATOR BADGE ENGINE
+        // 2. MYTHIC RELICS CATALOG & BADGE ENGINE
         const BADGE_CATALOG = [
             { id: 'work_1', tier: 'bronze', icon: '🌱', title: "Spark of Endeavor", desc: 'Log your very first work session.' },
             { id: 'work_cap', tier: 'silver', icon: '🍵', title: 'Crucible Mastered', desc: 'Reach daily Soft Cap (4.0h) in a single day.' },
@@ -862,15 +835,9 @@
             setTimeout(() => { toast.classList.add('toast-hiding'); setTimeout(() => toast.remove(), 500); }, duration);
         }
 
-        // STRICT LOGGED-IN ISOLATION & DYNAMIC RE-INDEXING FOR BADGES
         function evaluateBadges(logs, pRoundsList = [], targetUser = viewedUser) {
             if (!logs) return;
-            
-            // SPECTATOR GUARD: If spectating, render ONLY the spectated user's saved badges from Firestore without local evaluation
-            if (loggedInUser !== viewedUser) {
-                renderBadgeGrid(new Set(spectatorSettings?.unlockedBadges || []));
-                return;
-            }
+            if (loggedInUser !== viewedUser) { renderBadgeGrid(new Set(spectatorSettings?.unlockedBadges || [])); return; }
 
             userSettings.unlockedBadges = userSettings.unlockedBadges || [];
             const unlockedSet = new Set(userSettings.unlockedBadges), newlyUnlocked = [];
@@ -883,6 +850,14 @@
                 const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
                 workHoursByDay[key] = (workHoursByDay[key] || 0) + (l.hours || 0);
             });
+
+            const unlock = (id) => {
+                if (!unlockedSet.has(id)) {
+                    unlockedSet.add(id); newlyUnlocked.push(id);
+                    const b = BADGE_CATALOG.find(x => x.id === id);
+                    if (b) showToast({ title: '🏺 Relic Unlocked!', subtitle: `<strong>${b.title}</strong> — ${b.desc}`, icon: b.icon, tier: b.tier, duration: 4500 });
+                }
+            };
 
             if (workLogs.length >= 1) unlock('work_1');
             if (Object.values(workHoursByDay).some(dailyHrs => dailyHrs >= (userSettings.dailySoftCap || 4))) unlock('work_cap');
@@ -918,14 +893,6 @@
             let cleanStreak = 0;
             pRoundsList.forEach(p => { if (!p.wasPaused) { cleanStreak++; if (cleanStreak >= 4) unlock('pomo_zen'); } else { cleanStreak = 0; } });
 
-            function unlock(id) {
-                if (!unlockedSet.has(id)) {
-                    unlockedSet.add(id); newlyUnlocked.push(id);
-                    const b = BADGE_CATALOG.find(x => x.id === id);
-                    if (b) showToast({ title: '🏺 Relic Unlocked!', subtitle: `<strong>${b.title}</strong> — ${b.desc}`, icon: b.icon, tier: b.tier, duration: 4500 });
-                }
-            }
-
             if (newlyUnlocked.length > 0) {
                 userSettings.unlockedBadges = Array.from(unlockedSet);
                 renderBadgeGrid(unlockedSet);
@@ -933,7 +900,7 @@
             } else { renderBadgeGrid(unlockedSet); }
         }
 
-        // 3. AUDIO FEEDBACK
+        // 3. AUDIO & STEPPER UTILITIES
         function playTone(type) {
             if (audioMuted) return;
             try {
@@ -953,20 +920,28 @@
         function triggerDesktopNotification(t, b) { if ("Notification" in window && Notification.permission === "granted") new Notification(t, { body: b, icon: "https://fav.farm/✨" }); }
         function toggleAudioMute() { audioMuted = !audioMuted; document.getElementById('audio-toggle-btn').innerText = audioMuted ? "🔇" : "🔊"; }
 
-        function stepValue(id, delta, step, min, max) {
-            const el = document.getElementById(id); if (!el) return;
-            let val = (parseFloat(el.value) || 0) + (delta * step);
-            if (min !== undefined) val = Math.max(min, val);
-            if (max !== undefined) val = Math.min(max, val);
-            el.value = step < 1 ? val.toFixed(2) : Math.round(val);
-        }
-
-        function startHoldStep(id, delta, step, min, max, e) {
+        function startHold(mode, fieldOrId, delta, step = 1, min = 1, max = 5, e) {
             const evt = e || window.event; if (evt && evt.type === 'touchstart' && evt.cancelable) evt.preventDefault();
-            stopHoldStep(); stepValue(id, delta, step, min, max);
-            holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepValue(id, delta, step, min, max), 80); }, 300);
+            stopHold();
+            const action = () => {
+                if (mode === 'value') {
+                    const el = document.getElementById(fieldOrId); if (!el) return;
+                    let val = (parseFloat(el.value) || 0) + (delta * step);
+                    if (min !== undefined) val = Math.max(min, val);
+                    if (max !== undefined) val = Math.min(max, val);
+                    el.value = step < 1 ? val.toFixed(2) : Math.round(val);
+                } else if (mode === 'rating') {
+                    const input = document.getElementById(`work-${fieldOrId}`);
+                    input.value = Math.max(1, Math.min(5, (parseInt(input.value) || 3) + delta)); updateRatingUI(fieldOrId);
+                } else if (mode === 'strain') {
+                    const input = document.getElementById('workout-strain');
+                    input.value = Math.max(1, Math.min(5, (parseInt(input.value) || 3) + delta)); updateWorkoutStrainUI();
+                }
+            };
+            action();
+            holdTimeout = setTimeout(() => { holdInterval = setInterval(action, mode === 'value' ? 80 : 120); }, 300);
         }
-        function stopHoldStep() { clearTimeout(holdTimeout); clearInterval(holdInterval); holdTimeout = null; holdInterval = null; }
+        function stopHold() { clearTimeout(holdTimeout); clearInterval(holdInterval); holdTimeout = null; holdInterval = null; }
 
         function updateRatingUI(field) {
             const input = document.getElementById(`work-${field}`); if (!input) return;
@@ -976,15 +951,6 @@
             document.getElementById(`${p}-title`).innerText = d.title;
             document.getElementById(`${p}-desc`).innerText = d.desc;
         }
-        function stepRating(field, delta) {
-            const input = document.getElementById(`work-${field}`);
-            input.value = Math.max(1, Math.min(5, (parseInt(input.value) || 3) + delta)); updateRatingUI(field);
-        }
-        function startHoldStepRating(field, delta, e) {
-            const evt = e || window.event; if (evt && evt.type === 'touchstart' && evt.cancelable) evt.preventDefault();
-            stopHoldStep(); stepRating(field, delta);
-            holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepRating(field, delta), 120); }, 300);
-        }
 
         function updateWorkoutStrainUI() {
             const input = document.getElementById('workout-strain'); if (!input) return;
@@ -992,15 +958,6 @@
             document.getElementById('w-icon').innerText = d.icon;
             document.getElementById('w-badge').innerText = `LVL ${d.level}`;
             document.getElementById('w-title').innerText = d.title;
-        }
-        function stepWorkoutStrain(delta) {
-            const input = document.getElementById('workout-strain');
-            input.value = Math.max(1, Math.min(5, (parseInt(input.value) || 3) + delta)); updateWorkoutStrainUI();
-        }
-        function startHoldStepWorkoutStrain(delta, e) {
-            const evt = e || window.event; if (evt && evt.type === 'touchstart' && evt.cancelable) evt.preventDefault();
-            stopHoldStep(); stepWorkoutStrain(delta);
-            holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepWorkoutStrain(delta), 120); }, 300);
         }
 
         function applyThemeToBody(t) { document.body.setAttribute('data-theme', t || 'gold'); }
@@ -1121,7 +1078,7 @@
                 const dots = document.getElementById('pomo-round-dots');
                 if (dots.children.length !== totR) { dots.innerHTML = ''; for (let i = 0; i < totR; i++) dots.appendChild(document.createElement('div')); }
                 Array.from(dots.children).forEach((d, i) => d.className = i < round ? "w-2.5 h-2.5 rounded-full theme-accent-bg" : "w-2.5 h-2.5 rounded-full bg-slate-700");
-            }, 100);
+            }, 250);
         }
 
         function attachPomoSpectatorListener() {
@@ -1136,7 +1093,6 @@
                 pomoSyncUnsubscribe = db.collection('settings').doc(viewedUser).onSnapshot(doc => {
                     if (doc.exists) {
                         spectatorSettings = doc.data();
-                        // Keep local user's theme active while spectating
                         applyThemeToBody(userSettings.userTheme);
                         applyCursorToBody(userSettings.userCursor);
                         renderBadgeGrid(new Set(spectatorSettings.unlockedBadges || []));
@@ -1151,6 +1107,9 @@
                         }
                     }
                 });
+            } else {
+                applyThemeToBody(userSettings.userTheme);
+                applyCursorToBody(userSettings.userCursor);
             }
         }
 
@@ -1261,9 +1220,8 @@
                         userSettings = { ...userSettings, ...data };
                         applyThemeToBody(userSettings.userTheme);
                         applyCursorToBody(userSettings.userCursor);
-                   } else {
+                    } else {
                         spectatorSettings = data;
-                        // Keep local user's theme active while spectating
                         applyThemeToBody(userSettings.userTheme);
                         applyCursorToBody(userSettings.userCursor);
                     }
@@ -1293,30 +1251,16 @@
 
         function applyDynamicAvatarGlow(el, hours) {
             const softCap = userSettings.dailySoftCap || 4;
-            if (hours <= 0) {
-                el.style.boxShadow = "0 0 0 2px rgba(100, 116, 139, 0.4)";
-                el.style.opacity = "0.6";
-                return;
-            }
+            if (hours <= 0) { el.style.boxShadow = "0 0 0 2px rgba(100, 116, 139, 0.4)"; el.style.opacity = "0.6"; return; }
             el.style.opacity = "1";
-
             if (hours < 2.0) {
-                const p = hours / 2.0;
-                const r = Math.round(59 * p), g = Math.round(130 * p + 100 * (1 - p)), b = 246;
-                const blur = Math.round(8 + p * 10);
-                el.style.boxShadow = `0 0 ${blur}px ${Math.round(2 + p * 3)}px rgba(${r}, ${g}, ${b}, ${0.5 + p * 0.35})`;
-                el.style.borderColor = `rgba(${r}, ${g}, ${b}, 0.8)`;
+                const p = hours / 2.0, r = Math.round(59 * p), g = Math.round(130 * p + 100 * (1 - p)), b = 246, blur = Math.round(8 + p * 10);
+                el.style.boxShadow = `0 0 ${blur}px ${Math.round(2 + p * 3)}px rgba(${r}, ${g}, ${b}, ${0.5 + p * 0.35})`; el.style.borderColor = `rgba(${r}, ${g}, ${b}, 0.8)`;
             } else if (hours < softCap) {
-                const p = (hours - 2.0) / (softCap - 2.0);
-                const r = Math.round(16 + (245 - 16) * p);
-                const g = Math.round(185 + (158 - 185) * p);
-                const b = Math.round(129 + (11 - 129) * p);
-                const blur = Math.round(18 + p * 6);
-                el.style.boxShadow = `0 0 ${blur}px ${Math.round(4 + p * 2)}px rgba(${r}, ${g}, ${b}, ${0.75 + p * 0.2})`;
-                el.style.borderColor = `rgba(${r}, ${g}, ${b}, 0.9)`;
+                const p = (hours - 2.0) / (softCap - 2.0), r = Math.round(16 + (245 - 16) * p), g = Math.round(185 + (158 - 185) * p), b = Math.round(129 + (11 - 129) * p), blur = Math.round(18 + p * 6);
+                el.style.boxShadow = `0 0 ${blur}px ${Math.round(4 + p * 2)}px rgba(${r}, ${g}, ${b}, ${0.75 + p * 0.2})`; el.style.borderColor = `rgba(${r}, ${g}, ${b}, 0.9)`;
             } else {
-                el.style.boxShadow = "0 0 24px 6px rgba(245, 158, 11, 0.95)";
-                el.style.borderColor = "rgba(245, 158, 11, 1)";
+                el.style.boxShadow = "0 0 24px 6px rgba(245, 158, 11, 0.95)"; el.style.borderColor = "rgba(245, 158, 11, 1)";
             }
         }
 
@@ -1618,11 +1562,9 @@
         function renderSegmentedBar(val, max = 5, activeColor = '#10b981') {
             let bars = '';
             for (let i = 1; i <= max; i++) {
-                if (i <= val) {
-                    bars += `<span class="inline-block w-2.5 h-1.5 rounded-sm mr-0.5" style="background-color: ${activeColor};"></span>`;
-                } else {
-                    bars += `<span class="inline-block w-2.5 h-1.5 rounded-sm mr-0.5 bg-slate-800 border border-slate-700/60"></span>`;
-                }
+                bars += i <= val 
+                    ? `<span class="inline-block w-2.5 h-1.5 rounded-sm mr-0.5" style="background-color: ${activeColor};"></span>`
+                    : `<span class="inline-block w-2.5 h-1.5 rounded-sm mr-0.5 bg-slate-800 border border-slate-700/60"></span>`;
             }
             return bars;
         }
