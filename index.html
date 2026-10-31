@@ -102,6 +102,38 @@
             pointer-events: none; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7);
         }
         .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+
+        .avatar-btn {
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .avatar-btn:hover {
+            transform: scale(1.08);
+        }
+        .avatar-btn .avatar-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            top: 115%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #020617;
+            color: #f8fafc;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid #475569;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            z-index: 20;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .avatar-btn:hover .avatar-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
         
         .logo-gold {
             color: var(--accent-primary);
@@ -152,11 +184,21 @@
                 <p class="text-xs text-slate-400 tracking-wide mt-0.5">Autonomous Living & Creative Ledger</p>
             </div>
             
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-3 bg-slate-800/80 p-1.5 rounded-lg border border-slate-700">
-                    <button id="user-btn-north" onclick="switchActiveUser('North')" class="px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white">North</button>
-                    <button id="user-btn-cream" onclick="switchActiveUser('Cream')" class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all">Cream</button>
+            <div class="flex items-center gap-5">
+                <!-- Avatar Profile Selector -->
+                <div class="flex items-center gap-3 bg-slate-900/90 p-1.5 px-3 rounded-full border border-slate-700/80 shadow-lg">
+                    <!-- North Avatar -->
+                    <button id="user-btn-north" onclick="switchActiveUser('North')" class="avatar-btn rounded-full p-0.5 transition-all">
+                        <img id="avatar-img-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-transparent">
+                        <span class="avatar-tooltip" id="avatar-tip-north">North (You)</span>
+                    </button>
+                    <!-- Cream Avatar -->
+                    <button id="user-btn-cream" onclick="switchActiveUser('Cream')" class="avatar-btn rounded-full p-0.5 transition-all">
+                        <img id="avatar-img-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-transparent">
+                        <span class="avatar-tooltip" id="avatar-tip-cream">Cream</span>
+                    </button>
                 </div>
+
                 <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-sm text-slate-400 hover:text-white px-2.5 py-1.5 bg-slate-800/80 rounded-lg border border-slate-700 transition-all">🔊</button>
                 <button onclick="handleLogout()" class="text-xs text-slate-500 hover:text-slate-300 underline">Sign Out</button>
             </div>
@@ -457,28 +499,55 @@
         <!-- TAB 5: FORGE -->
         <div id="tab-forge" class="hidden space-y-6">
             
-            <!-- Aesthetic Profile Theme Selection Section -->
+            <!-- Aesthetic Profile Theme & Avatar Selection Section -->
             <div class="card p-6 rounded-xl max-w-2xl">
-                <h2 class="text-lg font-semibold mb-2 text-slate-200">Visual Theme & Aesthetics</h2>
-                <p class="text-xs text-slate-400 mb-4">Select your personal color palette. Automatically syncs and switches when spectating profiles.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Theme Palette</label>
-                        <select id="setting-user-theme" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
-                            <option value="gold">Aureum Gold (Classic Amber)</option>
-                            <option value="rose">Rose Quartz (Soft Magenta & Pink)</option>
-                            <option value="emerald">Emerald Grove (Mint & Forest)</option>
-                            <option value="cyber">Midnight Cyber (Neon Violet & Cyan)</option>
-                            <option value="sunset">Sunset Terracotta (Warm Peach)</option>
-                            <option value="amethyst">Amethyst Dusk (Lavender & Purple)</option>
-                            <option value="ocean">Ocean Abyss (Deep Sea Teal)</option>
-                            <option value="crimson">Crimson Forge (Ruby Flame)</option>
-                            <option value="matcha">Matcha Latte (Sage & Cream)</option>
-                            <option value="monochrome">Monochrome Slate (Silver Minimal)</option>
-                        </select>
+                <h2 class="text-lg font-semibold mb-2 text-slate-200">Visual Theme & Avatar Customization</h2>
+                <p class="text-xs text-slate-400 mb-6">Select your personal color palette and header profile avatar image.</p>
+                
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Theme Palette</label>
+                            <select id="setting-user-theme" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                                <option value="gold">Aureum Gold (Classic Amber)</option>
+                                <option value="rose">Rose Quartz (Soft Magenta & Pink)</option>
+                                <option value="emerald">Emerald Grove (Mint & Forest)</option>
+                                <option value="cyber">Midnight Cyber (Neon Violet & Cyan)</option>
+                                <option value="sunset">Sunset Terracotta (Warm Peach)</option>
+                                <option value="amethyst">Amethyst Dusk (Lavender & Purple)</option>
+                                <option value="ocean">Ocean Abyss (Deep Sea Teal)</option>
+                                <option value="crimson">Crimson Forge (Ruby Flame)</option>
+                                <option value="matcha">Matcha Latte (Sage & Cream)</option>
+                                <option value="monochrome">Monochrome Slate (Silver Minimal)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Avatar Image URL</label>
+                            <input type="text" id="setting-avatar-url" placeholder="https://..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                        </div>
                     </div>
-                    <div class="flex items-end">
-                        <button onclick="saveThemeSetting()" class="w-full theme-accent-bg font-semibold p-2.5 rounded-lg text-sm transition-all">Apply & Save Theme</button>
+
+                    <!-- Preset Avatar Quick Select -->
+                    <div>
+                        <span class="block text-xs text-slate-400 mb-2">Or choose a preset style:</span>
+                        <div class="flex gap-3">
+                            <button onclick="setAvatarPreset('bottts', 'North')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-500 transition-all">
+                                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=North" class="w-8 h-8 rounded-full">
+                            </button>
+                            <button onclick="setAvatarPreset('bottts', 'Cream')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-500 transition-all">
+                                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" class="w-8 h-8 rounded-full">
+                            </button>
+                            <button onclick="setAvatarPreset('thumbs', 'Celestial')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-500 transition-all">
+                                <img src="https://api.dicebear.com/7.x/thumbs/svg?seed=Celestial" class="w-8 h-8 rounded-full">
+                            </button>
+                            <button onclick="setAvatarPreset('identicon', 'Aureum')" class="p-1 rounded-lg border border-slate-700 bg-slate-900 hover:border-amber-500 transition-all">
+                                <img src="https://api.dicebear.com/7.x/identicon/svg?seed=Aureum" class="w-8 h-8 rounded-full">
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button onclick="saveThemeAndAvatarSetting()" class="w-full theme-accent-bg font-semibold p-2.5 rounded-lg text-sm transition-all">Save Aesthetics & Avatar</button>
                     </div>
                 </div>
             </div>
@@ -648,6 +717,7 @@
         
         let pomoUIRenderInterval = null;
         let pomoSyncUnsubscribe = null;
+        let settingsUnsubscribe = null;
         let spectatorSettings = null;
 
         let shadowSpectatorTime = 1500;
@@ -664,6 +734,7 @@
             pomoLong: 15,
             pomoRounds: 4,
             userTheme: 'gold',
+            avatarUrl: '',
             vaultedMonths: {}
         };
 
@@ -1126,7 +1197,7 @@
                 }
                 
                 viewedUser = loggedInUser;
-                await loadSettingsFromCloud();
+                initRealtimeSettingsListener();
                 await initAndRecoverMyPomoState();
                 
                 updateUserSwitcherUI();
@@ -1145,18 +1216,48 @@
             document.body.setAttribute('data-theme', themeKey || 'gold');
         }
 
-        async function loadSettingsFromCloud() {
-            try {
-                const docRef = db.collection('settings').doc(viewedUser);
-                const docSnap = await docRef.get();
-                if (docSnap.exists) {
-                    userSettings = { ...userSettings, ...docSnap.data() };
+        // REALTIME SETTINGS LISTENER (Realtime Chart Vault Updates Across Spectator Sessions)
+        function initRealtimeSettingsListener() {
+            if (settingsUnsubscribe) settingsUnsubscribe();
+
+            settingsUnsubscribe = db.collection('settings').doc(viewedUser).onSnapshot(doc => {
+                if (doc.exists) {
+                    userSettings = { ...userSettings, ...doc.data() };
                 }
-            } catch (err) {
-                console.error("Error loading cloud settings:", err);
+                applyThemeToBody(userSettings.userTheme);
+                updateSettingsUI();
+                updateAvatarsInHeader();
+                if (currentRawLogsCache.length > 0) {
+                    loadUserData();
+                }
+            });
+        }
+
+        function updateAvatarsInHeader() {
+            const northImg = document.getElementById('avatar-img-north');
+            const creamImg = document.getElementById('avatar-img-cream');
+
+            if (viewedUser === 'North') {
+                if (userSettings.avatarUrl) northImg.src = userSettings.avatarUrl;
+            } else if (viewedUser === 'Cream') {
+                if (userSettings.avatarUrl) creamImg.src = userSettings.avatarUrl;
             }
-            applyThemeToBody(userSettings.userTheme);
-            updateSettingsUI();
+
+            const northBtnImg = document.getElementById('avatar-img-north');
+            const creamBtnImg = document.getElementById('avatar-img-cream');
+
+            if (viewedUser === 'North') {
+                northBtnImg.className = "w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.5)]";
+                creamBtnImg.className = "w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-transparent opacity-60 hover:opacity-100";
+            } else {
+                creamBtnImg.className = "w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.5)]";
+                northBtnImg.className = "w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-transparent opacity-60 hover:opacity-100";
+            }
+        }
+
+        function setAvatarPreset(style, seed) {
+            const url = `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}`;
+            document.getElementById('setting-avatar-url').value = url;
         }
 
         function updateSettingsUI() {
@@ -1176,18 +1277,25 @@
             document.getElementById('setting-pomo-rounds').value = userSettings.pomoRounds || 4;
 
             document.getElementById('setting-user-theme').value = userSettings.userTheme || 'gold';
+            document.getElementById('setting-avatar-url').value = userSettings.avatarUrl || '';
         }
 
-        async function saveThemeSetting() {
+        async function saveThemeAndAvatarSetting() {
             const selectedTheme = document.getElementById('setting-user-theme').value;
+            const avatarUrl = document.getElementById('setting-avatar-url').value.trim();
+            
             userSettings.userTheme = selectedTheme;
+            userSettings.avatarUrl = avatarUrl;
             applyThemeToBody(selectedTheme);
             
             try {
-                await db.collection('settings').doc(loggedInUser).set({ userTheme: selectedTheme }, { merge: true });
+                await db.collection('settings').doc(loggedInUser).set({
+                    userTheme: selectedTheme,
+                    avatarUrl: avatarUrl
+                }, { merge: true });
                 playTone('save');
             } catch (err) {
-                console.error('Failed to save theme setting.');
+                console.error('Failed to save aesthetics and avatar settings.');
             }
         }
 
@@ -1246,22 +1354,13 @@
 
         async function switchActiveUser(targetUser) {
             viewedUser = targetUser;
-            await loadSettingsFromCloud();
+            initRealtimeSettingsListener();
             updateUserSwitcherUI();
             attachPomoSpectatorListener();
             loadUserData();
         }
 
         function updateUserSwitcherUI() {
-            const northBtn = document.getElementById('user-btn-north');
-            const creamBtn = document.getElementById('user-btn-cream');
-            
-            northBtn.innerText = loggedInUser === 'North' ? "North (You)" : "North";
-            creamBtn.innerText = loggedInUser === 'Cream' ? "Cream (You)" : "Cream";
-
-            northBtn.className = viewedUser === 'North' ? "px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white" : "px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all";
-            creamBtn.className = viewedUser === 'Cream' ? "px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white" : "px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all";
-
             const isSelf = loggedInUser === viewedUser;
             
             document.getElementById('work-form-card').style.display = isSelf ? 'block' : 'none';
@@ -1288,6 +1387,8 @@
             } else {
                 banner.classList.add('hidden');
             }
+
+            updateAvatarsInHeader();
         }
 
         function switchTab(tab) {
@@ -1384,7 +1485,7 @@
             }
         }
 
-        // INITIALIZE CHARTS WITH FULL VAULT TOGGLE CONTROL FOR VIEWED PROFILE
+        // INITIALIZE CHARTS WITH REALTIME VAULT TOGGLES
         function initCharts() {
             const chartOptions = {
                 responsive: true,
@@ -1426,7 +1527,6 @@
                                     vaultedMonths: userSettings.vaultedMonths
                                 }, { merge: true });
                                 playTone('save');
-                                loadUserData();
                             } catch (err) {
                                 console.error("Error saving vaulted status:", err);
                             }
@@ -1622,7 +1722,7 @@
               });
         }
 
-        // DYNAMIC LEDGER MONTH SELECTOR & FILTER
+        // DYNAMIC LEDGER MONTH SELECTOR & AUTO CURRENT-MONTH DEFAULT
         function populateAndFilterLedger() {
             const select = document.getElementById('ledger-month-select');
             if (!select) return;
@@ -1661,6 +1761,7 @@
             optionsHtml += `<option value="all">All Time Records</option>`;
             select.innerHTML = optionsHtml;
 
+            // Auto-default to current month unless explicitly filtered to another option
             if (Array.from(select.options).some(opt => opt.value === previousValue)) {
                 select.value = previousValue;
             } else {
@@ -1854,7 +1955,7 @@
                     const monthKey = `${now.getFullYear()}-${i}`;
                     const isVaulted = userSettings.vaultedMonths && userSettings.vaultedMonths[monthKey];
                     if (isVaulted) {
-                        bgColors.push('#f59e0b'); // Distinct Gold/Amber bar for VAULTED / Paid months
+                        bgColors.push('#f59e0b'); // Distinct Gold bar for VAULTED / Paid months
                     } else {
                         bgColors.push(workChartMetric === 'cash' ? '#10b981' : '#3b82f6');
                     }
