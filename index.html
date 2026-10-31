@@ -589,6 +589,25 @@
 
     <!-- APPLICATION SCRIPT ENGINE -->
     <script>
+        // GLOBAL MOBILE TOUCH DEDUPING
+        let lastTouchEndTime = 0;
+        window.addEventListener('touchstart', (e) => {
+            const btn = e.target.closest('button');
+            if (btn) {
+                lastTouchEndTime = Date.now();
+            }
+        }, true);
+
+        // Intercept simulated mouse events generated shortly after a touch event
+        ['mousedown', 'click'].forEach(evtType => {
+            window.addEventListener(evtType, (e) => {
+                if (Date.now() - lastTouchEndTime < 500) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }, true);
+        });
+
         // 1. CONFIG & INIT
         const firebaseConfig = {
             apiKey: "AIzaSyAJ7cVPRiJfiShTKFi___pJ9VZHEcLM47Q",
@@ -697,12 +716,10 @@
             if (!logs) return;
             userSettings.unlockedBadges = userSettings.unlockedBadges || [];
             const unlockedSet = new Set(userSettings.unlockedBadges), newlyUnlocked = [];
-            
-            // 1. Work Stats (Evaluates both single-entry and cumulative daily totals)
+
             const workLogs = logs.filter(l => l.type === 'work');
             const totalWorkHours = workLogs.reduce((acc, l) => acc + (l.hours || 0), 0);
             
-            // Group work hours by calendar date
             const workHoursByDay = {};
             workLogs.forEach(l => {
                 if (!l.timestamp) return;
@@ -710,12 +727,12 @@
                 const dateKey = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
                 workHoursByDay[dateKey] = (workHoursByDay[dateKey] || 0) + (l.hours || 0);
             });
-            
+
             const softCapTarget = userSettings.dailySoftCap || 4;
             const hitSoftCap = Object.values(workHoursByDay).some(dailyHrs => dailyHrs >= softCapTarget);
-            
+
             if (workLogs.length >= 1) unlock('work_1');
-            if (hitSoftCap) unlock('work_cap'); // Unlocks if cumulative daily hours >= Soft Cap
+            if (hitSoftCap) unlock('work_cap');
             if (totalWorkHours >= 100) unlock('work_100');
             if (totalWorkHours >= 1000) unlock('work_1000');
             if (totalWorkHours >= 10000) unlock('work_10000');
@@ -822,13 +839,9 @@
             if (max !== undefined) val = Math.min(max, val);
             el.value = step < 1 ? val.toFixed(2) : Math.round(val);
         }
-        function startHoldStep(id, delta, step, min, max, e) {
-            if (e && e.type === 'touchstart') e.preventDefault(); // Prevents simulated mouse event
-            stopHoldStep(); 
-            stepValue(id, delta, step, min, max);
-            holdTimeout = setTimeout(() => { 
-                holdInterval = setInterval(() => stepValue(id, delta, step, min, max), 80); 
-            }, 300);
+        function startHoldStep(id, delta, step, min, max) {
+            stopHoldStep(); stepValue(id, delta, step, min, max);
+            holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepValue(id, delta, step, min, max), 80); }, 300);
         }
         function stopHoldStep() { clearTimeout(holdTimeout); clearInterval(holdInterval); holdTimeout = null; holdInterval = null; }
 
@@ -845,13 +858,9 @@
             input.value = Math.max(1, Math.min(5, (parseInt(input.value) || 3) + delta));
             updateRatingUI(field);
         }
-        function startHoldStepRating(field, delta, e) {
-            if (e && e.type === 'touchstart') e.preventDefault(); // Prevents simulated mouse event
-            stopHoldStep(); 
-            stepRating(field, delta);
-            holdTimeout = setTimeout(() => { 
-                holdInterval = setInterval(() => stepRating(field, delta), 120); 
-            }, 300);
+        function startHoldStepRating(field, delta) {
+            stopHoldStep(); stepRating(field, delta);
+            holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepRating(field, delta), 120); }, 300);
         }
 
         function applyThemeToBody(t) { document.body.setAttribute('data-theme', t || 'gold'); }
@@ -1327,13 +1336,6 @@
             render('ledger-list-chore', c, 'No chore logs.', l => `<div class="flex justify-between font-medium"><span class="theme-accent-text font-bold">${l.hours} hrs</span><span class="text-slate-300 italic truncate max-w-[100px]">${l.note || 'No details'}</span></div>`);
             render('ledger-list-diary', d, 'No reflections.', l => `<div class="text-slate-200 italic leading-snug break-words">"${l.text}"</div>`);
         }
-    document.addEventListener('touchstart', (e) => {
-        const btn = e.target.closest('button');
-        if (btn && btn.getAttribute('onmousedown')) {
-            e.preventDefault();
-            btn.dispatchEvent(new Event('mousedown'));
-        }
-    }, { passive: false });    
     </script>
 </body>
 </html>
