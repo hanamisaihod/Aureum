@@ -40,13 +40,10 @@
         button, input, select { touch-action: manipulation; }
 
         .card { 
-            background: var(--card-bg); 
-            backdrop-filter: blur(14px); 
-            -webkit-backdrop-filter: blur(14px);
+            background: rgba(15, 23, 42, 0.92); 
             border: 1px solid var(--card-border); 
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             transition: box-shadow 0.25s, border-color 0.3s, transform 0.2s;
-            /* Force GPU layer promotion to prevent Chrome blur redraw lag */
             will-change: transform;
             transform: translateZ(0);
         }
@@ -1139,8 +1136,9 @@
                 pomoSyncUnsubscribe = db.collection('settings').doc(viewedUser).onSnapshot(doc => {
                     if (doc.exists) {
                         spectatorSettings = doc.data();
-                        if (spectatorSettings.userTheme) applyThemeToBody(spectatorSettings.userTheme);
-                        if (spectatorSettings.userCursor) applyCursorToBody(spectatorSettings.userCursor);
+                        // Keep local user's theme active while spectating
+                        applyThemeToBody(userSettings.userTheme);
+                        applyCursorToBody(userSettings.userCursor);
                         renderBadgeGrid(new Set(spectatorSettings.unlockedBadges || []));
                         const live = spectatorSettings.livePomoState;
                         if (live) {
@@ -1263,10 +1261,11 @@
                         userSettings = { ...userSettings, ...data };
                         applyThemeToBody(userSettings.userTheme);
                         applyCursorToBody(userSettings.userCursor);
-                    } else {
+                   } else {
                         spectatorSettings = data;
-                        if (spectatorSettings.userTheme) applyThemeToBody(spectatorSettings.userTheme);
-                        if (spectatorSettings.userCursor) applyCursorToBody(spectatorSettings.userCursor);
+                        // Keep local user's theme active while spectating
+                        applyThemeToBody(userSettings.userTheme);
+                        applyCursorToBody(userSettings.userCursor);
                     }
                 }
                 updateSettingsUI(); updateAvatarsInHeader();
