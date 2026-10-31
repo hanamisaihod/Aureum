@@ -103,9 +103,7 @@
         }
         .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
 
-        .avatar-btn {
-            position: relative; transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+        .avatar-btn { position: relative; transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .avatar-btn:hover { transform: scale(1.08); }
         .avatar-btn .avatar-tooltip {
             visibility: hidden; opacity: 0; position: absolute; top: 115%; left: 50%; transform: translateX(-50%);
@@ -119,20 +117,23 @@
             color: var(--accent-primary); letter-spacing: 0.25em; text-shadow: 0 0 12px var(--accent-glow); transition: color 0.3s ease;
         }
 
-        /* Minimal Tactile Rating Pills */
-        .rating-pill {
-            transition: all 0.15s ease-in-out;
+        /* Icon Tier Cards with Descriptions */
+        .tier-card {
+            transition: all 0.2s ease-in-out;
             border: 1px solid #334155;
             background-color: #0f172a;
-            color: #94a3b8;
         }
-        .rating-pill:hover { border-color: #64748b; color: #f8fafc; }
-        .rating-pill.active {
-            background-color: var(--accent-primary) !important;
-            color: var(--accent-primary-text) !important;
+        .tier-card:hover {
+            border-color: #64748b;
+            transform: translateY(-1px);
+        }
+        .tier-card.active {
+            background-color: rgba(245, 158, 11, 0.12) !important;
             border-color: var(--accent-primary) !important;
-            font-weight: 700;
-            box-shadow: 0 0 10px var(--accent-glow);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+        .tier-card.active .tier-icon {
+            transform: scale(1.15);
         }
 
         /* Ring Gauge Circle */
@@ -254,67 +255,172 @@
                 </div>
             </div>
 
-            <!-- Streamlined Work Log Form -->
-            <div id="work-form-card" class="card p-6 rounded-xl">
-                <h2 class="text-lg font-semibold mb-3 text-slate-200">Log Work Session</h2>
+            <!-- Enhanced Work Log Form with Icon Tier Cards & Side Steppers -->
+            <div id="work-form-card" class="card p-6 rounded-xl space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-lg font-semibold text-slate-200">Log Work Session</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Record completed focus hours, output quality, and strain.</p>
+                    </div>
+                </div>
                 
-                <div id="work-form-softcap-notice" class="hidden mb-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
+                <div id="work-form-softcap-notice" class="hidden p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
                     <span>🍵</span>
                     <span><strong>Soft Cap Active:</strong> You've reached your target hours for today! Time logged past the cap generates points at 25% yield to protect rest and prevent burnout.</span>
                 </div>
 
-                <form id="work-form" onsubmit="logWork(event)" class="space-y-4">
+                <form id="work-form" onsubmit="logWork(event)" class="space-y-6">
                     <input type="hidden" id="work-results" value="3">
                     <input type="hidden" id="work-effort" value="3">
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                        
-                        <!-- Hours Input -->
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-2 font-medium">
-                                Hours Spent
-                                <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
-                                    <span class="tooltip-text">
-                                        <strong>Duration:</strong> Total clock hours dedicated to work (e.g. 1.5 = 1 hr 30 mins).
-                                    </span>
+                    <!-- Duration Input with Side Steppers -->
+                    <div class="max-w-xs">
+                        <label class="block text-xs text-slate-400 mb-2 font-medium">
+                            Hours Spent
+                            <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
+                                <span class="tooltip-text">
+                                    <strong>Duration:</strong> Total clock hours dedicated to deep work (e.g. 1.50 = 1 hr 30 mins).
                                 </span>
-                            </label>
-                            <input type="number" id="work-time" step="0.25" min="0.25" value="1.0" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white font-mono font-semibold focus:outline-none focus:border-amber-500">
-                        </div>
+                            </span>
+                        </label>
 
-                        <!-- Output Quality -->
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <label class="text-xs text-slate-400 font-medium">Output Quality</label>
-                                <span id="label-results-text" class="text-xs theme-accent-text font-semibold">3 (Solid)</span>
-                            </div>
-                            <div class="grid grid-cols-5 gap-1.5" id="pills-results-container">
-                                <button type="button" onclick="selectRating('results', 1)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">1</button>
-                                <button type="button" onclick="selectRating('results', 2)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">2</button>
-                                <button type="button" onclick="selectRating('results', 3)" class="rating-pill active py-2.5 rounded-lg text-xs font-semibold">3</button>
-                                <button type="button" onclick="selectRating('results', 4)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">4</button>
-                                <button type="button" onclick="selectRating('results', 5)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">5</button>
-                            </div>
-                        </div>
-
-                        <!-- Effort & Friction -->
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <label class="text-xs text-slate-400 font-medium">Effort & Friction</label>
-                                <span id="label-effort-text" class="text-xs theme-accent-text font-semibold">3 (Moderate)</span>
-                            </div>
-                            <div class="grid grid-cols-5 gap-1.5" id="pills-effort-container">
-                                <button type="button" onclick="selectRating('effort', 1)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">1</button>
-                                <button type="button" onclick="selectRating('effort', 2)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">2</button>
-                                <button type="button" onclick="selectRating('effort', 3)" class="rating-pill active py-2.5 rounded-lg text-xs font-semibold">3</button>
-                                <button type="button" onclick="selectRating('effort', 4)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">4</button>
-                                <button type="button" onclick="selectRating('effort', 5)" class="rating-pill py-2.5 rounded-lg text-xs font-semibold">5</button>
-                            </div>
+                        <div class="flex items-center">
+                            <button type="button" onclick="adjustHours('work-time', -0.25)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-l-lg text-sm font-bold transition-all border-r-0">-</button>
+                            <input type="number" id="work-time" step="0.25" min="0.25" value="1.00" required class="w-full text-center bg-slate-900 border border-slate-700 p-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                            <button type="button" onclick="adjustHours('work-time', 0.25)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-r-lg text-sm font-bold transition-all border-l-0">+</button>
                         </div>
                     </div>
 
-                    <div class="flex justify-end pt-1">
-                        <button type="submit" class="w-full md:w-auto px-8 bg-blue-600 hover:bg-blue-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all shadow-md">Save Work Session</button>
+                    <!-- Output Quality Icon Tier Cards -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-xs text-slate-400 font-medium">Output Quality</label>
+                            <span id="label-results-text" class="text-xs theme-accent-text font-bold">3 — Solid (On-target baseline)</span>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5" id="pills-results-container">
+                            <button type="button" onclick="selectRating('results', 1)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="tier-icon text-lg transition-transform">⚡</span>
+                                    <span class="text-[10px] font-bold text-slate-400">LVL 1</span>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block">Minimal</span>
+                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Warmup or light prep</span>
+                                </div>
+                            </button>
+
+                            <button type="button" onclick="selectRating('results', 2)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="tier-icon text-lg transition-transform">🌱</span>
+                                    <span class="text-[10px] font-bold text-slate-400">LVL 2</span>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block">Fair</span>
+                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Modest progress made</span>
+                                </div>
+                            </button>
+
+                            <button type="button" onclick="selectRating('results', 3)" class="tier-card active p-3 rounded-xl text-left flex flex-col justify-between">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="tier-icon text-lg transition-transform">🎯</span>
+                                    <span class="text-[10px] font-bold text-slate-400">LVL 3</span>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block">Solid</span>
+                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">On-target standard pace</span>
+                                </div>
+                            </button>
+
+                            <button type="button" onclick="selectRating('results', 4)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="tier-icon text-lg transition-transform">✨</span>
+                                    <span class="text-[10px] font-bold text-slate-400">LVL 4</span>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block">High Craft</span>
+                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Exceptional output speed</span>
+                                </div>
+                            </button>
+
+                            <button type="button" onclick="selectRating('results', 5)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="tier-icon text-lg transition-transform">👑</span>
+                                    <span class="text-[10px] font-bold text-slate-400">LVL 5</span>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block">Peak Flow</span>
+                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Flawless breakthrough</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Effort & Friction Icon Tier Cards -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-xs text-slate-400 font-medium">Effort & Friction</label>
+                            <span id="label-effort-text" class="text-xs theme-accent-text font-bold">3 — Moderate (Standard focus effort)</span>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5" id="pills-effort-container">
+                            <button type="button" onclick="selectRating('effort', 1)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="tier-icon text-lg transition-transform">🍃</span>
+                                    <span class="text-[10px] font-bold text-slate-400">LVL 1</span>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block">Effortless</span>
+                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Zero resistance or strain</span>
+                                </div>
+                            </button>
+
+                            <button type="button" onclick="selectRating('effort', 2)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="tier-icon text-lg transition-transform">☁️</span>
+                                    <span class="text-[10px] font-bold text-slate-400">LVL 2</span>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block">Light</span>
+                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Mild focus required</span>
+                                </div>
+                            </button>
+
+                            <button type="button" onclick="selectRating('effort', 3)" class="tier-card active p-3 rounded-xl text-left flex flex-col justify-between">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="tier-icon text-lg transition-transform">🔥</span>
+                                    <span class="text-[10px] font-bold text-slate-400">LVL 3</span>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block">Moderate</span>
+                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Standard focus effort</span>
+                                </div>
+                            </button>
+
+                            <button type="button" onclick="selectRating('effort', 4)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="tier-icon text-lg transition-transform">⛰️</span>
+                                    <span class="text-[10px] font-bold text-slate-400">LVL 4</span>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block">Heavy</span>
+                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Overcame strong fatigue</span>
+                                </div>
+                            </button>
+
+                            <button type="button" onclick="selectRating('effort', 5)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="tier-icon text-lg transition-transform">🌋</span>
+                                    <span class="text-[10px] font-bold text-slate-400">LVL 5</span>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block">Max Willpower</span>
+                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Intense willpower push</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-2">
+                        <button type="submit" class="w-full md:w-auto px-8 bg-blue-600 hover:bg-blue-500 text-white font-semibold p-2.5 rounded-xl text-sm transition-all shadow-md">Save Work Session</button>
                     </div>
                 </form>
             </div>
@@ -461,17 +567,24 @@
                 <h2 class="text-lg font-semibold mb-1 text-slate-200">Log House Chores</h2>
                 <p class="text-xs text-slate-400 mb-4">Keeping the sanctuary glowing. Tracks your household hustle without messing with your cash.</p>
                 <form onsubmit="logChore(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    
+                    <!-- Chore Duration with Side Steppers -->
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">
+                        <label class="block text-xs text-slate-400 mb-2 font-medium">
                             Time Spent (Hours)
                             <span class="tooltip-container ml-1 theme-accent-text font-bold cursor-pointer">[?]
-                                <span class="tooltip-text">Total clock hours spent on household tasks (e.g. 0.5 = 30 minutes).</span>
+                                <span class="tooltip-text">Total clock hours spent on household tasks (e.g. 0.50 = 30 minutes).</span>
                             </span>
                         </label>
-                        <input type="number" id="chore-time" step="0.25" min="0.25" placeholder="0.5" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <div class="flex items-center">
+                            <button type="button" onclick="adjustHours('chore-time', -0.25)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-l-lg text-sm font-bold transition-all border-r-0">-</button>
+                            <input type="number" id="chore-time" step="0.25" min="0.25" value="0.50" required class="w-full text-center bg-slate-900 border border-slate-700 p-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                            <button type="button" onclick="adjustHours('chore-time', 0.25)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-r-lg text-sm font-bold transition-all border-l-0">+</button>
+                        </div>
                     </div>
+
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Chore Details</label>
+                        <label class="block text-xs text-slate-400 mb-2 font-medium">Chore Details</label>
                         <input type="text" id="chore-note" placeholder="e.g. Laundry, vacuuming, dishes..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div class="flex items-end">
@@ -786,13 +899,20 @@
             document.getElementById('audio-toggle-btn').innerText = audioMuted ? "🔇" : "🔊";
         }
 
-        // --- TACTILE RATING PILL CONTROLS ---
+        // --- DURATION STEPPERS & ICON TIER SELECTION ---
+
+        function adjustHours(inputId, delta) {
+            const input = document.getElementById(inputId);
+            let val = parseFloat(input.value) || 0.5;
+            val = Math.max(0.25, val + delta);
+            input.value = val.toFixed(2);
+        }
 
         function selectRating(field, val) {
             document.getElementById(`work-${field}`).value = val;
             
             const container = document.getElementById(`pills-${field}-container`);
-            const buttons = container.querySelectorAll('.rating-pill');
+            const buttons = container.querySelectorAll('.tier-card');
             buttons.forEach((btn, idx) => {
                 if (idx + 1 === val) {
                     btn.classList.add('active');
@@ -802,8 +922,20 @@
             });
 
             const labels = {
-                results: ['1 (Minimal)', '2 (Fair)', '3 (Solid)', '4 (High)', '5 (Exceptional)'],
-                effort: ['1 (Effortless)', '2 (Light)', '3 (Moderate)', '4 (Heavy)', '5 (Maximum)']
+                results: [
+                    '1 — Minimal (Warmup or light prep)',
+                    '2 — Fair (Modest progress made)',
+                    '3 — Solid (On-target standard pace)',
+                    '4 — High Craft (Exceptional output speed)',
+                    '5 — Peak Flow (Flawless breakthrough)'
+                ],
+                effort: [
+                    '1 — Effortless (Zero resistance or strain)',
+                    '2 — Light (Mild focus required)',
+                    '3 — Moderate (Standard focus effort)',
+                    '4 — Heavy (Overcame strong fatigue)',
+                    '5 — Max Willpower (Intense willpower push)'
+                ]
             };
             document.getElementById(`label-${field}-text`).innerText = labels[field][val - 1];
         }
@@ -1497,7 +1629,6 @@
             });
 
             playTone('save');
-            document.getElementById('chore-time').value = '';
             document.getElementById('chore-note').value = '';
             loadUserData();
         }
