@@ -333,7 +333,7 @@
             </div>
         </div>
 
-        <!-- TAB 3: SANCTUARY (INNER CONTAINER HEIGHT NORMALIZED) -->
+        <!-- TAB 3: SANCTUARY (COMPACT SINGLE-LINE STEPPER FOR PERFECT Y-ALIGNMENT) -->
         <div id="tab-sanctuary" class="hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                 <!-- 🏃 Fitness Card -->
@@ -355,18 +355,19 @@
                                 </div>
                             </div>
 
-                            <div class="h-[80px] flex flex-col justify-center">
+                            <div class="h-[68px] flex flex-col justify-center">
                                 <label class="block text-xs text-slate-400 mb-1 font-medium">Effort & Intensity</label>
-                                <div class="flex items-center bg-slate-900/90 rounded-xl border border-slate-800 p-1">
-                                    <button type="button" onmousedown="startHoldStepWorkoutStrain(-1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(-1)" ontouchend="stopHoldStep()" class="px-2.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none">◀</button>
-                                    <div id="selector-box-workout" class="flex-1 px-2 text-center">
-                                        <div class="flex items-center justify-center gap-1.5">
-                                            <span id="w-icon" class="text-lg">🔥</span>
-                                            <span id="w-badge" class="text-[10px] font-bold theme-accent-text uppercase">LVL 3</span>
-                                        </div>
-                                        <div id="w-title" class="text-[11px] font-bold text-slate-100">Moderate Effort</div>
+                                <div class="flex items-center bg-slate-900/90 rounded-xl border border-slate-700 p-1">
+                                    <button type="button" onmousedown="startHoldStepWorkoutStrain(-1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(-1)" ontouchend="stopHoldStep()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none">◀</button>
+                                    <div id="selector-box-workout" class="flex-1 text-center py-0.5">
+                                        <span class="text-xs font-semibold text-slate-100 flex items-center justify-center gap-1.5">
+                                            <span id="w-icon">🔥</span>
+                                            <span id="w-badge" class="theme-accent-text font-bold">LVL 3</span>
+                                            <span class="text-slate-500">·</span>
+                                            <span id="w-title">Moderate Effort</span>
+                                        </span>
                                     </div>
-                                    <button type="button" onmousedown="startHoldStepWorkoutStrain(1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(1)" ontouchend="stopHoldStep()" class="px-2.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none">▶</button>
+                                    <button type="button" onmousedown="startHoldStepWorkoutStrain(1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(1)" ontouchend="stopHoldStep()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none">▶</button>
                                 </div>
                             </div>
                         </div>
@@ -392,7 +393,7 @@
                                 </div>
                             </div>
 
-                            <div class="h-[80px] flex flex-col justify-center">
+                            <div class="h-[68px] flex flex-col justify-center">
                                 <label class="block text-xs text-slate-400 mb-1 font-medium">Task Details</label>
                                 <input type="text" id="chore-note" placeholder="e.g. Laundry, dishes, vacuuming..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none">
                             </div>
@@ -419,7 +420,7 @@
                                 </select>
                             </div>
 
-                            <div class="h-[80px] flex flex-col justify-center">
+                            <div class="h-[68px] flex flex-col justify-center">
                                 <label class="block text-xs text-slate-400 mb-1 font-medium">Snack / Dessert Name</label>
                                 <input type="text" id="health-note" placeholder="e.g. Ice cream, matcha, boba..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none">
                             </div>
@@ -847,13 +848,13 @@
             setTimeout(() => { toast.classList.add('toast-hiding'); setTimeout(() => toast.remove(), 500); }, duration);
         }
 
-        // STRICT LOGGED-IN ISOLATION FOR BADGES (PREVENTS SPECTATOR LEAKAGE)
+        // STRICT LOGGED-IN ISOLATION & DYNAMIC RE-INDEXING FOR BADGES
         function evaluateBadges(logs, pRoundsList = [], targetUser = viewedUser) {
             if (!logs) return;
             
-            // SPECTATOR GUARD: If spectating, render ONLY the spectated user's saved badges without evaluating local logs
+            // SPECTATOR GUARD: If spectating, render ONLY the spectated user's saved badges from Firestore without local evaluation
             if (loggedInUser !== viewedUser) {
-                renderBadgeGrid(new Set(userSettings.unlockedBadges || []));
+                renderBadgeGrid(new Set(spectatorSettings?.unlockedBadges || []));
                 return;
             }
 
@@ -1123,6 +1124,7 @@
                         spectatorSettings = doc.data();
                         if (spectatorSettings.userTheme) applyThemeToBody(spectatorSettings.userTheme);
                         if (spectatorSettings.userCursor) applyCursorToBody(spectatorSettings.userCursor);
+                        renderBadgeGrid(new Set(spectatorSettings.unlockedBadges || []));
                         const live = spectatorSettings.livePomoState;
                         if (live) {
                             shadowSpectatorIsRunning = !!live.isRunning;
@@ -1238,9 +1240,18 @@
         function initRealtimeSettingsListener() {
             if (settingsUnsubscribe) settingsUnsubscribe();
             settingsUnsubscribe = db.collection('settings').doc(viewedUser).onSnapshot(doc => {
-                if (doc.exists) userSettings = { ...userSettings, ...doc.data() };
-                applyThemeToBody(userSettings.userTheme);
-                applyCursorToBody(userSettings.userCursor);
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (loggedInUser === viewedUser) {
+                        userSettings = { ...userSettings, ...data };
+                        applyThemeToBody(userSettings.userTheme);
+                        applyCursorToBody(userSettings.userCursor);
+                    } else {
+                        spectatorSettings = data;
+                        if (spectatorSettings.userTheme) applyThemeToBody(spectatorSettings.userTheme);
+                        if (spectatorSettings.userCursor) applyCursorToBody(spectatorSettings.userCursor);
+                    }
+                }
                 updateSettingsUI(); updateAvatarsInHeader();
                 if (currentRawLogsCache.length > 0) loadUserData();
             });
@@ -1339,7 +1350,14 @@
         }
         function handleLogout() { auth.signOut(); }
 
-        function switchActiveUser(target) { viewedUser = target; initRealtimeSettingsListener(); updateUserSwitcherUI(); attachPomoSpectatorListener(); loadUserData(); }
+        function switchActiveUser(target) { 
+            viewedUser = target; 
+            initRealtimeSettingsListener(); 
+            updateUserSwitcherUI(); 
+            attachPomoSpectatorListener(); 
+            loadUserData(); 
+        }
+        
         function updateUserSwitcherUI() {
             const isSelf = loggedInUser === viewedUser;
             ['work-form-card', 'diary-form-card', 'health-form-card', 'chore-form-card', 'workout-form-card'].forEach(id => {
@@ -1581,7 +1599,6 @@
             renderLedgerLists(logs);
         }
 
-        // CONCEPT 2: SEGMENTED POWER MICRO-BARS GENERATOR
         function renderSegmentedBar(val, max = 5, activeColor = '#10b981') {
             let bars = '';
             for (let i = 1; i <= max; i++) {
@@ -1640,7 +1657,7 @@
                                     ${eBars}
                                 </span>
                             </div>
-                            ${isOverCap ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">🍵 Soft Cap</span>' : '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">⚡ 100% Rate</span>'}
+                            ${isOverCap ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">🍵 Soft Cap</span>' : ''}
                         </div>
                     </div>
                 `;
