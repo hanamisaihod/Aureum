@@ -13,6 +13,7 @@ let spectatorSettings = null;
 let shadowSpectatorTime = 1500;
 let shadowSpectatorIsRunning = false;
 let shadowSpectatorInterval = null;
+let currentSessionWasPaused = false;
 
 // SPACEBAR SHORTCUT LISTENERS
 document.addEventListener('keydown', (e) => {
@@ -65,6 +66,17 @@ function startMyPomoBackgroundTimer() {
             
             const totalRounds = parseInt(userSettings.pomoRounds) || 4;
             if (myPomoMode === 'focus') {
+                userSettings.completedPomoHistory = userSettings.completedPomoHistory || [];
+                userSettings.completedPomoHistory.push({
+                    durationSecs: myPomoInitialTime,
+                    wasPaused: currentSessionWasPaused,
+                    timestamp: Date.now()
+                });
+            
+                // Trigger immediate badge evaluation
+                if (typeof evaluateBadges === 'function' && currentRawLogsCache) {
+                    evaluateBadges(currentRawLogsCache, userSettings.completedPomoHistory);
+                }
                 if (myPomoRound < totalRounds) {
                     triggerDesktopNotification("✨ Focus Round Complete!", `Round ${myPomoRound} finished. Take a short break!`);
                     myPomoRound++;
@@ -85,6 +97,7 @@ function startMyPomoBackgroundTimer() {
 function setMyPomoMode(mode) {
     myPomoMode = mode;
     myPomoIsRunning = false;
+    currentSessionWasPaused = false; // Reset clean flag
     if (myPomoInterval) clearInterval(myPomoInterval);
 
     const focusMins = parseInt(userSettings.pomoFocus) || 25;
@@ -110,6 +123,7 @@ function toggleMyPomoTimer() {
 
     if (myPomoIsRunning) {
         myPomoIsRunning = false;
+        currentSessionWasPaused = true; // Flips pause flag
         if (myPomoInterval) clearInterval(myPomoInterval);
         syncMyPomoToCloud();
     } else {
