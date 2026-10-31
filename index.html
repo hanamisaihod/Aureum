@@ -77,7 +77,7 @@
             100% { box-shadow: inset 0 0 100px var(--accent-glow); }
         }
 
-        /* BADGES & TOAST ANIMATIONS */
+        /* BADGES / RELICS & TOAST ANIMATIONS */
         .badge-card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--card-border); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .badge-card:hover:not(.locked) { transform: translateY(-3px) scale(1.02); }
         .badge-card.locked { opacity: 0.35; filter: grayscale(0.9); border-color: rgba(255, 255, 255, 0.05) !important; }
@@ -144,24 +144,23 @@
             </div>
         </header>
 
-        <!-- Navigation Bar -->
+        <!-- Navigation Bar (Mythic Theme Titles) -->
         <nav class="flex items-center gap-2 mb-6 p-1.5 bg-slate-900/80 rounded-2xl border border-slate-800/90 overflow-x-auto no-scrollbar">
-            <button onclick="switchTab('work')" id="nav-work" class="tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap"><span>💼</span> <span>Work Engine</span></button>
-            <button onclick="switchTab('pomo')" id="nav-pomo" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⏱️</span> <span>Pomodoro</span></button>
-            <button onclick="switchTab('health')" id="nav-health" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🍨</span> <span>Snack Log</span></button>
-            <button onclick="switchTab('chores')" id="nav-chores" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🧹</span> <span>House Chores</span></button>
+            <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap"><span>⚗️</span> <span>Crucible</span></button>
+            <button onclick="switchTab('hourglass')" id="nav-hourglass" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⏳</span> <span>Hourglass</span></button>
+            <button onclick="switchTab('sanctuary')" id="nav-sanctuary" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🌿</span> <span>Sanctuary</span></button>
             <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⚙️</span> <span>Forge</span></button>
-            <button onclick="switchTab('ledger')" id="nav-ledger" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>📜</span> <span>Ledger History</span></button>
-            <button onclick="switchTab('badges')" id="nav-badges" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🏆</span> <span>Badges</span></button>
+            <button onclick="switchTab('chronicles')" id="nav-chronicles" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>📜</span> <span>Chronicles</span></button>
+            <button onclick="switchTab('relics')" id="nav-relics" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🏺</span> <span>Relics</span></button>
         </nav>
 
         <!-- Read-Only Banner -->
         <div id="read-only-banner" class="hidden card p-3 mb-6 rounded-xl text-center text-slate-400 text-sm">
-            🔒 Viewing <strong><span id="view-target-name"></span>'s</strong> dashboard in View-Only mode. Log deletion and settings are restricted.
+            🔒 Viewing <strong><span id="view-target-name"></span>'s</strong> sanctuary in View-Only mode. Log deletion and settings are restricted.
         </div>
 
-        <!-- TAB 1: WORK ENGINE -->
-        <div id="tab-work" class="space-y-6">
+        <!-- TAB 1: CRUCIBLE (WORK ENGINE) -->
+        <div id="tab-crucible" class="space-y-6">
             <div class="card p-6 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left items-center">
                 <div id="payout-card-box">
                     <span class="text-xs uppercase tracking-wider text-slate-400 block font-medium">Allowance Earned</span>
@@ -200,8 +199,8 @@
 
             <div id="work-form-card" class="card p-6 rounded-xl space-y-6">
                 <div>
-                    <h2 class="text-lg font-semibold text-slate-200">Log Work Session</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Record completed focus hours, output quality, and strain.</p>
+                    <h2 class="text-lg font-semibold text-slate-200">Log Crucible Session</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Record completed focus hours, output quality, and strain in the furnace.</p>
                 </div>
                 
                 <div id="work-form-softcap-notice" class="hidden p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
@@ -257,14 +256,14 @@
                     </div>
 
                     <div class="flex justify-end pt-2">
-                        <button type="submit" id="work-submit-btn" class="w-full md:w-auto px-8 bg-blue-600 hover:bg-blue-500 text-white font-semibold p-2.5 rounded-xl text-sm transition-all shadow-md">Save Work Session</button>
+                        <button type="submit" id="work-submit-btn" class="w-full md:w-auto px-8 bg-blue-600 hover:bg-blue-500 text-white font-semibold p-2.5 rounded-xl text-sm transition-all shadow-md">Save Crucible Session</button>
                     </div>
                 </form>
             </div>
 
             <div id="diary-form-card" class="card p-6 rounded-xl">
                 <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-lg font-semibold text-slate-200">Daily Reflection Note</h2>
+                    <h2 class="text-lg font-semibold text-slate-200">Daily Reflection Scroll</h2>
                     <span id="diary-status-badge" class="text-xs text-slate-400">Jot down thoughts or wins</span>
                 </div>
                 <form onsubmit="saveDailyDiary(event)" class="space-y-3">
@@ -278,7 +277,7 @@
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div class="flex items-center gap-3">
-                        <h3 class="text-md font-semibold text-slate-200">Work Analytics</h3>
+                        <h3 class="text-md font-semibold text-slate-200">Crucible Analytics</h3>
                         <select id="work-chart-mode" onchange="setWorkChartMode(this.value)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-white focus:outline-none font-medium">
                             <option value="bar">📊 Bar Chart</option>
                             <option value="line">📈 Smooth Line</option>
@@ -298,11 +297,11 @@
             </div>
         </div>
 
-        <!-- TAB 2: POMODORO CLOCK -->
-        <div id="tab-pomo" class="hidden space-y-6 max-w-xl mx-auto">
+        <!-- TAB 2: HOURGLASS (POMODORO CLOCK) -->
+        <div id="tab-hourglass" class="hidden space-y-6 max-w-xl mx-auto">
             <div class="card p-8 rounded-xl text-center space-y-6 shadow-xl relative">
                 <div id="pomo-spectator-banner" class="hidden p-2.5 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 font-medium">
-                    👁️ Viewing <strong><span id="pomo-spectator-target"></span>'s</strong> Live Pomodoro Clock (View Only)
+                    👁️ Viewing <strong><span id="pomo-spectator-target"></span>'s</strong> Live Hourglass Clock (View Only)
                 </div>
 
                 <div id="pomo-mode-box" class="flex justify-center gap-2 bg-slate-900/80 p-1.5 rounded-lg border border-slate-700 text-xs w-fit mx-auto">
@@ -325,7 +324,7 @@
 
                 <div id="pomo-clock-container" onclick="handleClockClick()" class="cursor-pointer group select-none py-2 my-1 rounded-2xl transition-all hover:bg-slate-800/50">
                     <div id="pomo-timer-display" class="text-7xl font-mono font-black theme-accent-text tracking-wider group-hover:scale-105 transition-transform">25:00</div>
-                    <div id="pomo-status-label" class="text-xs text-slate-400 mt-2 uppercase tracking-widest font-semibold group-hover:text-amber-300">Click Clock or Press Spacebar</div>
+                    <div id="pomo-status-label" class="text-xs text-slate-400 mt-2 uppercase tracking-widest font-semibold group-hover:text-amber-300">Click Hourglass or Press Spacebar</div>
                 </div>
 
                 <div class="w-full bg-slate-900/80 h-2.5 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
@@ -339,88 +338,121 @@
             </div>
         </div>
 
-        <!-- TAB 3: SNACK LOG -->
-        <div id="tab-health" class="hidden space-y-6">
-            <div id="health-form-card" class="card p-6 rounded-xl">
-                <h2 class="text-lg font-semibold mb-1 text-slate-200">Log Sweet / Dessert Intake</h2>
-                <p class="text-xs text-slate-400 mb-4">A cozy spot to track sweet treats. Doesn't alter points or allowance!</p>
-                <form onsubmit="logHealth(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- TAB 3: SANCTUARY (COMBINED WORKOUTS, CHORES & DELICACIES) -->
+        <div id="tab-sanctuary" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- 🏃 Physical Conditioning (Workout) Card -->
+                <div id="workout-form-card" class="card p-6 rounded-xl space-y-4">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Snack / Dessert Size</label>
-                        <select id="health-level" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
-                            <option value="1">Level 1 (Small / Light)</option>
-                            <option value="2">Level 2 (Medium / Standard)</option>
-                            <option value="3">Level 3 (Large / Heavy)</option>
+                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>🏃</span> <span>Conditioning</span></h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Log workouts & physical conditioning.</p>
+                    </div>
+                    <form onsubmit="logWorkout(event)" class="space-y-4">
+                        <input type="hidden" id="workout-strain" value="3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Time Spent (Hours)</label>
+                            <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
+                                <button type="button" onmousedown="startHoldStep('workout-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('workout-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
+                                <input type="number" id="workout-time" step="0.25" min="0.25" value="0.75" required class="w-full text-center bg-transparent py-1.5 text-xs text-white font-mono font-bold focus:outline-none [appearance:textfield]">
+                                <button type="button" onmousedown="startHoldStep('workout-time', 1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('workout-time', 1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Strain & Intensity</label>
+                            <div class="flex items-center bg-slate-900/90 rounded-xl border border-slate-800 p-1">
+                                <button type="button" onmousedown="startHoldStepWorkoutStrain(-1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(-1)" ontouchend="stopHoldStep()" class="px-2.5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none">◀</button>
+                                <div id="selector-box-workout" class="flex-1 px-2 py-1 text-center">
+                                    <div class="flex items-center justify-center gap-1.5">
+                                        <span id="w-icon" class="text-xl">🔥</span>
+                                        <span id="w-badge" class="text-[10px] font-bold theme-accent-text uppercase">LVL 3</span>
+                                    </div>
+                                    <div id="w-title" class="text-xs font-bold text-slate-100 mt-0.5">Solid Strain</div>
+                                </div>
+                                <button type="button" onmousedown="startHoldStepWorkoutStrain(1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStepWorkoutStrain(1)" ontouchend="stopHoldStep()" class="px-2.5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none">▶</button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full theme-accent-bg font-bold p-2.5 rounded-xl text-xs transition-all shadow-md">Save Conditioning</button>
+                    </form>
+                </div>
+
+                <!-- 🧹 Keep Upkeep (Chore) Card -->
+                <div id="chore-form-card" class="card p-6 rounded-xl space-y-4">
+                    <div>
+                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>🧹</span> <span>Keep Upkeep</span></h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Log household upkeep & chores.</p>
+                    </div>
+                    <form onsubmit="logChore(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Time Spent (Hours)</label>
+                            <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
+                                <button type="button" onmousedown="startHoldStep('chore-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('chore-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
+                                <input type="number" id="chore-time" step="0.25" min="0.25" value="0.50" required class="w-full text-center bg-transparent py-1.5 text-xs text-white font-mono font-bold focus:outline-none [appearance:textfield]">
+                                <button type="button" onmousedown="startHoldStep('chore-time', 1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('chore-time', 1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Task Details</label>
+                            <input type="text" id="chore-note" placeholder="e.g. Laundry, cleaning..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none">
+                        </div>
+
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold p-2.5 rounded-xl text-xs transition-all shadow-md">Save Upkeep</button>
+                    </form>
+                </div>
+
+                <!-- 🍨 Elixirs & Delicacies (Snack) Card -->
+                <div id="health-form-card" class="card p-6 rounded-xl space-y-4">
+                    <div>
+                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>🍨</span> <span>Delicacies</span></h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Track sweet treats & refreshments.</p>
+                    </div>
+                    <form onsubmit="logHealth(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Portion Size</label>
+                            <select id="health-level" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none">
+                                <option value="1">Level 1 (Small / Light)</option>
+                                <option value="2">Level 2 (Medium / Standard)</option>
+                                <option value="3">Level 3 (Large / Heavy)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Treat Name</label>
+                            <input type="text" id="health-note" placeholder="e.g. Matcha ice cream, boba..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none">
+                        </div>
+
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-2.5 rounded-xl text-xs transition-all shadow-md">Save Treat Entry</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sanctuary Combined Analytics Chart -->
+            <div class="card p-6 rounded-xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                    <div class="flex items-center gap-3">
+                        <h3 class="text-md font-semibold text-slate-200">Sanctuary Trends</h3>
+                        <select id="sanctuary-subchart-select" onchange="setSanctuaryChartMode(this.value)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-white focus:outline-none font-medium">
+                            <option value="workout">🏃 Conditioning Hours</option>
+                            <option value="chore">🧹 Keep Upkeep Hours</option>
+                            <option value="health">🍨 Delicacies Count</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">What did you have?</label>
-                        <input type="text" id="health-note" placeholder="e.g. Matcha ice cream, boba..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
-                    </div>
-                    <div class="flex items-end">
-                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium p-2.5 rounded-lg text-sm transition-all">Save Entry</button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="card p-6 rounded-xl">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                    <h3 class="text-md font-semibold text-slate-200">Snack Trends</h3>
                     <div class="flex bg-slate-900/80 p-1 rounded-lg border border-slate-700 text-xs">
-                        <button onclick="setChartRange('health', 'daily')" id="btn-health-daily" class="px-3 py-1 rounded text-slate-400">Daily</button>
-                        <button onclick="setChartRange('health', 'weekly')" id="btn-health-weekly" class="px-3 py-1 rounded text-slate-400">Weekly</button>
-                        <button onclick="setChartRange('health', 'monthly')" id="btn-health-monthly" class="px-3 py-1 rounded text-slate-400">Monthly</button>
-                        <button onclick="setChartRange('health', 'yearly')" id="btn-health-yearly" class="px-3 py-1 rounded text-slate-400">Yearly</button>
+                        <button onclick="setChartRange('sanctuary', 'daily')" id="btn-sanctuary-daily" class="px-3 py-1 rounded text-slate-400">Daily</button>
+                        <button onclick="setChartRange('sanctuary', 'weekly')" id="btn-sanctuary-weekly" class="px-3 py-1 rounded text-slate-400">Weekly</button>
+                        <button onclick="setChartRange('sanctuary', 'monthly')" id="btn-sanctuary-monthly" class="px-3 py-1 rounded text-slate-400">Monthly</button>
+                        <button onclick="setChartRange('sanctuary', 'yearly')" id="btn-sanctuary-yearly" class="px-3 py-1 rounded text-slate-400">Yearly</button>
                     </div>
                 </div>
                 <div class="h-64 w-full">
-                    <canvas id="healthChart"></canvas>
+                    <canvas id="sanctuaryChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- TAB 4: HOUSE CHORES -->
-        <div id="tab-chores" class="hidden space-y-6">
-            <div id="chore-form-card" class="card p-6 rounded-xl">
-                <h2 class="text-lg font-semibold mb-1 text-slate-200">Log House Chores</h2>
-                <p class="text-xs text-slate-400 mb-4">Keeping the sanctuary glowing. Tracks household tasks without altering cash.</p>
-                <form onsubmit="logChore(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-2 font-medium">Time Spent (Hours)</label>
-                        <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
-                            <button type="button" onmousedown="startHoldStep('chore-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('chore-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
-                            <input type="number" id="chore-time" step="0.25" min="0.25" value="0.50" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                            <button type="button" onmousedown="startHoldStep('chore-time', 1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()" ontouchstart="startHoldStep('chore-time', 1, 0.25, 0.25)" ontouchend="stopHoldStep()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-2 font-medium">Chore Details</label>
-                        <input type="text" id="chore-note" placeholder="e.g. Laundry, vacuuming, dishes..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
-                    </div>
-                    <div class="flex items-end">
-                        <button type="submit" class="w-full theme-accent-bg font-medium p-2.5 rounded-lg text-sm transition-all">Save Chore Time</button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="card p-6 rounded-xl">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                    <h3 class="text-md font-semibold text-slate-200">House Chore Hours</h3>
-                    <div class="flex bg-slate-900/80 p-1 rounded-lg border border-slate-700 text-xs">
-                        <button onclick="setChartRange('chore', 'daily')" id="btn-chore-daily" class="px-3 py-1 rounded text-slate-400">Daily</button>
-                        <button onclick="setChartRange('chore', 'weekly')" id="btn-chore-weekly" class="px-3 py-1 rounded text-slate-400">Weekly</button>
-                        <button onclick="setChartRange('chore', 'monthly')" id="btn-chore-monthly" class="px-3 py-1 rounded text-slate-400">Monthly</button>
-                        <button onclick="setChartRange('chore', 'yearly')" id="btn-chore-yearly" class="px-3 py-1 rounded text-slate-400">Yearly</button>
-                    </div>
-                </div>
-                <div class="h-64 w-full">
-                    <canvas id="choreChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 5: FORGE SETTINGS -->
+        <!-- TAB 4: FORGE SETTINGS -->
         <div id="tab-forge" class="hidden space-y-6">
             <form onsubmit="saveAllForgeSettings(event)" class="space-y-6 max-w-2xl">
                 <div class="card p-6 rounded-xl">
@@ -531,7 +563,7 @@
                 </div>
 
                 <div class="card p-6 rounded-xl">
-                    <h2 class="text-lg font-semibold mb-2 text-slate-200">Pomodoro Timer Configuration</h2>
+                    <h2 class="text-lg font-semibold mb-2 text-slate-200">Hourglass Clock Configuration</h2>
                     <p class="text-xs text-slate-400 mb-4">Customize focus session durations and round cycles.</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -578,13 +610,13 @@
             </form>
         </div>
 
-        <!-- TAB 6: LEDGER HISTORY -->
-        <div id="tab-ledger" class="hidden space-y-6">
+        <!-- TAB 5: CHRONICLES (LEDGER HISTORY) -->
+        <div id="tab-chronicles" class="hidden space-y-6">
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div>
-                        <h2 class="text-lg font-semibold text-slate-200">Activity Log Ledger</h2>
-                        <p class="text-xs text-slate-400 mt-0.5">View and manage historical log submissions.</p>
+                        <h2 class="text-lg font-semibold text-slate-200">Chronicles Registry</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">View historical deed records and logged activity.</p>
                     </div>
                     <div class="flex items-center gap-2 bg-slate-900/80 p-2 rounded-lg border border-slate-700">
                         <label for="ledger-month-select" class="text-xs text-slate-400 font-medium whitespace-nowrap">Period Filter:</label>
@@ -592,10 +624,10 @@
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3">
                         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider">💼 Work</h3>
+                            <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider">⚗️ Crucible (Work)</h3>
                             <span id="ledger-count-work" class="text-[10px] text-slate-500">0 entries</span>
                         </div>
                         <div id="ledger-list-work" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
@@ -603,23 +635,15 @@
 
                     <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3">
                         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">🍨 Snacks</h3>
-                            <span id="ledger-count-health" class="text-[10px] text-slate-500">0 entries</span>
+                            <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">🌿 Sanctuary (Habits)</h3>
+                            <span id="ledger-count-sanctuary" class="text-[10px] text-slate-500">0 entries</span>
                         </div>
-                        <div id="ledger-list-health" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
+                        <div id="ledger-list-sanctuary" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
                     </div>
 
                     <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3">
                         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <h3 class="text-xs font-bold theme-accent-text uppercase tracking-wider">🧹 Chores</h3>
-                            <span id="ledger-count-chore" class="text-[10px] text-slate-500">0 entries</span>
-                        </div>
-                        <div id="ledger-list-chore" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
-                    </div>
-
-                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3">
-                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider">📖 Reflections</h3>
+                            <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider">📖 Scrolls (Reflections)</h3>
                             <span id="ledger-count-diary" class="text-[10px] text-slate-500">0 entries</span>
                         </div>
                         <div id="ledger-list-diary" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
@@ -628,17 +652,17 @@
             </div>
         </div>
 
-        <!-- TAB 7: BADGES & ACHIEVEMENTS -->
-        <div id="tab-badges" class="hidden space-y-6">
+        <!-- TAB 6: RELICS (ACHIEVEMENTS) -->
+        <div id="tab-relics" class="hidden space-y-6">
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div>
-                        <h2 class="text-lg font-semibold text-slate-200">Hall of Achievements</h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Track your long-term milestones, focus streaks, and mastery progression.</p>
+                        <h2 class="text-lg font-semibold text-slate-200">Vault of Relics</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Track your milestones, focus streaks, and mastery progression.</p>
                     </div>
                     <div class="flex items-center gap-3 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-700/80">
                         <span class="text-xs text-slate-400 font-medium">Unlocked:</span>
-                        <span id="badge-completion-count" class="text-sm font-black theme-accent-text">0 / 22</span>
+                        <span id="badge-completion-count" class="text-sm font-black theme-accent-text">0 / 23</span>
                     </div>
                 </div>
 
@@ -669,7 +693,7 @@
         let userSettings = {
             monthlyCash: 8000, weeklyHours: 10, dailySoftCap: 4, maxBonusCapPct: 125,
             pomoFocus: 25, pomoShort: 5, pomoLong: 15, pomoRounds: 4, userTheme: 'gold', avatarUrl: '',
-            tiltStrength: 15, particleIntensity: 15, // Defaulted to 15% (85% reduction)
+            tiltStrength: 15, particleIntensity: 15,
             vaultedMonths: {}, unlockedBadges: [], completedPomoHistory: []
         };
 
@@ -687,10 +711,17 @@
                 { level: 3, icon: '🔥', title: 'Moderate', desc: 'Standard focus effort' },
                 { level: 4, icon: '⛰️', title: 'Heavy', desc: 'Overcame strong fatigue' },
                 { level: 5, icon: '🌋', title: 'Max Willpower', desc: 'Intense willpower push' }
+            ],
+            workoutStrain: [
+                { level: 1, icon: '🍃', title: 'Light Recovery', desc: 'Mobility & gentle movement' },
+                { level: 2, icon: '☁️', title: 'Aerobic Pace', desc: 'Steady endurance flow' },
+                { level: 3, icon: '🔥', title: 'Solid Strain', desc: 'Standard workout circuit' },
+                { level: 4, icon: '⛰️', title: 'High Power', desc: 'Heavy strength & calisthenics' },
+                { level: 5, icon: '🌋', title: 'Legendary Strain', desc: 'Max effort conditioning' }
             ]
         };
 
-        // 2. FX ENGINE: CANVAS PARTICLE BURSTS & TILT EFFECT (SCALABLE STRENGTHS)
+        // 2. FX ENGINE: CANVAS PARTICLE BURSTS & TILT EFFECT
         const canvas = document.getElementById('fx-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -707,7 +738,7 @@
             if (intensity <= 0) return;
 
             const colors = ['#fef08a', '#f59e0b', '#b45309', '#38bdf8', '#10b981'];
-            const count = Math.max(1, Math.round(35 * intensity)); // ~5 particles at 15% intensity
+            const count = Math.max(1, Math.round(35 * intensity));
             
             for (let i = 0; i < count; i++) {
                 const angle = Math.random() * Math.PI * 2;
@@ -730,7 +761,7 @@
                 const p = particles[i];
                 p.x += p.vx;
                 p.y += p.vy;
-                p.vy += 0.12; // Gravity
+                p.vy += 0.12;
                 p.alpha -= p.decay;
 
                 if (p.alpha <= 0) {
@@ -750,7 +781,6 @@
         }
         animateParticles();
 
-        // DELEGATED 3D GLASS TILT FOR STAT CARDS & BADGES (SCALABLE STRENGTH)
         document.addEventListener('mousemove', (e) => {
             const card = e.target.closest('.card');
             if (!card || card.classList.contains('locked')) return;
@@ -765,7 +795,7 @@
             const x = e.clientX - rect.left - rect.width / 2;
             const y = e.clientY - rect.top - rect.height / 2;
 
-            const maxDeg = 6 * strength; // At 15%, max tilt is 0.9 deg instead of 6 deg
+            const maxDeg = 6 * strength;
             const rotX = (-y / (rect.height / 2)) * maxDeg;
             const rotY = (x / (rect.width / 2)) * maxDeg;
 
@@ -779,31 +809,39 @@
             }
         });
 
-        // 3. BADGE CATALOG & ENGINE
+        // 3. MYTHIC RELICS CATALOG & ENGINE
         const BADGE_CATALOG = [
-            { id: 'work_1', tier: 'bronze', icon: '🌱', title: "Initiate's First Step", desc: 'Log your very first work session.' },
-            { id: 'work_cap', tier: 'silver', icon: '🍵', title: 'Soft Cap Survivor', desc: 'Reach daily Soft Cap (4.0h) in a single day.' },
-            { id: 'work_100', tier: 'gold', icon: '🎯', title: 'Century Focus', desc: 'Reach 100 total hours logged all-time.' },
-            { id: 'work_1000', tier: 'titan', icon: '🏛️', title: 'Millennium Scholar', desc: 'Reach 1,000 total hours logged all-time.' },
-            { id: 'work_10000', tier: 'aureum', icon: '👑', title: 'Master of the Craft', desc: 'Reach 10,000 total hours logged all-time.' },
-            { id: 'pomo_1', tier: 'bronze', icon: '⏱️', title: 'Clockwork', desc: 'Complete 1 focus Pomodoro session.' },
-            { id: 'pomo_flow', tier: 'silver', icon: '🌊', title: 'Flow State', desc: 'Complete 4 focus rounds in a single day.' },
-            { id: 'pomo_deep', tier: 'silver', icon: '🤿', title: 'Deep Dive', desc: 'Complete a 50+ minute focus session.' },
-            { id: 'pomo_overdrive', tier: 'gold', icon: '🔥', title: 'Overdrive', desc: 'Complete 8 focus rounds in a single day.' },
-            { id: 'pomo_unbroken', tier: 'gold', icon: '🛡️', title: 'Unbroken Void', desc: 'Complete a 50+ minute focus session without pausing.' },
-            { id: 'pomo_marathon', tier: 'titan', icon: '🏃', title: 'Marathon Runner', desc: 'Complete 12 focus rounds in a single day.' },
-            { id: 'pomo_zen', tier: 'titan', icon: '🧘', title: 'Zen Master', desc: 'Complete 4 back-to-back sessions without a pause.' },
-            { id: 'pomo_perfect', tier: 'aureum', icon: '✨', title: 'The Perfect Loop', desc: 'Complete a full 4-round loop with zero pauses.' },
-            { id: 'chore_1', tier: 'bronze', icon: '🧹', title: 'Clean Slate', desc: 'Log your first house chore session.' },
-            { id: 'chore_25', tier: 'silver', icon: '🏰', title: 'Sanctuary Keeper', desc: 'Log 25 total hours of house chores.' },
-            { id: 'chore_100', tier: 'gold', icon: '🌟', title: 'Pillar of the Home', desc: 'Log 100 total hours of house chores.' },
-            { id: 'diary_1', tier: 'bronze', icon: '✍️', title: 'Mindful Moment', desc: 'Save your first daily reflection note.' },
-            { id: 'diary_30', tier: 'silver', icon: '📖', title: 'Journaler', desc: 'Save 30 daily reflection notes all-time.' },
-            { id: 'diary_100', tier: 'gold', icon: '🧠', title: 'Philosopher', desc: 'Save 100 daily reflection notes all-time.' },
-            { id: 'streak_3', tier: 'bronze', icon: '⚡', title: '3-Day Ignition', desc: 'Maintain a 3-day active streak.' },
-            { id: 'streak_7', tier: 'silver', icon: '🚀', title: '7-Day Unstoppable', desc: 'Maintain a 7-day active streak.' },
-            { id: 'streak_30', tier: 'gold', icon: '💎', title: '30-Day Relentless', desc: 'Maintain a 30-day active streak.' },
-            { id: 'streak_100', tier: 'aureum', icon: '🌋', title: 'Monolith of Discipline', desc: 'Maintain a 100-day active streak.' }
+            // Crucible (Work)
+            { id: 'work_1', tier: 'bronze', icon: '🌱', title: "Spark of Endeavor", desc: 'Log your very first work session.' },
+            { id: 'work_cap', tier: 'silver', icon: '🍵', title: 'Crucible Mastered', desc: 'Reach daily Soft Cap (4.0h) in a single day.' },
+            { id: 'work_100', tier: 'gold', icon: '🎯', title: 'Century Ore', desc: 'Reach 100 total hours logged all-time.' },
+            { id: 'work_1000', tier: 'titan', icon: '🏛️', title: "Alchemist's Vault", desc: 'Reach 1,000 total hours logged all-time.' },
+            { id: 'work_10000', tier: 'aureum', icon: '👑', title: "Philosopher's Touch", desc: 'Reach 10,000 total hours logged all-time.' },
+            
+            // Hourglass (Pomodoro)
+            { id: 'pomo_1', tier: 'bronze', icon: '⏱️', title: 'Chrono Ignition', desc: 'Complete 1 focus Hourglass session.' },
+            { id: 'pomo_flow', tier: 'silver', icon: '🌊', title: 'Temporal Stream', desc: 'Complete 4 focus rounds in a single day.' },
+            { id: 'pomo_deep', tier: 'silver', icon: '🤿', title: 'Abyssal Focus', desc: 'Complete a 50+ minute focus session.' },
+            { id: 'pomo_overdrive', tier: 'gold', icon: '🔥', title: 'Chrono Overdrive', desc: 'Complete 8 focus rounds in a single day.' },
+            { id: 'pomo_unbroken', tier: 'gold', icon: '🛡️', title: 'Unbroken Seal', desc: 'Complete a 50+ minute focus session without pausing.' },
+            { id: 'pomo_marathon', tier: 'titan', icon: '🏃', title: 'Timeless Marathon', desc: 'Complete 12 focus rounds in a single day.' },
+            { id: 'pomo_zen', tier: 'titan', icon: '🧘', title: 'Zenith Loop', desc: 'Complete 4 back-to-back sessions without a pause.' },
+            { id: 'pomo_perfect', tier: 'aureum', icon: '✨', title: 'Eternity Loop', desc: 'Complete a full 4-round loop with zero pauses.' },
+
+            // Sanctuary (Conditioning, Upkeep, Delicacies & Scrolls)
+            { id: 'workout_1', tier: 'bronze', icon: '🏃', title: "Warrior's Rite", desc: 'Log your first physical conditioning workout.' },
+            { id: 'chore_1', tier: 'bronze', icon: '🧹', title: 'Ward of the Keep', desc: 'Log your first sanctuary chore.' },
+            { id: 'chore_25', tier: 'silver', icon: '🏰', title: 'Sanctuary Warden', desc: 'Log 25 total hours of house chores.' },
+            { id: 'chore_100', tier: 'gold', icon: '🌟', title: 'Monolith of the Home', desc: 'Log 100 total hours of house chores.' },
+            { id: 'diary_1', tier: 'bronze', icon: '✍️', title: 'Mindful Scroll', desc: 'Save your first daily reflection note.' },
+            { id: 'diary_30', tier: 'silver', icon: '📖', title: "Chronicler's Parchment", desc: 'Save 30 daily reflection notes all-time.' },
+            { id: 'diary_100', tier: 'gold', icon: '🧠', title: 'High Tome of Wisdom', desc: 'Save 100 daily reflection notes all-time.' },
+
+            // Streaks
+            { id: 'streak_3', tier: 'bronze', icon: '⚡', title: 'Tri-Flame Ignition', desc: 'Maintain a 3-day active streak.' },
+            { id: 'streak_7', tier: 'silver', icon: '🚀', title: 'Unyielding Crest', desc: 'Maintain a 7-day active streak.' },
+            { id: 'streak_30', tier: 'gold', icon: '💎', title: 'Obsidian Solace', desc: 'Maintain a 30-day active streak.' },
+            { id: 'streak_100', tier: 'aureum', icon: '🌋', title: 'Monolith of Eternity', desc: 'Maintain a 100-day active streak.' }
         ];
 
         function renderBadgeGrid(unlockedSet = new Set()) {
@@ -827,7 +865,6 @@
             }).join('');
         }
 
-        // UNIFIED TOAST NOTIFICATION ENGINE WITH PARTICLE BURST CALL
         function showToast({ title, subtitle, icon, tier = 'gold', duration = 3800, originEvt }) {
             const container = document.getElementById('badge-toast-container');
             if (!container) return;
@@ -843,14 +880,13 @@
             container.appendChild(toast);
             playTone('save');
 
-            // Trigger Particle Burst
             const burstX = originEvt?.clientX || window.innerWidth - 120;
             const burstY = originEvt?.clientY || 80;
             spawnParticleBurst(burstX, burstY);
 
             setTimeout(() => {
-                toast.style.animation = 'none'; // Release CSS keyframe fill lock
-                void toast.offsetHeight;       // Trigger reflow to restart render engine
+                toast.style.animation = 'none';
+                void toast.offsetHeight;
                 toast.classList.add('toast-hiding');
                 setTimeout(() => toast.remove(), 500);
             }, duration);
@@ -858,7 +894,7 @@
 
         function showBadgeToast(b) {
             showToast({
-                title: '🏆 Achievement Unlocked!',
+                title: '🏺 Relic Unlocked!',
                 subtitle: `<strong>${b.title}</strong> — ${b.desc}`,
                 icon: b.icon,
                 tier: b.tier,
@@ -890,6 +926,9 @@
             if (totalWorkHours >= 100) unlock('work_100');
             if (totalWorkHours >= 1000) unlock('work_1000');
             if (totalWorkHours >= 10000) unlock('work_10000');
+
+            const workoutLogs = logs.filter(l => l.type === 'workout');
+            if (workoutLogs.length >= 1) unlock('workout_1');
 
             const choreLogs = logs.filter(l => l.type === 'chore');
             const totalChoreHours = choreLogs.reduce((acc, l) => acc + (l.hours || 0), 0);
@@ -925,7 +964,7 @@
             logs.forEach(l => {
                 if (!l.timestamp) return;
                 const d = l.timestamp.toDate(), key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-                if ((l.type === 'work' && l.hours >= 1.0) || (l.type === 'chore' && l.hours >= 0.5)) activeDates.add(key);
+                if ((l.type === 'work' && l.hours >= 1.0) || (l.type === 'chore' && l.hours >= 0.5) || (l.type === 'workout' && l.hours >= 0.25)) activeDates.add(key);
             });
             Object.entries(pomoByDay).forEach(([dayStr, count]) => {
                 if (count >= 2) { const d = new Date(dayStr); activeDates.add(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`); }
@@ -1026,9 +1065,30 @@
             holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepRating(field, delta), 120); }, 300);
         }
 
+        function updateWorkoutStrainUI() {
+            const input = document.getElementById('workout-strain'); if (!input) return;
+            const val = parseInt(input.value) || 3, d = RATING_DATA.workoutStrain[val - 1];
+            document.getElementById('w-icon').innerText = d.icon;
+            document.getElementById('w-badge').innerText = `LVL ${d.level}`;
+            document.getElementById('w-title').innerText = d.title;
+        }
+        function stepWorkoutStrain(delta) {
+            const input = document.getElementById('workout-strain');
+            input.value = Math.max(1, Math.min(5, (parseInt(input.value) || 3) + delta));
+            updateWorkoutStrainUI();
+        }
+        function startHoldStepWorkoutStrain(delta, e) {
+            const evt = e || window.event;
+            if (evt && evt.type === 'touchstart' && evt.cancelable) {
+                evt.preventDefault();
+            }
+            stopHoldStep(); stepWorkoutStrain(delta);
+            holdTimeout = setTimeout(() => { holdInterval = setInterval(() => stepWorkoutStrain(delta), 120); }, 300);
+        }
+
         function applyThemeToBody(t) { document.body.setAttribute('data-theme', t || 'gold'); }
 
-        // 5. POMODORO ENGINE WITH LIVE AMBIENT ATMOSPHERE PULSE
+        // 5. HOURGLASS POMODORO ENGINE
         let myPomoMode = 'focus', myPomoRound = 1, myPomoTime = 1500, myPomoInitialTime = 1500, myPomoIsRunning = false, myPomoInterval = null, currentSessionWasPaused = false;
         let pomoUIRenderInterval = null, pomoSyncUnsubscribe = null, spectatorSettings = null, shadowSpectatorTime = 1500, shadowSpectatorIsRunning = false, shadowSpectatorInterval = null;
 
@@ -1142,7 +1202,7 @@
 
                 const statusEl = document.getElementById('pomo-status-label'), toggleBtn = document.getElementById('pomo-toggle-btn');
                 if (isSelf) {
-                    statusEl.innerText = isR ? (mode === 'focus' ? "Focus Active" : "Resting...") : (secs === initT ? "Click Clock or Press Spacebar" : "Paused");
+                    statusEl.innerText = isR ? (mode === 'focus' ? "Focus Active" : "Resting...") : (secs === initT ? "Click Hourglass or Press Spacebar" : "Paused");
                     toggleBtn.innerText = isR ? "Pause" : (secs === initT ? (mode === 'focus' ? "Start Focus" : "Start Break") : "Resume");
                 } else {
                     statusEl.innerText = isR ? `LIVE: ${mode.toUpperCase()}` : "PAUSED / IDLE";
@@ -1187,7 +1247,8 @@
         }
 
         // 6. CHARTS ENGINE
-        let charts = {}, chartTimeframes = { work: 'daily', health: 'daily', chore: 'daily' }, workChartMode = 'bar';
+        let charts = {}, chartTimeframes = { work: 'daily', sanctuary: 'daily' }, workChartMode = 'bar', sanctuaryChartSubmode = 'workout';
+        
         function initCharts() {
             const opts = { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }, y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } } }, plugins: { legend: { display: false } } };
             
@@ -1204,14 +1265,14 @@
                 }}
             });
 
-            ['health', 'chore'].forEach(t => {
-                charts[t] = new Chart(document.getElementById(`${t}Chart`).getContext('2d'), {
-                    type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: t === 'health' ? '#10b981' : '#f59e0b', borderRadius: 4 }] }, options: opts
-                });
+            charts['sanctuary'] = new Chart(document.getElementById('sanctuaryChart').getContext('2d'), {
+                type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: '#f59e0b', borderRadius: 4 }] }, options: opts
             });
         }
 
         function setWorkChartMode(m) { workChartMode = m; if (charts['work']) { charts['work'].config.type = m === 'area' ? 'line' : m; charts['work'].data.datasets[0].fill = (m === 'area'); charts['work'].update(); } }
+        function setSanctuaryChartMode(m) { sanctuaryChartSubmode = m; loadUserData(); }
+
         function setChartRange(t, r) { chartTimeframes[t] = r; updateChartTimeframeUI(t, r); loadUserData(); }
         function updateChartTimeframeUI(t, r) {
             ['daily', 'weekly', 'monthly', 'yearly'].forEach(x => {
@@ -1241,17 +1302,23 @@
             else if (range === 'monthly') { labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; values = new Array(12).fill(0); }
             else { labels = ['2025','2026','2027']; values = [0,0,0]; }
 
-            logs.forEach(l => { values[values.length - 1] += (type === 'work' ? (l.points || 0) * pointRate : (type === 'health' ? (l.level || 0) : (l.hours || 0))); });
-            if (type === 'work') values = values.map(v => Math.min(v, maxCash));
-
-            charts[type].data.labels = labels;
-            if (type === 'work' && range === 'monthly') {
-                charts[type].data.datasets[0].backgroundColor = labels.map((_, i) => userSettings.vaultedMonths?.[`${now.getFullYear()}-${i}`] ? '#f59e0b' : '#10b981');
-            } else {
-                charts[type].data.datasets[0].backgroundColor = type === 'work' ? '#10b981' : (type === 'health' ? '#10b981' : '#f59e0b');
+            if (type === 'work') {
+                logs.forEach(l => { values[values.length - 1] += (l.points || 0) * pointRate; });
+                values = values.map(v => Math.min(v, maxCash));
+                charts['work'].data.labels = labels;
+                charts['work'].data.datasets[0].backgroundColor = range === 'monthly' ? labels.map((_, i) => userSettings.vaultedMonths?.[`${now.getFullYear()}-${i}`] ? '#f59e0b' : '#10b981') : '#10b981';
+                charts['work'].data.datasets[0].data = values;
+                charts['work'].update();
+            } else if (type === 'sanctuary') {
+                const subType = sanctuaryChartSubmode;
+                const filteredLogs = logs.filter(l => l.type === subType);
+                filteredLogs.forEach(l => { values[values.length - 1] += (subType === 'health' ? (l.level || 1) : (l.hours || 0)); });
+                
+                charts['sanctuary'].data.labels = labels;
+                charts['sanctuary'].data.datasets[0].backgroundColor = subType === 'workout' ? '#f59e0b' : (subType === 'chore' ? '#38bdf8' : '#10b981');
+                charts['sanctuary'].data.datasets[0].data = values;
+                charts['sanctuary'].update();
             }
-            charts[type].data.datasets[0].data = values;
-            charts[type].update();
         }
 
         // 7. FIRESTORE CRUD & APP LOGIC
@@ -1267,7 +1334,7 @@
                 initRealtimeSettingsListener();
                 await initAndRecoverMyPomoState();
                 updateUserSwitcherUI(); initCharts(); loadUserData();
-                updateRatingUI('results'); updateRatingUI('effort');
+                updateRatingUI('results'); updateRatingUI('effort'); updateWorkoutStrainUI();
                 startGlobalUIRenderer(); attachPomoSpectatorListener();
             } else {
                 document.getElementById('login-modal').classList.remove('hidden');
@@ -1329,7 +1396,9 @@
         function switchActiveUser(target) { viewedUser = target; initRealtimeSettingsListener(); updateUserSwitcherUI(); attachPomoSpectatorListener(); loadUserData(); }
         function updateUserSwitcherUI() {
             const isSelf = loggedInUser === viewedUser;
-            ['work-form-card', 'diary-form-card', 'health-form-card', 'chore-form-card'].forEach(id => document.getElementById(id).style.display = isSelf ? 'block' : 'none');
+            ['work-form-card', 'diary-form-card', 'health-form-card', 'chore-form-card', 'workout-form-card'].forEach(id => {
+                const el = document.getElementById(id); if (el) el.style.display = isSelf ? 'block' : 'none';
+            });
             document.querySelectorAll('#tab-forge input, #tab-forge select').forEach(i => { i.disabled = !isSelf; i.classList.toggle('opacity-50', !isSelf); });
             document.querySelectorAll('#tab-forge button').forEach(b => b.style.display = isSelf ? 'inline-block' : 'none');
             document.getElementById('read-only-banner').classList.toggle('hidden', isSelf);
@@ -1338,13 +1407,13 @@
         }
 
         function switchTab(t) {
-            ['work', 'pomo', 'health', 'chores', 'forge', 'ledger', 'badges'].forEach(x => {
+            ['crucible', 'hourglass', 'sanctuary', 'forge', 'chronicles', 'relics'].forEach(x => {
                 document.getElementById(`tab-${x}`)?.classList.add('hidden');
                 const nav = document.getElementById(`nav-${x}`);
                 if (nav) nav.className = x === t ? "tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap" : "tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap";
             });
             document.getElementById(`tab-${t}`)?.classList.remove('hidden');
-            if (t === 'pomo') attachPomoSpectatorListener();
+            if (t === 'hourglass') attachPomoSpectatorListener();
         }
 
         async function logWork(e) {
@@ -1354,7 +1423,6 @@
             const normH = Math.min(T, Math.max(0, softCap - currentTodayHoursLogged)), overH = T - normH;
             const pts = (normH * baseRate) + (overH * baseRate * 0.25);
 
-            // Compute net cash allowance earned for this specific log (capped at maxCash)
             const targetPts = (userSettings.weeklyHours || 10) * 12;
             const pointRate = targetPts > 0 ? (userSettings.monthlyCash / targetPts) : 0;
             const maxCash = userSettings.monthlyCash * ((userSettings.maxBonusCapPct || 125) / 100);
@@ -1377,9 +1445,27 @@
             await db.collection('logs').add({ type: 'work', user: loggedInUser, hours: T, normalHours: normH, overCapHours: overH, results: R, effort: E, points: pts, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
             
             showToast({
-                title: '💼 Work Session Logged',
+                title: '⚗️ Crucible Session Logged',
                 subtitle: `<strong>+฿${Math.round(netCashEarned).toLocaleString()} Earned</strong> (${T}h logged @ Lvl ${R}/${E})`,
                 icon: '🎯',
+                tier: 'gold',
+                originEvt: e
+            });
+
+            loadUserData();
+        }
+
+        async function logWorkout(e) {
+            e.preventDefault();
+            const hrs = parseFloat(document.getElementById('workout-time').value);
+            const strain = parseInt(document.getElementById('workout-strain').value);
+
+            await db.collection('logs').add({ type: 'workout', user: loggedInUser, hours: hrs, strain: strain, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+            
+            showToast({
+                title: '🏃 Conditioning Logged',
+                subtitle: `${hrs}h workout session saved at Level ${strain} strain!`,
+                icon: '🔥',
                 tier: 'gold',
                 originEvt: e
             });
@@ -1395,8 +1481,8 @@
             await db.collection('logs').add({ type: 'health', user: loggedInUser, level: lvl, note: note, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
             
             showToast({
-                title: '🍨 Sweet Treat Logged',
-                subtitle: `Level ${lvl} snack recorded${note ? `: "${note}"` : ''}`,
+                title: '🍨 Delicacy Logged',
+                subtitle: `Level ${lvl} treat recorded${note ? `: "${note}"` : ''}`,
                 icon: '🍦',
                 tier: 'emerald',
                 originEvt: e
@@ -1414,7 +1500,7 @@
             await db.collection('logs').add({ type: 'chore', user: loggedInUser, hours: hrs, note: note, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
             
             showToast({
-                title: '🧹 House Chore Logged',
+                title: '🧹 Keep Upkeep Logged',
                 subtitle: `${hrs}h sanctuary time saved${note ? `: "${note}"` : ''}`,
                 icon: '🏰',
                 tier: 'silver',
@@ -1442,7 +1528,7 @@
             
             showToast({
                 title: '📖 Reflection Saved',
-                subtitle: 'Daily mindset note updated!',
+                subtitle: 'Daily mindset scroll updated!',
                 icon: '✍️',
                 tier: 'titan',
                 originEvt: e
@@ -1543,11 +1629,12 @@
                 }
 
                 updateGoalGauge(finalPayout, userSettings.monthlyCash);
-                ['work', 'health', 'chore'].forEach(t => updateChartData(t, rawLogs.filter(l => l.type === t), pointRate, maxCash));
+                updateChartData('work', rawLogs.filter(l => l.type === 'work'), pointRate, maxCash);
+                updateChartData('sanctuary', rawLogs, pointRate, maxCash);
 
                 const todayDiary = rawLogs.find(l => l.type === 'diary' && l.timestamp && l.timestamp.toDate() >= startToday);
                 document.getElementById('diary-text').value = todayDiary ? todayDiary.text : '';
-                document.getElementById('diary-status-badge').innerText = todayDiary ? "Today's Note Saved ✨" : "Jot down thoughts or wins";
+                document.getElementById('diary-status-badge').innerText = todayDiary ? "Today's Scroll Saved ✨" : "Jot down thoughts or wins";
 
                 populateAndFilterLedger();
                 evaluateBadges(rawLogs, userSettings.completedPomoHistory || []);
@@ -1594,15 +1681,22 @@
                 }
             };
 
-            const w = logs.filter(l => l.type === 'work'), h = logs.filter(l => l.type === 'health'), c = logs.filter(l => l.type === 'chore'), d = logs.filter(l => l.type === 'diary');
+            const w = logs.filter(l => l.type === 'work');
+            const s = logs.filter(l => ['workout', 'chore', 'health'].includes(l.type));
+            const d = logs.filter(l => l.type === 'diary');
+
             document.getElementById('ledger-count-work').innerText = `${w.length} entries`;
-            document.getElementById('ledger-count-health').innerText = `${h.length} entries`;
-            document.getElementById('ledger-count-chore').innerText = `${c.length} entries`;
+            document.getElementById('ledger-count-sanctuary').innerText = `${s.length} entries`;
             document.getElementById('ledger-count-diary').innerText = `${d.length} entries`;
 
-            render('ledger-list-work', w, 'No work logs.', l => `<div class="flex justify-between font-medium"><span class="text-slate-200">${l.hours} hrs (${l.results}/${l.effort})</span><span class="text-emerald-400 font-bold">฿${Math.round(l.points * (userSettings.monthlyCash / (userSettings.weeklyHours * 12))).toLocaleString()}</span></div>`);
-            render('ledger-list-health', h, 'No snack logs.', l => `<div class="flex justify-between font-medium"><span class="text-emerald-300">Level ${l.level}</span><span class="text-slate-300 italic truncate max-w-[100px]">${l.note || 'No note'}</span></div>`);
-            render('ledger-list-chore', c, 'No chore logs.', l => `<div class="flex justify-between font-medium"><span class="theme-accent-text font-bold">${l.hours} hrs</span><span class="text-slate-300 italic truncate max-w-[100px]">${l.note || 'No details'}</span></div>`);
+            render('ledger-list-work', w, 'No Crucible logs.', l => `<div class="flex justify-between font-medium"><span class="text-slate-200">${l.hours} hrs (${l.results}/${l.effort})</span><span class="text-emerald-400 font-bold">฿${Math.round(l.points * (userSettings.monthlyCash / (userSettings.weeklyHours * 12))).toLocaleString()}</span></div>`);
+            
+            render('ledger-list-sanctuary', s, 'No sanctuary entries.', l => {
+                if (l.type === 'workout') return `<div class="flex justify-between font-medium"><span class="text-amber-300">🏃 Conditioning (${l.hours}h)</span><span class="text-slate-400 font-bold">Strain Lvl ${l.strain || 3}</span></div>`;
+                if (l.type === 'chore') return `<div class="flex justify-between font-medium"><span class="text-sky-300">🧹 Upkeep (${l.hours}h)</span><span class="text-slate-300 italic truncate max-w-[100px]">${l.note || 'No note'}</span></div>`;
+                return `<div class="flex justify-between font-medium"><span class="text-emerald-300">🍨 Delicacy (Lvl ${l.level})</span><span class="text-slate-300 italic truncate max-w-[100px]">${l.note || 'No note'}</span></div>`;
+            });
+            
             render('ledger-list-diary', d, 'No reflections.', l => `<div class="text-slate-200 italic leading-snug break-words">"${l.text}"</div>`);
         }
     </script>
