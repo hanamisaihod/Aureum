@@ -84,6 +84,9 @@
             <button onclick="switchTab('ledger')" id="nav-ledger" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap">
                 <span>📜</span> <span>Ledger History</span>
             </button>
+            <button onclick="switchTab('badges')" id="nav-badges" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap">
+                <span>🏆</span> <span>Badges</span>
+            </button>
         </nav>
 
         <!-- Read-Only Banner -->
@@ -547,6 +550,30 @@
                     </div>
                 </div>
             </div>
+
+            <!-- TAB 7: BADGES & ACHIEVEMENTS -->
+            <div id="tab-badges" class="hidden space-y-6">
+                <div class="card p-6 rounded-xl">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                        <div>
+                            <h2 class="text-lg font-semibold text-slate-200">Hall of Achievements</h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Track your long-term milestones, focus streaks, and mastery progression.</p>
+                        </div>
+                        <div class="flex items-center gap-3 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-700/80">
+                            <span class="text-xs text-slate-400 font-medium">Unlocked:</span>
+                            <span id="badge-completion-count" class="text-sm font-black theme-accent-text">0 / 22</span>
+                        </div>
+                    </div>
+            
+                    <div id="badge-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <!-- Populated dynamically by js/badges.js -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating Toast Notification Container -->
+            <div id="badge-toast-container"></div>
+            
         </div>
     </div>
 
@@ -554,6 +581,7 @@
     <script src="js/config.js"></script>
     <script src="js/pomo.js"></script>
     <script src="js/charts.js"></script>
+    <script src="js/badges.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
