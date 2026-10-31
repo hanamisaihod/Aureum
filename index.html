@@ -186,11 +186,11 @@
                     <div class="text-xs text-slate-500 mt-1">Goal: <span id="label-monthly-goal-pts">120</span> pts (<span id="label-weekly-hrs">10</span> hrs/wk)</div>
                 </div>
                 
-                <!-- Allowance Tracker Box with Vault Status Toggle -->
+                <!-- Allowance Tracker Box -->
                 <div id="payout-card-box">
                     <div class="flex justify-between items-center">
                         <span class="text-xs uppercase tracking-wider text-slate-400">Allowance Earned</span>
-                        <button id="allowance-vault-btn" onclick="toggleAllowanceVault()" class="text-[10px] font-bold px-2 py-0.5 rounded border transition-all bg-emerald-500/20 text-emerald-300 border-emerald-500/40">🔓 UNLOCKED</button>
+                        <span id="current-month-vault-badge" class="text-[10px] font-bold px-2 py-0.5 rounded border transition-all bg-emerald-500/20 text-emerald-300 border-emerald-500/40">🔓 UNLOCKED</span>
                     </div>
                     <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="monthly-payout">฿0</div>
                     <div class="text-xs text-slate-500 mt-1">Target Base: ฿<span id="label-monthly-cash">8,000</span></div>
@@ -199,10 +199,17 @@
                 <div>
                     <span class="text-xs uppercase tracking-wider text-slate-400">Today's Soft Cap</span>
                     <div class="text-3xl font-extrabold theme-accent-text mt-1" id="today-hours-label">0.0 / 4.0 hrs</div>
-                    <div class="w-full bg-slate-900/80 h-2.5 rounded-full mt-2.5 overflow-hidden border border-slate-700/60 p-0.5">
+                    
+                    <!-- Soft Cap Progress Bar with 2.0h Visual Milestone Line -->
+                    <div class="relative w-full bg-slate-900/80 h-3 rounded-full mt-2.5 overflow-hidden border border-slate-700/60 p-0.5">
+                        <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-amber-400/60 z-10 pointer-events-none" title="2.0h Baseline Goal"></div>
                         <div id="daily-bar" class="bg-blue-500 h-full rounded-full transition-all duration-700"></div>
                     </div>
-                    <div class="text-xs mt-1" id="daily-cap-status">4.0 hrs remaining today</div>
+                    
+                    <div class="flex justify-between items-center text-xs mt-1">
+                        <span id="daily-cap-status" class="text-slate-400">4.0 hrs remaining today</span>
+                        <span id="milestone-2h-badge" class="text-[10px] font-semibold text-slate-500">2.0h Target</span>
+                    </div>
                 </div>
                 <div>
                     <span class="text-xs uppercase tracking-wider text-slate-400">Monthly Goal Progress</span>
@@ -325,12 +332,12 @@
                     <button onclick="handleUserSelectPomoMode('long')" id="pomo-mode-long" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Long Break</button>
                 </div>
 
-                <!-- Uncluttered Focus Preset Chips -->
+                <!-- Sorted Focus Preset Chips (Ascending Duration) -->
                 <div id="pomo-presets-box" class="flex justify-center items-center gap-1.5 text-xs text-slate-400">
                     <span class="text-[10px] uppercase font-bold text-slate-500 mr-1">Presets:</span>
+                    <button onclick="applyPomoPreset(15, 3, 10)" class="px-2.5 py-1 rounded bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 transition-all text-[11px]">15/3 Sprint</button>
                     <button onclick="applyPomoPreset(25, 5, 15)" class="px-2.5 py-1 rounded bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 transition-all text-[11px]">25/5 Classic</button>
                     <button onclick="applyPomoPreset(50, 10, 15)" class="px-2.5 py-1 rounded bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 transition-all text-[11px]">50/10 Deep Flow</button>
-                    <button onclick="applyPomoPreset(15, 3, 10)" class="px-2.5 py-1 rounded bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 transition-all text-[11px]">15/3 Sprint</button>
                 </div>
 
                 <!-- Round/Lap Indicator -->
@@ -1078,26 +1085,6 @@
             }
         }
 
-        // --- ALLOWANCE VAULT TRACKER ENGINE ---
-
-        async function toggleAllowanceVault() {
-            if (loggedInUser !== viewedUser) return;
-            const now = new Date();
-            const monthKey = `${now.getFullYear()}-${now.getMonth()}`;
-            userSettings.vaultedMonths = userSettings.vaultedMonths || {};
-            userSettings.vaultedMonths[monthKey] = !userSettings.vaultedMonths[monthKey];
-
-            try {
-                await db.collection('settings').doc(loggedInUser).set({
-                    vaultedMonths: userSettings.vaultedMonths
-                }, { merge: true });
-                playTone('save');
-                loadUserData();
-            } catch (err) {
-                console.error("Failed to toggle vault status:", err);
-            }
-        }
-
         // --- DAILY DIARY / REFLECTION ENGINE ---
 
         async function saveDailyDiary(e) {
@@ -1274,13 +1261,6 @@
             document.getElementById('health-form-card').style.display = isSelf ? 'block' : 'none';
             document.getElementById('chore-form-card').style.display = isSelf ? 'block' : 'none';
 
-            const vaultBtn = document.getElementById('allowance-vault-btn');
-            if (vaultBtn) {
-                vaultBtn.disabled = !isSelf;
-                if (!isSelf) vaultBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                else vaultBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
-
             const forgeInputs = document.querySelectorAll('#tab-forge input, #tab-forge select');
             forgeInputs.forEach(input => {
                 input.disabled = !isSelf;
@@ -1396,6 +1376,7 @@
             }
         }
 
+        // INITIALIZE CHARTS WITH INTERACTIVE MONTHLY BAR VAULTING & TOOLTIPS
         function initCharts() {
             const chartOptions = {
                 responsive: true,
@@ -1407,22 +1388,81 @@
                 plugins: { legend: { display: false } }
             };
 
-            ['work', 'health', 'chore'].forEach(type => {
+            // Work Chart Specific Setup
+            const workCtx = document.getElementById('workChart').getContext('2d');
+            charts['work'] = new Chart(workCtx, {
+                type: 'bar',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: '#3b82f6', borderRadius: 4 }] },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onHover: (evt, activeElements) => {
+                        if (chartTimeframes['work'] === 'monthly') {
+                            evt.chart.canvas.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+                        } else {
+                            evt.chart.canvas.style.cursor = 'default';
+                        }
+                    },
+                    onClick: (evt, activeElements) => {
+                        if (chartTimeframes['work'] === 'monthly' && activeElements.length > 0) {
+                            const index = activeElements[0].index;
+                            const now = new Date();
+                            const currentYear = now.getFullYear();
+                            const monthKey = `${currentYear}-${index}`;
+                            
+                            userSettings.vaultedMonths = userSettings.vaultedMonths || {};
+                            userSettings.vaultedMonths[monthKey] = !userSettings.vaultedMonths[monthKey];
+
+                            if (loggedInUser === viewedUser) {
+                                db.collection('settings').doc(loggedInUser).set({
+                                    vaultedMonths: userSettings.vaultedMonths
+                                }, { merge: true });
+                                playTone('save');
+                                loadUserData();
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', font: { size: 11 } } },
+                        y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                footer: (tooltipItems) => {
+                                    if (chartTimeframes['work'] === 'monthly') {
+                                        const index = tooltipItems[0].dataIndex;
+                                        const now = new Date();
+                                        const monthKey = `${now.getFullYear()}-${index}`;
+                                        const isVaulted = userSettings.vaultedMonths && userSettings.vaultedMonths[monthKey];
+                                        return isVaulted ? 'Status: 🔒 VAULTED (Paid)' : 'Status: 🔓 UNLOCKED (Unpaid)';
+                                    }
+                                    return '';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            ['health', 'chore'].forEach(type => {
                 const ctx = document.getElementById(`${type}Chart`).getContext('2d');
                 charts[type] = new Chart(ctx, {
                     type: 'bar',
-                    data: { labels: [], datasets: [{ data: [], backgroundColor: type === 'work' ? '#3b82f6' : (type === 'health' ? '#10b981' : '#f59e0b'), borderRadius: 4 }] },
+                    data: { labels: [], datasets: [{ data: [], backgroundColor: type === 'health' ? '#10b981' : '#f59e0b', borderRadius: 4 }] },
                     options: chartOptions
                 });
                 updateChartTimeframeUI(type, 'daily');
             });
+
+            updateChartTimeframeUI('work', 'daily');
         }
 
         function toggleWorkChartMetric(metric) {
             workChartMetric = metric;
             document.getElementById('btn-metric-pts').className = metric === 'pts' ? "px-2.5 py-1 rounded theme-accent-bg font-bold" : "px-2.5 py-1 rounded text-slate-400 hover:text-white";
             document.getElementById('btn-metric-cash').className = metric === 'cash' ? "px-2.5 py-1 rounded bg-emerald-500 text-slate-950 font-bold" : "px-2.5 py-1 rounded text-slate-400 hover:text-white";
-            charts['work'].data.datasets[0].backgroundColor = metric === 'cash' ? '#10b981' : '#3b82f6';
             loadUserData();
         }
 
@@ -1502,17 +1542,17 @@
                   
                   // Allowance Vault UI Status Sync
                   const isVaulted = userSettings.vaultedMonths && userSettings.vaultedMonths[monthKey];
-                  const vaultBtn = document.getElementById('allowance-vault-btn');
+                  const vaultBadge = document.getElementById('current-month-vault-badge');
                   const payoutEl = document.getElementById('monthly-payout');
 
                   if (isVaulted) {
-                      vaultBtn.innerText = "🔒 VAULTED";
-                      vaultBtn.className = "text-[10px] font-bold px-2 py-0.5 rounded border transition-all bg-amber-500/20 text-amber-300 border-amber-500/40";
+                      vaultBadge.innerText = "🔒 VAULTED";
+                      vaultBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded border transition-all bg-amber-500/20 text-amber-300 border-amber-500/40";
                       payoutEl.innerText = `฿${Math.round(finalPayout).toLocaleString()}`;
                       payoutEl.className = "text-3xl font-extrabold text-amber-400 mt-1 opacity-70 line-through";
                   } else {
-                      vaultBtn.innerText = "🔓 UNLOCKED";
-                      vaultBtn.className = "text-[10px] font-bold px-2 py-0.5 rounded border transition-all bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
+                      vaultBadge.innerText = "🔓 UNLOCKED";
+                      vaultBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded border transition-all bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
                       payoutEl.innerText = `฿${Math.round(finalPayout).toLocaleString()}`;
                       payoutEl.className = "text-3xl font-extrabold text-emerald-400 mt-1";
                   }
@@ -1521,19 +1561,35 @@
                   const dailyPct = Math.min((todayHours / dailySoftCap) * 100, 100);
                   document.getElementById('daily-bar').style.width = `${dailyPct}%`;
 
+                  // Soft Cap & 2.0h Visual Reward Logic
+                  const dailyBarEl = document.getElementById('daily-bar');
+                  const milestoneBadge = document.getElementById('milestone-2h-badge');
                   const dailyStatusEl = document.getElementById('daily-cap-status');
                   const noticeBox = document.getElementById('work-form-softcap-notice');
 
                   if (todayHours >= dailySoftCap) {
                       dailyStatusEl.innerText = "🍵 Soft Cap Active (25% Yield)";
                       dailyStatusEl.className = "text-xs font-semibold theme-accent-text mt-1";
-                      document.getElementById('daily-bar').className = "theme-accent-bg h-full rounded-full transition-all duration-700 shadow-[0_0_8px_rgba(245,158,11,0.4)]";
+                      dailyBarEl.className = "theme-accent-bg h-full rounded-full transition-all duration-700 shadow-[0_0_8px_rgba(245,158,11,0.4)]";
+                      milestoneBadge.innerText = "✨ Baseline Mastered";
+                      milestoneBadge.className = "text-[10px] font-bold theme-accent-text";
                       if (noticeBox) noticeBox.classList.remove('hidden');
+                  } else if (todayHours >= 2.0) {
+                      const remaining = (dailySoftCap - todayHours).toFixed(1);
+                      dailyStatusEl.innerText = `${remaining} hrs remaining today`;
+                      dailyStatusEl.className = "text-xs text-slate-400 mt-1";
+                      // High-satisfaction glowing cyan-to-emerald gradient when 2.0h goal is hit!
+                      dailyBarEl.className = "bg-gradient-to-r from-blue-500 via-cyan-400 to-emerald-400 h-full rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(56,189,248,0.5)]";
+                      milestoneBadge.innerText = "🎯 2.0h Reached!";
+                      milestoneBadge.className = "text-[10px] font-bold text-emerald-400";
+                      if (noticeBox) noticeBox.classList.add('hidden');
                   } else {
                       const remaining = (dailySoftCap - todayHours).toFixed(1);
                       dailyStatusEl.innerText = `${remaining} hrs remaining today`;
                       dailyStatusEl.className = "text-xs text-slate-400 mt-1";
-                      document.getElementById('daily-bar').className = "bg-blue-500 h-full rounded-full transition-all duration-700";
+                      dailyBarEl.className = "bg-blue-500 h-full rounded-full transition-all duration-700";
+                      milestoneBadge.innerText = "2.0h Target";
+                      milestoneBadge.className = "text-[10px] font-semibold text-slate-500";
                       if (noticeBox) noticeBox.classList.add('hidden');
                   }
 
@@ -1709,6 +1765,23 @@
             }
 
             charts[type].data.labels = labels;
+
+            if (type === 'work' && range === 'monthly') {
+                let bgColors = [];
+                for (let i = 0; i < 12; i++) {
+                    const monthKey = `${now.getFullYear()}-${i}`;
+                    const isVaulted = userSettings.vaultedMonths && userSettings.vaultedMonths[monthKey];
+                    if (isVaulted) {
+                        bgColors.push('#f59e0b'); // Distinct Gold/Amber bar for VAULTED / Paid months
+                    } else {
+                        bgColors.push(workChartMetric === 'cash' ? '#10b981' : '#3b82f6');
+                    }
+                }
+                charts[type].data.datasets[0].backgroundColor = bgColors;
+            } else {
+                charts[type].data.datasets[0].backgroundColor = type === 'work' ? (workChartMetric === 'cash' ? '#10b981' : '#3b82f6') : (type === 'health' ? '#10b981' : '#f59e0b');
+            }
+
             charts[type].data.datasets[0].data = values;
             charts[type].update();
         }
