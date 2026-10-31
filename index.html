@@ -87,7 +87,25 @@
 
         body { background-color: var(--bg-main); color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.3s ease; }
         .card { background-color: var(--card-bg); border: 1px solid var(--card-border); transition: background-color 0.3s ease, border-color 0.3s ease; }
-        .tab-active { border-bottom: 2px solid var(--accent-primary); color: var(--accent-primary); font-weight: 600; }
+        
+        /* SPICED-UP CAPSULE TABS */
+        .tab-btn {
+            color: #94a3b8;
+            background-color: transparent;
+            border: 1px solid transparent;
+            transition: all 0.2s ease-in-out;
+        }
+        .tab-btn:hover {
+            color: #f8fafc;
+            background-color: rgba(30, 41, 59, 0.7);
+        }
+        .tab-btn.active {
+            background-color: rgba(245, 158, 11, 0.15) !important;
+            color: var(--accent-primary) !important;
+            border-color: var(--accent-primary) !important;
+            font-weight: 700;
+            box-shadow: 0 0 14px var(--accent-glow);
+        }
         
         .theme-accent-bg { background-color: var(--accent-primary) !important; color: var(--accent-primary-text) !important; }
         .theme-accent-bg:hover { background-color: var(--accent-primary-hover) !important; }
@@ -117,27 +135,12 @@
             color: var(--accent-primary); letter-spacing: 0.25em; text-shadow: 0 0 12px var(--accent-glow); transition: color 0.3s ease;
         }
 
-        /* Icon Tier Cards with Descriptions */
-        .tier-card {
-            transition: all 0.2s ease-in-out;
-            border: 1px solid #334155;
-            background-color: #0f172a;
-        }
-        .tier-card:hover {
-            border-color: #64748b;
-            transform: translateY(-1px);
-        }
-        .tier-card.active {
-            background-color: rgba(245, 158, 11, 0.12) !important;
-            border-color: var(--accent-primary) !important;
-            box-shadow: 0 0 12px var(--accent-glow);
-        }
-        .tier-card.active .tier-icon {
-            transform: scale(1.15);
-        }
-
         /* Ring Gauge Circle */
         .gauge-circle { transition: stroke-dashoffset 0.8s ease-in-out, stroke 0.3s ease; }
+
+        /* Hide Scrollbars in Tab Nav */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body data-theme="gold" class="p-4 md:p-8 max-w-6xl mx-auto">
@@ -191,14 +194,26 @@
             </div>
         </header>
 
-        <!-- Navigation Tabs -->
-        <nav class="flex border-b border-slate-700 mb-6 gap-8 overflow-x-auto">
-            <button onclick="switchTab('work')" id="nav-work" class="pb-3 text-sm tab-active whitespace-nowrap">Work Engine</button>
-            <button onclick="switchTab('pomo')" id="nav-pomo" class="pb-3 text-sm text-slate-400 hover:text-slate-200 whitespace-nowrap">Pomodoro</button>
-            <button onclick="switchTab('health')" id="nav-health" class="pb-3 text-sm text-slate-400 hover:text-slate-200 whitespace-nowrap">Snack Log</button>
-            <button onclick="switchTab('chores')" id="nav-chores" class="pb-3 text-sm text-slate-400 hover:text-slate-200 whitespace-nowrap">House Chores</button>
-            <button onclick="switchTab('forge')" id="nav-forge" class="pb-3 text-sm text-slate-400 hover:text-slate-200 whitespace-nowrap">Forge</button>
-            <button onclick="switchTab('ledger')" id="nav-ledger" class="pb-3 text-sm text-slate-400 hover:text-slate-200 whitespace-nowrap">Ledger History</button>
+        <!-- Dynamic Capsule Navigation Bar -->
+        <nav class="flex items-center gap-2 mb-6 p-1.5 bg-slate-900/80 rounded-2xl border border-slate-800/90 overflow-x-auto no-scrollbar">
+            <button onclick="switchTab('work')" id="nav-work" class="tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap">
+                <span>💼</span> <span>Work Engine</span>
+            </button>
+            <button onclick="switchTab('pomo')" id="nav-pomo" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap">
+                <span>⏱️</span> <span>Pomodoro</span>
+            </button>
+            <button onclick="switchTab('health')" id="nav-health" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap">
+                <span>🍨</span> <span>Snack Log</span>
+            </button>
+            <button onclick="switchTab('chores')" id="nav-chores" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap">
+                <span>🧹</span> <span>House Chores</span>
+            </button>
+            <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap">
+                <span>⚙️</span> <span>Forge</span>
+            </button>
+            <button onclick="switchTab('ledger')" id="nav-ledger" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap">
+                <span>📜</span> <span>Ledger History</span>
+            </button>
         </nav>
 
         <!-- Read-Only Banner -->
@@ -255,7 +270,7 @@
                 </div>
             </div>
 
-            <!-- Enhanced Work Log Form with Icon Tier Cards & Side Steppers -->
+            <!-- Enhanced Work Log Form with Holdable Stepper & Single Selector Boxes -->
             <div id="work-form-card" class="card p-6 rounded-xl space-y-6">
                 <div class="flex justify-between items-center">
                     <div>
@@ -273,7 +288,7 @@
                     <input type="hidden" id="work-results" value="3">
                     <input type="hidden" id="work-effort" value="3">
 
-                    <!-- Duration Input with Side Steppers -->
+                    <!-- Duration Input with Holdable Side Stepper -->
                     <div class="max-w-xs">
                         <label class="block text-xs text-slate-400 mb-2 font-medium">
                             Hours Spent
@@ -284,139 +299,84 @@
                             </span>
                         </label>
 
-                        <div class="flex items-center">
-                            <button type="button" onclick="adjustHours('work-time', -0.25)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-l-lg text-sm font-bold transition-all border-r-0">-</button>
-                            <input type="number" id="work-time" step="0.25" min="0.25" value="1.00" required class="w-full text-center bg-slate-900 border border-slate-700 p-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                            <button type="button" onclick="adjustHours('work-time', 0.25)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-r-lg text-sm font-bold transition-all border-l-0">+</button>
-                        </div>
-                    </div>
-
-                    <!-- Output Quality Icon Tier Cards -->
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="text-xs text-slate-400 font-medium">Output Quality</label>
-                            <span id="label-results-text" class="text-xs theme-accent-text font-bold">3 — Solid (On-target baseline)</span>
-                        </div>
-                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5" id="pills-results-container">
-                            <button type="button" onclick="selectRating('results', 1)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="tier-icon text-lg transition-transform">⚡</span>
-                                    <span class="text-[10px] font-bold text-slate-400">LVL 1</span>
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold text-slate-200 block">Minimal</span>
-                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Warmup or light prep</span>
-                                </div>
+                        <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                            <button type="button" 
+                                onmousedown="startHoldStep('work-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                ontouchstart="startHoldStep('work-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()"
+                                class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-r border-slate-700 select-none text-base">
+                                -
                             </button>
-
-                            <button type="button" onclick="selectRating('results', 2)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="tier-icon text-lg transition-transform">🌱</span>
-                                    <span class="text-[10px] font-bold text-slate-400">LVL 2</span>
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold text-slate-200 block">Fair</span>
-                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Modest progress made</span>
-                                </div>
-                            </button>
-
-                            <button type="button" onclick="selectRating('results', 3)" class="tier-card active p-3 rounded-xl text-left flex flex-col justify-between">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="tier-icon text-lg transition-transform">🎯</span>
-                                    <span class="text-[10px] font-bold text-slate-400">LVL 3</span>
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold text-slate-200 block">Solid</span>
-                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">On-target standard pace</span>
-                                </div>
-                            </button>
-
-                            <button type="button" onclick="selectRating('results', 4)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="tier-icon text-lg transition-transform">✨</span>
-                                    <span class="text-[10px] font-bold text-slate-400">LVL 4</span>
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold text-slate-200 block">High Craft</span>
-                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Exceptional output speed</span>
-                                </div>
-                            </button>
-
-                            <button type="button" onclick="selectRating('results', 5)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="tier-icon text-lg transition-transform">👑</span>
-                                    <span class="text-[10px] font-bold text-slate-400">LVL 5</span>
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold text-slate-200 block">Peak Flow</span>
-                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Flawless breakthrough</span>
-                                </div>
+                            <input type="number" id="work-time" step="0.25" min="0.25" value="1.00" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                            <button type="button" 
+                                onmousedown="startHoldStep('work-time', 1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                ontouchstart="startHoldStep('work-time', 1, 0.25, 0.25)" ontouchend="stopHoldStep()"
+                                class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-l border-slate-700 select-none text-base">
+                                +
                             </button>
                         </div>
                     </div>
 
-                    <!-- Effort & Friction Icon Tier Cards -->
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="text-xs text-slate-400 font-medium">Effort & Friction</label>
-                            <span id="label-effort-text" class="text-xs theme-accent-text font-bold">3 — Moderate (Standard focus effort)</span>
+                    <!-- Single Selector Boxes for Quality & Effort (Max 2 Boxes on Screen) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        
+                        <!-- Output Quality Single Selector Box -->
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-2 font-medium">Output Quality</label>
+                            <div class="flex items-center bg-slate-900/90 rounded-2xl border border-slate-800 p-1.5 shadow-inner">
+                                <button type="button" 
+                                    onmousedown="startHoldStepRating('results', -1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStepRating('results', -1)" ontouchend="stopHoldStep()"
+                                    class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-300 rounded-xl text-sm font-bold transition-all flex items-center justify-center select-none">
+                                    ◀
+                                </button>
+                                
+                                <div id="selector-box-results" class="flex-1 px-4 py-2 text-center transition-all">
+                                    <div class="flex items-center justify-center gap-2 mb-0.5">
+                                        <span id="q-icon" class="text-2xl">🎯</span>
+                                        <span id="q-badge" class="text-xs font-bold theme-accent-text uppercase tracking-wider">LVL 3</span>
+                                    </div>
+                                    <div id="q-title" class="text-sm font-bold text-slate-100">Solid</div>
+                                    <div id="q-desc" class="text-[11px] text-slate-400 mt-0.5">On-target standard pace</div>
+                                </div>
+
+                                <button type="button" 
+                                    onmousedown="startHoldStepRating('results', 1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStepRating('results', 1)" ontouchend="stopHoldStep()"
+                                    class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-300 rounded-xl text-sm font-bold transition-all flex items-center justify-center select-none">
+                                    ▶
+                                </button>
+                            </div>
                         </div>
-                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5" id="pills-effort-container">
-                            <button type="button" onclick="selectRating('effort', 1)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="tier-icon text-lg transition-transform">🍃</span>
-                                    <span class="text-[10px] font-bold text-slate-400">LVL 1</span>
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold text-slate-200 block">Effortless</span>
-                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Zero resistance or strain</span>
-                                </div>
-                            </button>
 
-                            <button type="button" onclick="selectRating('effort', 2)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="tier-icon text-lg transition-transform">☁️</span>
-                                    <span class="text-[10px] font-bold text-slate-400">LVL 2</span>
+                        <!-- Effort & Friction Single Selector Box -->
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-2 font-medium">Effort & Friction</label>
+                            <div class="flex items-center bg-slate-900/90 rounded-2xl border border-slate-800 p-1.5 shadow-inner">
+                                <button type="button" 
+                                    onmousedown="startHoldStepRating('effort', -1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStepRating('effort', -1)" ontouchend="stopHoldStep()"
+                                    class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-300 rounded-xl text-sm font-bold transition-all flex items-center justify-center select-none">
+                                    ◀
+                                </button>
+                                
+                                <div id="selector-box-effort" class="flex-1 px-4 py-2 text-center transition-all">
+                                    <div class="flex items-center justify-center gap-2 mb-0.5">
+                                        <span id="e-icon" class="text-2xl">🔥</span>
+                                        <span id="e-badge" class="text-xs font-bold theme-accent-text uppercase tracking-wider">LVL 3</span>
+                                    </div>
+                                    <div id="e-title" class="text-sm font-bold text-slate-100">Moderate</div>
+                                    <div id="e-desc" class="text-[11px] text-slate-400 mt-0.5">Standard focus effort</div>
                                 </div>
-                                <div>
-                                    <span class="text-xs font-bold text-slate-200 block">Light</span>
-                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Mild focus required</span>
-                                </div>
-                            </button>
 
-                            <button type="button" onclick="selectRating('effort', 3)" class="tier-card active p-3 rounded-xl text-left flex flex-col justify-between">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="tier-icon text-lg transition-transform">🔥</span>
-                                    <span class="text-[10px] font-bold text-slate-400">LVL 3</span>
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold text-slate-200 block">Moderate</span>
-                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Standard focus effort</span>
-                                </div>
-                            </button>
-
-                            <button type="button" onclick="selectRating('effort', 4)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="tier-icon text-lg transition-transform">⛰️</span>
-                                    <span class="text-[10px] font-bold text-slate-400">LVL 4</span>
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold text-slate-200 block">Heavy</span>
-                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Overcame strong fatigue</span>
-                                </div>
-                            </button>
-
-                            <button type="button" onclick="selectRating('effort', 5)" class="tier-card p-3 rounded-xl text-left flex flex-col justify-between">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="tier-icon text-lg transition-transform">🌋</span>
-                                    <span class="text-[10px] font-bold text-slate-400">LVL 5</span>
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold text-slate-200 block">Max Willpower</span>
-                                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">Intense willpower push</span>
-                                </div>
-                            </button>
+                                <button type="button" 
+                                    onmousedown="startHoldStepRating('effort', 1)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStepRating('effort', 1)" ontouchend="stopHoldStep()"
+                                    class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-300 rounded-xl text-sm font-bold transition-all flex items-center justify-center select-none">
+                                    ▶
+                                </button>
+                            </div>
                         </div>
+
                     </div>
 
                     <div class="flex justify-end pt-2">
@@ -568,7 +528,7 @@
                 <p class="text-xs text-slate-400 mb-4">Keeping the sanctuary glowing. Tracks your household hustle without messing with your cash.</p>
                 <form onsubmit="logChore(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     
-                    <!-- Chore Duration with Side Steppers -->
+                    <!-- Chore Duration with Holdable Side Steppers -->
                     <div>
                         <label class="block text-xs text-slate-400 mb-2 font-medium">
                             Time Spent (Hours)
@@ -576,10 +536,16 @@
                                 <span class="tooltip-text">Total clock hours spent on household tasks (e.g. 0.50 = 30 minutes).</span>
                             </span>
                         </label>
-                        <div class="flex items-center">
-                            <button type="button" onclick="adjustHours('chore-time', -0.25)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-l-lg text-sm font-bold transition-all border-r-0">-</button>
-                            <input type="number" id="chore-time" step="0.25" min="0.25" value="0.50" required class="w-full text-center bg-slate-900 border border-slate-700 p-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                            <button type="button" onclick="adjustHours('chore-time', 0.25)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-r-lg text-sm font-bold transition-all border-l-0">+</button>
+                        <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                            <button type="button" 
+                                onmousedown="startHoldStep('chore-time', -1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                ontouchstart="startHoldStep('chore-time', -1, 0.25, 0.25)" ontouchend="stopHoldStep()"
+                                class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-r border-slate-700 select-none text-base">-</button>
+                            <input type="number" id="chore-time" step="0.25" min="0.25" value="0.50" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                            <button type="button" 
+                                onmousedown="startHoldStep('chore-time', 1, 0.25, 0.25)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                ontouchstart="startHoldStep('chore-time', 1, 0.25, 0.25)" ontouchend="stopHoldStep()"
+                                class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-l border-slate-700 select-none text-base">+</button>
                         </div>
                     </div>
 
@@ -610,7 +576,7 @@
             </div>
         </div>
 
-        <!-- TAB 5: FORGE (UNIFIED SAVE AT BOTTOM) -->
+        <!-- TAB 5: FORGE (UNIFIED SAVE AT BOTTOM WITH HOLDABLE STEPPERS) -->
         <div id="tab-forge" class="hidden space-y-6">
             <form onsubmit="saveAllForgeSettings(event)" class="space-y-6 max-w-2xl">
                 
@@ -670,19 +636,62 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Target Monthly Cash Allowance (฿)</label>
-                            <input type="number" id="setting-monthly-cash" min="1000" step="500" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-monthly-cash', -1, 500, 1000)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-monthly-cash', -1, 500, 1000)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-r border-slate-700 select-none">-</button>
+                                <input type="number" id="setting-monthly-cash" min="1000" step="500" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-monthly-cash', 1, 500, 1000)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-monthly-cash', 1, 500, 1000)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-l border-slate-700 select-none">+</button>
+                            </div>
                         </div>
+
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Target Weekly Work Hours</label>
-                            <input type="number" id="setting-weekly-hrs" min="1" max="80" step="1" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-weekly-hrs', -1, 1, 1, 80)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-weekly-hrs', -1, 1, 1, 80)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-r border-slate-700 select-none">-</button>
+                                <input type="number" id="setting-weekly-hrs" min="1" max="80" step="1" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-weekly-hrs', 1, 1, 1, 80)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-weekly-hrs', 1, 1, 1, 80)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-l border-slate-700 select-none">+</button>
+                            </div>
                         </div>
+
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Daily Soft Cap (Hours)</label>
-                            <input type="number" id="setting-daily-soft-cap" min="1" max="16" step="0.5" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-daily-soft-cap', -1, 0.5, 1, 16)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-daily-soft-cap', -1, 0.5, 1, 16)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-r border-slate-700 select-none">-</button>
+                                <input type="number" id="setting-daily-soft-cap" min="1" max="16" step="0.5" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-daily-soft-cap', 1, 0.5, 1, 16)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-daily-soft-cap', 1, 0.5, 1, 16)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-l border-slate-700 select-none">+</button>
+                            </div>
                         </div>
+
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Max Bonus Cap (%)</label>
-                            <input type="number" id="setting-bonus-cap" min="100" max="300" step="5" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-bonus-cap', -1, 5, 100, 300)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-bonus-cap', -1, 5, 100, 300)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-r border-slate-700 select-none">-</button>
+                                <input type="number" id="setting-bonus-cap" min="100" max="300" step="5" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-bonus-cap', 1, 5, 100, 300)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-bonus-cap', 1, 5, 100, 300)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-l border-slate-700 select-none">+</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -694,19 +703,62 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Focus Duration (Minutes)</label>
-                            <input type="number" id="setting-pomo-focus" min="1" max="180" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-pomo-focus', -1, 1, 1, 180)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-pomo-focus', -1, 1, 1, 180)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-r border-slate-700 select-none">-</button>
+                                <input type="number" id="setting-pomo-focus" min="1" max="180" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-pomo-focus', 1, 1, 1, 180)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-pomo-focus', 1, 1, 1, 180)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-l border-slate-700 select-none">+</button>
+                            </div>
                         </div>
+
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Short Break (Minutes)</label>
-                            <input type="number" id="setting-pomo-short" min="1" max="60" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-pomo-short', -1, 1, 1, 60)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-pomo-short', -1, 1, 1, 60)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-r border-slate-700 select-none">-</button>
+                                <input type="number" id="setting-pomo-short" min="1" max="60" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-pomo-short', 1, 1, 1, 60)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-pomo-short', 1, 1, 1, 60)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-l border-slate-700 select-none">+</button>
+                            </div>
                         </div>
+
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Long Break (Minutes)</label>
-                            <input type="number" id="setting-pomo-long" min="1" max="120" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-pomo-long', -1, 1, 1, 120)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-pomo-long', -1, 1, 1, 120)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-r border-slate-700 select-none">-</button>
+                                <input type="number" id="setting-pomo-long" min="1" max="120" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-pomo-long', 1, 1, 1, 120)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-pomo-long', 1, 1, 1, 120)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-l border-slate-700 select-none">+</button>
+                            </div>
                         </div>
+
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Target Focus Rounds Before Long Break</label>
-                            <input type="number" id="setting-pomo-rounds" min="1" max="12" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
+                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden shadow-inner">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-pomo-rounds', -1, 1, 1, 12)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-pomo-rounds', -1, 1, 1, 12)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-r border-slate-700 select-none">-</button>
+                                <input type="number" id="setting-pomo-rounds" min="1" max="12" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                <button type="button" 
+                                    onmousedown="startHoldStep('setting-pomo-rounds', 1, 1, 1, 12)" onmouseup="stopHoldStep()" onmouseleave="stopHoldStep()"
+                                    ontouchstart="startHoldStep('setting-pomo-rounds', 1, 1, 1, 12)" ontouchend="stopHoldStep()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold transition-all border-l border-slate-700 select-none">+</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -817,6 +869,26 @@
         let shadowSpectatorIsRunning = false;
         let shadowSpectatorInterval = null;
 
+        let holdInterval = null;
+        let holdTimeout = null;
+
+        const RATING_DATA = {
+            results: [
+                { level: 1, icon: '⚡', title: 'Minimal', desc: 'Warmup or light prep' },
+                { level: 2, icon: '🌱', title: 'Fair', desc: 'Modest progress made' },
+                { level: 3, icon: '🎯', title: 'Solid', desc: 'On-target standard pace' },
+                { level: 4, icon: '✨', title: 'High Craft', desc: 'Exceptional output speed' },
+                { level: 5, icon: '👑', title: 'Peak Flow', desc: 'Flawless breakthrough' }
+            ],
+            effort: [
+                { level: 1, icon: '🍃', title: 'Effortless', desc: 'Zero resistance or strain' },
+                { level: 2, icon: '☁️', title: 'Light', desc: 'Mild focus required' },
+                { level: 3, icon: '🔥', title: 'Moderate', desc: 'Standard focus effort' },
+                { level: 4, icon: '⛰️', title: 'Heavy', desc: 'Overcame strong fatigue' },
+                { level: 5, icon: '🌋', title: 'Max Willpower', desc: 'Intense willpower push' }
+            ]
+        };
+
         let userSettings = {
             monthlyCash: 8000,
             weeklyHours: 10,
@@ -899,45 +971,77 @@
             document.getElementById('audio-toggle-btn').innerText = audioMuted ? "🔇" : "🔊";
         }
 
-        // --- DURATION STEPPERS & ICON TIER SELECTION ---
+        // --- HOLDABLE STEPPERS FOR ALL NUMERIC INPUTS ---
 
-        function adjustHours(inputId, delta) {
+        function stepValue(inputId, delta, step, min, max) {
             const input = document.getElementById(inputId);
-            let val = parseFloat(input.value) || 0.5;
-            val = Math.max(0.25, val + delta);
-            input.value = val.toFixed(2);
+            if (!input) return;
+            let val = parseFloat(input.value) || 0;
+            val += delta * step;
+            if (min !== undefined && min !== null) val = Math.max(min, val);
+            if (max !== undefined && max !== null) val = Math.min(max, val);
+            
+            if (step < 1) {
+                input.value = val.toFixed(2);
+            } else {
+                input.value = Math.round(val);
+            }
         }
 
-        function selectRating(field, val) {
-            document.getElementById(`work-${field}`).value = val;
-            
-            const container = document.getElementById(`pills-${field}-container`);
-            const buttons = container.querySelectorAll('.tier-card');
-            buttons.forEach((btn, idx) => {
-                if (idx + 1 === val) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
+        function startHoldStep(inputId, delta, step, min, max) {
+            stopHoldStep();
+            stepValue(inputId, delta, step, min, max);
+            holdTimeout = setTimeout(() => {
+                holdInterval = setInterval(() => {
+                    stepValue(inputId, delta, step, min, max);
+                }, 80);
+            }, 300);
+        }
 
-            const labels = {
-                results: [
-                    '1 — Minimal (Warmup or light prep)',
-                    '2 — Fair (Modest progress made)',
-                    '3 — Solid (On-target standard pace)',
-                    '4 — High Craft (Exceptional output speed)',
-                    '5 — Peak Flow (Flawless breakthrough)'
-                ],
-                effort: [
-                    '1 — Effortless (Zero resistance or strain)',
-                    '2 — Light (Mild focus required)',
-                    '3 — Moderate (Standard focus effort)',
-                    '4 — Heavy (Overcame strong fatigue)',
-                    '5 — Max Willpower (Intense willpower push)'
-                ]
-            };
-            document.getElementById(`label-${field}-text`).innerText = labels[field][val - 1];
+        function stopHoldStep() {
+            if (holdTimeout) clearTimeout(holdTimeout);
+            if (holdInterval) clearInterval(holdInterval);
+            holdTimeout = null;
+            holdInterval = null;
+        }
+
+        // --- SINGLE SELECTOR BOX RATING CONTROLS ---
+
+        function updateRatingUI(field) {
+            const hiddenInput = document.getElementById(`work-${field}`);
+            if (!hiddenInput) return;
+            const val = parseInt(hiddenInput.value) || 3;
+            const data = RATING_DATA[field][val - 1];
+            
+            if (field === 'results') {
+                document.getElementById('q-icon').innerText = data.icon;
+                document.getElementById('q-badge').innerText = `LVL ${data.level}`;
+                document.getElementById('q-title').innerText = data.title;
+                document.getElementById('q-desc').innerText = data.desc;
+            } else {
+                document.getElementById('e-icon').innerText = data.icon;
+                document.getElementById('e-badge').innerText = `LVL ${data.level}`;
+                document.getElementById('e-title').innerText = data.title;
+                document.getElementById('e-desc').innerText = data.desc;
+            }
+        }
+
+        function stepRating(field, delta) {
+            const hiddenInput = document.getElementById(`work-${field}`);
+            let currentVal = parseInt(hiddenInput.value) || 3;
+            currentVal = Math.max(1, Math.min(5, currentVal + delta));
+            hiddenInput.value = currentVal;
+            updateRatingUI(field);
+        }
+
+        function startHoldStepRating(field, delta) {
+            stopHoldStep();
+            stepRating(field, delta);
+            holdTimeout = setTimeout(() => {
+                holdInterval = setInterval(() => {
+                    stepRating(field, delta);
+                }, 120);
+            }, 300);
         }
 
         // --- INSTANT AVATAR & THEME HANDLERS ---
@@ -1422,6 +1526,8 @@
                 updateUserSwitcherUI();
                 initCharts();
                 loadUserData();
+                updateRatingUI('results');
+                updateRatingUI('effort');
                 
                 startGlobalUIRenderer();
                 attachPomoSpectatorListener();
@@ -1556,10 +1662,15 @@
                 const el = document.getElementById(`tab-${t}`);
                 if (el) el.classList.add('hidden');
                 const nav = document.getElementById(`nav-${t}`);
-                if (nav) nav.className = "pb-3 text-sm text-slate-400 hover:text-slate-200 whitespace-nowrap";
+                if (nav) {
+                    if (t === tab) {
+                        nav.className = "tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap";
+                    } else {
+                        nav.className = "tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap";
+                    }
+                }
             });
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            document.getElementById(`nav-${tab}`).className = "pb-3 text-sm tab-active whitespace-nowrap";
             
             if (tab === 'pomo') {
                 attachPomoSpectatorListener();
