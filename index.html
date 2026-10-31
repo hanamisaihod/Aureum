@@ -4,11 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AUREUM — Autonomous Living & Creative Ledger</title>
+    
+    <!-- PWA & Mobile Home Screen Icon Configuration (Gold 'A' Theme) -->
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AUREUM">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23fef08a%22%2F%3E%3Cstop%20offset%3D%2250%25%22%20stop-color%3D%22%23f59e0b%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23b45309%22%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%22b%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%220%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231e293b%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23020617%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22110%22%20fill%3D%22url(%23b)%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%2214%22%20width%3D%22484%22%20height%3D%22484%22%20rx%3D%2296%22%20fill%3D%22none%22%20stroke%3D%22url(%23g)%22%20stroke-width%3D%2210%22%20stroke-opacity%3D%220.45%22%2F%3E%3Cpolygon%20points%3D%22256%2C80%20276%2C118%20256%2C108%20236%2C118%22%20fill%3D%22url(%23g)%22%2F%3E%3Cpath%20d%3D%22M%20256%2C122%20L%20378%2C412%20L%20316%2C412%20L%20286%2C336%20L%20226%2C336%20L%20196%2C412%20L%20134%2C412%20Z%20M%20256%2C212%20L%20240%2C276%20L%20272%2C276%20Z%22%20fill%3D%22url(%23g)%22%2F%3E%3C%2Fsvg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23fef08a%22%2F%3E%3Cstop%20offset%3D%2250%25%22%20stop-color%3D%22%23f59e0b%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23b45309%22%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%22b%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%220%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231e293b%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23020617%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22110%22%20fill%3D%22url(%23b)%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%2214%22%20width%3D%22484%22%20height%3D%22484%22%20rx%3D%2296%22%20fill%3D%22none%22%20stroke%3D%22url(%23g)%22%20stroke-width%3D%2210%22%20stroke-opacity%3D%220.45%22%2F%3E%3Cpolygon%20points%3D%22256%2C80%20276%2C118%20256%2C108%20236%2C118%22%20fill%3D%22url(%23g)%22%2F%3E%3Cpath%20d%3D%22M%20256%2C122%20L%20378%2C412%20L%20316%2C412%20L%20286%2C336%20L%20226%2C336%20L%20196%2C412%20L%20134%2C412%20Z%20M%20256%2C212%20L%20240%2C276%20L%20272%2C276%20Z%22%20fill%3D%22url(%23g)%22%2F%3E%3C%2Fsvg%3E">
+    <link rel="manifest" href="data:application/manifest+json;charset=UTF-8,%7B%22name%22%3A%22AUREUM%22%2C%22short_name%22%3A%22AUREUM%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bcharset%3DUTF-8%2C%253Csvg%2520xmlns%253D%2522http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg%2522%2520viewBox%253D%25220%25200%2520512%2520512%2522%253E%253Cdefs%253E%253ClinearGradient%2520id%253D%2522g%2522%2520x1%253D%25220%2525%2522%2520y1%253D%25220%2525%2522%2520x2%253D%2522100%2525%2522%2520y2%253D%2522100%2525%2522%253E%253Cstop%2520offset%253D%25220%2525%2522%2520stop-color%253D%2522%2523fef08a%2522%252F%253E%253Cstop%2520offset%253D%252250%2525%2522%2520stop-color%253D%2522%2523f59e0b%2522%252F%253E%253Cstop%2520offset%253D%2522100%2525%2522%2520stop-color%253D%2522%2523b45309%2522%252F%253E%253C%252FlinearGradient%253E%253ClinearGradient%2520id%253D%2522b%2522%2520x1%253D%25220%2525%2522%2520y1%253D%25220%2525%2522%2520x2%253D%25220%2525%2522%2520y2%253D%2522100%2525%2522%253E%253Cstop%2520offset%253D%25220%2525%2522%2520stop-color%253D%2522%25231e293b%2522%252F%253E%253Cstop%2520offset%253D%2522100%2525%2522%2520stop-color%253D%2522%2523020617%2522%252F%253E%253C%252FlinearGradient%253E%253C%252Fdefs%253E%253Crect%2520width%253D%2522512%2522%2520height%253D%2522512%2522%2520rx%253D%2522110%2522%2520fill%253D%2522url(%2523b)%2522%252F%253E%253Crect%2520x%253D%252214%2522%2520y%253D%252214%2522%2520width%253D%2522484%2522%2520height%253D%2522484%2522%2520rx%253D%252296%2522%2520fill%253D%2522none%2522%2520stroke%253D%2522url(%2523g)%2522%2520stroke-width%253D%252210%2522%2520stroke-opacity%3D%25220.45%2522%252F%253E%253Cpolygon%2520points%253D%2522256%252C80%2520276%252C118%2520256%252C108%2520236%252C118%2522%2520fill%253D%2522url(%2523g)%2522%252F%253E%253Cpath%2520d%253D%2522M%2520256%252C122%2520L%2520378%252C412%2520L%2520316%252C412%2520L%2520286%252C336%2520L%2520226%252C336%2520L%2520196%252C412%2520L%2520134%252C412%2520Z%2520M%2520256%252C212%2520L%2520240%252C276%2520L%2520272%252C276%2520Z%2522%2520fill%253D%2522url(%2523g)%2522%252F%253E%253C%252Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
     <style>
         :root { --bg-main: #0f172a; --card-bg: #1e293b; --card-border: #334155; --accent-primary: #f59e0b; --accent-primary-hover: #d97706; --accent-primary-text: #020617; --accent-glow: rgba(245, 158, 11, 0.25); }
         body[data-theme="gold"] { --bg-main: #0f172a; --card-bg: #1e293b; --card-border: #334155; --accent-primary: #f59e0b; --accent-primary-hover: #d97706; --accent-primary-text: #020617; --accent-glow: rgba(245, 158, 11, 0.25); }
@@ -40,7 +52,7 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* BADGES & TOAST STYLES */
+        /* BADGES & TOAST ANIMATIONS */
         .badge-card { background-color: var(--card-bg); border: 1px solid var(--card-border); transition: all 0.3s; }
         .badge-card.locked { opacity: 0.4; filter: grayscale(0.85); border-color: #334155 !important; }
         .badge-card.locked:hover { opacity: 0.65; filter: grayscale(0.4); }
@@ -49,9 +61,11 @@
         .badge-tier-gold { border-color: #f59e0b !important; box-shadow: 0 0 16px rgba(245, 158, 11, 0.35); }
         .badge-tier-titan { border-color: #10b981 !important; box-shadow: 0 0 18px rgba(16, 185, 129, 0.4); }
         .badge-tier-aureum { border-color: #a855f7 !important; box-shadow: 0 0 22px rgba(168, 85, 247, 0.5); background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(88, 28, 135, 0.25) 100%); }
+        
         #badge-toast-container { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 100; display: flex; flex-direction: column-reverse; gap: 0.75rem; pointer-events: none; }
-        .badge-toast { pointer-events: auto; animation: toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes toastSlideIn { from { opacity: 0; transform: translateY(-20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .badge-toast { pointer-events: auto; animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; transition: opacity 0.5s ease, transform 0.5s ease; }
+        .badge-toast.toast-hiding { opacity: 0 !important; transform: translateY(-20px) scale(0.9) !important; }
+        @keyframes toastSlideIn { from { opacity: 0; transform: translateY(-25px) scale(0.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
     </style>
 </head>
 <body data-theme="gold" class="p-4 md:p-8 max-w-6xl mx-auto">
@@ -676,22 +690,36 @@
             }).join('');
         }
 
-        function showBadgeToast(b) {
+        // UNIFIED SMOOTH TOAST NOTIFICATION ENGINE
+        function showToast({ title, subtitle, icon, tier = 'gold', duration = 3800 }) {
             const container = document.getElementById('badge-toast-container');
             if (!container) return;
             const toast = document.createElement('div');
-            toast.className = `badge-toast card p-4 rounded-xl shadow-2xl border-2 badge-tier-${b.tier} flex items-center gap-3 bg-slate-950/90 backdrop-blur-md`;
+            toast.className = `badge-toast card p-4 rounded-xl shadow-2xl border-2 badge-tier-${tier} flex items-center gap-3 bg-slate-950/90 backdrop-blur-md`;
             toast.innerHTML = `
-                <div class="text-3xl p-2 bg-slate-900 rounded-xl border border-slate-700 shrink-0">${b.icon}</div>
+                <div class="text-3xl p-2 bg-slate-900 rounded-xl border border-slate-700 shrink-0">${icon}</div>
                 <div>
-                    <div class="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest">🏆 Achievement Unlocked!</div>
-                    <div class="text-sm font-bold text-white">${b.title}</div>
-                    <div class="text-xs text-slate-300">${b.desc}</div>
+                    <div class="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest">${title}</div>
+                    <div class="text-xs text-slate-200 mt-0.5 font-medium leading-snug">${subtitle}</div>
                 </div>
             `;
             container.appendChild(toast);
             playTone('save');
-            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 4500);
+
+            setTimeout(() => {
+                toast.classList.add('toast-hiding');
+                setTimeout(() => toast.remove(), 500);
+            }, duration);
+        }
+
+        function showBadgeToast(b) {
+            showToast({
+                title: '🏆 Achievement Unlocked!',
+                subtitle: `<strong>${b.title}</strong> — ${b.desc}`,
+                icon: b.icon,
+                tier: b.tier,
+                duration: 4500
+            });
         }
 
         function evaluateBadges(logs, pRoundsList = []) {
@@ -1164,27 +1192,97 @@
             const normH = Math.min(T, Math.max(0, softCap - currentTodayHoursLogged)), overH = T - normH;
             const pts = (normH * baseRate) + (overH * baseRate * 0.25);
 
+            // Compute net cash allowance earned for this specific log (capped at maxCash)
+            const targetPts = (userSettings.weeklyHours || 10) * 12;
+            const pointRate = targetPts > 0 ? (userSettings.monthlyCash / targetPts) : 0;
+            const maxCash = userSettings.monthlyCash * ((userSettings.maxBonusCapPct || 125) / 100);
+
+            const now = new Date();
+            let currentMonthlyPts = 0;
+            currentRawLogsCache.forEach(l => {
+                if (l.type === 'work' && l.timestamp) {
+                    const d = l.timestamp.toDate ? l.timestamp.toDate() : new Date(l.timestamp);
+                    if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
+                        currentMonthlyPts += (l.points || 0);
+                    }
+                }
+            });
+
+            const cashBefore = Math.min(currentMonthlyPts * pointRate, maxCash);
+            const cashAfter = Math.min((currentMonthlyPts + pts) * pointRate, maxCash);
+            const netCashEarned = Math.max(0, cashAfter - cashBefore);
+
             await db.collection('logs').add({ type: 'work', user: loggedInUser, hours: T, normalHours: normH, overCapHours: overH, results: R, effort: E, points: pts, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            playTone('save'); loadUserData();
+            
+            showToast({
+                title: '💼 Work Session Logged',
+                subtitle: `<strong>+฿${Math.round(netCashEarned).toLocaleString()} Earned</strong> (${T}h logged @ Lvl ${R}/${E})`,
+                icon: '🎯',
+                tier: 'gold'
+            });
+
+            loadUserData();
         }
 
         async function logHealth(e) {
             e.preventDefault();
-            await db.collection('logs').add({ type: 'health', user: loggedInUser, level: parseInt(document.getElementById('health-level').value), note: document.getElementById('health-note').value, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            playTone('save'); document.getElementById('health-note').value = ''; loadUserData();
+            const lvl = parseInt(document.getElementById('health-level').value);
+            const note = document.getElementById('health-note').value.trim();
+
+            await db.collection('logs').add({ type: 'health', user: loggedInUser, level: lvl, note: note, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+            
+            showToast({
+                title: '🍨 Sweet Treat Logged',
+                subtitle: `Level ${lvl} snack recorded${note ? `: "${note}"` : ''}`,
+                icon: '🍦',
+                tier: 'emerald'
+            });
+
+            document.getElementById('health-note').value = ''; 
+            loadUserData();
         }
 
         async function logChore(e) {
             e.preventDefault();
-            await db.collection('logs').add({ type: 'chore', user: loggedInUser, hours: parseFloat(document.getElementById('chore-time').value), note: document.getElementById('chore-note').value, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            playTone('save'); document.getElementById('chore-note').value = ''; loadUserData();
+            const hrs = parseFloat(document.getElementById('chore-time').value);
+            const note = document.getElementById('chore-note').value.trim();
+
+            await db.collection('logs').add({ type: 'chore', user: loggedInUser, hours: hrs, note: note, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+            
+            showToast({
+                title: '🧹 House Chore Logged',
+                subtitle: `${hrs}h sanctuary time saved${note ? `: "${note}"` : ''}`,
+                icon: '🏰',
+                tier: 'silver'
+            });
+
+            document.getElementById('chore-note').value = ''; 
+            loadUserData();
         }
 
-        async function deleteLogEntry(id) { if (loggedInUser === viewedUser) { await db.collection('logs').doc(id).delete(); playTone('delete'); } }
+        async function deleteLogEntry(id) { 
+            if (loggedInUser === viewedUser) { 
+                await db.collection('logs').doc(id).delete(); 
+                playTone('delete'); 
+                showToast({ title: '🗑️ Entry Deleted', subtitle: 'Log record removed from Firestore.', icon: '📜', tier: 'bronze', duration: 2500 });
+            } 
+        }
+
         async function saveDailyDiary(e) {
-            e.preventDefault(); const text = document.getElementById('diary-text').value.trim(); if (!text) return;
+            e.preventDefault(); 
+            const text = document.getElementById('diary-text').value.trim(); 
+            if (!text) return;
+
             await db.collection('logs').add({ type: 'diary', user: loggedInUser, text: text, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            playTone('save'); loadUserData();
+            
+            showToast({
+                title: '📖 Reflection Saved',
+                subtitle: 'Daily mindset note updated!',
+                icon: '✍️',
+                tier: 'titan'
+            });
+
+            loadUserData();
         }
 
         async function handleInstantThemeChange() {
@@ -1221,7 +1319,9 @@
             userSettings.avatarUrl = document.getElementById('setting-avatar-url').value.trim();
 
             await db.collection('settings').doc(loggedInUser).set(userSettings, { merge: true });
-            playTone('save'); updateSettingsUI(); loadUserData(); setMyPomoMode('focus');
+            
+            showToast({ title: '⚙️ Settings Updated', subtitle: 'All Forge calibrations saved successfully.', icon: '🔧', tier: 'gold', duration: 3000 });
+            updateSettingsUI(); loadUserData(); setMyPomoMode('focus');
         }
 
         function loadUserData() {
