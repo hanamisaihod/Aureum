@@ -344,8 +344,110 @@
                                     </div>
                                     <div id="e-title" class="text-sm font-bold text-slate-100">Moderate Strain</div>
                                     <div id="e-desc" class="text-[11px] text-slate-400 mt-0.5">Standard focus effort</div>
+        <!-- TAB 1: CRUCIBLE -->
+        <div id="tab-crucible" class="space-y-6">
+            <!-- 1. TOP STATS GRID (CLOSED PROPERLY NOW) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                <!-- Card 1: Allowance Earned -->
+                <div id="payout-card-box" class="card p-6 rounded-xl flex flex-col justify-between text-center md:text-left min-h-[145px]">
+                    <div class="my-auto">
+                        <div class="flex items-center justify-between md:justify-start gap-2">
+                            <span class="text-xs uppercase tracking-wider text-slate-400 font-medium">Allowance Earned</span>
+                            <span id="allowance-yield-pill" class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">⚡ Standard Yield</span>
+                        </div>
+                        <div class="text-3xl font-extrabold text-emerald-400 mt-1.5" id="monthly-payout">฿0</div>
+                    </div>
+                    <div class="text-xs text-slate-500 pt-3 border-t border-slate-800/80 mt-2">Target Base: ฿<span id="label-monthly-cash">8,000</span> (<span id="label-weekly-hrs">10</span> hrs/wk)</div>
+                </div>
+
+                <!-- Card 2: Today's Work Cap -->
+                <div class="card p-6 rounded-xl flex flex-col justify-between text-center md:text-left min-h-[145px]">
+                    <div>
+                        <span class="text-xs uppercase tracking-wider text-slate-400 font-medium">Today's Work Cap</span>
+                        <div class="text-3xl font-extrabold theme-accent-text mt-1" id="today-hours-label">0.0 / 4.0 hrs</div>
+                        <div class="relative w-full bg-slate-900/80 h-3 rounded-full mt-3 overflow-hidden border border-slate-700/60 p-0.5">
+                            <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-amber-400/60 z-10 pointer-events-none" title="2.0h Daily Baseline"></div>
+                            <div id="daily-bar" class="bg-blue-500 h-full rounded-full transition-all duration-700"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center text-xs pt-3 border-t border-slate-800/80 mt-2">
+                        <span id="daily-cap-status" class="text-slate-400">4.0 hrs remaining today</span>
+                        <span id="milestone-2h-badge" class="text-[10px] font-semibold text-slate-500">2.0h Baseline</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: Monthly Goal Gauge -->
+                <div class="card p-6 rounded-xl flex items-center justify-between gap-4 min-h-[145px]">
+                    <div class="relative w-16 h-16 flex-shrink-0 flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            <path class="text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path id="gauge-circle-path" class="gauge-circle theme-accent-text" stroke-dasharray="100, 100" stroke-dashoffset="100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                        <span id="gauge-percent-text" class="absolute text-xs font-black text-slate-200">0%</span>
+                    </div>
+                    <div class="flex-1 text-right md:text-left">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Monthly Goal</span>
+                        <span id="gauge-tier-badge" class="text-sm font-extrabold theme-accent-text block mt-0.5">Initiate</span>
+                        <span id="gauge-tier-sub" class="text-xs text-slate-500 block mt-0.5">0% reached</span>
+                    </div>
+                </div>
+            </div> <!-- <-- PROPERLY CLOSES TOP 3-CARD GRID -->
+
+            <!-- 2. LOG WORK SESSION FORM -->
+            <div id="work-form-card" class="card p-6 rounded-xl space-y-6">
+                <div>
+                    <h2 class="text-lg font-semibold text-slate-200">Log Work Session</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Record completed work hours, quality rating, and focus effort.</p>
+                </div>
+                
+                <div id="work-form-softcap-notice" class="hidden p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
+                    <span>🍵</span>
+                    <span><strong>Soft Cap Active:</strong> Daily limit reached! Extra hours yield 25% allowance to preserve rest.</span>
+                </div>
+
+                <form id="work-form" onsubmit="logWork(event)" class="space-y-6">
+                    <input type="hidden" id="work-results" value="3">
+                    <input type="hidden" id="work-effort" value="3">
+
+                    <div class="max-w-xs">
+                        <label class="block text-xs text-slate-400 mb-2 font-medium">Time Spent (Hours)</label>
+                        <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
+                            <button type="button" onmousedown="startHold('value', 'work-time', -1, 0.25, 0.25)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'work-time', -1, 0.25, 0.25, undefined, event)" ontouchend="stopHold()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
+                            <input type="number" id="work-time" step="0.25" min="0.25" value="1.00" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
+                            <button type="button" onmousedown="startHold('value', 'work-time', 1, 0.25, 0.25)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'work-time', 1, 0.25, 0.25, undefined, event)" ontouchend="stopHold()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-2 font-medium">Work Quality</label>
+                            <div class="flex items-center bg-slate-900/90 rounded-2xl border border-slate-800 p-1.5">
+                                <button type="button" onmousedown="startHold('rating', 'results', -1)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('rating', 'results', -1, null, null, null, event)" ontouchend="stopHold()" class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold select-none">◀</button>
+                                <div id="selector-box-results" class="flex-1 px-4 py-2 text-center">
+                                    <div class="flex items-center justify-center gap-2 mb-0.5">
+                                        <span id="q-icon" class="text-2xl">🎯</span>
+                                        <span id="q-badge" class="text-xs font-bold theme-accent-text uppercase">LVL 3</span>
+                                    </div>
+                                    <div id="q-title" class="text-sm font-bold text-slate-100">Solid Output</div>
+                                    <div id="q-desc" class="text-[11px] text-slate-400 mt-0.5">Standard steady progress</div>
                                 </div>
-                                <button type="button" onmousedown="startHold('rating', 'effort', 1)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('rating', 'effort', 1, null, null, event)" ontouchend="stopHold()" class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold select-none">▶</button>
+                                <button type="button" onmousedown="startHold('rating', 'results', 1)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('rating', 'results', 1, null, null, null, event)" ontouchend="stopHold()" class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold select-none">▶</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-2 font-medium">Work Effort</label>
+                            <div class="flex items-center bg-slate-900/90 rounded-2xl border border-slate-800 p-1.5">
+                                <button type="button" onmousedown="startHold('rating', 'effort', -1)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('rating', 'effort', -1, null, null, null, event)" ontouchend="stopHold()" class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold select-none">◀</button>
+                                <div id="selector-box-effort" class="flex-1 px-4 py-2 text-center">
+                                    <div class="flex items-center justify-center gap-2 mb-0.5">
+                                        <span id="e-icon" class="text-2xl">🔥</span>
+                                        <span id="e-badge" class="text-xs font-bold theme-accent-text uppercase">LVL 3</span>
+                                    </div>
+                                    <div id="e-title" class="text-sm font-bold text-slate-100">Moderate Strain</div>
+                                    <div id="e-desc" class="text-[11px] text-slate-400 mt-0.5">Standard focus effort</div>
+                                </div>
+                                <button type="button" onmousedown="startHold('rating', 'effort', 1)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('rating', 'effort', 1, null, null, null, event)" ontouchend="stopHold()" class="px-3.5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold select-none">▶</button>
                             </div>
                         </div>
                     </div>
@@ -356,6 +458,7 @@
                 </form>
             </div>
 
+            <!-- 3. DAILY REFLECTION CARD -->
             <div id="diary-form-card" class="card p-6 rounded-xl">
                 <div class="flex justify-between items-center mb-2">
                     <h2 class="text-lg font-semibold text-slate-200">Daily Reflection</h2>
@@ -369,6 +472,7 @@
                 </form>
             </div>
 
+            <!-- 4. WORK ANALYTICS CHART -->
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div class="flex items-center gap-3">
@@ -391,6 +495,7 @@
                 </div>
             </div>
         </div>
+
 
         <!-- TAB 2: HOURGLASS -->
         <div id="tab-hourglass" class="hidden space-y-6 max-w-xl mx-auto">
