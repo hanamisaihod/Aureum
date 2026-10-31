@@ -43,7 +43,7 @@
         body { background-color: var(--bg-main); color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.3s; }
         button, input, select { touch-action: manipulation; }
 
-        /* CRISP GLASSMORPHISM CARDS (3D TILT FULLY REMOVED FOR TEXT CLARITY) */
+        /* CRISP GLASSMORPHISM CARDS */
         .card { 
             background: var(--card-bg); 
             backdrop-filter: blur(14px); 
@@ -71,6 +71,24 @@
         .avatar-btn:hover .avatar-tooltip { visibility: visible; opacity: 1; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* AMBIENT HEADER STATUS GLOW RINGS */
+        .glow-ring-idle { box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.4); }
+        .glow-ring-active { box-shadow: 0 0 12px 3px rgba(59, 130, 246, 0.6); animation: ringPulse 3s ease-in-out infinite alternate; }
+        .glow-ring-baseline { box-shadow: 0 0 18px 4px rgba(16, 185, 129, 0.7); animation: ringPulse 2.5s ease-in-out infinite alternate; }
+        .glow-ring-softcap { box-shadow: 0 0 22px 5px rgba(245, 158, 11, 0.85); animation: ringPulse 2s ease-in-out infinite alternate; }
+
+        @keyframes ringPulse {
+            0% { transform: scale(1); filter: brightness(1); }
+            100% { transform: scale(1.04); filter: brightness(1.25); }
+        }
+
+        /* POWER LEVEL BAR GLOW ANIMATION */
+        .power-bar-fill {
+            background: linear-gradient(90deg, #38bdf8 0%, #10b981 50%, #f59e0b 80%, #a855f7 100%);
+            box-shadow: 0 0 14px var(--accent-glow);
+            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
         /* LIVE FOCUS ATMOSPHERE GLOW PULSE */
         body.focus-ambient-active {
@@ -133,13 +151,14 @@
             </div>
             
             <div class="flex items-center gap-5">
+                <!-- AMBIENT HEADER STATUS GLOW AVATARS -->
                 <div class="flex items-center gap-3 bg-slate-900/90 p-1.5 px-3 rounded-full border border-slate-700/80 shadow-lg">
                     <button id="user-btn-north" onclick="switchActiveUser('North')" class="avatar-btn rounded-full p-0.5">
-                        <img id="avatar-img-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-transparent">
+                        <img id="avatar-img-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="w-9 h-9 rounded-full bg-slate-800 object-cover transition-all">
                         <span class="avatar-tooltip" id="avatar-tip-north">North (You)</span>
                     </button>
                     <button id="user-btn-cream" onclick="switchActiveUser('Cream')" class="avatar-btn rounded-full p-0.5">
-                        <img id="avatar-img-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-transparent">
+                        <img id="avatar-img-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="w-9 h-9 rounded-full bg-slate-800 object-cover transition-all">
                         <span class="avatar-tooltip" id="avatar-tip-cream">Cream</span>
                     </button>
                 </div>
@@ -301,7 +320,7 @@
             </div>
         </div>
 
-        <!-- TAB 2: HOURGLASS (POMODORO FOCUS TIMER) -->
+        <!-- TAB 2: HOURGLASS (POMODORO FOCUS TIMER + AMBIENT SOUNDSCAPES) -->
         <div id="tab-hourglass" class="hidden space-y-6 max-w-xl mx-auto">
             <div class="card p-8 rounded-xl text-center space-y-6 shadow-xl relative">
                 <div id="pomo-spectator-banner" class="hidden p-2.5 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 font-medium">
@@ -333,6 +352,32 @@
 
                 <div class="w-full bg-slate-900/80 h-2.5 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
                     <div id="pomo-progress-bar" class="theme-accent-bg h-full rounded-full transition-all duration-1000 w-full"></div>
+                </div>
+
+                <!-- AMBIENT SOUNDSCAPE GENERATOR PLAYER -->
+                <div class="p-4 bg-slate-900/70 border border-slate-800 rounded-xl space-y-3">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400 font-semibold flex items-center gap-1.5">
+                            <span>🎧</span> <span>Focus Soundscape</span>
+                        </span>
+                        <button onclick="toggleAmbientSoundscape()" id="ambient-toggle-btn" class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 transition-all">
+                            ▶ Play Sound
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 items-center">
+                        <select id="ambient-sound-select" onchange="changeAmbientSoundscape(this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none font-medium">
+                            <option value="rain">🌧️ Soft Rain & Drops</option>
+                            <option value="fire">🔥 Cozy Fireplace Crackle</option>
+                            <option value="cosmos">🌌 Deep Cosmos Drone</option>
+                            <option value="wind">🍃 Gentle Mountain Wind</option>
+                        </select>
+
+                        <div class="flex items-center gap-2 bg-slate-800/60 p-1.5 px-3 rounded-lg border border-slate-700/60">
+                            <span class="text-[11px] text-slate-400">Vol</span>
+                            <input type="range" id="ambient-vol-slider" min="0" max="100" value="50" oninput="updateAmbientVolume(this.value)" class="w-full accent-amber-500 cursor-pointer">
+                        </div>
+                    </div>
                 </div>
 
                 <div id="pomo-controls-box" class="flex justify-center gap-4">
@@ -618,8 +663,34 @@
             </form>
         </div>
 
-        <!-- TAB 5: CHRONICLES (LEDGER HISTORY) -->
+        <!-- TAB 5: CHRONICLES (LEDGER HISTORY & POWER LEVEL BAR) -->
         <div id="tab-chronicles" class="hidden space-y-6">
+            <!-- DAILY POWER LEVEL METER PILL -->
+            <div class="card p-6 rounded-xl border border-slate-700/80 space-y-3">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div class="flex items-center gap-3">
+                        <div id="power-rank-icon" class="text-3xl p-2.5 bg-slate-900/80 rounded-xl border border-slate-700/80">⚡</div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs uppercase font-extrabold tracking-widest text-slate-400">Daily Power Meter</span>
+                                <span id="power-rank-title" class="text-xs font-extrabold px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">Awakened Flame</span>
+                            </div>
+                            <div class="text-2xl font-black text-white mt-0.5 flex items-center gap-2">
+                                <span id="power-score-val" class="theme-accent-text font-mono">0</span>
+                                <span class="text-xs text-slate-400 font-normal">PWR</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="power-breakdown-tags" class="flex flex-wrap gap-2 text-[11px] font-semibold text-slate-300">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="relative w-full bg-slate-900/90 h-3.5 rounded-full overflow-hidden border border-slate-700/80 p-0.5">
+                    <div id="power-level-bar" class="power-bar-fill h-full rounded-full w-0"></div>
+                </div>
+            </div>
+
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div>
@@ -729,7 +800,7 @@
             ]
         };
 
-        // 2. FX ENGINE: CANVAS PARTICLE BURSTS (3D TILT FULLY REMOVED FOR TEXT CLARITY)
+        // 2. FX ENGINE: CANVAS PARTICLE BURSTS
         const canvas = document.getElementById('fx-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -977,7 +1048,9 @@
             } else { renderBadgeGrid(unlockedSet); }
         }
 
-        // 4. AUDIO & UI HELPERS
+        // 4. AUDIO & PROCEDURAL AMBIENT SOUNDSCAPE ENGINE (WEB AUDIO API)
+        let ambientAudioCtx = null, ambientSourceNode = null, ambientGainNode = null, ambientIsPlaying = false, currentSoundscape = 'rain';
+
         function playTone(type) {
             if (audioMuted) return;
             try {
@@ -999,6 +1072,104 @@
                     });
                 }
             } catch (e) {}
+        }
+
+        function initAmbientAudio() {
+            if (!ambientAudioCtx) ambientAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function startAmbientSoundscape(type) {
+            stopAmbientSoundscape();
+            initAmbientAudio();
+            if (ambientAudioCtx.state === 'suspended') ambientAudioCtx.resume();
+
+            currentSoundscape = type || 'rain';
+            const sampleRate = ambientAudioCtx.sampleRate, bufferSize = 2 * sampleRate;
+            const noiseBuffer = ambientAudioCtx.createBuffer(1, bufferSize, sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+
+            if (currentSoundscape === 'rain') {
+                let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+                for (let i = 0; i < bufferSize; i++) {
+                    let white = Math.random() * 2 - 1;
+                    b0 = 0.99886 * b0 + white * 0.0555179; b1 = 0.99332 * b1 + white * 0.0750759;
+                    b2 = 0.96900 * b2 + white * 0.1538520; b3 = 0.86650 * b3 + white * 0.3104856;
+                    b4 = 0.55000 * b4 + white * 0.5329522; b5 = -0.7616 * b5 - white * 0.0168980;
+                    output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.04;
+                    b6 = white * 0.115926;
+                }
+                ambientSourceNode = ambientAudioCtx.createBufferSource();
+                ambientSourceNode.buffer = noiseBuffer; ambientSourceNode.loop = true;
+                const filter = ambientAudioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 1000;
+                ambientGainNode = ambientAudioCtx.createGain();
+                const vol = (parseFloat(document.getElementById('ambient-vol-slider')?.value) || 50) / 100;
+                ambientGainNode.gain.value = vol * 0.25;
+                ambientSourceNode.connect(filter); filter.connect(ambientGainNode); ambientGainNode.connect(ambientAudioCtx.destination);
+                ambientSourceNode.start(); ambientIsPlaying = true;
+            } else if (currentSoundscape === 'fire') {
+                let lastOut = 0.0;
+                for (let i = 0; i < bufferSize; i++) {
+                    let white = Math.random() * 2 - 1;
+                    output[i] = (lastOut + (0.02 * white)) / 1.02; lastOut = output[i]; output[i] *= 2.5;
+                }
+                ambientSourceNode = ambientAudioCtx.createBufferSource();
+                ambientSourceNode.buffer = noiseBuffer; ambientSourceNode.loop = true;
+                ambientGainNode = ambientAudioCtx.createGain();
+                const vol = (parseFloat(document.getElementById('ambient-vol-slider')?.value) || 50) / 100;
+                ambientGainNode.gain.value = vol * 0.3;
+                ambientSourceNode.connect(ambientGainNode); ambientGainNode.connect(ambientAudioCtx.destination);
+                ambientSourceNode.start(); ambientIsPlaying = true;
+            } else if (currentSoundscape === 'cosmos') {
+                const osc = ambientAudioCtx.createOscillator(), osc2 = ambientAudioCtx.createOscillator();
+                osc.type = 'sine'; osc.frequency.value = 65.41;
+                osc2.type = 'sine'; osc2.frequency.value = 98.00;
+                ambientGainNode = ambientAudioCtx.createGain();
+                const vol = (parseFloat(document.getElementById('ambient-vol-slider')?.value) || 50) / 100;
+                ambientGainNode.gain.value = vol * 0.15;
+                osc.connect(ambientGainNode); osc2.connect(ambientGainNode); ambientGainNode.connect(ambientAudioCtx.destination);
+                osc.start(); osc2.start();
+                ambientSourceNode = { stop: () => { osc.stop(); osc2.stop(); } }; ambientIsPlaying = true;
+            } else if (currentSoundscape === 'wind') {
+                for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+                ambientSourceNode = ambientAudioCtx.createBufferSource();
+                ambientSourceNode.buffer = noiseBuffer; ambientSourceNode.loop = true;
+                const filter = ambientAudioCtx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 400; filter.Q.value = 3.0;
+                ambientGainNode = ambientAudioCtx.createGain();
+                const vol = (parseFloat(document.getElementById('ambient-vol-slider')?.value) || 50) / 100;
+                ambientGainNode.gain.value = vol * 0.25;
+                ambientSourceNode.connect(filter); filter.connect(ambientGainNode); ambientGainNode.connect(ambientAudioCtx.destination);
+                ambientSourceNode.start(); ambientIsPlaying = true;
+            }
+            updateAmbientBtnUI();
+        }
+
+        function stopAmbientSoundscape() {
+            if (ambientSourceNode) { try { ambientSourceNode.stop(); } catch(e){} ambientSourceNode = null; }
+            ambientIsPlaying = false; updateAmbientBtnUI();
+        }
+
+        function toggleAmbientSoundscape() {
+            if (ambientIsPlaying) stopAmbientSoundscape();
+            else startAmbientSoundscape(document.getElementById('ambient-sound-select').value);
+        }
+
+        function changeAmbientSoundscape(val) {
+            currentSoundscape = val; if (ambientIsPlaying) startAmbientSoundscape(val);
+        }
+
+        function updateAmbientVolume(val) {
+            if (ambientGainNode && ambientAudioCtx) {
+                const vol = (parseFloat(val) || 0) / 100;
+                ambientGainNode.gain.setValueAtTime(vol * 0.25, ambientAudioCtx.currentTime);
+            }
+        }
+
+        function updateAmbientBtnUI() {
+            const btn = document.getElementById('ambient-toggle-btn');
+            if (btn) {
+                btn.innerText = ambientIsPlaying ? "⏸ Pause Sound" : "▶ Play Sound";
+                btn.className = ambientIsPlaying ? "px-3 py-1 rounded bg-amber-500 text-slate-950 text-[11px] font-bold shadow-md transition-all" : "px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 transition-all";
+            }
         }
 
         function requestNotificationPermission() { if ("Notification" in window && Notification.permission === "default") Notification.requestPermission(); }
@@ -1335,12 +1506,24 @@
             });
         }
 
-        function updateAvatarsInHeader() {
+        function updateAvatarsInHeader(todayWorkHrs = currentTodayHoursLogged) {
             const nImg = document.getElementById('avatar-img-north'), cImg = document.getElementById('avatar-img-cream');
             if (viewedUser === 'North' && userSettings.avatarUrl) nImg.src = userSettings.avatarUrl;
             if (viewedUser === 'Cream' && userSettings.avatarUrl) cImg.src = userSettings.avatarUrl;
-            nImg.className = viewedUser === 'North' ? "w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.5)]" : "w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-transparent opacity-60";
-            cImg.className = viewedUser === 'Cream' ? "w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.5)]" : "w-9 h-9 rounded-full bg-slate-800 object-cover border-2 border-transparent opacity-60";
+            
+            const softCap = userSettings.dailySoftCap || 4;
+            let glowClass = "glow-ring-idle border-2 border-slate-700 opacity-60";
+            if (todayWorkHrs >= softCap) glowClass = "glow-ring-softcap border-2 border-amber-400 opacity-100";
+            else if (todayWorkHrs >= 2.0) glowClass = "glow-ring-baseline border-2 border-emerald-400 opacity-100";
+            else if (todayWorkHrs > 0) glowClass = "glow-ring-active border-2 border-blue-400 opacity-100";
+
+            if (viewedUser === 'North') {
+                nImg.className = `w-9 h-9 rounded-full bg-slate-800 object-cover ${glowClass}`;
+                cImg.className = "w-9 h-9 rounded-full bg-slate-800 object-cover glow-ring-idle border-2 border-transparent opacity-60";
+            } else {
+                cImg.className = `w-9 h-9 rounded-full bg-slate-800 object-cover ${glowClass}`;
+                nImg.className = "w-9 h-9 rounded-full bg-slate-800 object-cover glow-ring-idle border-2 border-transparent opacity-60";
+            }
         }
 
         function updateSettingsUI() {
@@ -1572,13 +1755,50 @@
             updateSettingsUI(); loadUserData(); setMyPomoMode('focus');
         }
 
+        function calculateAndRenderPowerMeter(todayLogs) {
+            let workH = 0, workoutH = 0, choreH = 0, snackC = 0;
+            todayLogs.forEach(l => {
+                if (l.type === 'work') workH += (l.hours || 0);
+                else if (l.type === 'workout') workoutH += (l.hours || 0);
+                else if (l.type === 'chore') choreH += (l.hours || 0);
+                else if (l.type === 'health') snackC += 1;
+            });
+
+            // Calculate Power Level Points
+            const pwrScore = Math.round((workH * 100) + (workoutH * 120) + (choreH * 80) + (snackC * 15));
+            document.getElementById('power-score-val').innerText = pwrScore.toLocaleString();
+
+            const targetCap = 800;
+            const barPct = Math.min(100, Math.round((pwrScore / targetCap) * 100));
+            document.getElementById('power-level-bar').style.width = `${barPct}%`;
+
+            const rankIcon = document.getElementById('power-rank-icon');
+            const rankTitle = document.getElementById('power-rank-title');
+            
+            if (pwrScore >= 900) { rankIcon.innerText = '👑'; rankTitle.innerText = 'Ascended Overlord'; rankTitle.className = "text-xs font-extrabold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40"; }
+            else if (pwrScore >= 600) { rankIcon.innerText = '🔥'; rankTitle.innerText = 'Mythic Champion'; rankTitle.className = "text-xs font-extrabold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40"; }
+            else if (pwrScore >= 350) { rankIcon.innerText = '🛡️'; rankTitle.innerText = 'Radiant Vanguard'; rankTitle.className = "text-xs font-extrabold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"; }
+            else if (pwrScore >= 150) { rankIcon.innerText = '⚡'; rankTitle.innerText = 'Awakened Flame'; rankTitle.className = "text-xs font-extrabold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/40"; }
+            else { rankIcon.innerText = '🪨'; rankTitle.innerText = 'Dormant Spark'; rankTitle.className = "text-xs font-extrabold px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700"; }
+
+            const tagsContainer = document.getElementById('power-breakdown-tags');
+            tagsContainer.innerHTML = `
+                <span class="px-2 py-1 bg-slate-900/90 rounded-md border border-amber-500/30 text-amber-300">⚗️ ${workH.toFixed(1)}h Work</span>
+                <span class="px-2 py-1 bg-slate-900/90 rounded-md border border-emerald-500/30 text-emerald-300">🏃 ${workoutH.toFixed(1)}h Fitness</span>
+                <span class="px-2 py-1 bg-slate-900/90 rounded-md border border-sky-500/30 text-sky-300">🧹 ${choreH.toFixed(1)}h Chores</span>
+                <span class="px-2 py-1 bg-slate-900/90 rounded-md border border-purple-500/30 text-purple-300">🍨 ${snackC} Snacks</span>
+            `;
+        }
+
         function loadUserData() {
             db.collection('logs').where('user', '==', viewedUser).onSnapshot(snapshot => {
-                let rawLogs = [], monthlyPoints = 0, todayHours = 0;
+                let rawLogs = [], monthlyPoints = 0, todayHours = 0, todayLogs = [];
                 const now = new Date(), startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
                 snapshot.forEach(doc => {
                     const d = doc.data(); d.id = doc.id; rawLogs.push(d);
+                    if (d.timestamp && d.timestamp.toDate() >= startToday) todayLogs.push(d);
+
                     if (d.type === 'work' && d.timestamp) {
                         const lDate = d.timestamp.toDate();
                         if (lDate.getFullYear() === now.getFullYear() && lDate.getMonth() === now.getMonth()) monthlyPoints += (d.points || 0);
@@ -1612,6 +1832,8 @@
                     badge.innerText = "2.0h Baseline"; badge.className = "text-[10px] font-semibold text-slate-500"; notice?.classList.add('hidden');
                 }
 
+                updateAvatarsInHeader(todayHours);
+                calculateAndRenderPowerMeter(todayLogs);
                 updateGoalGauge(finalPayout, userSettings.monthlyCash);
                 updateChartData('work', rawLogs.filter(l => l.type === 'work'), pointRate, maxCash);
                 updateChartData('sanctuary', rawLogs, pointRate, maxCash);
