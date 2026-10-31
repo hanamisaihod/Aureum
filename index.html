@@ -334,7 +334,7 @@
             </div>
         </div>
 
-        <!-- TAB 3: SANCTUARY (TIGHTENED UNIFORM LAYOUT) -->
+        <!-- TAB 3: SANCTUARY -->
         <div id="tab-sanctuary" class="hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                 <!-- 🏃 Fitness Card -->
@@ -435,6 +435,29 @@
                 </div>
             </div>
 
+            <div class="card p-6 rounded-xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                    <div class="flex items-center gap-3">
+                        <h3 class="text-md font-semibold text-slate-200">Activity Trends</h3>
+                        <select id="sanctuary-subchart-select" onchange="setSanctuaryChartMode(this.value)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-white focus:outline-none font-medium">
+                            <option value="workout">🏃 Fitness Hours</option>
+                            <option value="chore">🧹 Chore Hours</option>
+                            <option value="health">🍨 Snack Count</option>
+                        </select>
+                    </div>
+                    <div class="flex bg-slate-900/80 p-1 rounded-lg border border-slate-700 text-xs">
+                        <button onclick="setChartRange('sanctuary', 'daily')" id="btn-sanctuary-daily" class="px-3 py-1 rounded text-slate-400">Daily</button>
+                        <button onclick="setChartRange('sanctuary', 'weekly')" id="btn-sanctuary-weekly" class="px-3 py-1 rounded text-slate-400">Weekly</button>
+                        <button onclick="setChartRange('sanctuary', 'monthly')" id="btn-sanctuary-monthly" class="px-3 py-1 rounded text-slate-400">Monthly</button>
+                        <button onclick="setChartRange('sanctuary', 'yearly')" id="btn-sanctuary-yearly" class="px-3 py-1 rounded text-slate-400">Yearly</button>
+                    </div>
+                </div>
+                <div class="h-64 w-full">
+                    <canvas id="sanctuaryChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
         <!-- TAB 4: FORGE SETTINGS -->
         <div id="tab-forge" class="hidden space-y-6">
             <form onsubmit="saveAllForgeSettings(event)" class="space-y-6 max-w-2xl">
