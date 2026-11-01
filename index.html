@@ -173,19 +173,19 @@
                     </div>
                 </div>
 
-                <!-- Card 3: Monthly Goal Gauge -->
-                <div class="card p-6 rounded-xl flex items-center justify-between gap-4 min-h-[145px]">
-                    <div class="relative w-16 h-16 flex-shrink-0 flex items-center justify-center">
+                <!-- Card 3: Monthly Goal Gauge (SCALED UP) -->
+                <div class="card p-6 rounded-xl flex items-center justify-between gap-6 min-h-[145px]">
+                    <div class="relative w-24 h-24 flex-shrink-0 flex items-center justify-center">
                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                            <path class="text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path id="gauge-circle-path" class="gauge-circle theme-accent-text" stroke-dasharray="100, 100" stroke-dashoffset="100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="text-slate-800" stroke-width="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path id="gauge-circle-path" class="gauge-circle theme-accent-text" stroke-dasharray="100, 100" stroke-dashoffset="100" stroke-width="4" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         </svg>
-                        <span id="gauge-percent-text" class="absolute text-xs font-black text-slate-200">0%</span>
+                        <span id="gauge-percent-text" class="absolute text-base font-black text-slate-100">0%</span>
                     </div>
                     <div class="flex-1 text-right md:text-left">
-                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Monthly Goal</span>
-                        <span id="gauge-tier-badge" class="text-sm font-extrabold theme-accent-text block mt-0.5">Initiate</span>
-                        <span id="gauge-tier-sub" class="text-xs text-slate-500 block mt-0.5">0% reached</span>
+                        <span class="text-xs uppercase font-bold text-slate-400 tracking-wider block">Monthly Goal</span>
+                        <span id="gauge-tier-badge" class="text-base font-black theme-accent-text block mt-1">Initiate</span>
+                        <span id="gauge-tier-sub" class="text-xs text-slate-400 block mt-0.5">0% reached</span>
                     </div>
                 </div>
             </div>
@@ -274,11 +274,11 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div class="flex items-center gap-3">
                         <h3 class="text-md font-semibold text-slate-200">Work Analytics</h3>
-                        <select id="work-chart-mode" onchange="setWorkChartMode(this.value)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-white focus:outline-none font-medium">
-                            <option value="bar">📊 Bar Chart</option>
-                            <option value="line">📈 Line Chart</option>
-                            <option value="area">🌊 Area Chart</option>
-                        </select>
+                        <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700 text-xs gap-1">
+                            <button type="button" onclick="setWorkChartMode('bar')" id="btn-work-mode-bar" class="px-3 py-1.5 rounded-lg font-medium transition-all bg-blue-600 text-white flex items-center gap-1"><span>📊</span> <span>Bar</span></button>
+                            <button type="button" onclick="setWorkChartMode('line')" id="btn-work-mode-line" class="px-3 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white flex items-center gap-1"><span>📈</span> <span>Line</span></button>
+                            <button type="button" onclick="setWorkChartMode('area')" id="btn-work-mode-area" class="px-3 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white flex items-center gap-1"><span>🌊</span> <span>Area</span></button>
+                        </div>
                     </div>
                     <div class="flex bg-slate-900/80 p-1 rounded-lg border border-slate-700 text-xs">
                         <button onclick="setChartRange('work', 'daily')" id="btn-work-daily" class="px-3 py-1 rounded text-slate-400">Daily</button>
@@ -334,14 +334,13 @@
             </div>
         </div>
 
-        <!-- TAB 3: SANCTUARY -->
+        <!-- TAB 3: SANCTUARY (CLEANED CARDS) -->
         <div id="tab-sanctuary" class="hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                 <!-- 🏃 Fitness Card -->
                 <div id="workout-form-card" class="card p-6 rounded-xl flex flex-col justify-between">
-                    <div class="h-10 flex flex-col justify-center">
+                    <div class="h-8 flex flex-col justify-center">
                         <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>🏃</span> <span>Fitness Log</span></h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Log exercise & workout sessions.</p>
                     </div>
                     <form onsubmit="logWorkout(event)" class="relative h-[196px] mt-2">
                         <input type="hidden" id="workout-strain" value="3">
@@ -377,9 +376,8 @@
 
                 <!-- 🧹 House Chores Card -->
                 <div id="chore-form-card" class="card p-6 rounded-xl flex flex-col justify-between">
-                    <div class="h-10 flex flex-col justify-center">
+                    <div class="h-8 flex flex-col justify-center">
                         <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>🧹</span> <span>House Chores</span></h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Log household tasks & cleaning.</p>
                     </div>
                     <form onsubmit="logChore(event)" class="relative h-[196px] mt-2">
                         <div class="absolute top-0 left-0 right-0 h-[64px]">
@@ -402,9 +400,8 @@
 
                 <!-- 🍨 Snacks Card -->
                 <div id="health-form-card" class="card p-6 rounded-xl flex flex-col justify-between">
-                    <div class="h-10 flex flex-col justify-center">
+                    <div class="h-8 flex flex-col justify-center">
                         <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>🍨</span> <span>Snacks & Treats</span></h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Track sweet treats & refreshments.</p>
                     </div>
                     <form onsubmit="logHealth(event)" class="relative h-[196px] mt-2">
                         <div class="absolute top-0 left-0 right-0 h-[64px]">
@@ -426,15 +423,16 @@
                 </div>
             </div>
 
+            <!-- SANCTUARY CHART (MULTI-DATASET WITH ICON BUTTONS) -->
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div class="flex items-center gap-3">
                         <h3 class="text-md font-semibold text-slate-200">Activity Trends</h3>
-                        <select id="sanctuary-subchart-select" onchange="setSanctuaryChartMode(this.value)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-white focus:outline-none font-medium">
-                            <option value="workout">🏃 Fitness Hours</option>
-                            <option value="chore">🧹 Chore Hours</option>
-                            <option value="health">🍨 Snack Count</option>
-                        </select>
+                        <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700 text-xs gap-1">
+                            <button type="button" onclick="setSanctuaryChartMode('bar')" id="btn-sanctuary-mode-bar" class="px-3 py-1.5 rounded-lg font-medium transition-all bg-blue-600 text-white flex items-center gap-1"><span>📊</span> <span>Bar</span></button>
+                            <button type="button" onclick="setSanctuaryChartMode('line')" id="btn-sanctuary-mode-line" class="px-3 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white flex items-center gap-1"><span>📈</span> <span>Line</span></button>
+                            <button type="button" onclick="setSanctuaryChartMode('area')" id="btn-sanctuary-mode-area" class="px-3 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white flex items-center gap-1"><span>🌊</span> <span>Area</span></button>
+                        </div>
                     </div>
                     <div class="flex bg-slate-900/80 p-1 rounded-lg border border-slate-700 text-xs">
                         <button onclick="setChartRange('sanctuary', 'daily')" id="btn-sanctuary-daily" class="px-3 py-1 rounded text-slate-400">Daily</button>
@@ -525,17 +523,14 @@
                     <h2 class="text-lg font-semibold mb-2 text-slate-200">Work & Allowance Goals</h2>
                     <p class="text-xs text-slate-400 mb-4">Calibrate monthly work goals and spending allowance payouts.</p>
                     <div class="space-y-4">
+                        <!-- CLEAN INPUT FOR ALLOWANCE CASH (STEPPERS REMOVED) -->
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Target Monthly Cash Allowance (฿)</label>
-                            <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
-                                <button type="button" onmousedown="startHold('value', 'setting-monthly-cash', -1, 500, 1000, undefined, event)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-monthly-cash', -1, 500, 1000, undefined, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
-                                <input type="number" id="setting-monthly-cash" min="1000" step="500" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                <button type="button" onmousedown="startHold('value', 'setting-monthly-cash', 1, 500, 1000, undefined, event)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-monthly-cash', 1, 500, 1000, undefined, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
-                            </div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Target Monthly Cash Allowance (฿)</label>
+                            <input type="number" id="setting-monthly-cash" min="1000" step="500" value="8000" required class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-sm text-white font-mono font-bold focus:outline-none focus:border-amber-500">
                         </div>
 
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Target Weekly Work Hours</label>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Target Weekly Work Hours</label>
                             <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
                                 <button type="button" onmousedown="startHold('value', 'setting-weekly-hrs', -1, 1, 1, 80, event)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-weekly-hrs', -1, 1, 1, 80, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-weekly-hrs" min="1" max="80" step="1" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
@@ -544,7 +539,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Daily Work Soft Cap (Hours)</label>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Daily Work Soft Cap (Hours)</label>
                             <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
                                 <button type="button" onmousedown="startHold('value', 'setting-daily-soft-cap', -1, 0.5, 1, 16, event)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-daily-soft-cap', -1, 0.5, 1, 16, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-daily-soft-cap" min="1" max="16" step="0.5" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
@@ -553,7 +548,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Max Bonus Cap (%)</label>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Max Bonus Cap (%)</label>
                             <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
                                 <button type="button" onmousedown="startHold('value', 'setting-bonus-cap', -1, 5, 100, 300, event)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-bonus-cap', -1, 5, 100, 300, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-bonus-cap" min="100" max="300" step="5" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
@@ -568,7 +563,7 @@
                     <p class="text-xs text-slate-400 mb-4">Customize focus session durations and round cycles.</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Focus Duration (Minutes)</label>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Focus Duration (Minutes)</label>
                             <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
                                 <button type="button" onmousedown="startHold('value', 'setting-pomo-focus', -1, 1, 1, 180, event)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-pomo-focus', -1, 1, 1, 180, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-pomo-focus" min="1" max="180" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
@@ -577,7 +572,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Short Break (Minutes)</label>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Short Break (Minutes)</label>
                             <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
                                 <button type="button" onmousedown="startHold('value', 'setting-pomo-short', -1, 1, 1, 60, event)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-pomo-short', -1, 1, 1, 60, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-pomo-short" min="1" max="60" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
@@ -586,7 +581,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Long Break (Minutes)</label>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Long Break (Minutes)</label>
                             <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
                                 <button type="button" onmousedown="startHold('value', 'setting-pomo-long', -1, 1, 1, 120, event)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-pomo-long', -1, 1, 1, 120, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-pomo-long" min="1" max="120" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
@@ -595,7 +590,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Rounds Before Long Break</label>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Rounds Before Long Break</label>
                             <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
                                 <button type="button" onmousedown="startHold('value', 'setting-pomo-rounds', -1, 1, 1, 12, event)" onmouseup="stopHold()" onmouseleave="stopHold()" ontouchstart="startHold('value', 'setting-pomo-rounds', -1, 1, 1, 12, event)" ontouchend="stopHold()" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="setting-pomo-rounds" min="1" max="12" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
@@ -712,6 +707,24 @@
 
         let loggedInUser = 'North', viewedUser = 'North', currentUserUid = null, audioMuted = false;
         let activeHoldTimer = null, activeHoldInterval = null, isTouchScrolling = false;
+
+        // PC RIGHT-CLICK DRAG SCROLLING
+        let isRightDragging = false, dragStartX = 0, dragStartY = 0, dragScrollX = 0, dragScrollY = 0, didRightDrag = false;
+        window.addEventListener('mousedown', (e) => {
+            if (e.button === 2) {
+                isRightDragging = true; didRightDrag = false;
+                dragStartX = e.clientX; dragStartY = e.clientY;
+                dragScrollX = window.scrollX; dragScrollY = window.scrollY;
+            }
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!isRightDragging) return;
+            const dx = e.clientX - dragStartX, dy = e.clientY - dragStartY;
+            if (Math.abs(dx) > 4 || Math.abs(dy) > 4) didRightDrag = true;
+            window.scrollTo(dragScrollX - dx, dragScrollY - dy);
+        });
+        window.addEventListener('mouseup', (e) => { if (e.button === 2) isRightDragging = false; });
+        window.addEventListener('contextmenu', (e) => { if (didRightDrag) { e.preventDefault(); didRightDrag = false; } });
 
         window.addEventListener('touchmove', () => { isTouchScrolling = true; stopHold(); }, { passive: true });
         window.addEventListener('touchend', () => { setTimeout(() => { isTouchScrolling = false; }, 50); });
@@ -912,7 +925,7 @@
             } else { renderBadgeGrid(unlockedSet); }
         }
 
-        // 3. AUDIO & STEPPER UTILITIES (OPTIMIZED FOR PC + MOBILE)
+        // 3. AUDIO & STEPPER UTILITIES
         function playTone(type) {
             if (audioMuted) return;
             try {
@@ -940,7 +953,6 @@
                 if (evt.type === 'touchstart') {
                     if (evt.cancelable) evt.preventDefault();
                 } else if (evt.type === 'mousedown' && ('ontouchstart' in window)) {
-                    // Ignore mouse emulations on touch-capable browsers
                     return;
                 }
             }
@@ -1144,11 +1156,11 @@
             }
         }
 
-        // 5. CHARTS ENGINE
-        let charts = {}, chartTimeframes = { work: 'daily', sanctuary: 'daily' }, workChartMode = 'bar', sanctuaryChartSubmode = 'workout';
+        // 5. CHARTS ENGINE (MULTI-DATASET & DIRECT ICON MODE BUTTONS)
+        let charts = {}, chartTimeframes = { work: 'daily', sanctuary: 'daily' }, workChartMode = 'bar', sanctuaryChartSubmode = 'bar';
         
         function initCharts() {
-            const opts = { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }, y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } } }, plugins: { legend: { display: false } } };
+            const opts = { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }, y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' }, beginAtZero: true } }, plugins: { legend: { display: false } } };
             
             charts['work'] = new Chart(document.getElementById('workChart').getContext('2d'), {
                 type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: '#10b981', borderColor: '#10b981', borderRadius: 4 }] },
@@ -1164,12 +1176,50 @@
             });
 
             charts['sanctuary'] = new Chart(document.getElementById('sanctuaryChart').getContext('2d'), {
-                type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: '#f59e0b', borderRadius: 4 }] }, options: opts
+                type: 'bar', 
+                data: { 
+                    labels: [], 
+                    datasets: [
+                        { label: '🏃 Fitness (h)', data: [], backgroundColor: '#f59e0b', borderColor: '#f59e0b', borderRadius: 4 },
+                        { label: '🧹 Chores (h)', data: [], backgroundColor: '#38bdf8', borderColor: '#38bdf8', borderRadius: 4 },
+                        { label: '🍨 Snacks', data: [], backgroundColor: '#10b981', borderColor: '#10b981', borderRadius: 4 }
+                    ] 
+                }, 
+                options: {
+                    ...opts,
+                    plugins: {
+                        legend: { display: true, labels: { color: '#94a3b8', font: { size: 11, weight: 'bold' } } }
+                    }
+                }
             });
         }
 
-        function setWorkChartMode(m) { workChartMode = m; if (charts['work']) { charts['work'].config.type = m === 'area' ? 'line' : m; charts['work'].data.datasets[0].fill = (m === 'area'); charts['work'].update(); } }
-        function setSanctuaryChartMode(m) { sanctuaryChartSubmode = m; loadUserData(); }
+        function setWorkChartMode(m) { 
+            workChartMode = m; 
+            if (charts['work']) { 
+                charts['work'].config.type = m === 'area' ? 'line' : m; 
+                charts['work'].data.datasets[0].fill = (m === 'area'); 
+                charts['work'].update(); 
+            } 
+            ['bar', 'line', 'area'].forEach(mode => {
+                const btn = document.getElementById(`btn-work-mode-${mode}`);
+                if (btn) btn.className = mode === m ? "px-3 py-1.5 rounded-lg font-medium transition-all bg-blue-600 text-white flex items-center gap-1" : "px-3 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white flex items-center gap-1";
+            });
+        }
+
+        function setSanctuaryChartMode(m) { 
+            sanctuaryChartSubmode = m; 
+            if (charts['sanctuary']) { 
+                charts['sanctuary'].config.type = m === 'area' ? 'line' : m; 
+                charts['sanctuary'].data.datasets.forEach(ds => ds.fill = (m === 'area'));
+                charts['sanctuary'].update(); 
+            } 
+            ['bar', 'line', 'area'].forEach(mode => {
+                const btn = document.getElementById(`btn-sanctuary-mode-${mode}`);
+                if (btn) btn.className = mode === m ? "px-3 py-1.5 rounded-lg font-medium transition-all bg-blue-600 text-white flex items-center gap-1" : "px-3 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white flex items-center gap-1";
+            });
+        }
+
         function setChartRange(t, r) { chartTimeframes[t] = r; updateChartTimeframeUI(t, r); loadUserData(); }
         function updateChartTimeframeUI(t, r) {
             ['daily', 'weekly', 'monthly', 'yearly'].forEach(x => {
@@ -1192,14 +1242,15 @@
 
         function updateChartData(type, logs, pointRate, maxCash) {
             const range = chartTimeframes[type], now = new Date();
-            let labels = [], values = [];
+            let labels = [];
 
-            if (range === 'daily') { for (let i = 13; i >= 0; i--) { const d = new Date(); d.setDate(now.getDate() - i); labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })); values.push(0); } }
-            else if (range === 'weekly') { for (let i = 7; i >= 0; i--) { const d = new Date(); d.setDate(now.getDate() - (i * 7)); labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })); values.push(0); } }
-            else if (range === 'monthly') { labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; values = new Array(12).fill(0); }
-            else { labels = ['2025','2026','2027']; values = [0,0,0]; }
+            if (range === 'daily') { for (let i = 13; i >= 0; i--) { const d = new Date(); d.setDate(now.getDate() - i); labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })); } }
+            else if (range === 'weekly') { for (let i = 7; i >= 0; i--) { const d = new Date(); d.setDate(now.getDate() - (i * 7)); labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })); } }
+            else if (range === 'monthly') { labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; }
+            else { labels = ['2025','2026','2027']; }
 
             if (type === 'work') {
+                let values = new Array(labels.length).fill(0);
                 logs.forEach(l => { values[values.length - 1] += (l.points || 0) * pointRate; });
                 values = values.map(v => Math.min(v, maxCash));
                 charts['work'].data.labels = labels;
@@ -1207,13 +1258,20 @@
                 charts['work'].data.datasets[0].data = values;
                 charts['work'].update();
             } else if (type === 'sanctuary') {
-                const subType = sanctuaryChartSubmode;
-                const filteredLogs = logs.filter(l => l.type === subType);
-                filteredLogs.forEach(l => { values[values.length - 1] += (subType === 'health' ? (l.level || 1) : (l.hours || 0)); });
+                let vWorkout = new Array(labels.length).fill(0);
+                let vChore = new Array(labels.length).fill(0);
+                let vHealth = new Array(labels.length).fill(0);
+
+                logs.forEach(l => {
+                    if (l.type === 'workout') vWorkout[vWorkout.length - 1] += (l.hours || 0);
+                    else if (l.type === 'chore') vChore[vChore.length - 1] += (l.hours || 0);
+                    else if (l.type === 'health') vHealth[vHealth.length - 1] += (l.level || 1);
+                });
                 
                 charts['sanctuary'].data.labels = labels;
-                charts['sanctuary'].data.datasets[0].backgroundColor = subType === 'workout' ? '#f59e0b' : (subType === 'chore' ? '#38bdf8' : '#10b981');
-                charts['sanctuary'].data.datasets[0].data = values;
+                charts['sanctuary'].data.datasets[0].data = vWorkout;
+                charts['sanctuary'].data.datasets[1].data = vChore;
+                charts['sanctuary'].data.datasets[2].data = vHealth;
                 charts['sanctuary'].update();
             }
         }
