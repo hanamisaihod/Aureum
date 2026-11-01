@@ -19,17 +19,56 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <style>
-        :root { --bg-main: #0f172a; --card-bg: rgba(15, 23, 42, 0.92); --card-border: rgba(255, 255, 255, 0.08); --accent-primary: #f59e0b; --accent-primary-hover: #d97706; --accent-primary-text: #020617; --accent-glow: rgba(245, 158, 11, 0.25); }
-        body[data-theme="gold"] { --bg-main: #0f172a; --card-bg: rgba(15, 23, 42, 0.92); --card-border: rgba(255, 255, 255, 0.08); --accent-primary: #f59e0b; --accent-primary-hover: #d97706; --accent-primary-text: #020617; --accent-glow: rgba(245, 158, 11, 0.25); }
-        body[data-theme="rose"] { --bg-main: #180e15; --card-bg: rgba(30, 16, 26, 0.92); --card-border: rgba(244, 114, 182, 0.15); --accent-primary: #f472b6; --accent-primary-hover: #e11d48; --accent-primary-text: #020617; --accent-glow: rgba(244, 114, 182, 0.3); }
-        body[data-theme="emerald"] { --bg-main: #061814; --card-bg: rgba(10, 32, 27, 0.92); --card-border: rgba(16, 185, 129, 0.15); --accent-primary: #10b981; --accent-primary-hover: #059669; --accent-primary-text: #020617; --accent-glow: rgba(16, 185, 129, 0.3); }
-        body[data-theme="cyber"] { --bg-main: #0b0f19; --card-bg: rgba(15, 20, 34, 0.92); --card-border: rgba(168, 85, 247, 0.15); --accent-primary: #a855f7; --accent-primary-hover: #9333ea; --accent-primary-text: #ffffff; --accent-glow: rgba(168, 85, 247, 0.35); }
-        body[data-theme="sunset"] { --bg-main: #1a100c; --card-bg: rgba(34, 20, 15, 0.92); --card-border: rgba(249, 115, 22, 0.15); --accent-primary: #f97316; --accent-primary-hover: #ea580c; --accent-primary-text: #020617; --accent-glow: rgba(249, 115, 22, 0.3); }
-        body[data-theme="amethyst"] { --bg-main: #120d1d; --card-bg: rgba(22, 16, 36, 0.92); --card-border: rgba(192, 132, 252, 0.15); --accent-primary: #c084fc; --accent-primary-hover: #a855f7; --accent-primary-text: #020617; --accent-glow: rgba(192, 132, 252, 0.3); }
-        body[data-theme="ocean"] { --bg-main: #0b1920; --card-bg: rgba(12, 28, 36, 0.92); --card-border: rgba(20, 184, 166, 0.15); --accent-primary: #14b8a6; --accent-primary-hover: #0d9488; --accent-primary-text: #020617; --accent-glow: rgba(20, 184, 166, 0.3); }
-        body[data-theme="crimson"] { --bg-main: #1a0c0e; --card-bg: rgba(34, 14, 17, 0.92); --card-border: rgba(239, 68, 68, 0.15); --accent-primary: #ef4444; --accent-primary-hover: #dc2626; --accent-primary-text: #ffffff; --accent-glow: rgba(239, 68, 68, 0.35); }
-        body[data-theme="matcha"] { --bg-main: #121813; --card-bg: rgba(20, 28, 22, 0.92); --card-border: rgba(132, 204, 22, 0.15); --accent-primary: #84cc16; --accent-primary-hover: #65a30d; --accent-primary-text: #020617; --accent-glow: rgba(132, 204, 22, 0.3); }
-        body[data-theme="monochrome"] { --bg-main: #121212; --card-bg: rgba(24, 24, 24, 0.92); --card-border: rgba(255, 255, 255, 0.1); --accent-primary: #e2e8f0; --accent-primary-hover: #cbd5e1; --accent-primary-text: #0f172a; --accent-glow: rgba(226, 232, 240, 0.25); }
+        :root { 
+            --bg-main: #0f172a; 
+            --card-bg: rgba(15, 23, 42, 0.92); 
+            --card-border: rgba(255, 255, 255, 0.08); 
+            --accent-primary: #f59e0b; 
+            --accent-secondary: #fef08a;
+            --accent-primary-hover: #d97706; 
+            --accent-primary-text: #020617; 
+            --accent-glow: rgba(245, 158, 11, 0.28); 
+        }
+        body[data-theme="gold"] { 
+            --bg-main: #0f172a; --card-bg: rgba(15, 23, 42, 0.92); --card-border: rgba(255, 255, 255, 0.08); 
+            --accent-primary: #f59e0b; --accent-secondary: #fef08a; --accent-primary-hover: #d97706; --accent-primary-text: #020617; --accent-glow: rgba(245, 158, 11, 0.28); 
+        }
+        body[data-theme="rose"] { 
+            --bg-main: #180e15; --card-bg: rgba(30, 16, 26, 0.92); --card-border: rgba(244, 114, 182, 0.18); 
+            --accent-primary: #f472b6; --accent-secondary: #fef08a; --accent-primary-hover: #e11d48; --accent-primary-text: #020617; --accent-glow: rgba(244, 114, 182, 0.35); 
+        }
+        body[data-theme="emerald"] { 
+            --bg-main: #061814; --card-bg: rgba(10, 32, 27, 0.92); --card-border: rgba(16, 185, 129, 0.18); 
+            --accent-primary: #10b981; --accent-secondary: #06b6d4; --accent-primary-hover: #059669; --accent-primary-text: #020617; --accent-glow: rgba(16, 185, 129, 0.35); 
+        }
+        body[data-theme="cyber"] { 
+            --bg-main: #0b0f19; --card-bg: rgba(15, 20, 34, 0.92); --card-border: rgba(168, 85, 247, 0.2); 
+            --accent-primary: #a855f7; --accent-secondary: #ec4899; --accent-primary-hover: #9333ea; --accent-primary-text: #ffffff; --accent-glow: rgba(168, 85, 247, 0.4); 
+        }
+        body[data-theme="sunset"] { 
+            --bg-main: #1a100c; --card-bg: rgba(34, 20, 15, 0.92); --card-border: rgba(249, 115, 22, 0.2); 
+            --accent-primary: #f97316; --accent-secondary: #facc15; --accent-primary-hover: #ea580c; --accent-primary-text: #020617; --accent-glow: rgba(249, 115, 22, 0.35); 
+        }
+        body[data-theme="amethyst"] { 
+            --bg-main: #120d1d; --card-bg: rgba(22, 16, 36, 0.92); --card-border: rgba(192, 132, 252, 0.2); 
+            --accent-primary: #c084fc; --accent-secondary: #818cf8; --accent-primary-hover: #a855f7; --accent-primary-text: #020617; --accent-glow: rgba(192, 132, 252, 0.35); 
+        }
+        body[data-theme="ocean"] { 
+            --bg-main: #0b1920; --card-bg: rgba(12, 28, 36, 0.92); --card-border: rgba(20, 184, 166, 0.2); 
+            --accent-primary: #14b8a6; --accent-secondary: #38bdf8; --accent-primary-hover: #0d9488; --accent-primary-text: #020617; --accent-glow: rgba(20, 184, 166, 0.35); 
+        }
+        body[data-theme="crimson"] { 
+            --bg-main: #1a0c0e; --card-bg: rgba(34, 14, 17, 0.92); --card-border: rgba(239, 68, 68, 0.2); 
+            --accent-primary: #ef4444; --accent-secondary: #f59e0b; --accent-primary-hover: #dc2626; --accent-primary-text: #ffffff; --accent-glow: rgba(239, 68, 68, 0.4); 
+        }
+        body[data-theme="matcha"] { 
+            --bg-main: #121813; --card-bg: rgba(20, 28, 22, 0.92); --card-border: rgba(132, 204, 22, 0.2); 
+            --accent-primary: #84cc16; --accent-secondary: #fde047; --accent-primary-hover: #65a30d; --accent-primary-text: #020617; --accent-glow: rgba(132, 204, 22, 0.35); 
+        }
+        body[data-theme="monochrome"] { 
+            --bg-main: #121212; --card-bg: rgba(24, 24, 24, 0.92); --card-border: rgba(255, 255, 255, 0.12); 
+            --accent-primary: #e2e8f0; --accent-secondary: #38bdf8; --accent-primary-hover: #cbd5e1; --accent-primary-text: #0f172a; --accent-glow: rgba(226, 232, 240, 0.3); 
+        }
 
         body[data-cursor="gold"] { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><polygon points='3,3 21,11 13,13 11,21' fill='%23f59e0b' stroke='%23020617' stroke-width='1.5'/></svg>"), auto; }
         body[data-cursor="sparkle"] { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M12,2 L14.5,9.5 L22,12 L14.5,14.5 L12,22 L9.5,14.5 L2,12 L9.5,9.5 Z' fill='%2338bdf8' stroke='%23020617' stroke-width='1.5'/></svg>"), auto; }
@@ -51,11 +90,11 @@
 
         .tab-btn { color: #94a3b8; background-color: transparent; border: 1px solid transparent; transition: all 0.2s; user-select: none; }
         .tab-btn:hover { color: #f8fafc; background-color: rgba(30, 41, 59, 0.7); }
-        .tab-btn.active { background-color: rgba(245, 158, 11, 0.15) !important; color: var(--accent-primary) !important; border-color: var(--accent-primary) !important; font-weight: 700; box-shadow: 0 0 14px var(--accent-glow); }
-        .theme-accent-bg { background-color: var(--accent-primary) !important; color: var(--accent-primary-text) !important; }
-        .theme-accent-bg:hover { background-color: var(--accent-primary-hover) !important; }
-        .theme-accent-text { color: var(--accent-primary) !important; }
-        .logo-gold { color: var(--accent-primary); letter-spacing: 0.25em; text-shadow: 0 0 12px var(--accent-glow); }
+        .tab-btn.active { background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(254, 240, 138, 0.08) 100%) !important; color: var(--accent-primary) !important; border-color: var(--accent-primary) !important; font-weight: 700; box-shadow: 0 0 14px var(--accent-glow); }
+        .theme-accent-bg { background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%) !important; color: var(--accent-primary-text) !important; }
+        .theme-accent-bg:hover { opacity: 0.92; }
+        .theme-accent-text { background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo-gold { background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 0.25em; text-shadow: 0 0 16px var(--accent-glow); }
         .gauge-circle { transition: stroke-dashoffset 0.8s ease-in-out, stroke 0.3s; }
         .avatar-btn { position: relative; transition: transform 0.2s; touch-action: manipulation; }
         .avatar-btn:hover { transform: scale(1.08); }
@@ -173,7 +212,7 @@
                     </div>
                 </div>
 
-                <!-- Card 3: Monthly Goal Gauge (SCALED UP) -->
+                <!-- Card 3: Monthly Goal Progress Gauge -->
                 <div class="card p-6 rounded-xl flex items-center justify-between gap-6 min-h-[145px]">
                     <div class="relative w-24 h-24 flex-shrink-0 flex items-center justify-center">
                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
@@ -334,7 +373,7 @@
             </div>
         </div>
 
-        <!-- TAB 3: SANCTUARY (CLEANED CARDS) -->
+        <!-- TAB 3: SANCTUARY -->
         <div id="tab-sanctuary" class="hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                 <!-- 🏃 Fitness Card -->
@@ -423,7 +462,7 @@
                 </div>
             </div>
 
-            <!-- SANCTUARY CHART (MULTI-DATASET WITH ICON BUTTONS) -->
+            <!-- SANCTUARY CHART (2-WAY BAR/LINE TOGGLE) -->
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div class="flex items-center gap-3">
@@ -431,7 +470,6 @@
                         <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700 text-xs gap-1">
                             <button type="button" onclick="setSanctuaryChartMode('bar')" id="btn-sanctuary-mode-bar" class="px-3 py-1.5 rounded-lg font-medium transition-all bg-blue-600 text-white flex items-center gap-1"><span>📊</span> <span>Bar</span></button>
                             <button type="button" onclick="setSanctuaryChartMode('line')" id="btn-sanctuary-mode-line" class="px-3 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white flex items-center gap-1"><span>📈</span> <span>Line</span></button>
-                            <button type="button" onclick="setSanctuaryChartMode('area')" id="btn-sanctuary-mode-area" class="px-3 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white flex items-center gap-1"><span>🌊</span> <span>Area</span></button>
                         </div>
                     </div>
                     <div class="flex bg-slate-900/80 p-1 rounded-lg border border-slate-700 text-xs">
@@ -452,23 +490,23 @@
             <form onsubmit="saveAllForgeSettings(event)" class="space-y-6 max-w-2xl">
                 <div class="card p-6 rounded-xl">
                     <h2 class="text-lg font-semibold mb-2 text-slate-200">Theme, Cursor & Visual FX</h2>
-                    <p class="text-xs text-slate-400 mb-5">Select color themes, custom mouse cursor style, and particle effects.</p>
+                    <p class="text-xs text-slate-400 mb-5">Select dual-tone color themes, custom mouse cursor style, and particle effects.</p>
                     
                     <div class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1 font-medium">Color Theme</label>
                                 <select id="setting-user-theme" onchange="handleInstantThemeChange()" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none">
-                                    <option value="gold">Aureum Gold (Classic Amber)</option>
-                                    <option value="rose">Rose Quartz (Soft Magenta & Pink)</option>
-                                    <option value="emerald">Emerald Grove (Mint & Forest)</option>
-                                    <option value="cyber">Midnight Cyber (Neon Violet & Cyan)</option>
-                                    <option value="sunset">Sunset Terracotta (Warm Peach)</option>
-                                    <option value="amethyst">Amethyst Dusk (Lavender & Purple)</option>
-                                    <option value="ocean">Ocean Abyss (Deep Sea Teal)</option>
-                                    <option value="crimson">Crimson Forge (Ruby Flame)</option>
-                                    <option value="matcha">Matcha Latte (Sage & Cream)</option>
-                                    <option value="monochrome">Monochrome Slate (Silver Minimal)</option>
+                                    <option value="gold">Aureum Gold (Amber + Champagne)</option>
+                                    <option value="rose">Rose Quartz (Rose Pink + Warm Gold)</option>
+                                    <option value="emerald">Emerald Grove (Mint + Cyan)</option>
+                                    <option value="cyber">Midnight Cyber (Neon Violet + Hot Pink)</option>
+                                    <option value="sunset">Sunset Terracotta (Warm Peach + Yellow)</option>
+                                    <option value="amethyst">Amethyst Dusk (Lavender + Indigo)</option>
+                                    <option value="ocean">Ocean Abyss (Deep Teal + Sky Blue)</option>
+                                    <option value="crimson">Crimson Forge (Ruby Flame + Amber)</option>
+                                    <option value="matcha">Matcha Latte (Lime Sage + Cream)</option>
+                                    <option value="monochrome">Monochrome Slate (Silver + Cyan)</option>
                                 </select>
                             </div>
 
@@ -523,7 +561,6 @@
                     <h2 class="text-lg font-semibold mb-2 text-slate-200">Work & Allowance Goals</h2>
                     <p class="text-xs text-slate-400 mb-4">Calibrate monthly work goals and spending allowance payouts.</p>
                     <div class="space-y-4">
-                        <!-- CLEAN INPUT FOR ALLOWANCE CASH (STEPPERS REMOVED) -->
                         <div>
                             <label class="block text-xs text-slate-400 mb-1 font-medium">Target Monthly Cash Allowance (฿)</label>
                             <input type="number" id="setting-monthly-cash" min="1000" step="500" value="8000" required class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-sm text-white font-mono font-bold focus:outline-none focus:border-amber-500">
@@ -1156,7 +1193,7 @@
             }
         }
 
-        // 5. CHARTS ENGINE (MULTI-DATASET & DIRECT ICON MODE BUTTONS)
+        // 5. CHARTS ENGINE
         let charts = {}, chartTimeframes = { work: 'daily', sanctuary: 'daily' }, workChartMode = 'bar', sanctuaryChartSubmode = 'bar';
         
         function initCharts() {
@@ -1180,9 +1217,9 @@
                 data: { 
                     labels: [], 
                     datasets: [
-                        { label: '🏃 Fitness (h)', data: [], backgroundColor: '#f59e0b', borderColor: '#f59e0b', borderRadius: 4 },
-                        { label: '🧹 Chores (h)', data: [], backgroundColor: '#38bdf8', borderColor: '#38bdf8', borderRadius: 4 },
-                        { label: '🍨 Snacks', data: [], backgroundColor: '#10b981', borderColor: '#10b981', borderRadius: 4 }
+                        { label: '🏃 Fitness (h)', data: [], backgroundColor: '#f59e0b', borderColor: '#f59e0b', borderRadius: 4, fill: false },
+                        { label: '🧹 Chores (h)', data: [], backgroundColor: '#38bdf8', borderColor: '#38bdf8', borderRadius: 4, fill: false },
+                        { label: '🍨 Snacks', data: [], backgroundColor: '#10b981', borderColor: '#10b981', borderRadius: 4, fill: false }
                     ] 
                 }, 
                 options: {
@@ -1210,11 +1247,11 @@
         function setSanctuaryChartMode(m) { 
             sanctuaryChartSubmode = m; 
             if (charts['sanctuary']) { 
-                charts['sanctuary'].config.type = m === 'area' ? 'line' : m; 
-                charts['sanctuary'].data.datasets.forEach(ds => ds.fill = (m === 'area'));
+                charts['sanctuary'].config.type = m; 
+                charts['sanctuary'].data.datasets.forEach(ds => ds.fill = false);
                 charts['sanctuary'].update(); 
             } 
-            ['bar', 'line', 'area'].forEach(mode => {
+            ['bar', 'line'].forEach(mode => {
                 const btn = document.getElementById(`btn-sanctuary-mode-${mode}`);
                 if (btn) btn.className = mode === m ? "px-3 py-1.5 rounded-lg font-medium transition-all bg-blue-600 text-white flex items-center gap-1" : "px-3 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white flex items-center gap-1";
             });
@@ -1286,14 +1323,8 @@
 
             if (u) {
                 currentUserUid = u.uid;
-                if (modal) {
-                    modal.style.display = 'none';
-                    modal.classList.add('hidden');
-                }
-                if (app) {
-                    app.style.display = 'block';
-                    app.classList.remove('hidden');
-                }
+                if (modal) { modal.style.display = 'none'; modal.classList.add('hidden'); }
+                if (app) { app.style.display = 'block'; app.classList.remove('hidden'); }
 
                 loggedInUser = (u.uid === "ioxjbBLDH0NDLDWVoYCjq8p3PYU2" || u.email?.toLowerCase().includes("cream")) ? 'Cream' : 'North';
                 viewedUser = loggedInUser;
@@ -1305,14 +1336,8 @@
                 updateRatingUI('results'); updateRatingUI('effort'); updateWorkoutStrainUI();
                 startGlobalUIRenderer(); attachPomoSpectatorListener();
             } else {
-                if (modal) {
-                    modal.style.display = 'flex';
-                    modal.classList.remove('hidden');
-                }
-                if (app) {
-                    app.style.display = 'none';
-                    app.classList.add('hidden');
-                }
+                if (modal) { modal.style.display = 'flex'; modal.classList.remove('hidden'); }
+                if (app) { app.style.display = 'none'; app.classList.add('hidden'); }
             }
         });
 
