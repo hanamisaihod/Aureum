@@ -182,7 +182,7 @@
         </nav>
 
         <div id="read-only-banner" class="hidden card p-3 mb-6 rounded-xl text-center text-slate-400 text-sm">
-            🔒 Viewing <strong><span id="view-target-name"></span>'s</strong> space in View-Only mode. Log deletion and settings are restricted.
+            🔒 Viewing <strong><span id="view-target-name"></span>'s</strong> space in View-Only mode. Log deletion, todo edits, and settings are restricted.
         </div>
 
         <!-- TAB 1: CRUCIBLE -->
@@ -467,21 +467,21 @@
                 </div>
             </div>
 
-            <!-- 📝 SCRATCHPAD TODO LIST MODULE -->
+            <!-- 📝 FIRESTORE TODO LIST MODULE WITH SPECTATOR RESTRICTION -->
             <div class="card p-6 rounded-xl space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div>
                         <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>📝</span> <span>Scratchpad TODOs</span></h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Quick non-persisted task scratchpad. Click items to toggle complete.</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Cloud-synced task scratchpad. Click items to toggle complete.</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="todo-count-active" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">0 Active</span>
                         <span id="todo-count-done" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">0 Done</span>
-                        <button onclick="clearCompletedTodos()" class="text-xs text-slate-400 hover:text-red-400 px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all">Clear Done</button>
+                        <button id="todo-clear-btn" onclick="clearCompletedTodos()" class="text-xs text-slate-400 hover:text-red-400 px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all">Clear Done</button>
                     </div>
                 </div>
 
-                <form onsubmit="addTodoItem(event)" class="flex gap-2">
+                <form id="todo-form" onsubmit="addTodoItem(event)" class="flex gap-2">
                     <input type="text" id="todo-input" placeholder="Add a quick task..." class="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
                     <button type="submit" class="theme-accent-bg font-bold px-5 py-2.5 rounded-xl text-xs transition-all shadow-md">+ Add Task</button>
                 </form>
@@ -788,36 +788,51 @@
         let loggedInUser = 'North', viewedUser = 'North', currentUserUid = null, audioMuted = false;
         let activeHoldTimer = null, activeHoldInterval = null, isTouchScrolling = false;
 
-        // LOCAL TODO SCRATCHPAD STATE
-        let todoList = JSON.parse(localStorage.getItem('aureum_scratchpad_todos') || '[]');
-
-        function saveTodosToLocalStorage() {
-            localStorage.setItem('aureum_scratchpad_todos', JSON.stringify(todoList));
+        // CLOUD FIRESTORE TODO SCRATCHPAD ENGINE
+        async function syncTodosToFirestore(list) {
+            if (loggedInUser !== viewedUser) return;
+            userSettings.scratchpadTodos = list;
             renderTodoList();
+            try {
+                await db.collection('settings').doc(loggedInUser).set({ scratchpadTodos: list }, { merge: true });
+            } catch (e) {}
         }
 
         function addTodoItem(e) {
             if (e) e.preventDefault();
+            if (loggedInUser !== viewedUser) return;
             const input = document.getElementById('todo-input'); if (!input) return;
             const text = input.value.trim(); if (!text) return;
-            todoList.push({ id: Date.now().toString(), text, done: false });
-            input.value = ''; playTone('save'); saveTodosToLocalStorage();
+            const list = [...(userSettings.scratchpadTodos || [])];
+            list.push({ id: Date.now().toString(), text, done: false });
+            input.value = ''; playTone('save');
+            syncTodosToFirestore(list);
         }
 
         function toggleTodoStatus(id) {
-            const item = todoList.find(t => t.id === id);
-            if (item) { item.done = !item.done; playTone(item.done ? 'save' : 'delete'); saveTodosToLocalStorage(); }
+            if (loggedInUser !== viewedUser) return;
+            const list = [...(userSettings.scratchpadTodos || [])];
+            const item = list.find(t => t.id === id);
+            if (item) {
+                item.done = !item.done;
+                playTone(item.done ? 'save' : 'delete');
+                syncTodosToFirestore(list);
+            }
         }
 
         function removeTodoItem(id, e) {
             if (e) e.stopPropagation();
-            todoList = todoList.filter(t => t.id !== id);
-            playTone('delete'); saveTodosToLocalStorage();
+            if (loggedInUser !== viewedUser) return;
+            const list = (userSettings.scratchpadTodos || []).filter(t => t.id !== id);
+            playTone('delete');
+            syncTodosToFirestore(list);
         }
 
         function clearCompletedTodos() {
-            todoList = todoList.filter(t => !t.done);
-            playTone('delete'); saveTodosToLocalStorage();
+            if (loggedInUser !== viewedUser) return;
+            const list = (userSettings.scratchpadTodos || []).filter(t => !t.done);
+            playTone('delete');
+            syncTodosToFirestore(list);
         }
 
         function renderTodoList() {
@@ -828,33 +843,38 @@
 
             if (!activeListEl || !doneListEl) return;
 
-            const activeItems = todoList.filter(t => !t.done);
-            const doneItems = todoList.filter(t => t.done);
+            const isSelf = (loggedInUser === viewedUser);
+            const todoData = isSelf ? (userSettings.scratchpadTodos || []) : (spectatorSettings?.scratchpadTodos || []);
+
+            const activeItems = todoData.filter(t => !t.done);
+            const doneItems = todoData.filter(t => t.done);
 
             if (activeCountEl) activeCountEl.innerText = `${activeItems.length} Active`;
             if (doneCountEl) doneCountEl.innerText = `${doneItems.length} Done`;
 
+            const cursorClass = isSelf ? "cursor-pointer" : "cursor-default";
+
             activeListEl.innerHTML = activeItems.length === 0 
-                ? `<div class="text-xs text-slate-500 italic py-2 text-center">No active tasks. Add one above!</div>`
+                ? `<div class="text-xs text-slate-500 italic py-2 text-center">No active tasks.</div>`
                 : activeItems.map(t => `
-                    <div onclick="toggleTodoStatus('${t.id}')" class="todo-item cursor-pointer p-2.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/70 rounded-xl flex items-center justify-between gap-3 text-xs text-slate-200 select-none">
+                    <div ${isSelf ? `onclick="toggleTodoStatus('${t.id}')"` : ''} class="todo-item ${cursorClass} p-2.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/70 rounded-xl flex items-center justify-between gap-3 text-xs text-slate-200 select-none">
                         <div class="flex items-center gap-2.5 truncate">
                             <span class="w-4 h-4 rounded-md border border-slate-600 flex items-center justify-center shrink-0"></span>
                             <span class="truncate font-medium">${t.text}</span>
                         </div>
-                        <button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-[11px] font-bold">×</button>
+                        ${isSelf ? `<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-[11px] font-bold">×</button>` : ''}
                     </div>
                 `).join('');
 
             doneListEl.innerHTML = doneItems.length === 0 
                 ? `<div class="text-xs text-slate-500 italic py-2 text-center">No completed tasks yet.</div>`
                 : doneItems.map(t => `
-                    <div onclick="toggleTodoStatus('${t.id}')" class="todo-item done cursor-pointer p-2.5 bg-slate-900/60 border border-slate-800/80 rounded-xl flex items-center justify-between gap-3 text-xs text-slate-400 select-none">
+                    <div ${isSelf ? `onclick="toggleTodoStatus('${t.id}')"` : ''} class="todo-item done ${cursorClass} p-2.5 bg-slate-900/60 border border-slate-800/80 rounded-xl flex items-center justify-between gap-3 text-xs text-slate-400 select-none">
                         <div class="flex items-center gap-2.5 truncate">
                             <span class="w-4 h-4 rounded-md theme-accent-bg text-slate-950 flex items-center justify-center shrink-0 font-bold text-[10px]">✓</span>
                             <span class="truncate font-medium">${t.text}</span>
                         </div>
-                        <button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-[11px] font-bold">×</button>
+                        ${isSelf ? `<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-[11px] font-bold">×</button>` : ''}
                     </div>
                 `).join('');
         }
@@ -883,7 +903,7 @@
         let userSettings = {
             monthlyCash: 8000, weeklyHours: 10, dailySoftCap: 4, maxBonusCapPct: 125,
             pomoFocus: 25, pomoShort: 5, pomoLong: 15, pomoRounds: 4, userTheme: 'gold', userCursor: 'default', avatarUrl: '',
-            particleIntensity: 15, vaultedMonths: {}, unlockedBadges: [], completedPomoHistory: []
+            particleIntensity: 15, vaultedMonths: {}, unlockedBadges: [], completedPomoHistory: [], scratchpadTodos: []
         };
 
         const RATING_DATA = {
@@ -1290,6 +1310,7 @@
                         applyThemeToBody(userSettings.userTheme);
                         applyCursorToBody(userSettings.userCursor);
                         renderBadgeGrid(new Set(spectatorSettings.unlockedBadges || []));
+                        renderTodoList();
                         const live = spectatorSettings.livePomoState;
                         if (live) {
                             shadowSpectatorIsRunning = !!live.isRunning;
@@ -1304,6 +1325,7 @@
             } else {
                 applyThemeToBody(userSettings.userTheme);
                 applyCursorToBody(userSettings.userCursor);
+                renderTodoList();
             }
         }
 
@@ -1447,7 +1469,6 @@
                 initGlobalHeaderGlowListener();
                 await initAndRecoverMyPomoState();
                 updateUserSwitcherUI(); initCharts(); loadUserData();
-                renderTodoList();
                 updateRatingUI('results'); updateRatingUI('effort'); updateWorkoutStrainUI();
                 startGlobalUIRenderer(); attachPomoSpectatorListener();
             } else {
@@ -1471,7 +1492,7 @@
                         applyCursorToBody(userSettings.userCursor);
                     }
                 }
-                updateSettingsUI(); updateAvatarsInHeader();
+                updateSettingsUI(); updateAvatarsInHeader(); renderTodoList();
                 if (currentRawLogsCache.length > 0) loadUserData();
             });
         }
@@ -1574,14 +1595,18 @@
         
         function updateUserSwitcherUI() {
             const isSelf = loggedInUser === viewedUser;
-            ['work-form-card', 'diary-form-card', 'health-form-card', 'chore-form-card', 'workout-form-card'].forEach(id => {
-                const el = document.getElementById(id); if (el) el.style.display = isSelf ? 'block' : 'none';
+            ['work-form-card', 'diary-form-card', 'health-form-card', 'chore-form-card', 'workout-form-card', 'todo-form'].forEach(id => {
+                const el = document.getElementById(id); if (el) el.style.display = isSelf ? 'flex' : 'none';
             });
+            const clearBtn = document.getElementById('todo-clear-btn');
+            if (clearBtn) clearBtn.style.display = isSelf ? 'inline-block' : 'none';
+
             document.querySelectorAll('#tab-forge input, #tab-forge select').forEach(i => { i.disabled = !isSelf; i.classList.toggle('opacity-50', !isSelf); });
             document.querySelectorAll('#tab-forge button').forEach(b => b.style.display = isSelf ? 'inline-block' : 'none');
             document.getElementById('read-only-banner').classList.toggle('hidden', isSelf);
             if (!isSelf) document.getElementById('view-target-name').innerText = viewedUser;
             updateAvatarsInHeader();
+            renderTodoList();
         }
 
         function switchTab(t) {
