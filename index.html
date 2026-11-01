@@ -117,6 +117,11 @@
         .badge-toast { pointer-events: auto; animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; transition: opacity 0.5s ease, transform 0.5s ease; will-change: transform, opacity; }
         .badge-toast.toast-hiding { opacity: 0 !important; transform: translateY(20px) scale(0.9) !important; }
         @keyframes toastSlideIn { from { opacity: 0; transform: translateY(25px) scale(0.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        /* TODO ITEM STYLES */
+        .todo-item { transition: all 0.2s ease-out; }
+        .todo-item:hover { border-color: var(--card-border); transform: translateX(2px); }
+        .todo-item.done { opacity: 0.5; text-decoration: line-through; }
     </style>
 </head>
 <body data-theme="gold" data-cursor="default" class="p-4 md:p-8 max-w-6xl mx-auto relative min-h-screen">
@@ -462,6 +467,44 @@
                 </div>
             </div>
 
+            <!-- 📝 SCRATCHPAD TODO LIST MODULE -->
+            <div class="card p-6 rounded-xl space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>📝</span> <span>Scratchpad TODOs</span></h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Quick non-persisted task scratchpad. Click items to toggle complete.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="todo-count-active" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">0 Active</span>
+                        <span id="todo-count-done" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">0 Done</span>
+                        <button onclick="clearCompletedTodos()" class="text-xs text-slate-400 hover:text-red-400 px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all">Clear Done</button>
+                    </div>
+                </div>
+
+                <form onsubmit="addTodoItem(event)" class="flex gap-2">
+                    <input type="text" id="todo-input" placeholder="Add a quick task..." class="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                    <button type="submit" class="theme-accent-bg font-bold px-5 py-2.5 rounded-xl text-xs transition-all shadow-md">+ Add Task</button>
+                </form>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <!-- Active Column -->
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800/80">
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+                            <span>Pending Tasks</span>
+                        </div>
+                        <div id="todo-active-list" class="space-y-2 max-h-[280px] overflow-y-auto pr-1"></div>
+                    </div>
+
+                    <!-- Completed Column -->
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800/80">
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center justify-between">
+                            <span>Finished</span>
+                        </div>
+                        <div id="todo-completed-list" class="space-y-2 max-h-[280px] overflow-y-auto pr-1"></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- SANCTUARY CHART (2-WAY BAR/LINE TOGGLE) -->
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
@@ -744,6 +787,77 @@
 
         let loggedInUser = 'North', viewedUser = 'North', currentUserUid = null, audioMuted = false;
         let activeHoldTimer = null, activeHoldInterval = null, isTouchScrolling = false;
+
+        // LOCAL TODO SCRATCHPAD STATE
+        let todoList = JSON.parse(localStorage.getItem('aureum_scratchpad_todos') || '[]');
+
+        function saveTodosToLocalStorage() {
+            localStorage.setItem('aureum_scratchpad_todos', JSON.stringify(todoList));
+            renderTodoList();
+        }
+
+        function addTodoItem(e) {
+            if (e) e.preventDefault();
+            const input = document.getElementById('todo-input'); if (!input) return;
+            const text = input.value.trim(); if (!text) return;
+            todoList.push({ id: Date.now().toString(), text, done: false });
+            input.value = ''; playTone('save'); saveTodosToLocalStorage();
+        }
+
+        function toggleTodoStatus(id) {
+            const item = todoList.find(t => t.id === id);
+            if (item) { item.done = !item.done; playTone(item.done ? 'save' : 'delete'); saveTodosToLocalStorage(); }
+        }
+
+        function removeTodoItem(id, e) {
+            if (e) e.stopPropagation();
+            todoList = todoList.filter(t => t.id !== id);
+            playTone('delete'); saveTodosToLocalStorage();
+        }
+
+        function clearCompletedTodos() {
+            todoList = todoList.filter(t => !t.done);
+            playTone('delete'); saveTodosToLocalStorage();
+        }
+
+        function renderTodoList() {
+            const activeListEl = document.getElementById('todo-active-list');
+            const doneListEl = document.getElementById('todo-completed-list');
+            const activeCountEl = document.getElementById('todo-count-active');
+            const doneCountEl = document.getElementById('todo-count-done');
+
+            if (!activeListEl || !doneListEl) return;
+
+            const activeItems = todoList.filter(t => !t.done);
+            const doneItems = todoList.filter(t => t.done);
+
+            if (activeCountEl) activeCountEl.innerText = `${activeItems.length} Active`;
+            if (doneCountEl) doneCountEl.innerText = `${doneItems.length} Done`;
+
+            activeListEl.innerHTML = activeItems.length === 0 
+                ? `<div class="text-xs text-slate-500 italic py-2 text-center">No active tasks. Add one above!</div>`
+                : activeItems.map(t => `
+                    <div onclick="toggleTodoStatus('${t.id}')" class="todo-item cursor-pointer p-2.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/70 rounded-xl flex items-center justify-between gap-3 text-xs text-slate-200 select-none">
+                        <div class="flex items-center gap-2.5 truncate">
+                            <span class="w-4 h-4 rounded-md border border-slate-600 flex items-center justify-center shrink-0"></span>
+                            <span class="truncate font-medium">${t.text}</span>
+                        </div>
+                        <button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-[11px] font-bold">×</button>
+                    </div>
+                `).join('');
+
+            doneListEl.innerHTML = doneItems.length === 0 
+                ? `<div class="text-xs text-slate-500 italic py-2 text-center">No completed tasks yet.</div>`
+                : doneItems.map(t => `
+                    <div onclick="toggleTodoStatus('${t.id}')" class="todo-item done cursor-pointer p-2.5 bg-slate-900/60 border border-slate-800/80 rounded-xl flex items-center justify-between gap-3 text-xs text-slate-400 select-none">
+                        <div class="flex items-center gap-2.5 truncate">
+                            <span class="w-4 h-4 rounded-md theme-accent-bg text-slate-950 flex items-center justify-center shrink-0 font-bold text-[10px]">✓</span>
+                            <span class="truncate font-medium">${t.text}</span>
+                        </div>
+                        <button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-[11px] font-bold">×</button>
+                    </div>
+                `).join('');
+        }
 
         // PC RIGHT-CLICK DRAG SCROLLING
         let isRightDragging = false, dragStartX = 0, dragStartY = 0, dragScrollX = 0, dragScrollY = 0, didRightDrag = false;
@@ -1333,6 +1447,7 @@
                 initGlobalHeaderGlowListener();
                 await initAndRecoverMyPomoState();
                 updateUserSwitcherUI(); initCharts(); loadUserData();
+                renderTodoList();
                 updateRatingUI('results'); updateRatingUI('effort'); updateWorkoutStrainUI();
                 startGlobalUIRenderer(); attachPomoSpectatorListener();
             } else {
