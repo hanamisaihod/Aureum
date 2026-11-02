@@ -1096,8 +1096,8 @@
         function applyThemeToBody(t){document.body.setAttribute('data-theme',t||'gold')}
         function applyCursorToBody(c){document.body.setAttribute('data-cursor',c||'default')}
 
-        // POMODORO ENGINE WITH UNLOGGED FOCUS TRACKER & EXPORT CONTROL
-        let myPomoMode='focus',myPomoRound=1,myPomoTime=1500,myPomoInitialTime=1500,myPomoIsRunning=false,myPomoInterval=null,currentSessionWasPaused=false;
+        // POMODORO ENGINE WITH WALL-CLOCK TIMESTAMP ENGINE FIX
+        let myPomoMode='focus',myPomoRound=1,myPomoTime=1500,myPomoEndTime=null,myPomoInitialTime=1500,myPomoIsRunning=false,myPomoInterval=null,currentSessionWasPaused=false;
         let pomoUIRenderInterval=null,pomoSyncUnsubscribe=null,spectatorSettings=null,shadowSpectatorTime=1500,shadowSpectatorIsRunning=false,shadowSpectatorInterval=null;
 
         document.addEventListener('keydown',e=>{
@@ -1106,20 +1106,43 @@
             }
         });
 
+        // Instant tab focus recalculation
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && myPomoIsRunning && myPomoEndTime) {
+                myPomoTime = Math.max(0, Math.ceil((myPomoEndTime - Date.now()) / 1000));
+            }
+        });
+
         async function syncMyPomoToCloud(){
             if(!loggedInUser)return;
-            try{db.collection('settings').doc(loggedInUser).set({livePomoState:{mode:myPomoMode,round:myPomoRound,isRunning:myPomoIsRunning,pomoTime:myPomoTime,updatedAtMillis:Date.now()}},{merge:true})}catch(e){}
+            try{
+                db.collection('settings').doc(loggedInUser).set({
+                    livePomoState:{
+                        mode:myPomoMode,
+                        round:myPomoRound,
+                        isRunning:myPomoIsRunning,
+                        pomoTime:myPomoTime,
+                        pomoEndTime:myPomoEndTime,
+                        updatedAtMillis:Date.now()
+                    }
+                },{merge:true});
+            }catch(e){}
         }
 
         function startMyPomoBackgroundTimer(){
             if(myPomoInterval)clearInterval(myPomoInterval);
             let ticks=0;
             myPomoInterval=setInterval(()=>{
-                if(!myPomoIsRunning)return;
-                myPomoTime--;ticks++;
+                if(!myPomoIsRunning || !myPomoEndTime)return;
+                
+                // Real-time wall-clock calculation
+                myPomoTime = Math.max(0, Math.ceil((myPomoEndTime - Date.now()) / 1000));
+                
+                ticks++;
                 if(ticks>=4){syncMyPomoToCloud();ticks=0}
+                
                 if(myPomoTime<=0){
-                    myPomoTime=0;myPomoIsRunning=false;clearInterval(myPomoInterval);
+                    myPomoTime=0;myPomoIsRunning=false;myPomoEndTime=null;clearInterval(myPomoInterval);
                     playPomoSound(userSettings.pomoSound);syncMyPomoToCloud();
                     const totalRounds=parseInt(userSettings.pomoRounds)||4;
                     if(myPomoMode==='focus'){
@@ -1192,7 +1215,7 @@
         }
 
         function setMyPomoMode(mode){
-            myPomoMode=mode;myPomoIsRunning=false;currentSessionWasPaused=false;
+            myPomoMode=mode;myPomoIsRunning=false;currentSessionWasPaused=false;myPomoEndTime=null;
             if(myPomoInterval)clearInterval(myPomoInterval);
             const f=parseInt(userSettings.pomoFocus)||25,s=parseInt(userSettings.pomoShort)||5,l=parseInt(userSettings.pomoLong)||15;
             myPomoInitialTime=(mode==='focus'?f:(mode==='short'?s:l))*60;myPomoTime=myPomoInitialTime;syncMyPomoToCloud();
@@ -1201,11 +1224,14 @@
         function handleUserSelectPomoMode(m){if(loggedInUser===viewedUser)setMyPomoMode(m)}
         function toggleMyPomoTimer(){
             if(loggedInUser!==viewedUser)return;requestNotificationPermission();
-            if(myPomoIsRunning){myPomoIsRunning=false;currentSessionWasPaused=true;clearInterval(myPomoInterval)}
-            else{myPomoIsRunning=true;startMyPomoBackgroundTimer()}
+            if(myPomoIsRunning){
+                myPomoIsRunning=false;currentSessionWasPaused=true;myPomoEndTime=null;clearInterval(myPomoInterval);
+            }else{
+                myPomoIsRunning=true;myPomoEndTime=Date.now()+(myPomoTime*1000);startMyPomoBackgroundTimer();
+            }
             syncMyPomoToCloud();
         }
-        function resetMyPomoTimer(){if(loggedInUser===viewedUser){clearInterval(myPomoInterval);myPomoIsRunning=false;myPomoRound=1;setMyPomoMode('focus')}}
+        function resetMyPomoTimer(){if(loggedInUser===viewedUser){clearInterval(myPomoInterval);myPomoIsRunning=false;myPomoEndTime=null;myPomoRound=1;setMyPomoMode('focus')}}
         function handleClockClick(){if(loggedInUser===viewedUser)toggleMyPomoTimer()}
 
         async function applyPomoPreset(f,s,l){
@@ -1225,18 +1251,22 @@
                     myPomoMode=d.mode||'focus';myPomoRound=parseInt(d.round)||1;
                     const f=parseInt(userSettings.pomoFocus)||25,s=parseInt(userSettings.pomoShort)||5,l=parseInt(userSettings.pomoLong)||15;
                     myPomoInitialTime=(myPomoMode==='focus'?f:(myPomoMode==='short'?s:l))*60;
-                    if(d.isRunning&&d.updatedAtMillis){
-                        const rem=(parseInt(d.pomoTime)||myPomoInitialTime)-Math.floor((Date.now()-d.updatedAtMillis)/1000);
-                        if(rem>0){myPomoTime=rem;myPomoIsRunning=true;startMyPomoBackgroundTimer()}
-                        else{myPomoTime=0;myPomoIsRunning=false;setMyPomoMode('focus')}
-                    }else{myPomoTime=d.pomoTime||myPomoInitialTime;myPomoIsRunning=false;syncMyPomoToCloud()}
+                    if(d.isRunning&&d.pomoEndTime){
+                        const rem=Math.max(0,Math.ceil((d.pomoEndTime-Date.now())/1000));
+                        if(rem>0){myPomoTime=rem;myPomoEndTime=d.pomoEndTime;myPomoIsRunning=true;startMyPomoBackgroundTimer()}
+                        else{myPomoTime=0;myPomoIsRunning=false;myPomoEndTime=null;setMyPomoMode('focus')}
+                    }else{myPomoTime=d.pomoTime||myPomoInitialTime;myPomoIsRunning=false;myPomoEndTime=null;syncMyPomoToCloud()}
                 }else{setMyPomoMode('focus')}
             }catch(e){setMyPomoMode('focus')}
         }
 
         function startShadowSpectatorTimer(){
             clearInterval(shadowSpectatorInterval);
-            shadowSpectatorInterval=setInterval(()=>{if(shadowSpectatorIsRunning&&shadowSpectatorTime>0)shadowSpectatorTime--},1000);
+            shadowSpectatorInterval=setInterval(()=>{
+                if(shadowSpectatorIsRunning&&spectatorSettings?.livePomoState?.pomoEndTime){
+                    shadowSpectatorTime=Math.max(0,Math.ceil((spectatorSettings.livePomoState.pomoEndTime-Date.now())/1000));
+                }
+            },1000);
         }
 
         function startGlobalUIRenderer(){
@@ -1279,9 +1309,13 @@
                         const live=spectatorSettings.livePomoState;
                         if(live){
                             shadowSpectatorIsRunning=!!live.isRunning;
-                            let dbTime=live.pomoTime!==undefined?parseInt(live.pomoTime):1500;
-                            if(shadowSpectatorIsRunning&&live.updatedAtMillis){shadowSpectatorTime=Math.max(0,dbTime-Math.floor((Date.now()-live.updatedAtMillis)/1000));startShadowSpectatorTimer()}
-                            else{shadowSpectatorTime=dbTime;clearInterval(shadowSpectatorInterval)}
+                            if(shadowSpectatorIsRunning&&live.pomoEndTime){
+                                shadowSpectatorTime=Math.max(0,Math.ceil((live.pomoEndTime-Date.now())/1000));
+                                startShadowSpectatorTimer();
+                            }else{
+                                shadowSpectatorTime=live.pomoTime!==undefined?parseInt(live.pomoTime):1500;
+                                clearInterval(shadowSpectatorInterval);
+                            }
                         }
                     }
                 });
