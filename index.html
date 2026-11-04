@@ -48,6 +48,8 @@
         .hud-card.view-space:hover{opacity:1;border-color:rgba(255,255,255,0.3)}
         .presence-pulse{animation:pulseGlow 2s infinite}
         @keyframes pulseGlow{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.85)}}
+        .status-preset-btn{transition:all 0.2s ease;user-select:none}
+        .status-preset-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,0.4);border-color:var(--accent-primary)}
         .no-scrollbar::-webkit-scrollbar{display:none}
         .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
         .power-bar-fill{background:linear-gradient(90deg,#38bdf8 0%,#10b981 50%,#f59e0b 80%,#a855f7 100%);box-shadow:0 0 14px var(--accent-glow);transition:width 0.8s cubic-bezier(0.16,1,0.3,1)}
@@ -91,6 +93,66 @@
         </div>
     </div>
 
+    <!-- QUICK STATUS PICKER MODAL -->
+    <div id="status-picker-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 hidden p-4">
+        <div class="card p-6 rounded-2xl max-w-lg w-full shadow-2xl border border-slate-700 space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div>
+                    <h3 class="text-base font-bold text-slate-100 flex items-center gap-2"><span>💬</span> <span>Set Status Note</span></h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Pick what you're doing right now.</p>
+                </div>
+                <button onclick="closeStatusPicker()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-1">✕</button>
+            </div>
+
+            <!-- PRESET CATEGORY GRID -->
+            <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+                <div>
+                    <div class="text-[11px] font-extrabold text-amber-400 uppercase tracking-wider mb-2">⚡ Work & Study</div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="selectStatusPreset('Working ⚡')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>⚡</span> <span>Working</span></button>
+                        <button onclick="selectStatusPreset('Coding 💻')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>💻</span> <span>Coding</span></button>
+                        <button onclick="selectStatusPreset('Studying 📚')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>📚</span> <span>Studying</span></button>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-[11px] font-extrabold text-purple-400 uppercase tracking-wider mb-2">🎨 Creative & Music</div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="selectStatusPreset('Drawing 🎨')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>🎨</span> <span>Drawing</span></button>
+                        <button onclick="selectStatusPreset('Writing ✍️')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>✍️</span> <span>Writing</span></button>
+                        <button onclick="selectStatusPreset('Listening 🎧')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>🎧</span> <span>Listening</span></button>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-[11px] font-extrabold text-sky-400 uppercase tracking-wider mb-2">☕ Rest & Chill</div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="selectStatusPreset('Chilling ☕')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>☕</span> <span>Chilling</span></button>
+                        <button onclick="selectStatusPreset('Resting zZZ 😴')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>😴</span> <span>Resting zZZ</span></button>
+                        <button onclick="selectStatusPreset('Snack Break 🍨')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>🍨</span> <span>Snack Break</span></button>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-[11px] font-extrabold text-emerald-400 uppercase tracking-wider mb-2">🌿 Life & Play</div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="selectStatusPreset('Running 🏃')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>🏃</span> <span>Running</span></button>
+                        <button onclick="selectStatusPreset('Workout 💪')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>💪</span> <span>Workout</span></button>
+                        <button onclick="selectStatusPreset('Cleaning 🧹')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>🧹</span> <span>Cleaning</span></button>
+                        <button onclick="selectStatusPreset('Gaming 🎮')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>🎮</span> <span>Gaming</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800 flex justify-between items-center">
+                <button onclick="promptCustomStatus()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700 transition-all flex items-center gap-1.5">
+                    <span>✏️</span> <span>Write Custom...</span>
+                </button>
+                <button onclick="closeStatusPicker()" class="px-4 py-2 text-xs text-slate-400 hover:text-white">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MAIN APP CONTENT -->
     <div id="app-content" class="hidden">
         <!-- PROMINENT DUO PLAYER HERO HUD HEADER -->
@@ -119,7 +181,7 @@
                             <span class="font-bold text-sm text-slate-100 flex items-center gap-1.5">North <span id="hud-badge-north" class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">ACTIVE</span></span>
                             <span id="hud-pwr-north" class="text-[11px] font-mono font-bold text-amber-400">0 PWR</span>
                         </div>
-                        <div id="hud-status-north" onclick="editUserStatusNote('North', event)" class="text-[11px] text-slate-400 truncate mt-0.5 hover:text-amber-300 transition-colors cursor-pointer" title="Click to edit status message">Loomis Head Studies 🎨</div>
+                        <div id="hud-status-north" onclick="editUserStatusNote('North', event)" class="text-[11px] text-slate-400 truncate mt-0.5 hover:text-amber-300 transition-colors cursor-pointer" title="Click to pick status">Drawing 🎨</div>
                         <div class="flex items-center justify-between text-[10px] text-slate-400 mt-1.5 pt-1 border-t border-slate-800/80">
                             <span id="hud-hours-north" class="font-mono">0.0 / 4.0h</span>
                             <span id="hud-pomo-north" class="text-emerald-400 font-semibold truncate max-w-[120px]">Idle</span>
@@ -138,7 +200,7 @@
                             <span class="font-bold text-sm text-slate-100 flex items-center gap-1.5">Cream <span id="hud-badge-cream" class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase">VIEW</span></span>
                             <span id="hud-pwr-cream" class="text-[11px] font-mono font-bold text-amber-400">0 PWR</span>
                         </div>
-                        <div id="hud-status-cream" onclick="editUserStatusNote('Cream', event)" class="text-[11px] text-slate-400 truncate mt-0.5 hover:text-amber-300 transition-colors cursor-pointer" title="Click to edit status message">Drafting Scene 4 ✍️</div>
+                        <div id="hud-status-cream" onclick="editUserStatusNote('Cream', event)" class="text-[11px] text-slate-400 truncate mt-0.5 hover:text-amber-300 transition-colors cursor-pointer" title="Click to pick status">Writing ✍️</div>
                         <div class="flex items-center justify-between text-[10px] text-slate-400 mt-1.5 pt-1 border-t border-slate-800/80">
                             <span id="hud-hours-cream" class="font-mono">0.0 / 4.0h</span>
                             <span id="hud-pomo-cream" class="text-emerald-400 font-semibold truncate max-w-[120px]">Idle</span>
@@ -845,7 +907,7 @@
 
         function spawnParticleBurst(x,y){
             const intensity=(userSettings.particleIntensity??15)/100;if(intensity<=0)return;
-            const colors=['#fef08a','#f59e0b','#b45309','#38bdf8','#10b981'];
+            const colors=['#fef08a','#f59e0b','#b45309','#38bdf8','#10b981','#a855f7'];
             const count=Math.min(MAX_PARTICLES,Math.max(1,Math.round(35*intensity)));
             let spawned=0;
             for(let i=0;i<MAX_PARTICLES&&spawned<count;i++){
@@ -1169,17 +1231,35 @@
             }catch(e){}
         }
 
-        async function editUserStatusNote(user,e){
+        // QUICK STATUS PICKER MODAL ENGINE
+        function editUserStatusNote(user,e){
             if(e)e.stopPropagation();
             if(user!==loggedInUser)return;
-            const current=userSettings.statusNote||(user==='North'?'Loomis Head Studies 🎨':'Drafting Scene 4 ✍️');
-            const note=prompt('Enter your micro-status note (max 30 chars):',current);
-            if(note!==null){
-                const trimmed=note.trim().substring(0,30);
-                userSettings.statusNote=trimmed;
-                await db.collection('settings').doc(loggedInUser).set({statusNote:trimmed},{merge:true});
-                renderDuoHUDCards();
-                showToast({title:'💬 Status Note Updated',subtitle:`"${trimmed}"`,icon:'✨',tier:'gold'});
+            $('status-picker-modal').classList.remove('hidden');
+        }
+
+        function closeStatusPicker(){
+            $('status-picker-modal').classList.add('hidden');
+        }
+
+        async function selectStatusPreset(noteText){
+            if(!noteText)return;
+            userSettings.statusNote=noteText;
+            closeStatusPicker();
+            playTone('save');
+            spawnParticleBurst(window.innerWidth/2, window.innerHeight/3);
+            renderDuoHUDCards();
+            showToast({title:'💬 Status Note Updated',subtitle:`"${noteText}"`,icon:'✨',tier:'gold'});
+            await db.collection('settings').doc(loggedInUser).set({statusNote:noteText},{merge:true});
+        }
+
+        async function promptCustomStatus(){
+            closeStatusPicker();
+            const current=userSettings.statusNote||(loggedInUser==='North'?'Drawing 🎨':'Writing ✍️');
+            const customNote=prompt('Enter custom status (max 25 chars):',current);
+            if(customNote!==null&&customNote.trim()){
+                const trimmed=customNote.trim().substring(0,25);
+                await selectStatusPreset(trimmed);
             }
         }
 
@@ -1581,7 +1661,7 @@
                 // Status note
                 const statusEl=$(`hud-status-${u.toLowerCase()}`);
                 if(statusEl){
-                    const note=s.statusNote||(u==='North'?'Loomis Head Studies 🎨':'Drafting Scene 4 ✍️');
+                    const note=s.statusNote||(u==='North'?'Drawing 🎨':'Writing ✍️');
                     statusEl.innerText=note;
                 }
 
