@@ -42,10 +42,12 @@
         .theme-accent-text{background:linear-gradient(135deg,var(--accent-primary) 0%,var(--accent-secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
         .logo-gold{background:linear-gradient(135deg,var(--accent-primary) 0%,var(--accent-secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:0.25em;text-shadow:0 0 16px var(--accent-glow)}
         .gauge-circle{transition:stroke-dashoffset 0.8s ease-in-out,stroke 0.3s}
-        .avatar-btn{position:relative;transition:transform 0.2s;touch-action:manipulation}
-        .avatar-btn:hover{transform:scale(1.08)}
-        .avatar-btn .avatar-tooltip{visibility:hidden;opacity:0;position:absolute;top:115%;left:50%;transform:translateX(-50%);background-color:#020617;color:#f8fafc;padding:4px 10px;border-radius:6px;border:1px solid #475569;font-size:11px;font-weight:600;white-space:nowrap;transition:opacity 0.2s;pointer-events:none;z-index:20}
-        .avatar-btn:hover .avatar-tooltip{visibility:visible;opacity:1}
+        .hud-card{transition:all 0.3s ease;user-select:none}
+        .hud-card.active-space{border-color:var(--accent-primary)!important;box-shadow:0 0 20px var(--accent-glow);background:linear-gradient(135deg,rgba(15,23,42,0.95) 0%,rgba(30,41,59,0.9) 100%)}
+        .hud-card.view-space{border-color:rgba(148,163,184,0.2);opacity:0.85}
+        .hud-card.view-space:hover{opacity:1;border-color:rgba(255,255,255,0.3)}
+        .presence-pulse{animation:pulseGlow 2s infinite}
+        @keyframes pulseGlow{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.85)}}
         .no-scrollbar::-webkit-scrollbar{display:none}
         .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
         .power-bar-fill{background:linear-gradient(90deg,#38bdf8 0%,#10b981 50%,#f59e0b 80%,#a855f7 100%);box-shadow:0 0 14px var(--accent-glow);transition:width 0.8s cubic-bezier(0.16,1,0.3,1)}
@@ -91,24 +93,63 @@
 
     <!-- MAIN APP CONTENT -->
     <div id="app-content" class="hidden">
-        <header class="flex flex-col md:flex-row justify-between items-center mb-6 pb-4 border-b border-slate-700/80 gap-4">
-            <div>
-                <h1 class="text-3xl font-black logo-gold uppercase">AUREUM</h1>
-                <p class="text-xs text-slate-400 tracking-wide mt-0.5">Autonomous Living & Creative Ledger</p>
-            </div>
-            <div class="flex items-center gap-5">
-                <div class="flex items-center gap-3 bg-slate-900/90 p-1.5 px-3 rounded-full border border-slate-700/80 shadow-lg">
-                    <button id="user-btn-north" onclick="switchActiveUser('North')" class="avatar-btn rounded-full p-0.5">
-                        <img id="avatar-img-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="w-9 h-9 rounded-full bg-slate-800 object-cover transition-all">
-                        <span class="avatar-tooltip" id="avatar-tip-north">North</span>
-                    </button>
-                    <button id="user-btn-cream" onclick="switchActiveUser('Cream')" class="avatar-btn rounded-full p-0.5">
-                        <img id="avatar-img-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="w-9 h-9 rounded-full bg-slate-800 object-cover transition-all">
-                        <span class="avatar-tooltip" id="avatar-tip-cream">Cream</span>
-                    </button>
+        <!-- PROMINENT DUO PLAYER HERO HUD HEADER -->
+        <header class="flex flex-col lg:flex-row justify-between items-center mb-6 pb-6 border-b border-slate-700/80 gap-6">
+            <div class="flex items-center justify-between w-full lg:w-auto">
+                <div>
+                    <h1 class="text-3xl font-black logo-gold uppercase">AUREUM</h1>
+                    <p class="text-xs text-slate-400 tracking-wide mt-0.5">Autonomous Living & Creative Ledger</p>
                 </div>
-                <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-sm text-slate-400 hover:text-white px-2.5 py-1.5 bg-slate-800/80 rounded-lg border border-slate-700">🔊</button>
-                <button onclick="handleLogout()" class="text-xs text-slate-500 hover:text-slate-300 underline">Sign Out</button>
+                <div class="flex items-center gap-2 lg:hidden">
+                    <button onclick="toggleAudioMute()" id="audio-toggle-btn-mobile" class="text-xs text-slate-400 p-2 bg-slate-800 rounded-lg border border-slate-700">🔊</button>
+                    <button onclick="handleLogout()" class="text-xs text-slate-500 hover:text-slate-300 underline">Sign Out</button>
+                </div>
+            </div>
+
+            <!-- PROMINENT DUO HUD CARDS -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full lg:w-auto flex-1 max-w-2xl">
+                <!-- NORTH HERO CARD -->
+                <div id="hud-card-north" onclick="switchActiveUser('North')" class="hud-card card p-3.5 rounded-2xl border flex items-center gap-3.5 relative overflow-hidden group cursor-pointer">
+                    <div class="relative shrink-0">
+                        <img id="hud-avatar-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="w-14 h-14 rounded-full bg-slate-900 border-2 border-slate-700 object-cover transition-all">
+                        <span id="hud-presence-dot-north" class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md"></span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="font-bold text-sm text-slate-100 flex items-center gap-1.5">North <span id="hud-badge-north" class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">ACTIVE</span></span>
+                            <span id="hud-pwr-north" class="text-[11px] font-mono font-bold text-amber-400">0 PWR</span>
+                        </div>
+                        <div id="hud-status-north" onclick="editUserStatusNote('North', event)" class="text-[11px] text-slate-400 truncate mt-0.5 hover:text-amber-300 transition-colors cursor-pointer" title="Click to edit status message">Loomis Head Studies 🎨</div>
+                        <div class="flex items-center justify-between text-[10px] text-slate-400 mt-1.5 pt-1 border-t border-slate-800/80">
+                            <span id="hud-hours-north" class="font-mono">0.0 / 4.0h</span>
+                            <span id="hud-pomo-north" class="text-emerald-400 font-semibold truncate max-w-[120px]">Idle</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CREAM HERO CARD -->
+                <div id="hud-card-cream" onclick="switchActiveUser('Cream')" class="hud-card card p-3.5 rounded-2xl border flex items-center gap-3.5 relative overflow-hidden group cursor-pointer">
+                    <div class="relative shrink-0">
+                        <img id="hud-avatar-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="w-14 h-14 rounded-full bg-slate-900 border-2 border-slate-700 object-cover transition-all">
+                        <span id="hud-presence-dot-cream" class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md"></span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="font-bold text-sm text-slate-100 flex items-center gap-1.5">Cream <span id="hud-badge-cream" class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase">VIEW</span></span>
+                            <span id="hud-pwr-cream" class="text-[11px] font-mono font-bold text-amber-400">0 PWR</span>
+                        </div>
+                        <div id="hud-status-cream" onclick="editUserStatusNote('Cream', event)" class="text-[11px] text-slate-400 truncate mt-0.5 hover:text-amber-300 transition-colors cursor-pointer" title="Click to edit status message">Drafting Scene 4 ✍️</div>
+                        <div class="flex items-center justify-between text-[10px] text-slate-400 mt-1.5 pt-1 border-t border-slate-800/80">
+                            <span id="hud-hours-cream" class="font-mono">0.0 / 4.0h</span>
+                            <span id="hud-pomo-cream" class="text-emerald-400 font-semibold truncate max-w-[120px]">Idle</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden lg:flex items-center gap-3">
+                <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-sm text-slate-400 hover:text-white px-3 py-2 bg-slate-800/80 rounded-xl border border-slate-700">🔊</button>
+                <button onclick="handleLogout()" class="text-xs text-slate-400 hover:text-slate-200 px-3 py-2 bg-slate-900 rounded-xl border border-slate-800">Sign Out</button>
             </div>
         </header>
 
@@ -751,7 +792,7 @@
         let loggedInUser='North',viewedUser='North',currentUserUid=null,audioMuted=false;
         let activeHoldTimer=null,activeHoldInterval=null,isTouchScrolling=false;
 
-        // HELPER: Safe date resolver to handle Firebase local latency null timestamps
+        // SAFE DATE FALLBACK HELPER
         function getLogDate(l){
             if(!l||!l.timestamp)return new Date();
             return l.timestamp.toDate?l.timestamp.toDate():new Date(l.timestamp);
@@ -790,7 +831,8 @@
             {id:'streak_100',tier:'aureum',icon:'🌋',title:'Monolith of Eternity',desc:'Maintain a 100-day active streak.'}
         ];
 
-        let userSettings={monthlyCash:8000,weeklyHours:10,dailySoftCap:4,maxBonusCapPct:125,pomoFocus:25,pomoShort:5,pomoLong:15,pomoRounds:4,pomoSound:'zen_bowl',pomoSoundRepeats:3,unloggedFocusSecs:0,userTheme:'gold',userCursor:'default',avatarUrl:'',particleIntensity:15,vaultedMonths:{},unlockedBadges:[],completedPomoHistory:[],scratchpadTodos:[]};
+        let userSettings={monthlyCash:8000,weeklyHours:10,dailySoftCap:4,maxBonusCapPct:125,pomoFocus:25,pomoShort:5,pomoLong:15,pomoRounds:4,pomoSound:'zen_bowl',pomoSoundRepeats:3,unloggedFocusSecs:0,userTheme:'gold',userCursor:'default',avatarUrl:'',particleIntensity:15,statusNote:'',vaultedMonths:{},unlockedBadges:[],completedPomoHistory:[],scratchpadTodos:[]};
+        let duoPresenceData={North:{settings:{},hoursToday:0,powerScore:0},Cream:{settings:{},hoursToday:0,powerScore:0}};
 
         // CANVAS FX POOL
         const canvas=$('fx-canvas'),ctx=canvas.getContext('2d');
@@ -834,7 +876,7 @@
             if(activeCount>0){requestAnimationFrame(animateParticles)}else{isFxAnimating=false}
         }
 
-        // REPEATING SYNTHESIZER AUDIO ENGINE
+        // SYNTHESIZER SOUND ENGINE
         function playSingleToneBurst(key,c,now){
             const k=key||userSettings.pomoSound||'zen_bowl';
             if(k==='zen_bowl'){
@@ -928,7 +970,7 @@
             if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({pomoSound:val},{merge:true});
         }
 
-        // DOM UTILITIES & TODO ENGINE
+        // TODO SCRATCHPAD ENGINE
         async function syncTodosToFirestore(list){
             if(loggedInUser!==viewedUser)return;
             userSettings.scratchpadTodos=list;renderTodoList();
@@ -968,7 +1010,7 @@
             doneListEl.innerHTML=doneItems.length===0?'<div class="text-xs text-slate-500 italic py-2 text-center">No completed tasks yet.</div>':doneItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item done ${cursorClass} p-2.5 bg-slate-900/60 border border-slate-800/80 rounded-xl flex items-center justify-between gap-3 text-xs text-slate-400 select-none"><div class="flex items-center gap-2.5 truncate"><span class="w-4 h-4 rounded-md theme-accent-bg text-slate-950 flex items-center justify-center shrink-0 font-bold text-[10px]">✓</span><span class="truncate font-medium">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-[11px] font-bold">×</button>`:''}</div>`).join('');
         }
 
-        // DRAG, SCROLL & HOLD RELEASE HANDLERS
+        // MOUSE & TOUCH HOLD SAFETY LISTENERS
         let isRightDragging=false,dragStartX=0,dragStartY=0,dragScrollX=0,dragScrollY=0,didRightDrag=false;
         window.addEventListener('mousedown',e=>{if(e.button===2){isRightDragging=true;didRightDrag=false;dragStartX=e.clientX;dragStartY=e.clientY;dragScrollX=window.scrollX;dragScrollY=window.scrollY}},{passive:true});
         window.addEventListener('mousemove',e=>{if(!isRightDragging)return;const dx=e.clientX-dragStartX,dy=e.clientY-dragStartY;if(Math.abs(dx)>4||Math.abs(dy)>4)didRightDrag=true;window.scrollTo(dragScrollX-dx,dragScrollY-dy)},{passive:true});
@@ -979,7 +1021,7 @@
         window.addEventListener('touchmove',()=>{isTouchScrolling=true;stopHold()},{passive:true});
         window.addEventListener('touchend',()=>{setTimeout(()=>{isTouchScrolling=false},50)},{passive:true});
 
-        // BADGE RENDER & EVALUATOR
+        // BADGE & TOAST ENGINE
         function renderBadgeGrid(unlockedSet=new Set()){
             const gridEl=$('badge-grid');if(!gridEl)return;
             $('badge-completion-count').innerText=`${unlockedSet.size} / ${BADGE_CATALOG.length}`;
@@ -1059,7 +1101,12 @@
 
         function requestNotificationPermission(){if("Notification"in window&&Notification.permission==="default")Notification.requestPermission()}
         function triggerDesktopNotification(t,b){if("Notification"in window&&Notification.permission==="granted")new Notification(t,{body:b,icon:"https://fav.farm/✨"})}
-        function toggleAudioMute(){audioMuted=!audioMuted;$('audio-toggle-btn').innerText=audioMuted?"🔇":"🔊"}
+        function toggleAudioMute(){
+            audioMuted=!audioMuted;
+            const text=audioMuted?"🔇":"🔊";
+            $('audio-toggle-btn').innerText=text;
+            if($('audio-toggle-btn-mobile'))$('audio-toggle-btn-mobile').innerText=text;
+        }
 
         function startHold(mode,fieldOrId,delta,step=1,min=1,max=5,e){
             if(isTouchScrolling)return;
@@ -1099,7 +1146,7 @@
         function applyThemeToBody(t){document.body.setAttribute('data-theme',t||'gold')}
         function applyCursorToBody(c){document.body.setAttribute('data-cursor',c||'default')}
 
-        // POMODORO ENGINE WITH WALL-CLOCK TIMESTAMP ENGINE
+        // POMODORO ENGINE
         let myPomoMode='focus',myPomoRound=1,myPomoTime=1500,myPomoEndTime=null,myPomoInitialTime=1500,myPomoIsRunning=false,myPomoInterval=null,currentSessionWasPaused=false;
         let pomoUIRenderInterval=null,pomoSyncUnsubscribe=null,spectatorSettings=null,shadowSpectatorTime=1500,shadowSpectatorIsRunning=false,shadowSpectatorInterval=null;
 
@@ -1115,10 +1162,32 @@
             }
         });
 
+        async function updatePresenceTimestamp(){
+            if(!loggedInUser)return;
+            try{
+                await db.collection('settings').doc(loggedInUser).set({lastActiveTimestamp:Date.now()},{merge:true});
+            }catch(e){}
+        }
+
+        async function editUserStatusNote(user,e){
+            if(e)e.stopPropagation();
+            if(user!==loggedInUser)return;
+            const current=userSettings.statusNote||(user==='North'?'Loomis Head Studies 🎨':'Drafting Scene 4 ✍️');
+            const note=prompt('Enter your micro-status note (max 30 chars):',current);
+            if(note!==null){
+                const trimmed=note.trim().substring(0,30);
+                userSettings.statusNote=trimmed;
+                await db.collection('settings').doc(loggedInUser).set({statusNote:trimmed},{merge:true});
+                renderDuoHUDCards();
+                showToast({title:'💬 Status Note Updated',subtitle:`"${trimmed}"`,icon:'✨',tier:'gold'});
+            }
+        }
+
         async function syncMyPomoToCloud(){
             if(!loggedInUser)return;
             try{
                 db.collection('settings').doc(loggedInUser).set({
+                    lastActiveTimestamp:Date.now(),
                     livePomoState:{
                         mode:myPomoMode,
                         round:myPomoRound,
@@ -1299,6 +1368,7 @@
                 if(dots.children.length!==totR){dots.innerHTML='';for(let i=0;i<totR;i++)dots.appendChild(document.createElement('div'))}
                 Array.from(dots.children).forEach((d,i)=>d.className=i<round?"w-2.5 h-2.5 rounded-full theme-accent-bg":"w-2.5 h-2.5 rounded-full bg-slate-700");
                 updateUnloggedFocusDisplay();
+                renderDuoHUDCards();
             },250);
         }
 
@@ -1377,7 +1447,6 @@
             else{badge.innerText="🌱 Initiate";sub.innerText=`${pct}% reached`}
         }
 
-        // FIXED: DYNAMIC CHART TIME-BUCKET INDEXING ENGINE
         function updateChartData(type,logs,pointRate,maxCash){
             const range=chartTimeframes[type],now=new Date();let labels=[];
             if(range==='daily'){for(let i=13;i>=0;i--){const d=new Date();d.setDate(now.getDate()-i);labels.push(d.toLocaleDateString('en-US',{month:'short',day:'numeric'}))}}
@@ -1443,7 +1512,7 @@
         }
 
         let currentTodayHoursLogged=0,currentRawLogsCache=[],settingsUnsubscribe=null,globalLogsUnsubscribe=null;
-        let northDailyHours=0,creamDailyHours=0;
+        let unsubscribeNorthSettings=null,unsubscribeCreamSettings=null;
 
         auth.onAuthStateChanged(async u=>{
             const modal=$('login-modal'),app=$('app-content');
@@ -1451,13 +1520,89 @@
                 currentUserUid=u.uid;if(modal)modal.classList.add('hidden');if(app)app.classList.remove('hidden');
                 loggedInUser=(u.uid==="ioxjbBLDH0NDLDWVoYCjq8p3PYU2"||u.email?.toLowerCase().includes("cream"))?'Cream':'North';
                 viewedUser=loggedInUser;
+                initDuoHUDListeners();
                 initRealtimeSettingsListener();initGlobalHeaderGlowListener();
                 await initAndRecoverMyPomoState();
                 updateUserSwitcherUI();initCharts();loadUserData();
                 updateRatingUI('results');updateRatingUI('effort');updateWorkoutStrainUI();
                 startGlobalUIRenderer();attachPomoSpectatorListener();
+                updatePresenceTimestamp();
             }else{if(modal)modal.classList.remove('hidden');if(app)app.classList.add('hidden')}
         });
+
+        // REAL-TIME DUO HUD LISTENERS (Pulls state for both North and Cream simultaneously)
+        function initDuoHUDListeners(){
+            if(unsubscribeNorthSettings)unsubscribeNorthSettings();
+            if(unsubscribeCreamSettings)unsubscribeCreamSettings();
+
+            unsubscribeNorthSettings=db.collection('settings').doc('North').onSnapshot(doc=>{
+                if(doc.exists)duoPresenceData.North.settings=doc.data();
+                renderDuoHUDCards();
+            });
+            unsubscribeCreamSettings=db.collection('settings').doc('Cream').onSnapshot(doc=>{
+                if(doc.exists)duoPresenceData.Cream.settings=doc.data();
+                renderDuoHUDCards();
+            });
+        }
+
+        function renderDuoHUDCards(){
+            ['North','Cream'].forEach(u=>{
+                const isMe=(u===loggedInUser),isViewing=(u===viewedUser);
+                const s=isMe?userSettings:(spectatorSettings&&viewedUser===u?spectatorSettings:(duoPresenceData[u]?.settings||{}));
+                
+                // Active Card Styling
+                const cardEl=$(`hud-card-${u.toLowerCase()}`);
+                if(cardEl){
+                    if(isViewing)cardEl.className="hud-card card active-space p-3.5 rounded-2xl border flex items-center gap-3.5 relative overflow-hidden group cursor-pointer";
+                    else cardEl.className="hud-card card view-space p-3.5 rounded-2xl border flex items-center gap-3.5 relative overflow-hidden group cursor-pointer";
+                }
+
+                // Avatar & Presence
+                const imgEl=$(`hud-avatar-${u.toLowerCase()}`);
+                if(imgEl){
+                    imgEl.src=s.avatarUrl||`https://api.dicebear.com/7.x/bottts/svg?seed=${u}`;
+                    applyDynamicAvatarGlow(imgEl,duoPresenceData[u].hoursToday||0);
+                }
+                const dotEl=$(`hud-presence-dot-${u.toLowerCase()}`);
+                if(dotEl){
+                    const lastActive=s.lastActiveTimestamp||0;
+                    const isOnline=(Date.now()-lastActive)<300000; // 5 min idle window
+                    dotEl.className=isOnline?"absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md presence-pulse":"absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-slate-600 border-2 border-slate-950 shadow-md";
+                }
+
+                // Badges
+                const badgeEl=$(`hud-badge-${u.toLowerCase()}`);
+                if(badgeEl){
+                    if(isMe){badgeEl.innerText="YOU";badgeEl.className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase"}
+                    else if(isViewing){badgeEl.innerText="VIEWING";badgeEl.className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 uppercase"}
+                    else{badgeEl.innerText="PEER";badgeEl.className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase"}
+                }
+
+                // Status note
+                const statusEl=$(`hud-status-${u.toLowerCase()}`);
+                if(statusEl){
+                    const note=s.statusNote||(u==='North'?'Loomis Head Studies 🎨':'Drafting Scene 4 ✍️');
+                    statusEl.innerText=note;
+                }
+
+                // Power & Hours
+                $(`hud-pwr-${u.toLowerCase()}`).innerText=`${duoPresenceData[u].powerScore||0} PWR`;
+                $(`hud-hours-${u.toLowerCase()}`).innerText=`${(duoPresenceData[u].hoursToday||0).toFixed(1)} / ${(s.dailySoftCap||4)}h`;
+
+                // Live Pomodoro Flow State
+                const pomoEl=$(`hud-pomo-${u.toLowerCase()}`);
+                if(pomoEl){
+                    const pomo=s.livePomoState;
+                    if(pomo&&pomo.isRunning&&pomo.pomoEndTime){
+                        const rem=Math.max(0,Math.ceil((pomo.pomoEndTime-Date.now())/1000));
+                        const m=Math.floor(rem/60),sec=(rem%60).toString().padStart(2,'0');
+                        pomoEl.innerText=`⏳ Flow ${m}:${sec}`;pomoEl.className="text-amber-300 font-bold truncate max-w-[120px]";
+                    }else{
+                        pomoEl.innerText="Idle";pomoEl.className="text-slate-500 font-semibold truncate max-w-[120px]";
+                    }
+                }
+            });
+        }
 
         function initRealtimeSettingsListener(){
             if(settingsUnsubscribe)settingsUnsubscribe();
@@ -1467,7 +1612,7 @@
                     if(loggedInUser===viewedUser){userSettings={...userSettings,...data};applyThemeToBody(userSettings.userTheme);applyCursorToBody(userSettings.userCursor)}
                     else{spectatorSettings=data;applyThemeToBody(userSettings.userTheme);applyCursorToBody(userSettings.userCursor)}
                 }
-                updateSettingsUI();updateAvatarsInHeader();renderTodoList();
+                updateSettingsUI();renderTodoList();renderDuoHUDCards();
                 if(currentRawLogsCache.length>0)loadUserData();
             });
         }
@@ -1475,18 +1620,38 @@
         function initGlobalHeaderGlowListener(){
             if(globalLogsUnsubscribe)globalLogsUnsubscribe();
             const now=new Date(),startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-            globalLogsUnsubscribe=db.collection('logs').where('type','==','work').onSnapshot(snapshot=>{
-                let nH=0,cH=0;
+            globalLogsUnsubscribe=db.collection('logs').onSnapshot(snapshot=>{
+                let nH=0,cH=0,nLogs=[],cLogs=[];
                 snapshot.forEach(doc=>{
                     const d=doc.data();
                     const logDate=getLogDate(d);
                     if(logDate>=startToday){
-                        if(d.user==='North')nH+=(d.hours||0);
-                        else if(d.user==='Cream')cH+=(d.hours||0);
+                        if(d.user==='North'){
+                            nLogs.push(d);
+                            if(d.type==='work')nH+=(d.hours||0);
+                        }else if(d.user==='Cream'){
+                            cLogs.push(d);
+                            if(d.type==='work')cH+=(d.hours||0);
+                        }
                     }
                 });
-                northDailyHours=nH;creamDailyHours=cH;updateAvatarsInHeader();
+                duoPresenceData.North.hoursToday=nH;duoPresenceData.Cream.hoursToday=cH;
+                duoPresenceData.North.powerScore=calculatePowerScore(nLogs);
+                duoPresenceData.Cream.powerScore=calculatePowerScore(cLogs);
+                renderDuoHUDCards();
             });
+        }
+
+        function calculatePowerScore(todayLogs){
+            let workH=0,workoutH=0,choreH=0,snackC=0;
+            for(let i=0;i<todayLogs.length;i++){
+                const l=todayLogs[i];
+                if(l.type==='work')workH+=(l.hours||0);
+                else if(l.type==='workout')workoutH+=(l.hours||0);
+                else if(l.type==='chore')choreH+=(l.hours||0);
+                else if(l.type==='health')snackC+=1;
+            }
+            return Math.round((workH*100)+(workoutH*120)+(choreH*80)+(snackC*15));
         }
 
         function applyDynamicAvatarGlow(el,hours){
@@ -1500,18 +1665,6 @@
                 const p=(hours-2.0)/(softCap-2.0),r=Math.round(16+(245-16)*p),g=Math.round(185+(158-185)*p),b=Math.round(129+(11-129)*p),blur=Math.round(18+p*6);
                 el.style.boxShadow=`0 0 ${blur}px ${Math.round(4+p*2)}px rgba(${r}, ${g}, ${b}, ${0.75+p*0.2})`;el.style.borderColor=`rgba(${r}, ${g}, ${b}, 0.9)`;
             }else{el.style.boxShadow="0 0 24px 6px rgba(245, 158, 11, 0.95)";el.style.borderColor="rgba(245, 158, 11, 1)"}
-        }
-
-        function updateAvatarsInHeader(){
-            const nBtn=$('user-btn-north'),cBtn=$('user-btn-cream'),nImg=$('avatar-img-north'),cImg=$('avatar-img-cream'),nTip=$('avatar-tip-north'),cTip=$('avatar-tip-cream');
-            if(!nBtn||!cBtn||!nImg||!cImg)return;
-            nTip.innerText=loggedInUser==='North'?'North (You)':'North';cTip.innerText=loggedInUser==='Cream'?'Cream (You)':'Cream';
-            nBtn.className=`avatar-btn rounded-full p-0.5 ${viewedUser==='North'?'ring-2 ring-amber-400 scale-105':''}`;
-            cBtn.className=`avatar-btn rounded-full p-0.5 ${viewedUser==='Cream'?'ring-2 ring-amber-400 scale-105':''}`;
-            const activeSettings=loggedInUser===viewedUser?userSettings:spectatorSettings;
-            if(viewedUser==='North'){nImg.src=activeSettings?.avatarUrl||"https://api.dicebear.com/7.x/bottts/svg?seed=North"}
-            else if(viewedUser==='Cream'){cImg.src=activeSettings?.avatarUrl||"https://api.dicebear.com/7.x/bottts/svg?seed=Cream"}
-            applyDynamicAvatarGlow(nImg,northDailyHours);applyDynamicAvatarGlow(cImg,creamDailyHours);
         }
 
         function updateSettingsUI(){
@@ -1552,7 +1705,7 @@
             document.querySelectorAll('#tab-forge button').forEach(b=>b.style.display=isSelf?'inline-block':'none');
             $('read-only-banner').classList.toggle('hidden',isSelf);
             if(!isSelf)$('view-target-name').innerText=viewedUser;
-            updateAvatarsInHeader();renderTodoList();
+            renderTodoList();renderDuoHUDCards();
         }
 
         function switchTab(t){
@@ -1641,20 +1794,20 @@
         }
         async function applyCustomAvatarUrl(){
             const url=$('setting-avatar-url').value.trim();if(!url)return;
-            userSettings.avatarUrl=url;updateAvatarsInHeader();
+            userSettings.avatarUrl=url;renderDuoHUDCards();
             if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({avatarUrl:url},{merge:true});
             showToast({title:'🖼️ Avatar Updated',subtitle:'New custom avatar applied!',icon:'✨',tier:'gold'});
         }
         async function setAvatarPreset(style,seed){
             const url=`https://api.dicebear.com/7.x/${style}/svg?seed=${seed}`;
-            $('setting-avatar-url').value=url;userSettings.avatarUrl=url;updateAvatarsInHeader();
+            $('setting-avatar-url').value=url;userSettings.avatarUrl=url;renderDuoHUDCards();
             if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({avatarUrl:url},{merge:true});
             showToast({title:'🤖 Preset Applied',subtitle:'Avatar updated!',icon:'🤖',tier:'gold'});
         }
         async function randomizeAvatar(){
             const styles=['bottts','adventurer','lorelei','avataaars','personas','micah'];
             const url=`https://api.dicebear.com/7.x/${styles[(Math.random()*styles.length)|0]}/svg?seed=${Math.random().toString(36).substring(7)}`;
-            $('setting-avatar-url').value=url;userSettings.avatarUrl=url;updateAvatarsInHeader();
+            $('setting-avatar-url').value=url;userSettings.avatarUrl=url;renderDuoHUDCards();
             if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({avatarUrl:url},{merge:true});
             showToast({title:'🎲 Surprise!',subtitle:'New random avatar generated!',icon:'✨',tier:'gold'});
         }
@@ -1682,6 +1835,10 @@
         }
 
         function calculateAndRenderPowerMeter(todayLogs){
+            const pwrScore=calculatePowerScore(todayLogs);
+            $('power-score-val').innerText=pwrScore.toLocaleString();
+            $('power-level-bar').style.width=`${Math.min(100,Math.round((pwrScore/800)*100))}%`;
+
             let workH=0,workoutH=0,choreH=0,snackC=0;
             for(let i=0;i<todayLogs.length;i++){
                 const l=todayLogs[i];
@@ -1690,9 +1847,6 @@
                 else if(l.type==='chore')choreH+=(l.hours||0);
                 else if(l.type==='health')snackC+=1;
             }
-            const pwrScore=Math.round((workH*100)+(workoutH*120)+(choreH*80)+(snackC*15));
-            $('power-score-val').innerText=pwrScore.toLocaleString();
-            $('power-level-bar').style.width=`${Math.min(100,Math.round((pwrScore/800)*100))}%`;
 
             const rankIcon=$('power-rank-icon'),rankTitle=$('power-rank-title');
             if(pwrScore>=900){rankIcon.innerText='👑';rankTitle.innerText='Ascended Overlord';rankTitle.className="text-xs font-extrabold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40"}
@@ -1719,7 +1873,7 @@
                     }
                 });
 
-                // SAFE SORTING: Uses getLogDate helper to avoid null timestamp exceptions
+                // SAFE TIMESTAMP SORTING
                 rawLogs.sort((a,b)=>getLogDate(b).getTime()-getLogDate(a).getTime());
                 currentTodayHoursLogged=todayHours;currentRawLogsCache=rawLogs;
 
