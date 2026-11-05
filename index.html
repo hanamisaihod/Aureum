@@ -332,17 +332,33 @@
                 </form>
             </div>
 
-            <div id="diary-form-card" class="card p-6 rounded-xl">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-lg font-semibold text-slate-200">Daily Reflection</h2>
-                    <span id="diary-status-badge" class="text-xs text-slate-400">Jot down thoughts or wins</span>
-                </div>
-                <form onsubmit="saveDailyDiary(event)" class="space-y-3 relative">
-                    <textarea id="diary-text" rows="2" placeholder="What went well today? Lessons learned or ideas?" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 resize-none"></textarea>
-                    <div class="flex justify-end">
-                        <button type="submit" class="theme-accent-bg font-medium px-5 py-2 rounded-lg text-xs transition-all">Save Daily Reflection</button>
+            <!-- SCRATCHPAD TODOs (MOVED TO CRUCIBLE) -->
+            <div id="todo-card" class="card p-6 rounded-xl space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>📝</span> <span>Scratchpad TODOs</span></h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Cloud-synced task scratchpad. Click items to toggle complete.</p>
                     </div>
+                    <div class="flex items-center gap-2">
+                        <span id="todo-count-active" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">0 Active</span>
+                        <span id="todo-count-done" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">0 Done</span>
+                        <button id="todo-clear-btn" onclick="clearCompletedTodos()" class="text-xs text-slate-400 hover:text-red-400 px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all">Clear Done</button>
+                    </div>
+                </div>
+                <form id="todo-form" onsubmit="addTodoItem(event)" class="flex gap-2">
+                    <input type="text" id="todo-input" placeholder="Add a quick task..." class="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                    <button type="submit" class="theme-accent-bg font-bold px-5 py-2.5 rounded-xl text-xs transition-all shadow-md">+ Add Task</button>
                 </form>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800/80">
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Pending Tasks</div>
+                        <div id="todo-active-list" class="space-y-2 max-h-[280px] overflow-y-auto pr-1"></div>
+                    </div>
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800/80">
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Finished</div>
+                        <div id="todo-completed-list" class="space-y-2 max-h-[280px] overflow-y-auto pr-1"></div>
+                    </div>
+                </div>
             </div>
 
             <div class="card p-6 rounded-xl">
@@ -513,32 +529,18 @@
                 </div>
             </div>
 
-            <div class="card p-6 rounded-xl space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div>
-                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>📝</span> <span>Scratchpad TODOs</span></h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Cloud-synced task scratchpad. Click items to toggle complete.</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span id="todo-count-active" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">0 Active</span>
-                        <span id="todo-count-done" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">0 Done</span>
-                        <button id="todo-clear-btn" onclick="clearCompletedTodos()" class="text-xs text-slate-400 hover:text-red-400 px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all">Clear Done</button>
-                    </div>
+            <!-- DAILY REFLECTION CARD (MOVED TO SANCTUARY) -->
+            <div id="diary-form-card" class="card p-6 rounded-xl">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-lg font-semibold text-slate-200">Daily Reflection</h2>
+                    <span id="diary-status-badge" class="text-xs text-slate-400">Jot down thoughts or wins</span>
                 </div>
-                <form id="todo-form" onsubmit="addTodoItem(event)" class="flex gap-2">
-                    <input type="text" id="todo-input" placeholder="Add a quick task..." class="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
-                    <button type="submit" class="theme-accent-bg font-bold px-5 py-2.5 rounded-xl text-xs transition-all shadow-md">+ Add Task</button>
+                <form onsubmit="saveDailyDiary(event)" class="space-y-3 relative">
+                    <textarea id="diary-text" rows="2" placeholder="What went well today? Lessons learned or ideas?" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 resize-none"></textarea>
+                    <div class="flex justify-end">
+                        <button type="submit" class="theme-accent-bg font-medium px-5 py-2 rounded-lg text-xs transition-all">Save Daily Reflection</button>
+                    </div>
                 </form>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800/80">
-                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Pending Tasks</div>
-                        <div id="todo-active-list" class="space-y-2 max-h-[280px] overflow-y-auto pr-1"></div>
-                    </div>
-                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800/80">
-                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Finished</div>
-                        <div id="todo-completed-list" class="space-y-2 max-h-[280px] overflow-y-auto pr-1"></div>
-                    </div>
-                </div>
             </div>
 
             <div class="card p-6 rounded-xl">
