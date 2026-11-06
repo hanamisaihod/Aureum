@@ -1487,10 +1487,16 @@
         function stopHold(){if(activeHoldTimer){clearTimeout(activeHoldTimer);activeHoldTimer=null}if(activeHoldInterval){clearInterval(activeHoldInterval);activeHoldInterval=null}}
 
         function updateRatingUI(field){
-            const input=$(`work-${field}`);if(!input)return;
-            const val=parseInt(input.value)||3,d=RATING_DATA[field][val-1],p=field==='results'?'q':'e';
-            $(`${p}-icon`).innerText=d.icon;$(`${p}-badge`).innerText=`LVL ${d.level}`;
-            $(`${p}-title`).innerText=d.title;$(`${p}-desc`).innerText=d.desc;
+            const input = $(`work-${field}`); 
+            if (!input) return;
+            
+            const val = parseInt(input.value) || 3, d = RATING_DATA[field][val-1], p = field === 'results' ? 'q' : 'e';
+            
+            // Safely update each element only if it actually exists in the DOM
+            const iconEl = $(`${p}-icon`); if (iconEl) iconEl.innerText = d.icon;
+            const badgeEl = $(`${p}-badge`); if (badgeEl) badgeEl.innerText = `LVL ${d.level}`;
+            const titleEl = $(`${p}-title`); if (titleEl) titleEl.innerText = d.title;
+            const descEl = $(`${p}-desc`); if (descEl) descEl.innerText = d.desc;
         }
         function updateWorkoutStrainUI(){
             const input=$('workout-strain');if(!input)return;
