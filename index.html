@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AUREUM — Autonomous Living & Creative Ledger</title>
     <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="AUREUM">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23fef08a%22%2F%3E%3Cstop%20offset%3D%2250%25%22%20stop-color%3D%22%23f59e0b%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23b45309%22%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%22b%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%220%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231e293b%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23020617%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22110%22%20fill%3D%22url(%23b)%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%2214%22%20width%3D%22484%22%20height%3D%22484%22%20rx%3D%2296%22%20fill%3D%22none%22%20stroke%3D%22url(%23g)%22%20stroke-width%3D%2210%22%20stroke-opacity%3D%220.45%22%2F%3E%3Cpolygon%20points%3D%22256%2C80%20276%2C118%20256%2C108%20236%2C118%22%20fill%3D%22url(%23g)%22%2F%3E%3Cpath%20d%3D%22M%20256%2C122%20L%20378%2C412%20L%20316%2C412%20L%20286%2C336%20L%20226%2C336%20L%20196%2C412%20L%20134%2C412%20Z%20M%20256%2C212%20L%20240%2C276%20L%20272%2C276%20Z%22%20fill%3D%22url(%23g)%22%2F%3E%3C%2Fsvg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -15,62 +12,44 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
-        :root{--bg-main:#0f172a;--card-bg:rgba(15,23,42,0.92);--card-border:rgba(255,255,255,0.08);--accent-primary:#f59e0b;--accent-secondary:#fef08a;--accent-primary-hover:#d97706;--accent-primary-text:#020617;--accent-glow:rgba(245,158,11,0.28)}
-        body[data-theme="gold"]{--bg-main:#0f172a;--card-bg:rgba(15,23,42,0.92);--card-border:rgba(255,255,255,0.08);--accent-primary:#f59e0b;--accent-secondary:#fef08a;--accent-primary-hover:#d97706;--accent-primary-text:#020617;--accent-glow:rgba(245,158,11,0.28)}
-        body[data-theme="rose"]{--bg-main:#180e15;--card-bg:rgba(30,16,26,0.92);--card-border:rgba(244,114,182,0.18);--accent-primary:#f472b6;--accent-secondary:#fef08a;--accent-primary-hover:#e11d48;--accent-primary-text:#020617;--accent-glow:rgba(244,114,182,0.35)}
-        body[data-theme="emerald"]{--bg-main:#061814;--card-bg:rgba(10,32,27,0.92);--card-border:rgba(16,185,129,0.18);--accent-primary:#10b981;--accent-secondary:#06b6d4;--accent-primary-hover:#059669;--accent-primary-text:#020617;--accent-glow:rgba(16,185,129,0.35)}
-        body[data-theme="cyber"]{--bg-main:#0b0f19;--card-bg:rgba(15,20,34,0.92);--card-border:rgba(168,85,247,0.2);--accent-primary:#a855f7;--accent-secondary:#ec4899;--accent-primary-hover:#9333ea;--accent-primary-text:#ffffff;--accent-glow:rgba(168,85,247,0.4)}
-        body[data-theme="sunset"]{--bg-main:#1a100c;--card-bg:rgba(34,20,15,0.92);--card-border:rgba(249,115,22,0.2);--accent-primary:#f97316;--accent-secondary:#facc15;--accent-primary-hover:#ea580c;--accent-primary-text:#020617;--accent-glow:rgba(249,115,22,0.35)}
-        body[data-theme="amethyst"]{--bg-main:#120d1d;--card-bg:rgba(22,16,36,0.92);--card-border:rgba(192,132,252,0.2);--accent-primary:#c084fc;--accent-secondary:#818cf8;--accent-primary-hover:#a855f7;--accent-primary-text:#020617;--accent-glow:rgba(192,132,252,0.35)}
-        body[data-theme="ocean"]{--bg-main:#0b1920;--card-bg:rgba(12,28,36,0.92);--card-border:rgba(20,184,166,0.2);--accent-primary:#14b8a6;--accent-secondary:#38bdf8;--accent-primary-hover:#0d9488;--accent-primary-text:#020617;--accent-glow:rgba(20,184,166,0.35)}
-        body[data-theme="crimson"]{--bg-main:#1a0c0e;--card-bg:rgba(34,14,17,0.92);--card-border:rgba(239,68,68,0.2);--accent-primary:#ef4444;--accent-secondary:#f59e0b;--accent-primary-hover:#dc2626;--accent-primary-text:#ffffff;--accent-glow:rgba(239,68,68,0.4)}
-        body[data-theme="matcha"]{--bg-main:#121813;--card-bg:rgba(20,28,22,0.92);--card-border:rgba(132,204,22,0.2);--accent-primary:#84cc16;--accent-secondary:#fde047;--accent-primary-hover:#65a30d;--accent-primary-text:#020617;--accent-glow:rgba(132,204,22,0.35)}
-        body[data-theme="monochrome"]{--bg-main:#121212;--card-bg:rgba(24,24,24,0.92);--card-border:rgba(255,255,255,0.12);--accent-primary:#e2e8f0;--accent-secondary:#38bdf8;--accent-primary-hover:#cbd5e1;--accent-primary-text:#0f172a;--accent-glow:rgba(226,232,240,0.3)}
-        body[data-cursor="gold"]{cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><polygon points='3,3 21,11 13,13 11,21' fill='%23f59e0b' stroke='%23020617' stroke-width='1.5'/></svg>"),auto}
-        body[data-cursor="sparkle"]{cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M12,2 L14.5,9.5 L22,12 L14.5,14.5 L12,22 L9.5,14.5 L2,12 L9.5,9.5 Z' fill='%2338bdf8' stroke='%23020617' stroke-width='1.5'/></svg>"),auto}
-        body[data-cursor="quill"]{cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M2,22 L8,20 L20,4 C20,4 22,2 18,2 C14,2 12,4 12,4 L4,16 Z' fill='%23c084fc' stroke='%23020617' stroke-width='1.5'/></svg>"),auto}
-        body[data-cursor="crosshair"]{cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><circle cx='12' cy='12' r='8' fill='none' stroke='%2310b981' stroke-width='2'/><circle cx='12' cy='12' r='2' fill='%2310b981'/><line x1='12' y1='2' x2='12' y2='6' stroke='%2310b981' stroke-width='2'/><line x1='12' y1='18' x2='12' y2='22' stroke='%2310b981' stroke-width='2'/><line x1='2' y1='12' x2='6' y2='12' stroke='%2310b981' stroke-width='2'/><line x1='18' y1='12' x2='22' y2='12' stroke='%2310b981' stroke-width='2'/></svg>") 12 12,crosshair}
-        body{background-color:var(--bg-main);color:#f8fafc;font-family:system-ui,-apple-system,sans-serif;transition:background-color 0.3s;-webkit-tap-highlight-color:transparent}
-        button,input,select{touch-action:manipulation}
-        .card{position:relative;background:var(--card-bg);border:1px solid var(--card-border);box-shadow:0 8px 32px 0 rgba(0,0,0,0.3);transition:box-shadow 0.25s,border-color 0.3s,transform 0.2s;will-change:transform;transform:translateZ(0)}
+        :root{--bg-main:#0f172a;--card-bg:rgba(15,23,42,0.92);--card-border:rgba(255,255,255,0.08);--accent-primary:#f59e0b;--accent-secondary:#fef08a;--accent-glow:rgba(245,158,11,0.28);--accent-text:#020617}
+        body[data-theme="gold"]{--bg-main:#0f172a;--card-bg:rgba(15,23,42,0.92);--card-border:rgba(255,255,255,0.08);--accent-primary:#f59e0b;--accent-secondary:#fef08a;--accent-glow:rgba(245,158,11,0.28);--accent-text:#020617}
+        body[data-theme="rose"]{--bg-main:#180e15;--card-bg:rgba(30,16,26,0.92);--card-border:rgba(244,114,182,0.18);--accent-primary:#f472b6;--accent-secondary:#fef08a;--accent-glow:rgba(244,114,182,0.35);--accent-text:#020617}
+        body[data-theme="emerald"]{--bg-main:#061814;--card-bg:rgba(10,32,27,0.92);--card-border:rgba(16,185,129,0.18);--accent-primary:#10b981;--accent-secondary:#06b6d4;--accent-glow:rgba(16,185,129,0.35);--accent-text:#020617}
+        body[data-theme="cyber"]{--bg-main:#0b0f19;--card-bg:rgba(15,20,34,0.92);--card-border:rgba(168,85,247,0.2);--accent-primary:#a855f7;--accent-secondary:#ec4899;--accent-glow:rgba(168,85,247,0.4);--accent-text:#ffffff}
+        body[data-theme="sunset"]{--bg-main:#1a100c;--card-bg:rgba(34,20,15,0.92);--card-border:rgba(249,115,22,0.2);--accent-primary:#f97316;--accent-secondary:#facc15;--accent-glow:rgba(249,115,22,0.35);--accent-text:#020617}
+        body[data-theme="amethyst"]{--bg-main:#120d1d;--card-bg:rgba(22,16,36,0.92);--card-border:rgba(192,132,252,0.2);--accent-primary:#c084fc;--accent-secondary:#818cf8;--accent-glow:rgba(192,132,252,0.35);--accent-text:#020617}
+        body[data-theme="ocean"]{--bg-main:#0b1920;--card-bg:rgba(12,28,36,0.92);--card-border:rgba(20,184,166,0.2);--accent-primary:#14b8a6;--accent-secondary:#38bdf8;--accent-glow:rgba(20,184,166,0.35);--accent-text:#020617}
+        body[data-theme="crimson"]{--bg-main:#1a0c0e;--card-bg:rgba(34,14,17,0.92);--card-border:rgba(239,68,68,0.2);--accent-primary:#ef4444;--accent-secondary:#f59e0b;--accent-glow:rgba(239,68,68,0.4);--accent-text:#ffffff}
+        body[data-theme="matcha"]{--bg-main:#121813;--card-bg:rgba(20,28,22,0.92);--card-border:rgba(132,204,22,0.2);--accent-primary:#84cc16;--accent-secondary:#fde047;--accent-glow:rgba(132,204,22,0.35);--accent-text:#020617}
+        body[data-theme="monochrome"]{--bg-main:#121212;--card-bg:rgba(24,24,24,0.92);--card-border:rgba(255,255,255,0.12);--accent-primary:#e2e8f0;--accent-secondary:#38bdf8;--accent-glow:rgba(226,232,240,0.3);--accent-text:#0f172a}
+        body{background-color:var(--bg-main);color:#f8fafc;font-family:system-ui,-apple-system,sans-serif;transition:background-color 0.3s}
+        .card{background:var(--card-bg);border:1px solid var(--card-border);box-shadow:0 8px 32px 0 rgba(0,0,0,0.3);transition:box-shadow 0.25s,border-color 0.3s}
         .card:hover{box-shadow:0 12px 36px -8px var(--accent-glow);border-color:rgba(255,255,255,0.18)}
-        .tab-btn{color:#94a3b8;background-color:transparent;border:1px solid transparent;transition:all 0.2s;user-select:none}
+        .tab-btn{color:#94a3b8;background-color:transparent;border:1px solid transparent;transition:all 0.2s}
         .tab-btn:hover{color:#f8fafc;background-color:rgba(30,41,59,0.7)}
         .tab-btn.active{background:linear-gradient(135deg,rgba(245,158,11,0.2) 0%,rgba(254,240,138,0.08) 100%)!important;color:var(--accent-primary)!important;border-color:var(--accent-primary)!important;font-weight:700;box-shadow:0 0 14px var(--accent-glow)}
-        .theme-accent-bg{background:linear-gradient(135deg,var(--accent-primary) 0%,var(--accent-secondary) 100%)!important;color:var(--accent-primary-text)!important}
-        .theme-accent-bg:hover{opacity:0.92}
+        .theme-accent-bg{background:linear-gradient(135deg,var(--accent-primary) 0%,var(--accent-secondary) 100%)!important;color:var(--accent-text)!important}
         .theme-accent-text{background:linear-gradient(135deg,var(--accent-primary) 0%,var(--accent-secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .logo-gold{background:linear-gradient(135deg,var(--accent-primary) 0%,var(--accent-secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:0.25em;text-shadow:0 0 16px var(--accent-glow)}
+        .logo-gold{background:linear-gradient(135deg,var(--accent-primary) 0%,var(--accent-secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:0.25em}
         .gauge-circle{transition:stroke-dashoffset 0.8s ease-in-out,stroke 0.3s}
         .hud-card{transition:all 0.3s ease;user-select:none}
         .hud-card.active-space{border-color:var(--accent-primary)!important;box-shadow:0 0 20px var(--accent-glow);background:linear-gradient(135deg,rgba(15,23,42,0.95) 0%,rgba(30,41,59,0.9) 100%)}
-        .hud-card.view-space{border-color:rgba(148,163,184,0.2);opacity:0.85}
-        .hud-card.view-space:hover{opacity:1;border-color:rgba(255,255,255,0.3)}
-        .presence-pulse{animation:pulseGlow 2s infinite}
-        @keyframes pulseGlow{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.85)}}
-        .status-preset-btn{transition:all 0.2s ease;user-select:none}
-        .status-preset-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,0.4);border-color:var(--accent-primary)}
+        .status-preset-btn{transition:all 0.2s ease}
+        .status-preset-btn:hover{transform:translateY(-2px);border-color:var(--accent-primary)}
         .no-scrollbar::-webkit-scrollbar{display:none}
-        .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
         .power-bar-fill{background:linear-gradient(90deg,#38bdf8 0%,#10b981 50%,#f59e0b 80%,#a855f7 100%);box-shadow:0 0 14px var(--accent-glow);transition:width 0.8s cubic-bezier(0.16,1,0.3,1)}
         .badge-card{background:var(--card-bg);border:1px solid var(--card-border);transition:all 0.25s ease-out}
-        .badge-card:hover:not(.locked){transform:translateY(-2px)}
         .badge-card.locked{opacity:0.35;filter:grayscale(0.9);border-color:rgba(255,255,255,0.05)!important}
-        .badge-tier-bronze{border-color:#d97706!important;box-shadow:0 0 12px rgba(217,119,6,0.2)}
-        .badge-tier-silver{border-color:#38bdf8!important;box-shadow:0 0 14px rgba(56,189,248,0.25)}
-        .badge-tier-gold{border-color:#f59e0b!important;box-shadow:0 0 16px rgba(245,158,11,0.35)}
-        .badge-tier-titan{border-color:#10b981!important;box-shadow:0 0 18px rgba(16,185,129,0.4)}
-        .badge-tier-aureum{border-color:#a855f7!important;box-shadow:0 0 22px rgba(168,85,247,0.5);background:linear-gradient(135deg,rgba(30,41,59,0.9) 0%,rgba(88,28,135,0.25) 100%)}
-        #badge-toast-container{position:fixed;bottom:1.5rem;left:1.5rem;z-index:100;display:flex;flex-direction:column;gap:0.75rem;pointer-events:none}
-        .badge-toast{pointer-events:auto;animation:toastSlideIn 0.35s cubic-bezier(0.16,1,0.3,1) forwards;transition:opacity 0.5s ease,transform 0.5s ease;will-change:transform,opacity}
-        .badge-toast.toast-hiding{opacity:0!important;transform:translateY(20px) scale(0.9)!important}
-        @keyframes toastSlideIn{from{opacity:0;transform:translateY(25px) scale(0.92)}to{opacity:1;transform:translateY(0) scale(1)}}
-        .todo-item{transition:all 0.2s ease-out}
-        .todo-item:hover{border-color:var(--card-border);transform:translateX(2px)}
+        .badge-tier-bronze{border-color:#d97706!important}
+        .badge-tier-silver{border-color:#38bdf8!important}
+        .badge-tier-gold{border-color:#f59e0b!important}
+        .badge-tier-titan{border-color:#10b981!important}
+        .badge-tier-aureum{border-color:#a855f7!important}
         .todo-item.done{opacity:0.5;text-decoration:line-through}
     </style>
 </head>
-<body data-theme="gold" data-cursor="default" class="p-3 md:p-6 max-w-7xl mx-auto relative min-h-screen">
+<body data-theme="gold" class="p-3 md:p-6 max-w-7xl mx-auto relative min-h-screen">
     <canvas id="fx-canvas" class="fixed inset-0 pointer-events-none z-[200]"></canvas>
 
     <!-- LOGIN MODAL -->
@@ -93,61 +72,23 @@
         </div>
     </div>
 
-    <!-- QUICK STATUS PICKER MODAL -->
+    <!-- STATUS PICKER MODAL -->
     <div id="status-picker-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 hidden p-4">
         <div class="card p-6 rounded-2xl max-w-lg w-full shadow-2xl border border-slate-700 space-y-5">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div>
-                    <h3 class="text-base font-bold text-slate-100 flex items-center gap-2"><span>💬</span> <span>Set Status Note</span></h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Pick what you're doing right now.</p>
-                </div>
+                <h3 class="text-base font-bold text-slate-100 flex items-center gap-2"><span>💬</span> <span>Set Status Note</span></h3>
                 <button onclick="closeStatusPicker()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-1">✕</button>
             </div>
-
-            <!-- PRESET CATEGORY GRID -->
-            <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
-                <div>
-                    <div class="text-[11px] font-extrabold text-amber-400 uppercase tracking-wider mb-2">⚡ Work & Study</div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="selectStatusPreset('Working ⚡')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>⚡</span> <span>Working</span></button>
-                        <button onclick="selectStatusPreset('Coding 💻')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>💻</span> <span>Coding</span></button>
-                        <button onclick="selectStatusPreset('Studying 📚')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>📚</span> <span>Studying</span></button>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="text-[11px] font-extrabold text-purple-400 uppercase tracking-wider mb-2">🎨 Creative & Music</div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="selectStatusPreset('Drawing 🎨')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>🎨</span> <span>Drawing</span></button>
-                        <button onclick="selectStatusPreset('Writing ✍️')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>✍️</span> <span>Writing</span></button>
-                        <button onclick="selectStatusPreset('Listening 🎧')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>🎧</span> <span>Listening</span></button>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="text-[11px] font-extrabold text-sky-400 uppercase tracking-wider mb-2">☕ Rest & Chill</div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="selectStatusPreset('Chilling ☕')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>☕</span> <span>Chilling</span></button>
-                        <button onclick="selectStatusPreset('Resting zZZ 😴')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>😴</span> <span>Resting zZZ</span></button>
-                        <button onclick="selectStatusPreset('Snack Break 🍨')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>🍨</span> <span>Snack Break</span></button>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="text-[11px] font-extrabold text-emerald-400 uppercase tracking-wider mb-2">🌿 Life & Play</div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="selectStatusPreset('Running 🏃')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>🏃</span> <span>Running</span></button>
-                        <button onclick="selectStatusPreset('Workout 💪')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>💪</span> <span>Workout</span></button>
-                        <button onclick="selectStatusPreset('Cleaning 🧹')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>🧹</span> <span>Cleaning</span></button>
-                        <button onclick="selectStatusPreset('Gaming 🎮')" class="status-preset-btn p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left flex items-center gap-2"><span>🎮</span> <span>Gaming</span></button>
-                    </div>
-                </div>
+            <div class="grid grid-cols-2 gap-2 max-h-[60vh] overflow-y-auto pr-1">
+                <button onclick="selectStatusPreset('Working ⚡')" class="status-preset-btn p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left">⚡ Working</button>
+                <button onclick="selectStatusPreset('Coding 💻')" class="status-preset-btn p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left">💻 Coding</button>
+                <button onclick="selectStatusPreset('Drawing 🎨')" class="status-preset-btn p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left">🎨 Drawing</button>
+                <button onclick="selectStatusPreset('Writing ✍️')" class="status-preset-btn p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left">✍️ Writing</button>
+                <button onclick="selectStatusPreset('Running 🏃')" class="status-preset-btn p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left">🏃 Running</button>
+                <button onclick="selectStatusPreset('Chilling ☕')" class="status-preset-btn p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-200 text-left">☕ Chilling</button>
             </div>
-
             <div class="pt-2 border-t border-slate-800 flex justify-between items-center">
-                <button onclick="promptCustomStatus()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700 transition-all flex items-center gap-1.5">
-                    <span>✏️</span> <span>Write Custom...</span>
-                </button>
+                <button onclick="promptCustomStatus()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700">✏️ Write Custom...</button>
                 <button onclick="closeStatusPicker()" class="px-4 py-2 text-xs text-slate-400 hover:text-white">Cancel</button>
             </div>
         </div>
@@ -155,67 +96,54 @@
 
     <!-- MAIN APP CONTENT -->
     <div id="app-content" class="hidden space-y-4">
-        <!-- COMPACT HEADER WITH DUO HUD CARDS -->
+        <!-- HEADER WITH DUO HUD CARDS -->
         <header class="flex flex-col lg:flex-row justify-between items-center pb-4 border-b border-slate-700/80 gap-4">
             <div class="flex items-center justify-between w-full lg:w-auto">
                 <div>
                     <h1 class="text-2xl font-black logo-gold uppercase tracking-wider">AUREUM</h1>
                     <p class="text-[11px] text-slate-400 tracking-wide">Autonomous Living & Creative Ledger</p>
                 </div>
-                <div class="flex items-center gap-2 lg:hidden">
-                    <button onclick="toggleAudioMute()" id="audio-toggle-btn-mobile" class="text-xs text-slate-400 p-1.5 bg-slate-800 rounded-lg border border-slate-700">🔊</button>
-                    <button onclick="handleLogout()" class="text-xs text-slate-500 hover:text-slate-300 underline">Sign Out</button>
-                </div>
+                <button onclick="handleLogout()" class="lg:hidden text-xs text-slate-500 hover:text-slate-300 underline">Sign Out</button>
             </div>
 
-            <!-- DUO HUD HERO CARDS -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full lg:w-auto flex-1 max-w-2xl">
                 <!-- NORTH HERO CARD -->
-                <div id="hud-card-north" onclick="switchActiveUser('North')" class="hud-card card p-2.5 rounded-xl border flex items-center gap-3 relative overflow-hidden cursor-pointer">
-                    <div class="relative shrink-0">
-                        <img id="hud-avatar-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="w-11 h-11 rounded-full bg-slate-900 border-2 border-slate-700 object-cover transition-all">
-                        <span id="hud-presence-dot-north" class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md"></span>
-                    </div>
+                <div id="hud-card-north" onclick="switchActiveUser('North')" class="hud-card card p-2.5 rounded-xl border flex items-center gap-3 cursor-pointer">
+                    <img id="hud-avatar-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="w-10 h-10 rounded-full bg-slate-900 border border-slate-700">
                     <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between gap-1">
-                            <span class="font-bold text-xs text-slate-100 flex items-center gap-1.5">North <span id="hud-badge-north" class="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">ACTIVE</span></span>
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-xs text-slate-100">North</span>
                             <span id="hud-pwr-north" class="text-[10px] font-mono font-bold text-amber-400">0 PWR</span>
                         </div>
-                        <div id="hud-status-north" onclick="editUserStatusNote('North', event)" class="text-[10px] text-slate-400 truncate mt-0.5 hover:text-amber-300 transition-colors cursor-pointer" title="Click to pick status">Drawing 🎨</div>
-                        <div class="flex items-center justify-between text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-800/80">
+                        <div id="hud-status-north" onclick="editUserStatusNote('North', event)" class="text-[10px] text-slate-400 truncate mt-0.5 hover:text-amber-300">Drawing 🎨</div>
+                        <div class="flex items-center justify-between text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-800">
                             <span id="hud-hours-north" class="font-mono">0.00 / 4.00h</span>
-                            <span id="hud-pomo-north" class="text-emerald-400 font-semibold truncate max-w-[100px]">Idle</span>
+                            <span id="hud-pomo-north" class="text-emerald-400 font-semibold truncate">Idle</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- CREAM HERO CARD -->
-                <div id="hud-card-cream" onclick="switchActiveUser('Cream')" class="hud-card card p-2.5 rounded-xl border flex items-center gap-3 relative overflow-hidden cursor-pointer">
-                    <div class="relative shrink-0">
-                        <img id="hud-avatar-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="w-11 h-11 rounded-full bg-slate-900 border-2 border-slate-700 object-cover transition-all">
-                        <span id="hud-presence-dot-cream" class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md"></span>
-                    </div>
+                <div id="hud-card-cream" onclick="switchActiveUser('Cream')" class="hud-card card p-2.5 rounded-xl border flex items-center gap-3 cursor-pointer">
+                    <img id="hud-avatar-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="w-10 h-10 rounded-full bg-slate-900 border border-slate-700">
                     <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between gap-1">
-                            <span class="font-bold text-xs text-slate-100 flex items-center gap-1.5">Cream <span id="hud-badge-cream" class="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase">VIEW</span></span>
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-xs text-slate-100">Cream</span>
                             <span id="hud-pwr-cream" class="text-[10px] font-mono font-bold text-amber-400">0 PWR</span>
                         </div>
-                        <div id="hud-status-cream" onclick="editUserStatusNote('Cream', event)" class="text-[10px] text-slate-400 truncate mt-0.5 hover:text-amber-300 transition-colors cursor-pointer" title="Click to pick status">Writing ✍️</div>
-                        <div class="flex items-center justify-between text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-800/80">
+                        <div id="hud-status-cream" onclick="editUserStatusNote('Cream', event)" class="text-[10px] text-slate-400 truncate mt-0.5 hover:text-amber-300">Writing ✍️</div>
+                        <div class="flex items-center justify-between text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-800">
                             <span id="hud-hours-cream" class="font-mono">0.00 / 4.00h</span>
-                            <span id="hud-pomo-cream" class="text-emerald-400 font-semibold truncate max-w-[100px]">Idle</span>
+                            <span id="hud-pomo-cream" class="text-emerald-400 font-semibold truncate">Idle</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="hidden lg:flex items-center gap-2">
-                <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-xs text-slate-400 hover:text-white px-3 py-1.5 bg-slate-800/80 rounded-xl border border-slate-700">🔊</button>
-                <button onclick="handleLogout()" class="text-xs text-slate-400 hover:text-slate-200 px-3 py-1.5 bg-slate-900 rounded-xl border border-slate-800">Sign Out</button>
-            </div>
+            <button onclick="handleLogout()" class="hidden lg:block text-xs text-slate-400 hover:text-slate-200 px-3 py-1.5 bg-slate-900 rounded-xl border border-slate-800">Sign Out</button>
         </header>
 
-        <!-- STREAMLINED 3-PAGE TABS NAVIGATION -->
+        <!-- NAVIGATION TABS -->
         <nav class="flex items-center gap-2 p-1 bg-slate-900/90 rounded-xl border border-slate-800 overflow-x-auto no-scrollbar">
             <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 whitespace-nowrap"><span>⚗️</span> <span>Crucible</span></button>
             <button onclick="switchTab('sanctuary')" id="nav-sanctuary" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🌿</span> <span>Sanctuary</span></button>
@@ -223,35 +151,29 @@
             <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap ml-auto text-slate-400"><span>⚙️</span> <span>Forge</span></button>
         </nav>
 
-        <div id="read-only-banner" class="hidden card p-2.5 rounded-xl text-center text-slate-400 text-xs">
-            🔒 Viewing <strong><span id="view-target-name"></span>'s</strong> space in View-Only mode. Log deletion, todo edits, and settings are restricted.
-        </div>
-
-        <!-- PAGE 1: CRUCIBLE (ACTIVE FOCUS STUDIO) -->
+        <!-- PAGE 1: CRUCIBLE -->
         <div id="tab-crucible" class="space-y-4">
-            <!-- COMPACT STAT PILLS TOP BAR -->
+            <!-- STAT PILLS -->
             <div class="grid grid-cols-3 gap-3">
                 <div class="card p-3 rounded-xl flex items-center justify-between bg-slate-900/90 border border-slate-800">
                     <div>
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Allowance</div>
+                        <div class="text-[10px] font-bold text-slate-400 uppercase">Allowance</div>
                         <div class="text-lg font-extrabold text-emerald-400 mt-0.5" id="monthly-payout">฿0</div>
                     </div>
-                    <span id="allowance-yield-pill" class="text-[9px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">⚡ ฿<span id="label-monthly-cash">8,000</span> Target</span>
-                </div>
-
-                <div class="card p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
-                    <div class="flex-1">
-                        <div class="flex items-center justify-between pr-2">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Today's Cap</div>
-                            <span id="daily-cap-status" class="text-[10px] text-slate-400">4.00h remaining</span>
-                        </div>
-                        <div class="text-lg font-extrabold theme-accent-text mt-0.5" id="today-hours-label">0.00 / 4.00 hrs</div>
-                    </div>
+                    <span class="text-[9px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Target ฿<span id="label-monthly-cash">8,000</span></span>
                 </div>
 
                 <div class="card p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
                     <div>
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Monthly Goal</div>
+                        <div class="text-[10px] font-bold text-slate-400 uppercase pr-2">Today's Cap</div>
+                        <div class="text-lg font-extrabold theme-accent-text mt-0.5" id="today-hours-label">0.00 / 4.00 hrs</div>
+                    </div>
+                    <span id="daily-cap-status" class="text-[10px] text-slate-400">4.00h remaining</span>
+                </div>
+
+                <div class="card p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] font-bold text-slate-400 uppercase">Monthly Goal</div>
                         <div id="gauge-tier-badge" class="text-sm font-black theme-accent-text mt-0.5">Initiate</div>
                     </div>
                     <div class="relative w-10 h-10 flex-shrink-0 flex items-center justify-center">
@@ -264,49 +186,41 @@
                 </div>
             </div>
 
-            <!-- MAIN SPLIT (50 / 50): HOURGLASS TIMER + WORK SESSION LOGGER -->
+            <!-- MAIN SPLIT -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
                 <!-- HOURGLASS FOCUS TIMER -->
-                <div class="card p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-xl border border-slate-800">
+                <div class="card p-5 rounded-2xl flex flex-col justify-between space-y-4 border border-slate-800">
                     <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
-                        <div class="flex items-center gap-2">
-                            <span class="text-lg">⏳</span>
-                            <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Hourglass Focus</h2>
-                        </div>
-                        <div id="pomo-mode-box" class="flex gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-800 text-[11px]">
-                            <button onclick="handleUserSelectPomoMode('focus')" id="pomo-mode-focus" class="px-2.5 py-1 rounded-md font-medium transition-all bg-blue-600 text-white">Focus</button>
-                            <button onclick="handleUserSelectPomoMode('short')" id="pomo-mode-short" class="px-2.5 py-1 rounded-md font-medium text-slate-400 hover:text-white transition-all">Short</button>
-                            <button onclick="handleUserSelectPomoMode('long')" id="pomo-mode-long" class="px-2.5 py-1 rounded-md font-medium text-slate-400 hover:text-white transition-all">Long</button>
+                        <h2 class="text-sm font-bold text-slate-200 uppercase flex items-center gap-2"><span>⏳</span> <span>Hourglass Focus</span></h2>
+                        <div class="flex gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800 text-[11px]">
+                            <button onclick="handleUserSelectPomoMode('focus')" id="pomo-mode-focus" class="px-2.5 py-1 rounded-md font-medium bg-blue-600 text-white">Focus</button>
+                            <button onclick="handleUserSelectPomoMode('short')" id="pomo-mode-short" class="px-2.5 py-1 rounded-md font-medium text-slate-400">Short</button>
+                            <button onclick="handleUserSelectPomoMode('long')" id="pomo-mode-long" class="px-2.5 py-1 rounded-md font-medium text-slate-400">Long</button>
                         </div>
                     </div>
 
-                    <div id="pomo-spectator-banner" class="hidden p-2 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 text-center">
-                        👁️ Viewing <strong><span id="pomo-spectator-target"></span>'s</strong> Timer
+                    <div onclick="handleClockClick()" class="cursor-pointer text-center py-2 select-none">
+                        <div id="pomo-timer-display" class="text-6xl font-mono font-black theme-accent-text">25:00</div>
+                        <div id="pomo-status-label" class="text-[10px] text-slate-400 mt-2 uppercase font-semibold">Click Timer or Press Start</div>
                     </div>
 
-                    <div id="pomo-clock-container" onclick="handleClockClick()" class="cursor-pointer group select-none py-2 text-center rounded-2xl transition-all hover:bg-slate-800/40">
-                        <div id="pomo-timer-display" class="text-6xl font-mono font-black theme-accent-text tracking-wider group-hover:scale-105 transition-transform">25:00</div>
-                        <div id="pomo-status-label" class="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold group-hover:text-amber-300">Click Timer or Press Spacebar</div>
-                    </div>
-
-                    <div class="w-full bg-slate-900/90 h-2 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
+                    <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
                         <div id="pomo-progress-bar" class="theme-accent-bg h-full rounded-full transition-all duration-1000 w-full"></div>
                     </div>
 
-                    <div id="pomo-controls-box" class="flex justify-center gap-3">
-                        <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="px-6 py-2 rounded-xl theme-accent-bg font-bold text-xs transition-all shadow-md">Start Focus</button>
-                        <button onclick="resetMyPomoTimer()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs transition-all">Reset</button>
+                    <div class="flex justify-center gap-3">
+                        <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="px-6 py-2 rounded-xl theme-accent-bg font-bold text-xs shadow-md">Start Focus</button>
+                        <button onclick="resetMyPomoTimer()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs">Reset</button>
                     </div>
 
-                    <!-- UNLOGGED FOCUS COUNTER & EXPORT -->
-                    <div id="pomo-unlogged-card" class="pt-3 border-t border-slate-800 flex items-center justify-between">
+                    <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
                         <div>
-                            <div class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1"><span>⚡</span> <span>Unlogged Focus</span></div>
-                            <div class="text-base font-black text-white font-mono mt-0.5" id="pomo-unlogged-hours">0.00 hrs</div>
+                            <div class="text-[10px] font-bold text-emerald-400 uppercase">⚡ Unlogged Focus</div>
+                            <div class="text-base font-black text-white font-mono" id="pomo-unlogged-hours">0.00 hrs</div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button onclick="resetUnloggedFocusTime(event)" title="Reset unlogged focus" class="px-2.5 py-1.5 bg-slate-800 hover:bg-red-900/40 text-slate-400 hover:text-red-300 text-xs rounded-lg border border-slate-700">🗑️</button>
-                            <button onclick="togglePomoExportDrawer()" id="pomo-export-toggle-btn" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg shadow transition-all">Log to Crucible</button>
+                            <button onclick="resetUnloggedFocusTime(event)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-red-900/40 text-slate-400 text-xs rounded-lg border border-slate-700">🗑️</button>
+                            <button onclick="togglePomoExportDrawer()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg shadow">Log to Crucible</button>
                         </div>
                     </div>
 
@@ -338,94 +252,93 @@
                 </div>
 
                 <!-- WORK SESSION LOGGER -->
-                <div id="work-form-card" class="card p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-xl border border-slate-800">
-                    <div class="border-b border-slate-800/80 pb-3 flex items-center justify-between">
-                        <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2"><span>⚗️</span> <span>Log Work Session</span></h2>
+                <div class="card p-5 rounded-2xl flex flex-col justify-between space-y-4 border border-slate-800">
+                    <div class="border-b border-slate-800/80 pb-3">
+                        <h2 class="text-sm font-bold text-slate-200 uppercase flex items-center gap-2"><span>⚗️</span> <span>Log Work Session</span></h2>
                     </div>
 
-                    <form id="work-form" onsubmit="logWork(event)" class="space-y-4">
+                    <form onsubmit="logWork(event)" class="space-y-4">
                         <input type="hidden" id="work-results" value="3">
                         <input type="hidden" id="work-effort" value="3">
 
                         <div>
                             <label class="block text-xs text-slate-400 mb-1 font-medium">Time Spent (Hours)</label>
                             <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden max-w-xs">
-                                <button type="button" onmousedown="startHold('value', 'work-time', -1, 0.25, 0.25, undefined, event)" ontouchstart="startHold('value', 'work-time', -1, 0.25, 0.25, undefined, event)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
-                                <input type="number" id="work-time" step="0.25" min="0.25" value="1.00" required class="w-full text-center bg-transparent py-1.5 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                <button type="button" onmousedown="startHold('value', 'work-time', 1, 0.25, 0.25, undefined, event)" ontouchstart="startHold('value', 'work-time', 1, 0.25, 0.25, undefined, event)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
+                                <button type="button" onclick="adjustTimeInput('work-time', -0.25)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
+                                <input type="number" id="work-time" step="0.25" min="0.25" value="1.00" required class="w-full text-center bg-transparent py-1.5 text-sm text-white font-mono font-bold focus:outline-none">
+                                <button type="button" onclick="adjustTimeInput('work-time', 0.25)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1 font-medium">Quality Rating</label>
-                                <div class="flex items-center bg-slate-900/90 rounded-xl border border-slate-800 p-1 min-h-[72px]">
-                                    <button type="button" onmousedown="startHold('rating', 'results', -1, null, null, null, event)" ontouchstart="startHold('rating', 'results', -1, null, null, null, event)" class="px-2.5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold">◀</button>
-                                    <div id="selector-box-results" class="flex-1 px-2 text-center">
+                                <div class="flex items-center bg-slate-900 rounded-xl border border-slate-800 p-1 min-h-[72px]">
+                                    <button type="button" onclick="adjustRating('results', -1)" class="px-2.5 py-3 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold">◀</button>
+                                    <div class="flex-1 text-center">
                                         <div class="flex items-center justify-center gap-1">
                                             <span id="q-icon" class="text-lg">🎯</span>
                                             <span id="q-badge" class="text-[10px] font-bold theme-accent-text">LVL 3</span>
                                         </div>
                                         <div id="q-title" class="text-xs font-bold text-slate-100 mt-0.5">Solid Output</div>
                                     </div>
-                                    <button type="button" onmousedown="startHold('rating', 'results', 1, null, null, null, event)" ontouchstart="startHold('rating', 'results', 1, null, null, null, event)" class="px-2.5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold">▶</button>
+                                    <button type="button" onclick="adjustRating('results', 1)" class="px-2.5 py-3 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold">▶</button>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1 font-medium">Focus Effort</label>
-                                <div class="flex items-center bg-slate-900/90 rounded-xl border border-slate-800 p-1 min-h-[72px]">
-                                    <button type="button" onmousedown="startHold('rating', 'effort', -1, null, null, null, event)" ontouchstart="startHold('rating', 'effort', -1, null, null, null, event)" class="px-2.5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold">◀</button>
-                                    <div id="selector-box-effort" class="flex-1 px-2 text-center">
+                                <div class="flex items-center bg-slate-900 rounded-xl border border-slate-800 p-1 min-h-[72px]">
+                                    <button type="button" onclick="adjustRating('effort', -1)" class="px-2.5 py-3 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold">◀</button>
+                                    <div class="flex-1 text-center">
                                         <div class="flex items-center justify-center gap-1">
                                             <span id="e-icon" class="text-lg">🔥</span>
                                             <span id="e-badge" class="text-[10px] font-bold theme-accent-text">LVL 3</span>
                                         </div>
                                         <div id="e-title" class="text-xs font-bold text-slate-100 mt-0.5">Moderate Strain</div>
                                     </div>
-                                    <button type="button" onmousedown="startHold('rating', 'effort', 1, null, null, null, event)" ontouchstart="startHold('rating', 'effort', 1, null, null, null, event)" class="px-2.5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold">▶</button>
+                                    <button type="button" onclick="adjustRating('effort', 1)" class="px-2.5 py-3 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold">▶</button>
                                 </div>
                             </div>
                         </div>
 
-                        <button type="submit" id="work-submit-btn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-md transition-all">Save Work Session</button>
+                        <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-md">Save Work Session</button>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- PAGE 2: SANCTUARY (DAILY LIFE & TODO TRACKER) -->
+        <!-- PAGE 2: SANCTUARY -->
         <div id="tab-sanctuary" class="hidden space-y-4">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
                 <!-- TODOS SCRATCHPAD -->
-                <div id="todo-card" class="card p-5 rounded-2xl flex flex-col justify-between space-y-3 shadow-xl border border-slate-800">
+                <div class="card p-5 rounded-2xl flex flex-col justify-between space-y-3 border border-slate-800">
                     <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
-                        <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2"><span>📝</span> <span>Todos</span></h2>
+                        <h2 class="text-sm font-bold text-slate-200 uppercase flex items-center gap-2"><span>📝</span> <span>Todos</span></h2>
                         <div class="flex items-center gap-2">
                             <span id="todo-count-active" class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">0 Active</span>
-                            <button id="todo-clear-btn" onclick="clearCompletedTodos()" class="text-[10px] text-slate-400 hover:text-red-400 px-2 py-0.5 rounded bg-slate-800 border border-slate-700">Clear Done</button>
+                            <button onclick="clearCompletedTodos()" class="text-[10px] text-slate-400 hover:text-red-400 px-2 py-0.5 rounded bg-slate-800 border border-slate-700">Clear Done</button>
                         </div>
                     </div>
-                    <form id="todo-form" onsubmit="addTodoItem(event)" class="flex gap-2">
+                    <form onsubmit="addTodoItem(event)" class="flex gap-2">
                         <input type="text" id="todo-input" placeholder="Add a quick task..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                         <button type="submit" class="theme-accent-bg font-bold px-4 py-2 rounded-xl text-xs shadow-md">+ Add</button>
                     </form>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                        <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/80">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Pending</div>
+                        <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Pending</div>
                             <div id="todo-active-list" class="space-y-1.5 max-h-[220px] overflow-y-auto pr-1"></div>
                         </div>
-                        <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/80">
-                            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Done</div>
+                        <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800">
+                            <div class="text-[10px] font-bold text-slate-500 uppercase mb-2">Done</div>
                             <div id="todo-completed-list" class="space-y-1.5 max-h-[220px] overflow-y-auto pr-1"></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- DAILY REFLECTION -->
-                <div id="diary-form-card" class="card p-5 rounded-2xl flex flex-col justify-between space-y-3 shadow-xl border border-slate-800">
+                <div class="card p-5 rounded-2xl flex flex-col justify-between space-y-3 border border-slate-800">
                     <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
-                        <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2"><span>📖</span> <span>Daily Reflection</span></h2>
-                        <span id="diary-status-badge" class="text-[10px] text-slate-400">Jot down thoughts or wins</span>
+                        <h2 class="text-sm font-bold text-slate-200 uppercase flex items-center gap-2"><span>📖</span> <span>Daily Reflection</span></h2>
                     </div>
                     <form onsubmit="saveDailyDiary(event)" class="space-y-3">
                         <textarea id="diary-text" rows="4" placeholder="What went well today? Lessons learned or ideas?" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500 resize-none"></textarea>
@@ -438,20 +351,19 @@
 
             <!-- LIFE LOGGERS GRID -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div id="workout-form-card" class="card p-4 rounded-xl space-y-3 border border-slate-800">
+                <div class="card p-4 rounded-xl space-y-3 border border-slate-800">
                     <h3 class="text-xs font-bold text-slate-200 flex items-center gap-1.5"><span>🏃</span> <span>Fitness Log</span></h3>
                     <form onsubmit="logWorkout(event)" class="space-y-3">
-                        <input type="hidden" id="workout-strain" value="3">
                         <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
-                            <button type="button" onmousedown="startHold('value', 'workout-time', -1, 0.25, 0.25, undefined, event)" ontouchstart="startHold('value', 'workout-time', -1, 0.25, 0.25, undefined, event)" class="px-3 py-1.5 bg-slate-800 text-slate-200 font-bold">-</button>
+                            <button type="button" onclick="adjustTimeInput('workout-time', -0.25)" class="px-3 py-1.5 bg-slate-800 text-slate-200 font-bold">-</button>
                             <input type="number" id="workout-time" step="0.25" min="0.25" value="0.75" required class="w-full text-center bg-transparent text-xs text-white font-mono font-bold focus:outline-none">
-                            <button type="button" onmousedown="startHold('value', 'workout-time', 1, 0.25, 0.25, undefined, event)" ontouchstart="startHold('value', 'workout-time', 1, 0.25, 0.25, undefined, event)" class="px-3 py-1.5 bg-slate-800 text-slate-200 font-bold">+</button>
+                            <button type="button" onclick="adjustTimeInput('workout-time', 0.25)" class="px-3 py-1.5 bg-slate-800 text-slate-200 font-bold">+</button>
                         </div>
                         <button type="submit" class="w-full theme-accent-bg font-bold py-2 rounded-xl text-xs">Save Workout</button>
                     </form>
                 </div>
 
-                <div id="chore-form-card" class="card p-4 rounded-xl space-y-3 border border-slate-800">
+                <div class="card p-4 rounded-xl space-y-3 border border-slate-800">
                     <h3 class="text-xs font-bold text-slate-200 flex items-center gap-1.5"><span>🧹</span> <span>House Chores</span></h3>
                     <form onsubmit="logChore(event)" class="space-y-3">
                         <input type="text" id="chore-note" placeholder="Task details..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white">
@@ -459,7 +371,7 @@
                     </form>
                 </div>
 
-                <div id="health-form-card" class="card p-4 rounded-xl space-y-3 border border-slate-800">
+                <div class="card p-4 rounded-xl space-y-3 border border-slate-800">
                     <h3 class="text-xs font-bold text-slate-200 flex items-center gap-1.5"><span>🍨</span> <span>Snacks & Treats</span></h3>
                     <form onsubmit="logHealth(event)" class="space-y-3">
                         <input type="text" id="health-note" placeholder="Snack name..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white">
@@ -475,7 +387,7 @@
             <div class="card p-4 rounded-xl border border-slate-800 space-y-2">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div id="power-rank-icon" class="text-2xl p-2 bg-slate-900 rounded-lg border border-slate-700">⚡</div>
+                        <div class="text-2xl p-2 bg-slate-900 rounded-lg border border-slate-700">⚡</div>
                         <div>
                             <div class="text-[10px] uppercase font-bold text-slate-400">Power Score</div>
                             <div class="text-xl font-black text-white theme-accent-text font-mono"><span id="power-score-val">0</span> PWR</div>
@@ -494,9 +406,9 @@
                     <div class="flex justify-between items-center">
                         <h3 class="text-xs font-bold text-slate-200 uppercase">Work Analytics</h3>
                         <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 text-[10px]">
-                            <button onclick="setChartRange('work', 'daily')" id="btn-work-daily" class="px-2 py-0.5 rounded text-slate-400">Daily</button>
-                            <button onclick="setChartRange('work', 'weekly')" id="btn-work-weekly" class="px-2 py-0.5 rounded text-slate-400">Weekly</button>
-                            <button onclick="setChartRange('work', 'monthly')" id="btn-work-monthly" class="px-2 py-0.5 rounded text-slate-400">Monthly</button>
+                            <button onclick="setChartRange('work', 'daily')" class="px-2 py-0.5 rounded text-slate-400">Daily</button>
+                            <button onclick="setChartRange('work', 'weekly')" class="px-2 py-0.5 rounded text-slate-400">Weekly</button>
+                            <button onclick="setChartRange('work', 'monthly')" class="px-2 py-0.5 rounded text-slate-400">Monthly</button>
                         </div>
                     </div>
                     <div class="h-48 w-full"><canvas id="workChart"></canvas></div>
@@ -506,16 +418,16 @@
                     <div class="flex justify-between items-center">
                         <h3 class="text-xs font-bold text-slate-200 uppercase">Activity Trends</h3>
                         <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 text-[10px]">
-                            <button onclick="setChartRange('sanctuary', 'daily')" id="btn-sanctuary-daily" class="px-2 py-0.5 rounded text-slate-400">Daily</button>
-                            <button onclick="setChartRange('sanctuary', 'weekly')" id="btn-sanctuary-weekly" class="px-2 py-0.5 rounded text-slate-400">Weekly</button>
-                            <button onclick="setChartRange('sanctuary', 'monthly')" id="btn-sanctuary-monthly" class="px-2 py-0.5 rounded text-slate-400">Monthly</button>
+                            <button onclick="setChartRange('sanctuary', 'daily')" class="px-2 py-0.5 rounded text-slate-400">Daily</button>
+                            <button onclick="setChartRange('sanctuary', 'weekly')" class="px-2 py-0.5 rounded text-slate-400">Weekly</button>
+                            <button onclick="setChartRange('sanctuary', 'monthly')" class="px-2 py-0.5 rounded text-slate-400">Monthly</button>
                         </div>
                     </div>
                     <div class="h-48 w-full"><canvas id="sanctuaryChart"></canvas></div>
                 </div>
             </div>
 
-            <!-- VAULT OF RELICS (FULL FANTASY TITLES INTACT) -->
+            <!-- VAULT OF RELICS -->
             <div class="card p-5 rounded-2xl border border-slate-800 space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                     <div>
@@ -527,11 +439,10 @@
                 <div id="badge-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"></div>
             </div>
 
-            <!-- CHRONICLES REGISTRY LOGS -->
+            <!-- CHRONICLES REGISTRY -->
             <div class="card p-5 rounded-2xl border border-slate-800 space-y-3">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                     <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Chronicles Registry</h2>
-                    <select id="ledger-month-select" onchange="applyLedgerFilter()" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white"></select>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 space-y-2">
@@ -550,11 +461,11 @@
             </div>
         </div>
 
-        <!-- PAGE 4: FORGE SETTINGS -->
+        <!-- PAGE 4: FORGE SETTINGS (RESTORED FULL OPTIONS) -->
         <div id="tab-forge" class="hidden space-y-4 max-w-2xl">
             <form onsubmit="saveAllForgeSettings(event)" class="space-y-4">
                 <div class="card p-5 rounded-xl border border-slate-800 space-y-3">
-                    <h2 class="text-sm font-bold text-slate-200 uppercase">Visual Theme & Cursor</h2>
+                    <h2 class="text-sm font-bold text-slate-200 uppercase">Visual Theme & Customization</h2>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Color Theme</label>
@@ -572,20 +483,32 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Cursor Style</label>
-                            <select id="setting-user-cursor" onchange="handleInstantCursorChange()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
-                                <option value="default">Default</option>
-                                <option value="gold">✨ Gold Pointer</option>
-                                <option value="sparkle">💎 Sparkle Gem</option>
-                                <option value="quill">🪶 Quill</option>
-                                <option value="crosshair">🎯 Crosshair</option>
-                            </select>
+                            <label class="block text-xs text-slate-400 mb-1">Particle Density (%)</label>
+                            <input type="number" id="setting-particle-intensity" min="0" max="100" value="15" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono font-bold">
                         </div>
                     </div>
                 </div>
 
                 <div class="card p-5 rounded-xl border border-slate-800 space-y-3">
-                    <h2 class="text-sm font-bold text-slate-200 uppercase">Work & Allowance Goals</h2>
+                    <h2 class="text-sm font-bold text-slate-200 uppercase">Hourglass Timer Parameters</h2>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Focus (Mins)</label>
+                            <input type="number" id="setting-pomo-focus" value="25" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Short Break</label>
+                            <input type="number" id="setting-pomo-short" value="5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Long Break</label>
+                            <input type="number" id="setting-pomo-long" value="15" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono font-bold">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-5 rounded-xl border border-slate-800 space-y-3">
+                    <h2 class="text-sm font-bold text-slate-200 uppercase">Work & Allowance Economics</h2>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Target Monthly Cash (฿)</label>
@@ -595,35 +518,34 @@
                             <label class="block text-xs text-slate-400 mb-1">Daily Soft Cap (Hours)</label>
                             <input type="number" id="setting-daily-soft-cap" step="0.25" value="4.00" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono font-bold">
                         </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Weekly Target Hours</label>
+                            <input type="number" id="setting-weekly-hours" value="10" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Max Overcap Bonus (%)</label>
+                            <input type="number" id="setting-max-bonus-cap" value="125" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono font-bold">
+                        </div>
                     </div>
                 </div>
 
                 <button type="submit" class="w-full theme-accent-bg font-bold p-2.5 rounded-xl text-xs shadow-lg">Save Forge Settings</button>
             </form>
         </div>
-
-        <div id="badge-toast-container"></div>
     </div>
 
-    <!-- SCRIPT ENGINE -->
+    <!-- REPAIRED ENGINE -->
     <script>
         const $=(i)=>document.getElementById(i);
         const firebaseConfig={apiKey:"AIzaSyAJ7cVPRiJfiShTKFi___pJ9VZHEcLM47Q",authDomain:"aureum-214d1.firebaseapp.com",projectId:"aureum-214d1",storageBucket:"aureum-214d1.firebasestorage.app",messagingSenderId:"967566110651",appId:"1:967566110651:web:4ee66bc4a6afd271b45e9e"};
         firebase.initializeApp(firebaseConfig);
         const db=firebase.firestore(),auth=firebase.auth();
 
-        let loggedInUser='North',viewedUser='North',currentUserUid=null,audioMuted=false;
-        let activeHoldTimer=null,activeHoldInterval=null,isTouchScrolling=false;
-
-        function getLogDate(l){
-            if(!l||!l.timestamp)return new Date();
-            return l.timestamp.toDate?l.timestamp.toDate():new Date(l.timestamp);
-        }
+        let loggedInUser='North',viewedUser='North',currentUserUid=null;
 
         const RATING_DATA={
-            results:[{level:1,icon:'⚡',title:'Minimal',desc:'Warmup or light prep'},{level:2,icon:'🌱',title:'Fair Output',desc:'Modest progress made'},{level:3,icon:'🎯',title:'Solid Output',desc:'Standard steady progress'},{level:4,icon:'✨',title:'High Craft',desc:'Exceptional output speed'},{level:5,icon:'👑',title:'Peak Flow',desc:'Flawless breakthrough'}],
-            effort:[{level:1,icon:'🍃',title:'Effortless',desc:'Zero resistance or strain'},{level:2,icon:'☁️',title:'Light',desc:'Mild focus required'},{level:3,icon:'🔥',title:'Moderate Strain',desc:'Standard focus effort'},{level:4,icon:'⛰️',title:'Heavy Strain',desc:'Overcame strong fatigue'},{level:5,icon:'🌋',title:'Max Strain',desc:'Intense willpower push'}],
-            workoutStrain:[{level:1,icon:'🍃',title:'Light Recovery',desc:'Mobility & gentle movement'},{level:2,icon:'☁️',title:'Steady Pace',desc:'Aerobic endurance flow'},{level:3,icon:'🔥',title:'Moderate Effort',desc:'Standard workout circuit'},{level:4,icon:'⛰️',title:'High Intensity',desc:'Heavy strength & calisthenics'},{level:5,icon:'🌋',title:'Max Strain',desc:'Maximum effort conditioning'}]
+            results:[{level:1,icon:'⚡',title:'Minimal'},{level:2,icon:'🌱',title:'Fair Output'},{level:3,icon:'🎯',title:'Solid Output'},{level:4,icon:'✨',title:'High Craft'},{level:5,icon:'👑',title:'Peak Flow'}],
+            effort:[{level:1,icon:'🍃',title:'Effortless'},{level:2,icon:'☁️',title:'Light Focus'},{level:3,icon:'🔥',title:'Moderate Strain'},{level:4,icon:'⛰️',title:'Heavy Strain'},{level:5,icon:'🌋',title:'Max Strain'}]
         };
 
         const BADGE_CATALOG=[
@@ -653,78 +575,51 @@
             {id:'streak_100',tier:'aureum',icon:'🌋',title:'Monolith of Eternity',desc:'Maintain a 100-day active streak.'}
         ];
 
-        let userSettings={monthlyCash:8000,weeklyHours:10,dailySoftCap:4,maxBonusCapPct:125,pomoFocus:25,pomoShort:5,pomoLong:15,pomoRounds:4,pomoSound:'zen_bowl',pomoSoundRepeats:3,unloggedFocusSecs:0,userTheme:'gold',userCursor:'default',avatarUrl:'',particleIntensity:15,statusNote:'',vaultedMonths:{},unlockedBadges:[],completedPomoHistory:[],scratchpadTodos:[]};
+        let userSettings={monthlyCash:8000,weeklyHours:10,dailySoftCap:4,maxBonusCapPct:125,pomoFocus:25,pomoShort:5,pomoLong:15,unloggedFocusSecs:0,userTheme:'gold',particleIntensity:15,statusNote:'',unlockedBadges:[],scratchpadTodos:[]};
+        let spectatorSettings=null;
         let duoPresenceData={North:{settings:{},hoursToday:0,powerScore:0},Cream:{settings:{},hoursToday:0,powerScore:0}};
 
-        // CANVAS FX POOL
-        const canvas=$('fx-canvas'),ctx=canvas.getContext('2d');
-        const MAX_PARTICLES=150;
-        const particlePool=Array.from({length:MAX_PARTICLES},()=>({x:0,y:0,vx:0,vy:0,size:0,color:'',alpha:0,decay:0,active:false}));
-        let isFxAnimating=false;
-
-        function resizeFxCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
-        window.addEventListener('resize',resizeFxCanvas,{passive:true});resizeFxCanvas();
-
-        function spawnParticleBurst(x,y){
-            const intensity=(userSettings.particleIntensity??15)/100;if(intensity<=0)return;
-            const colors=['#fef08a','#f59e0b','#b45309','#38bdf8','#10b981','#a855f7'];
-            const count=Math.min(MAX_PARTICLES,Math.max(1,Math.round(35*intensity)));
-            let spawned=0;
-            for(let i=0;i<MAX_PARTICLES&&spawned<count;i++){
-                const p=particlePool[i];
-                if(!p.active){
-                    const angle=Math.random()*Math.PI*2,speed=(Math.random()*5+1.5)*(0.4+intensity*0.6);
-                    p.x=x;p.y=y;p.vx=Math.cos(angle)*speed;p.vy=Math.sin(angle)*speed-1.0;
-                    p.size=(Math.random()*3.5+2)*(0.5+intensity*0.5);p.color=colors[(Math.random()*colors.length)|0];
-                    p.alpha=1;p.decay=Math.random()*0.03+0.02;p.active=true;spawned++;
-                }
-            }
-            if(!isFxAnimating&&spawned>0){isFxAnimating=true;animateParticles()}
+        function adjustTimeInput(id, delta){
+            const el=$(id);if(!el)return;
+            let val=(parseFloat(el.value)||0)+delta;
+            el.value=Math.max(0.25, val).toFixed(2);
         }
 
-        function animateParticles(){
-            let activeCount=0;ctx.clearRect(0,0,canvas.width,canvas.height);
-            for(let i=0;i<MAX_PARTICLES;i++){
-                const p=particlePool[i];
-                if(p.active){
-                    p.x+=p.vx;p.y+=p.vy;p.vy+=0.12;p.alpha-=p.decay;
-                    if(p.alpha<=0){p.active=false}
-                    else{
-                        activeCount++;ctx.save();ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;
-                        ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();ctx.restore();
-                    }
-                }
-            }
-            if(activeCount>0){requestAnimationFrame(animateParticles)}else{isFxAnimating=false}
+        function adjustRating(field, delta){
+            const input=$(`work-${field}`);if(!input)return;
+            let val=Math.max(1, Math.min(5, (parseInt(input.value)||3)+delta));
+            input.value=val;
+            const d=RATING_DATA[field][val-1], p=field==='results'?'q':'e';
+            $(`${p}-icon`).innerText=d.icon;$(`${p}-badge`).innerText=`LVL ${d.level}`;$(`${p}-title`).innerText=d.title;
         }
 
-        // TODO SCRATCHPAD ENGINE
+        // TODO ENGINE
         async function syncTodosToFirestore(list){
             if(loggedInUser!==viewedUser)return;
             userSettings.scratchpadTodos=list;renderTodoList();
             try{await db.collection('settings').doc(loggedInUser).set({scratchpadTodos:list},{merge:true})}catch(e){}
         }
         function addTodoItem(e){
-            if(e)e.preventDefault();if(loggedInUser!==viewedUser)return;
+            if(e)e.preventDefault();
             const input=$('todo-input');if(!input)return;
             const text=input.value.trim();if(!text)return;
             const list=[...(userSettings.scratchpadTodos||[])];
-            list.push({id:Date.now().toString(),text,done:false});input.value='';playTone('save');
+            list.push({id:Date.now().toString(),text,done:false});input.value='';
             syncTodosToFirestore(list);
         }
         function toggleTodoStatus(id){
             if(loggedInUser!==viewedUser)return;
             const list=[...(userSettings.scratchpadTodos||[])];
             const item=list.find(t=>t.id===id);
-            if(item){item.done=!item.done;playTone(item.done?'save':'delete');syncTodosToFirestore(list)}
+            if(item){item.done=!item.done;syncTodosToFirestore(list)}
         }
         function removeTodoItem(id,e){
             if(e)e.stopPropagation();if(loggedInUser!==viewedUser)return;
-            const list=(userSettings.scratchpadTodos||[]).filter(t=>t.id!==id);playTone('delete');syncTodosToFirestore(list);
+            const list=(userSettings.scratchpadTodos||[]).filter(t=>t.id!==id);syncTodosToFirestore(list);
         }
         function clearCompletedTodos(){
             if(loggedInUser!==viewedUser)return;
-            const list=(userSettings.scratchpadTodos||[]).filter(t=>!t.done);playTone('delete');syncTodosToFirestore(list);
+            const list=(userSettings.scratchpadTodos||[]).filter(t=>!t.done);syncTodosToFirestore(list);
         }
 
         function renderTodoList(){
@@ -733,99 +628,56 @@
             const activeItems=[],doneItems=[];
             for(let i=0;i<todoData.length;i++){if(todoData[i].done)doneItems.push(todoData[i]);else activeItems.push(todoData[i])}
             $('todo-count-active').innerText=`${activeItems.length} Active`;
-            const cursorClass=isSelf?"cursor-pointer":"cursor-default";
-            activeListEl.innerHTML=activeItems.length===0?'<div class="text-[11px] text-slate-500 italic py-1 text-center">No active tasks.</div>':activeItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item ${cursorClass} p-2 bg-slate-800/80 border border-slate-700/70 rounded-lg flex items-center justify-between gap-2 text-xs text-slate-200 select-none"><div class="flex items-center gap-2 truncate"><span class="w-3.5 h-3.5 rounded border border-slate-600 shrink-0"></span><span class="truncate font-medium">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 text-[10px] font-bold">×</button>`:''}</div>`).join('');
-            doneListEl.innerHTML=doneItems.length===0?'<div class="text-[11px] text-slate-500 italic py-1 text-center">No completed tasks.</div>':doneItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item done ${cursorClass} p-2 bg-slate-900/60 border border-slate-800/80 rounded-lg flex items-center justify-between gap-2 text-xs text-slate-400 select-none"><div class="flex items-center gap-2 truncate"><span class="w-3.5 h-3.5 rounded theme-accent-bg text-slate-950 flex items-center justify-center shrink-0 font-bold text-[9px]">✓</span><span class="truncate font-medium">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 text-[10px] font-bold">×</button>`:''}</div>`).join('');
+            activeListEl.innerHTML=activeItems.length===0?'<div class="text-[11px] text-slate-500 italic py-1 text-center">No active tasks.</div>':activeItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item p-2 bg-slate-800/80 border border-slate-700/70 rounded-lg flex items-center justify-between gap-2 text-xs text-slate-200 select-none cursor-pointer"><div class="flex items-center gap-2 truncate"><span class="w-3.5 h-3.5 rounded border border-slate-600 shrink-0"></span><span class="truncate font-medium">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 text-[10px] font-bold">×</button>`:''}</div>`).join('');
+            doneListEl.innerHTML=doneItems.length===0?'<div class="text-[11px] text-slate-500 italic py-1 text-center">No completed tasks.</div>':doneItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item done p-2 bg-slate-900/60 border border-slate-800/80 rounded-lg flex items-center justify-between gap-2 text-xs text-slate-400 select-none cursor-pointer"><div class="flex items-center gap-2 truncate"><span class="w-3.5 h-3.5 rounded theme-accent-bg text-slate-950 flex items-center justify-center shrink-0 font-bold text-[9px]">✓</span><span class="truncate font-medium">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 text-[10px] font-bold">×</button>`:''}</div>`).join('');
         }
 
-        // MOUSE & TOUCH HOLD LISTENERS
-        function startHold(mode,fieldOrId,delta,step=1,min=1,max=5,e){
-            if(isTouchScrolling)return;
-            stopHold();
-            const executeStep=()=>{
-                if(mode==='value'){
-                    const el=$(fieldOrId);if(!el)return;
-                    let val=(parseFloat(el.value)||0)+(delta*step);
-                    if(min!==undefined)val=Math.max(min,val);if(max!==undefined)val=Math.min(max,val);
-                    el.value=val.toFixed(2);
-                }else if(mode==='rating'){
-                    const input=$(`work-${fieldOrId}`);if(!input)return;
-                    input.value=Math.max(1,Math.min(5,(parseInt(input.value)||3)+delta));updateRatingUI(fieldOrId);
-                }
-            };
-            executeStep();
-            activeHoldTimer=setTimeout(()=>{activeHoldInterval=setInterval(executeStep,mode==='value'?80:120)},280);
+        // TIMER LOGIC
+        let myPomoMode='focus',myPomoTime=1500,myPomoIsRunning=false,myPomoInterval=null;
+        function toggleMyPomoTimer(){
+            if(myPomoIsRunning){clearInterval(myPomoInterval);myPomoIsRunning=false}
+            else{
+                myPomoIsRunning=true;
+                myPomoInterval=setInterval(()=>{
+                    if(myPomoTime>0){myPomoTime--}
+                    else{
+                        clearInterval(myPomoInterval);myPomoIsRunning=false;
+                        if(myPomoMode==='focus'){
+                            userSettings.unloggedFocusSecs=(userSettings.unloggedFocusSecs||0)+((userSettings.pomoFocus||25)*60);
+                            updateUnloggedFocusDisplay();
+                            db.collection('settings').doc(loggedInUser).set({unloggedFocusSecs:userSettings.unloggedFocusSecs},{merge:true});
+                            handleUserSelectPomoMode('short');
+                        }else{handleUserSelectPomoMode('focus')}
+                    }
+                    renderTimerUI();
+                },1000);
+            }
+            renderTimerUI();
         }
-        function stopHold(){if(activeHoldTimer){clearTimeout(activeHoldTimer);activeHoldTimer=null}if(activeHoldInterval){clearInterval(activeHoldInterval);activeHoldInterval=null}}
-
-        function updateRatingUI(field){
-            const input=$(`work-${field}`);if(!input)return;
-            const val=parseInt(input.value)||3,d=RATING_DATA[field][val-1],p=field==='results'?'q':'e';
-            $(`${p}-icon`).innerText=d.icon;$(`${p}-badge`).innerText=`LVL ${d.level}`;$(`${p}-title`).innerText=d.title;
+        function resetMyPomoTimer(){clearInterval(myPomoInterval);myPomoIsRunning=false;handleUserSelectPomoMode('focus')}
+        function handleClockClick(){if(loggedInUser===viewedUser)toggleMyPomoTimer()}
+        function handleUserSelectPomoMode(m){
+            myPomoMode=m;clearInterval(myPomoInterval);myPomoIsRunning=false;
+            const f=parseInt(userSettings.pomoFocus)||25,s=parseInt(userSettings.pomoShort)||5,l=parseInt(userSettings.pomoLong)||15;
+            myPomoTime=(m==='focus'?f:(m==='short'?s:l))*60;
+            ['focus','short','long'].forEach(x=>{$(`pomo-mode-${x}`)?.classList.remove('bg-blue-600','text-white');$(`pomo-mode-${x}`)?.classList.add('text-slate-400')});
+            $(`pomo-mode-${m}`)?.classList.add('bg-blue-600','text-white');$(`pomo-mode-${m}`)?.classList.remove('text-slate-400');
+            renderTimerUI();
         }
-
-        function applyThemeToBody(t){document.body.setAttribute('data-theme',t||'gold')}
-        function applyCursorToBody(c){document.body.setAttribute('data-cursor',c||'default')}
-
-        // POMODORO ENGINE
-        let myPomoMode='focus',myPomoRound=1,myPomoTime=1500,myPomoEndTime=null,myPomoInitialTime=1500,myPomoIsRunning=false,myPomoInterval=null,currentSessionWasPaused=false;
-        let pomoUIRenderInterval=null,pomoSyncUnsubscribe=null,spectatorSettings=null,shadowSpectatorTime=1500,shadowSpectatorIsRunning=false,shadowSpectatorInterval=null;
-
-        function editUserStatusNote(user,e){if(e)e.stopPropagation();if(user===loggedInUser)$('status-picker-modal').classList.remove('hidden')}
-        function closeStatusPicker(){$('status-picker-modal').classList.add('hidden')}
-        async function selectStatusPreset(noteText){
-            if(!noteText)return;userSettings.statusNote=noteText;closeStatusPicker();playTone('save');
-            spawnParticleBurst(window.innerWidth/2, window.innerHeight/3);renderDuoHUDCards();
-            await db.collection('settings').doc(loggedInUser).set({statusNote:noteText},{merge:true});
+        function renderTimerUI(){
+            $('pomo-timer-display').innerText=`${Math.floor(myPomoTime/60).toString().padStart(2,'0')}:${(myPomoTime%60).toString().padStart(2,'0')}`;
+            $('pomo-toggle-btn').innerText=myPomoIsRunning?"Pause":"Start Focus";
         }
-        async function promptCustomStatus(){
-            closeStatusPicker();const current=userSettings.statusNote||(loggedInUser==='North'?'Drawing 🎨':'Writing ✍️');
-            const customNote=prompt('Enter custom status:',current);
-            if(customNote!==null&&customNote.trim())await selectStatusPreset(customNote.trim().substring(0,25));
-        }
-
-        async function syncMyPomoToCloud(){
-            if(!loggedInUser)return;
-            try{
-                db.collection('settings').doc(loggedInUser).set({
-                    lastActiveTimestamp:Date.now(),
-                    livePomoState:{mode:myPomoMode,round:myPomoRound,isRunning:myPomoIsRunning,pomoTime:myPomoTime,pomoEndTime:myPomoEndTime,updatedAtMillis:Date.now()}
-                },{merge:true});
-            }catch(e){}
-        }
-
-        function startMyPomoBackgroundTimer(){
-            if(myPomoInterval)clearInterval(myPomoInterval);
-            let ticks=0;
-            myPomoInterval=setInterval(()=>{
-                if(!myPomoIsRunning || !myPomoEndTime)return;
-                myPomoTime = Math.max(0, Math.ceil((myPomoEndTime - Date.now()) / 1000));
-                ticks++;if(ticks>=4){syncMyPomoToCloud();ticks=0}
-                if(myPomoTime<=0){
-                    myPomoTime=0;myPomoIsRunning=false;myPomoEndTime=null;clearInterval(myPomoInterval);
-                    syncMyPomoToCloud();
-                    if(myPomoMode==='focus'){
-                        userSettings.unloggedFocusSecs=(userSettings.unloggedFocusSecs||0)+myPomoInitialTime;
-                        updateUnloggedFocusDisplay();
-                        db.collection('settings').doc(loggedInUser).set({unloggedFocusSecs:userSettings.unloggedFocusSecs},{merge:true});
-                        setMyPomoMode('short');
-                    }else{setMyPomoMode('focus')}
-                }
-            },1000);
-        }
-
         function updateUnloggedFocusDisplay(){
             const secs=(loggedInUser===viewedUser?userSettings:spectatorSettings)?.unloggedFocusSecs||0;
             $('pomo-unlogged-hours').innerText=`${(secs/3600).toFixed(2)} hrs`;
         }
         function togglePomoExportDrawer(){$('pomo-export-panel')?.classList.toggle('hidden')}
-
         async function resetUnloggedFocusTime(e){
             if(loggedInUser!==viewedUser)return;
             userSettings.unloggedFocusSecs=0;updateUnloggedFocusDisplay();
-            await db.collection('settings').doc(loggedInUser).set({unloggedFocusSecs:0},{merge:true});playTone('delete');
+            await db.collection('settings').doc(loggedInUser).set({unloggedFocusSecs:0},{merge:true});
         }
-
         async function confirmLogUnloggedFocusToCrucible(e){
             if(loggedInUser!==viewedUser)return;
             const secs=userSettings.unloggedFocusSecs||0;if(secs<=0)return;
@@ -840,56 +692,60 @@
             $('pomo-export-panel').classList.add('hidden');loadUserData();
         }
 
-        function setMyPomoMode(mode){
-            myPomoMode=mode;myPomoIsRunning=false;myPomoEndTime=null;if(myPomoInterval)clearInterval(myPomoInterval);
-            const f=parseInt(userSettings.pomoFocus)||25,s=parseInt(userSettings.pomoShort)||5,l=parseInt(userSettings.pomoLong)||15;
-            myPomoInitialTime=(mode==='focus'?f:(mode==='short'?s:l))*60;myPomoTime=myPomoInitialTime;syncMyPomoToCloud();
-        }
-        function handleUserSelectPomoMode(m){if(loggedInUser===viewedUser)setMyPomoMode(m)}
-        function toggleMyPomoTimer(){
-            if(loggedInUser!==viewedUser)return;
-            if(myPomoIsRunning){myPomoIsRunning=false;myPomoEndTime=null;clearInterval(myPomoInterval)}
-            else{myPomoIsRunning=true;myPomoEndTime=Date.now()+(myPomoTime*1000);startMyPomoBackgroundTimer()}
-            syncMyPomoToCloud();
-        }
-        function resetMyPomoTimer(){if(loggedInUser===viewedUser){clearInterval(myPomoInterval);myPomoIsRunning=false;myPomoEndTime=null;setMyPomoMode('focus')}}
-        function handleClockClick(){if(loggedInUser===viewedUser)toggleMyPomoTimer()}
-
-        function startGlobalUIRenderer(){
-            clearInterval(pomoUIRenderInterval);
-            pomoUIRenderInterval=setInterval(()=>{
-                const isSelf=(loggedInUser===viewedUser);
-                let secs=isSelf?myPomoTime:shadowSpectatorTime,isR=isSelf?myPomoIsRunning:shadowSpectatorIsRunning,mode=isSelf?myPomoMode:(spectatorSettings?.livePomoState?.mode||'focus');
-                let f=parseInt((isSelf?userSettings:spectatorSettings)?.pomoFocus)||25,s=parseInt((isSelf?userSettings:spectatorSettings)?.pomoShort)||5,l=parseInt((isSelf?userSettings:spectatorSettings)?.pomoLong)||15;
-                let initT=(mode==='focus'?f:(mode==='short'?s:l))*60;
-
-                $('pomo-timer-display').innerText=`${Math.floor(secs/60).toString().padStart(2,'0')}:${(secs%60).toString().padStart(2,'0')}`;
-                $('pomo-progress-bar').style.width=`${initT>0?(secs/initT)*100:0}%`;
-                $('pomo-status-label').innerText=isSelf?(isR?(mode==='focus'?"Focus Active":"Resting..."):"Click Timer or Press Spacebar"):(isR?`LIVE: ${mode.toUpperCase()}`:"PAUSED");
-                $('pomo-toggle-btn').innerText=isR?"Pause":"Start Focus";
-                updateUnloggedFocusDisplay();renderDuoHUDCards();
-            },250);
-        }
-
-        // CHARTS & LOGS ENGINE
+        // CHARTS ENGINE
         let charts={},chartTimeframes={work:'daily',sanctuary:'daily'};
         function initCharts(){
             const opts={responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'#334155'},ticks:{color:'#94a3b8'}},y:{grid:{color:'#334155'},ticks:{color:'#94a3b8'},beginAtZero:true}},plugins:{legend:{display:false}}};
             charts['work']=new Chart($('workChart').getContext('2d'),{type:'bar',data:{labels:[],datasets:[{data:[],backgroundColor:'#10b981'}]},options:opts});
             charts['sanctuary']=new Chart($('sanctuaryChart').getContext('2d'),{type:'bar',data:{labels:[],datasets:[{label:'Fitness',data:[],backgroundColor:'#f59e0b'},{label:'Chores',data:[],backgroundColor:'#38bdf8'}]},options:{...opts,plugins:{legend:{display:true}}}});
         }
-
         function setChartRange(t,r){chartTimeframes[t]=r;loadUserData()}
 
+        // FORGE SETTINGS SAVE & LOAD
+        function populateForgeForm(){
+            $('setting-user-theme').value=userSettings.userTheme||'gold';
+            $('setting-particle-intensity').value=userSettings.particleIntensity??15;
+            $('setting-pomo-focus').value=userSettings.pomoFocus||25;
+            $('setting-pomo-short').value=userSettings.pomoShort||5;
+            $('setting-pomo-long').value=userSettings.pomoLong||15;
+            $('setting-monthly-cash').value=userSettings.monthlyCash||8000;
+            $('setting-daily-soft-cap').value=(userSettings.dailySoftCap||4).toFixed(2);
+            $('setting-weekly-hours').value=userSettings.weeklyHours||10;
+            $('setting-max-bonus-cap').value=userSettings.maxBonusCapPct||125;
+            $('label-monthly-cash').innerText=(userSettings.monthlyCash||8000).toLocaleString();
+        }
+
+        function handleInstantThemeChange(){
+            const t=$('setting-user-theme').value;
+            document.body.setAttribute('data-theme',t);
+        }
+
+        async function saveAllForgeSettings(e){
+            e.preventDefault();if(loggedInUser!==viewedUser)return;
+            userSettings.userTheme=$('setting-user-theme').value;
+            userSettings.particleIntensity=parseInt($('setting-particle-intensity').value)||15;
+            userSettings.pomoFocus=parseInt($('setting-pomo-focus').value)||25;
+            userSettings.pomoShort=parseInt($('setting-pomo-short').value)||5;
+            userSettings.pomoLong=parseInt($('setting-pomo-long').value)||15;
+            userSettings.monthlyCash=parseFloat($('setting-monthly-cash').value)||8000;
+            userSettings.dailySoftCap=parseFloat($('setting-daily-soft-cap').value)||4.0;
+            userSettings.weeklyHours=parseFloat($('setting-weekly-hours').value)||10;
+            userSettings.maxBonusCapPct=parseFloat($('setting-max-bonus-cap').value)||125;
+
+            handleInstantThemeChange();
+            await db.collection('settings').doc(loggedInUser).set(userSettings,{merge:true});
+            loadUserData();
+        }
+
+        // AUTH & LISTENERS
         auth.onAuthStateChanged(async u=>{
             const modal=$('login-modal'),app=$('app-content');
             if(u){
                 currentUserUid=u.uid;modal.classList.add('hidden');app.classList.remove('hidden');
                 loggedInUser=(u.uid==="ioxjbBLDH0NDLDWVoYCjq8p3PYU2"||u.email?.toLowerCase().includes("cream"))?'Cream':'North';
                 viewedUser=loggedInUser;
-                initDuoHUDListeners();initRealtimeSettingsListener();initGlobalHeaderGlowListener();
-                initCharts();loadUserData();updateRatingUI('results');updateRatingUI('effort');
-                startGlobalUIRenderer();
+                initDuoHUDListeners();initRealtimeSettingsListener();
+                initCharts();loadUserData();
             }else{modal.classList.remove('hidden');app.classList.add('hidden')}
         });
 
@@ -900,11 +756,12 @@
 
         function renderDuoHUDCards(){
             ['North','Cream'].forEach(u=>{
-                const isMe=(u===loggedInUser),isViewing=(u===viewedUser);
+                const isMe=(u===loggedInUser);
                 const s=isMe?userSettings:(spectatorSettings&&viewedUser===u?spectatorSettings:(duoPresenceData[u]?.settings||{}));
                 $(`hud-status-${u.toLowerCase()}`).innerText=s.statusNote||(u==='North'?'Drawing 🎨':'Writing ✍️');
                 $(`hud-pwr-${u.toLowerCase()}`).innerText=`${duoPresenceData[u].powerScore||0} PWR`;
                 $(`hud-hours-${u.toLowerCase()}`).innerText=`${(duoPresenceData[u].hoursToday||0).toFixed(2)} / ${(s.dailySoftCap||4).toFixed(2)}h`;
+                $(`hud-card-${u.toLowerCase()}`).classList.toggle('active-space', u===viewedUser);
             });
         }
 
@@ -912,36 +769,37 @@
             db.collection('settings').doc(viewedUser).onSnapshot(doc=>{
                 if(doc.exists){
                     const data=doc.data();
-                    if(loggedInUser===viewedUser){userSettings={...userSettings,...data};applyThemeToBody(userSettings.userTheme);applyCursorToBody(userSettings.userCursor)}
-                    else spectatorSettings=data;
+                    if(loggedInUser===viewedUser){
+                        userSettings={...userSettings,...data};
+                        document.body.setAttribute('data-theme',userSettings.userTheme||'gold');
+                        populateForgeForm();
+                    } else spectatorSettings=data;
                 }
                 renderTodoList();renderDuoHUDCards();
-            });
-        }
-
-        function initGlobalHeaderGlowListener(){
-            const now=new Date(),startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-            db.collection('logs').onSnapshot(snapshot=>{
-                let nH=0,cH=0;
-                snapshot.forEach(doc=>{
-                    const d=doc.data();
-                    if(getLogDate(d)>=startToday){
-                        if(d.user==='North'&&d.type==='work')nH+=(d.hours||0);
-                        if(d.user==='Cream'&&d.type==='work')cH+=(d.hours||0);
-                    }
-                });
-                duoPresenceData.North.hoursToday=nH;duoPresenceData.Cream.hoursToday=cH;
-                renderDuoHUDCards();
             });
         }
 
         function switchActiveUser(target){viewedUser=target;initRealtimeSettingsListener();loadUserData()}
 
         function switchTab(t){
-            ['crucible','sanctuary','chronicles','forge'].forEach(x=>{$(`tab-${x}`)?.classList.add('hidden')});
-            $(`tab-${t}`)?.classList.remove('hidden');
+            ['crucible','sanctuary','chronicles','forge'].forEach(x=>{$(`tab-${x}`)?.classList.add('hidden');$(`nav-${x}`)?.classList.remove('active')});
+            $(`tab-${t}`)?.classList.remove('hidden');$(`nav-${t}`)?.classList.add('active');
         }
 
+        function editUserStatusNote(user,e){if(e)e.stopPropagation();if(user===loggedInUser)$('status-picker-modal').classList.remove('hidden')}
+        function closeStatusPicker(){$('status-picker-modal').classList.add('hidden')}
+        async function selectStatusPreset(noteText){
+            if(!noteText)return;userSettings.statusNote=noteText;closeStatusPicker();renderDuoHUDCards();
+            await db.collection('settings').doc(loggedInUser).set({statusNote:noteText},{merge:true});
+        }
+        async function promptCustomStatus(){
+            closeStatusPicker();const current=userSettings.statusNote||(loggedInUser==='North'?'Drawing 🎨':'Writing ✍️');
+            const customNote=prompt('Enter custom status:',current);
+            if(customNote!==null&&customNote.trim())await selectStatusPreset(customNote.trim().substring(0,25));
+        }
+
+        // LOGGING ACTIONS
+        let currentTodayHoursLogged=0;
         async function logWork(e){
             e.preventDefault();
             const T=parseFloat($('work-time').value),R=parseFloat($('work-results').value),E=parseFloat($('work-effort').value);
@@ -951,7 +809,6 @@
             await db.collection('logs').add({type:'work',user:loggedInUser,hours:T,normalHours:normH,overCapHours:overH,results:R,effort:E,points:pts,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
             loadUserData();
         }
-
         async function logWorkout(e){
             e.preventDefault();const hrs=parseFloat($('workout-time').value);
             await db.collection('logs').add({type:'workout',user:loggedInUser,hours:hrs,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
@@ -970,25 +827,28 @@
         async function saveDailyDiary(e){
             e.preventDefault();const text=$('diary-text').value.trim();if(!text)return;
             await db.collection('logs').add({type:'diary',user:loggedInUser,text:text,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
-            loadUserData();
+            $('diary-text').value='';loadUserData();
         }
 
-        let currentTodayHoursLogged=0,currentRawLogsCache=[];
         function loadUserData(){
             db.collection('logs').where('user','==',viewedUser).onSnapshot(snapshot=>{
-                let rawLogs=[],monthlyPoints=0,todayHours=0;
+                let rawLogs=[],monthlyPoints=0,todayHours=0,totalPowerScore=0;
                 const now=new Date(),startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate());
 
                 snapshot.forEach(doc=>{
                     const d=doc.data();d.id=doc.id;rawLogs.push(d);
-                    const lDate=getLogDate(d);
+                    const lDate=d.timestamp?.toDate ? d.timestamp.toDate() : new Date();
                     if(d.type==='work'){
                         if(lDate.getFullYear()===now.getFullYear()&&lDate.getMonth()===now.getMonth())monthlyPoints+=(d.points||0);
                         if(lDate>=startToday)todayHours+=(d.hours||0);
+                        totalPowerScore+=Math.round((d.hours||0)*10*(d.results||3));
                     }
                 });
 
-                currentTodayHoursLogged=todayHours;currentRawLogsCache=rawLogs;
+                currentTodayHoursLogged=todayHours;
+                duoPresenceData[viewedUser].hoursToday=todayHours;
+                duoPresenceData[viewedUser].powerScore=totalPowerScore;
+
                 const softCap=userSettings.dailySoftCap||4;
                 const targetPts=userSettings.weeklyHours*12,pointRate=userSettings.monthlyCash/targetPts;
                 const finalPayout=monthlyPoints*pointRate;
@@ -997,8 +857,25 @@
                 $('today-hours-label').innerText=`${todayHours.toFixed(2)} / ${softCap.toFixed(2)} hrs`;
                 $('daily-cap-status').innerText=`${Math.max(0,softCap-todayHours).toFixed(2)}h remaining`;
 
+                // Update Gauge & Power
+                const monthlyPct=Math.min(100, Math.round((monthlyPoints/(targetPts*4))*100));
+                $('gauge-percent-text').innerText=`${monthlyPct}%`;
+                $('gauge-circle-path').style.strokeDashoffset=100-monthlyPct;
+                $('power-score-val').innerText=totalPowerScore;
+                $('power-level-bar').style.width=`${Math.min(100, (totalPowerScore/1000)*100)}%`;
+
                 renderBadgeGrid(new Set(userSettings.unlockedBadges||[]));
+                renderLedgerLists(rawLogs);
+                renderDuoHUDCards();
             });
+        }
+
+        function renderLedgerLists(logs){
+            const wEl=$('ledger-list-work'),sEl=$('ledger-list-sanctuary'),dEl=$('ledger-list-diary');
+            if(!wEl||!sEl||!dEl)return;
+            wEl.innerHTML=logs.filter(l=>l.type==='work').slice(-10).reverse().map(l=>`<div class="p-2 bg-slate-900 border border-slate-800 rounded text-[11px] flex justify-between"><span>${(l.hours||0).toFixed(2)}h Work (LVL ${l.results||3})</span><span class="text-amber-400 font-bold">+${Math.round(l.points||0)} pts</span></div>`).join('');
+            sEl.innerHTML=logs.filter(l=>l.type==='workout'||l.type==='chore'||l.type==='health').slice(-10).reverse().map(l=>`<div class="p-2 bg-slate-900 border border-slate-800 rounded text-[11px] flex justify-between"><span class="capitalize">${l.type}: ${l.note||((l.hours||0).toFixed(2)+'h')}</span></div>`).join('');
+            dEl.innerHTML=logs.filter(l=>l.type==='diary').slice(-10).reverse().map(l=>`<div class="p-2 bg-slate-900 border border-slate-800 rounded text-[11px] text-slate-300">${l.text}</div>`).join('');
         }
 
         function renderBadgeGrid(unlockedSet){
@@ -1010,18 +887,6 @@
             }).join('');
         }
 
-        function playTone(type){
-            if(audioMuted)return;
-            try{
-                const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();
-                o.connect(g);g.connect(c.destination);o.type='sine';
-                o.frequency.setValueAtTime(type==='save'?600:400,c.currentTime);
-                g.gain.setValueAtTime(0.2,c.currentTime);g.gain.linearRampToValueAtTime(0.001,c.currentTime+0.12);
-                o.start();o.stop(c.currentTime+0.12);
-            }catch(e){}
-        }
-
-        function toggleAudioMute(){audioMuted=!audioMuted;$('audio-toggle-btn').innerText=audioMuted?"🔇":"🔊"}
         function handleLogin(e){e.preventDefault();auth.signInWithEmailAndPassword($('login-email').value,$('login-password').value)}
         function handleLogout(){auth.signOut()}
     </script>
