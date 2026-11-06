@@ -68,15 +68,29 @@
             border-radius: 4px;
         }
 
+        /* PROMINENT TAB SELECTORS */
         .tab-btn{color:#94a3b8;background-color:transparent;border:1px solid transparent;transition:all 0.2s;user-select:none}
-        .tab-btn:hover{color:#f8fafc;background-color:rgba(255,255,255,0.08)}
-        .tab-btn.active{background:linear-gradient(135deg,var(--accent-glow) 0%,rgba(255,255,255,0.05) 100%)!important;color:var(--accent-primary)!important;border-color:var(--accent-primary)!important;font-weight:700;box-shadow:0 0 16px var(--accent-glow)}
+        .tab-btn:hover{color:#f8fafc;background-color:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.1)}
+        .tab-btn.active{background:linear-gradient(135deg,var(--accent-glow) 0%,rgba(255,255,255,0.05) 100%)!important;color:var(--accent-primary)!important;border-color:var(--accent-primary)!important;font-weight:800;box-shadow:0 0 18px var(--accent-glow)}
         
         .theme-accent-bg{background:linear-gradient(135deg,var(--accent-primary) 0%,var(--accent-secondary) 100%)!important;color:var(--accent-primary-text)!important}
-        .theme-accent-bg:hover{opacity:0.92}
         .theme-accent-text{background:linear-gradient(135deg,var(--accent-primary) 0%,var(--accent-secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .theme-accent-btn{background:linear-gradient(135deg,var(--accent-primary) 0%,var(--accent-secondary) 100%)!important;color:var(--accent-primary-text)!important;font-weight:700;transition:all 0.2s}
-        .theme-accent-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+        
+        /* HOVER-ONLY GRADIENT BUTTONS */
+        .theme-accent-btn {
+            background: rgba(15, 23, 42, 0.9) !important;
+            border: 1.5px solid var(--accent-primary) !important;
+            color: var(--accent-primary) !important;
+            font-weight: 700;
+            transition: all 0.2s ease-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .theme-accent-btn:hover, .theme-accent-btn:active {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%) !important;
+            color: var(--accent-primary-text) !important;
+            box-shadow: 0 0 20px var(--accent-glow), 0 6px 16px rgba(0,0,0,0.4);
+            transform: translateY(-1px);
+        }
         
         .logo-gold{background:linear-gradient(135deg,var(--accent-primary) 0%,var(--accent-secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:0.25em;text-shadow:0 0 16px var(--accent-glow)}
         .gauge-circle{transition:stroke-dashoffset 0.8s ease-in-out,stroke 0.3s}
@@ -114,6 +128,32 @@
             background-color: var(--card-bg) !important;
             border: 1.5px solid var(--card-border) !important;
             box-shadow: 0 10px 30px -5px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08);
+        }
+
+        /* IMMERSIVE DIARY BOOK STYLING */
+        .journal-book {
+            background: linear-gradient(90deg, #10141e 0%, #161b26 48%, #090c12 50%, #161b26 52%, #10141e 100%);
+            border: 2px solid var(--card-border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.85), inset 0 0 40px rgba(0,0,0,0.6);
+            border-radius: 1.5rem;
+            position: relative;
+        }
+        .journal-spine {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, rgba(0,0,0,0.6), rgba(245,158,11,0.3), rgba(0,0,0,0.6));
+            box-shadow: 0 0 10px rgba(0,0,0,0.8);
+            z-index: 10;
+        }
+        .journal-page {
+            background: rgba(18, 23, 33, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+            transition: all 0.3s ease;
         }
     </style>
 </head>
@@ -204,23 +244,18 @@
     <!-- MAIN APP WRAPPER WITH RESPONSIVE TWO-COLUMN SIDEBAR LAYOUT -->
     <div id="app-content" class="hidden flex flex-col md:flex-row gap-6 max-w-7xl mx-auto">
         
-        <!-- VERTICAL SIDEBAR PANEL WITH EXPANDED PROFILE CARDS -->
+        <!-- VERTICAL SIDEBAR PANEL WITH PROMINENT NAV BUTTONS -->
         <aside class="app-sidebar p-4 sm:p-5 rounded-2xl md:w-72 lg:w-80 shrink-0 space-y-6 md:sticky md:top-6 md:h-[calc(100vh-3rem)] flex flex-col overflow-y-auto no-scrollbar">
             <!-- BRAND HEADER -->
             <div class="flex items-center justify-between pb-3 border-b border-slate-800">
                 <div>
                     <h1 class="text-2xl font-black logo-gold uppercase tracking-widest">AUREUM</h1>
-                    <p class="text-xs font-extrabold text-amber-400/90 tracking-wider uppercase mt-0.5">The Aureate Standard</p>
                 </div>
                 <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-sm text-slate-300 hover:text-white p-2.5 bg-slate-900 rounded-xl border border-slate-800 transition-all">🔊</button>
             </div>
 
-            <!-- DUO USER HUD STATUS CARDS (EXPANDED PROMINENT AVATARS) -->
+            <!-- DUO USER HUD STATUS CARDS -->
             <div class="space-y-3">
-                <div class="text-xs font-extrabold uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
-                    <span>👥</span> <span>Duo Command</span>
-                </div>
-                
                 <!-- NORTH HUD CARD -->
                 <div id="hud-card-north" onclick="switchActiveUser('North')" class="hud-card card p-3.5 rounded-2xl border flex flex-col gap-3 cursor-pointer">
                     <div class="flex items-center gap-3">
@@ -264,13 +299,13 @@
                 </div>
             </div>
 
-            <!-- VERTICAL NAVIGATION BUTTONS -->
-            <nav class="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible no-scrollbar py-1">
-                <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-4 py-3 rounded-xl text-xs font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span>⚗️</span> <span>Crucible</span></button>
-                <button onclick="switchTab('sanctuary')" id="nav-sanctuary" class="tab-btn px-4 py-3 rounded-xl text-xs font-semibold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span>🌿</span> <span>Sanctuary</span></button>
-                <button onclick="switchTab('chronicles')" id="nav-chronicles" class="tab-btn px-4 py-3 rounded-xl text-xs font-semibold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span>📜</span> <span>Chronicles</span></button>
-                <button onclick="switchTab('relics')" id="nav-relics" class="tab-btn px-4 py-3 rounded-xl text-xs font-semibold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span>🏺</span> <span>Relics</span></button>
-                <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-4 py-3 rounded-xl text-xs font-semibold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span>⚙️</span> <span>Forge</span></button>
+            <!-- ENLARGED PROMINENT TAB SELECTORS -->
+            <nav class="flex flex-row md:flex-col gap-2.5 overflow-x-auto md:overflow-visible no-scrollbar py-1">
+                <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-4 py-3.5 rounded-xl text-base sm:text-lg font-bold flex items-center gap-3.5 w-full justify-start whitespace-nowrap"><span class="text-xl sm:text-2xl">⚗️</span> <span>Crucible</span></button>
+                <button onclick="switchTab('sanctuary')" id="nav-sanctuary" class="tab-btn px-4 py-3.5 rounded-xl text-base sm:text-lg font-bold flex items-center gap-3.5 w-full justify-start whitespace-nowrap"><span class="text-xl sm:text-2xl">🌿</span> <span>Sanctuary</span></button>
+                <button onclick="switchTab('chronicles')" id="nav-chronicles" class="tab-btn px-4 py-3.5 rounded-xl text-base sm:text-lg font-bold flex items-center gap-3.5 w-full justify-start whitespace-nowrap"><span class="text-xl sm:text-2xl">📜</span> <span>Chronicles</span></button>
+                <button onclick="switchTab('relics')" id="nav-relics" class="tab-btn px-4 py-3.5 rounded-xl text-base sm:text-lg font-bold flex items-center gap-3.5 w-full justify-start whitespace-nowrap"><span class="text-xl sm:text-2xl">🏺</span> <span>Relics</span></button>
+                <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-4 py-3.5 rounded-xl text-base sm:text-lg font-bold flex items-center gap-3.5 w-full justify-start whitespace-nowrap"><span class="text-xl sm:text-2xl">⚙️</span> <span>Forge</span></button>
             </nav>
 
             <div class="mt-auto pt-4 border-t border-slate-800 flex justify-between items-center text-xs">
@@ -416,7 +451,7 @@
                         <!-- MELODIC AUDIO ENGINE CARD -->
                         <div id="audioSettingsCard" class="card p-4 rounded-2xl border border-slate-800 space-y-3">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-1.5"><span>🔔</span> <span>Melodic Audio Engine</span></span>
+                                <span class="text-xs font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-1.5"><span>🔔</span> <span>Audio Engine</span></span>
                                 <button type="button" onclick="previewPomoSound()" class="px-3 py-1.5 theme-accent-btn font-black text-xs rounded-lg transition-all flex items-center gap-1">
                                     <span>🔊</span> <span>Test Sound</span>
                                 </button>
@@ -453,9 +488,9 @@
                         </div>
                     </div>
 
-                    <!-- RIGHT COLUMN: LOG WORK & TODO LIST -->
+                    <!-- RIGHT COLUMN: LOG WORK & TASKS -->
                     <div class="lg:col-span-5 space-y-5">
-                        <!-- EXPANDED LOG WORK CARD -->
+                        <!-- LOG WORK CARD -->
                         <div id="work-form-card" class="card p-5 sm:p-6 rounded-2xl space-y-4">
                             <div class="flex items-center justify-between">
                                 <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>⚗️</span> <span>Log Work</span></h2>
@@ -468,7 +503,7 @@
                                 <input type="hidden" id="work-effort" value="3">
 
                                 <div>
-                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Time Spent (Hours)</label>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Hours Spent</label>
                                     <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden h-11">
                                         <button type="button" onmousedown="startHold('value', 'work-time', -1, 0.25, 0.25, undefined, event)" ontouchstart="startHold('value', 'work-time', -1, 0.25, 0.25, undefined, event)" class="px-4 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-base font-bold select-none">-</button>
                                         <input type="number" id="work-time" step="0.25" min="0.25" value="1.00" required class="w-full text-center bg-transparent py-1 text-sm text-white font-mono font-black focus:outline-none [appearance:textfield]">
@@ -476,7 +511,6 @@
                                     </div>
                                 </div>
 
-                                <!-- UNSQUISHED SELECTORS IN FULLSCREEN -->
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div>
                                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Quality Level</label>
@@ -510,10 +544,10 @@
                             </form>
                         </div>
 
-                        <!-- TODO LIST CARD -->
+                        <!-- TASKS CARD -->
                         <div id="todo-card" class="card p-5 sm:p-6 rounded-2xl space-y-4">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                                <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>📝</span> <span>Todo List</span></h2>
+                                <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>📝</span> <span>Tasks</span></h2>
                                 <div class="flex items-center gap-2">
                                     <span id="todo-count-active" class="text-xs font-bold px-2.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">0 Active</span>
                                     <span id="todo-count-done" class="text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">0 Done</span>
@@ -521,12 +555,12 @@
                                 </div>
                             </div>
                             <form id="todo-form" onsubmit="addTodoItem(event)" class="flex gap-2">
-                                <input type="text" id="todo-input" placeholder="Add a new task..." class="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                                <input type="text" id="todo-input" placeholder="Add task..." class="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                                 <button type="submit" class="theme-accent-btn font-black px-5 py-2 rounded-xl text-xs transition-all shadow-md">+ Add</button>
                             </form>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                                 <div class="bg-slate-900/50 p-3.5 rounded-xl border border-slate-800">
-                                    <div class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-2">Pending Tasks</div>
+                                    <div class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-2">Pending</div>
                                     <div id="todo-active-list" class="space-y-2 pr-1 max-h-[240px] overflow-y-auto"></div>
                                 </div>
                                 <div class="bg-slate-900/50 p-3.5 rounded-xl border border-slate-800">
@@ -539,7 +573,7 @@
                 </div>
             </div>
 
-            <!-- TAB 2: SANCTUARY (FITNESS, CHORES, SNACKS & REFLECTION) -->
+            <!-- TAB 2: SANCTUARY (FITNESS, CHORES, SNACKS & IMMERSIVE DIARY BOOK) -->
             <div id="tab-sanctuary" class="hidden space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                     <!-- FITNESS CARD -->
@@ -550,7 +584,7 @@
                         <form onsubmit="logWorkout(event)" class="space-y-4">
                             <input type="hidden" id="workout-strain" value="3">
                             <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Time Spent (Hours)</label>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Hours Spent</label>
                                 <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden h-11">
                                     <button type="button" onmousedown="startHold('value', 'workout-time', -1, 0.25, 0.25, undefined, event)" ontouchstart="startHold('value', 'workout-time', -1, 0.25, 0.25, undefined, event)" class="px-4 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-base font-bold select-none">-</button>
                                     <input type="number" id="workout-time" step="0.25" min="0.25" value="0.75" required class="w-full text-center bg-transparent text-sm text-white font-mono font-black focus:outline-none [appearance:textfield]">
@@ -558,7 +592,7 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Intensity</label>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Intensity Level</label>
                                 <div class="flex items-center bg-slate-900/90 rounded-xl border border-slate-700 p-1 h-11">
                                     <button type="button" onmousedown="startHold('strain', 'workout-strain', -1, null, null, null, event)" ontouchstart="startHold('strain', 'workout-strain', -1, null, null, null, event)" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none flex items-center justify-center">◀</button>
                                     <div id="selector-box-workout" class="flex-1 text-center">
@@ -580,7 +614,7 @@
                         </div>
                         <form onsubmit="logChore(event)" class="space-y-4">
                             <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Time Spent (Hours)</label>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Hours Spent</label>
                                 <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden h-11">
                                     <button type="button" onmousedown="startHold('value', 'chore-time', -1, 0.25, 0.25, undefined, event)" ontouchstart="startHold('value', 'chore-time', -1, 0.25, 0.25, undefined, event)" class="px-4 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-base font-bold select-none">-</button>
                                     <input type="number" id="chore-time" step="0.25" min="0.25" value="0.50" required class="w-full text-center bg-transparent text-sm text-white font-mono font-black focus:outline-none [appearance:textfield]">
@@ -588,7 +622,7 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Task Description</label>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Description</label>
                                 <input type="text" id="chore-note" placeholder="e.g. Laundry, kitchen reset..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3.5 h-11 text-xs text-white focus:outline-none focus:border-amber-500">
                             </div>
                             <button type="submit" class="w-full theme-accent-btn font-extrabold rounded-xl text-xs py-3 transition-all shadow-md mt-2">Save Chore Log</button>
@@ -602,7 +636,7 @@
                         </div>
                         <form onsubmit="logHealth(event)" class="space-y-4">
                             <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Portion Size</label>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Portion Level</label>
                                 <select id="health-level" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3.5 h-11 text-xs text-white focus:outline-none focus:border-amber-500">
                                     <option value="1">Level 1 (Small / Light)</option>
                                     <option value="2">Level 2 (Medium / Standard)</option>
@@ -610,7 +644,7 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Treat Item</label>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Item</label>
                                 <input type="text" id="health-note" placeholder="e.g. Ice cream, matcha..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3.5 h-11 text-xs text-white focus:outline-none focus:border-amber-500">
                             </div>
                             <button type="submit" class="w-full theme-accent-btn font-extrabold rounded-xl text-xs py-3 transition-all shadow-md mt-2">Save Snack Log</button>
@@ -618,18 +652,54 @@
                     </div>
                 </div>
 
-                <!-- DAILY REFLECTION JOURNAL -->
-                <div id="diary-form-card" class="card p-6 rounded-2xl border border-slate-800">
-                    <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>✍️</span> <span>Daily Reflection</span></h2>
-                        <span id="diary-status-badge" class="text-xs font-bold text-amber-300">Saved ✨</span>
-                    </div>
-                    <form onsubmit="saveDailyDiary(event)" class="space-y-4 relative">
-                        <textarea id="diary-text" rows="4" placeholder="What went well today? Lessons learned, thoughts, or wins?" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-3.5 text-sm text-white focus:outline-none focus:border-amber-500 resize-none"></textarea>
-                        <div class="flex justify-end">
-                            <button type="submit" class="theme-accent-btn font-extrabold px-6 py-2.5 rounded-xl text-xs transition-all">Save Reflection</button>
+                <!-- INTERACTIVE IMMERSIVE TWO-PAGE REFLECTION BOOK -->
+                <div class="journal-book p-6 sm:p-8 rounded-3xl relative overflow-hidden space-y-4">
+                    <div class="journal-spine hidden sm:block"></div>
+                    
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">📖</span>
+                            <h2 class="text-xl font-black text-slate-100">Chronicle Journal</h2>
                         </div>
-                    </form>
+                        <div class="flex items-center gap-2">
+                            <button onclick="changeJournalBookPage(-1)" class="px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-xl text-xs font-bold transition-all select-none">◀ Prev</button>
+                            <span id="journal-page-number-label" class="text-xs font-mono font-bold text-amber-400 px-2">Page 1</span>
+                            <button onclick="changeJournalBookPage(1)" class="px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-xl text-xs font-bold transition-all select-none">Next ▶</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10 pt-2">
+                        <!-- LEFT PAGE: PREVIOUS REFLECTION ENTRY LOG -->
+                        <div class="journal-page p-5 sm:p-6 rounded-2xl flex flex-col justify-between min-h-[320px]">
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
+                                    <span class="text-xs font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5"><span>📜</span> <span>Previous Entry</span></span>
+                                    <span id="book-left-date" class="text-xs font-mono text-slate-400">---</span>
+                                </div>
+                                <div id="book-left-content" class="text-sm text-slate-200 italic leading-relaxed font-serif pt-1 max-h-[240px] overflow-y-auto">
+                                    No entry logged for this page.
+                                </div>
+                            </div>
+                            <div class="text-right border-t border-slate-800/80 pt-2 text-[10px] text-slate-500 font-mono" id="book-left-footer">Page Left</div>
+                        </div>
+
+                        <!-- RIGHT PAGE: TODAY'S WRITE & SAVE PAGE -->
+                        <div class="journal-page p-5 sm:p-6 rounded-2xl flex flex-col justify-between min-h-[320px]">
+                            <form id="diary-form-card" onsubmit="saveDailyDiary(event)" class="space-y-3 flex-1 flex flex-col justify-between">
+                                <div class="space-y-2 flex-1">
+                                    <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
+                                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1.5"><span>✍️</span> <span>Write Today's Page</span></span>
+                                        <span id="diary-status-badge" class="text-xs font-bold text-amber-300">Saved ✨</span>
+                                    </div>
+                                    <textarea id="diary-text" rows="7" placeholder="Write today's reflection..." class="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-sm text-slate-100 font-serif focus:outline-none focus:border-amber-500 resize-none flex-1 leading-relaxed"></textarea>
+                                </div>
+                                <div class="flex justify-between items-center border-t border-slate-800/80 pt-2">
+                                    <span class="text-[10px] text-slate-500 font-mono">Page Right</span>
+                                    <button type="submit" class="theme-accent-btn font-black px-6 py-2 rounded-xl text-xs transition-all">Sign & Save Page</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -737,7 +807,7 @@
                         <div class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Dual-Tone Color Theme</label>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Dual-Tone Theme</label>
                                     <select id="setting-user-theme" onchange="handleInstantThemeChange()" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
                                         <option value="gold">Aureum Gold (Amber + Champagne Gold)</option>
                                         <option value="rose">Rose Quartz (Rose Pink + Warm Amber Gold)</option>
@@ -910,6 +980,7 @@
 
         let loggedInUser='North',viewedUser='North',currentUserUid=null,audioMuted=false;
         let activeHoldTimer=null,activeHoldInterval=null,isTouchScrolling=false;
+        let currentJournalPageIndex=0;
 
         function getLogDate(l){
             if(!l||!l.timestamp)return new Date();
@@ -1045,7 +1116,7 @@
         window.addEventListener('keydown', unlockAudioContext, {passive:true});
         window.addEventListener('touchstart', unlockAudioContext, {passive:true});
 
-        // MELODIC AUDIO ENGINE SYNTHESIZER (NO BASSY GONGS/BELLS)
+        // MELODIC AUDIO ENGINE SYNTHESIZER
         function playSingleToneBurst(key,c,now){
             const k=key||userSettings.pomoSound||'zen_bowl';
             if(k==='zen_bowl'){
@@ -1946,7 +2017,7 @@
             ['crucible','sanctuary','chronicles','relics','forge'].forEach(x=>{
                 $(`tab-${x}`)?.classList.add('hidden');
                 const nav=$(`nav-${x}`);
-                if(nav)nav.className=x===t?"tab-btn active px-4 py-3 rounded-xl text-xs font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap":"tab-btn px-4 py-3 rounded-xl text-xs font-semibold flex items-center gap-3 w-full justify-start whitespace-nowrap";
+                if(nav)nav.className=x===t?"tab-btn active px-4 py-3.5 rounded-xl text-base sm:text-lg font-bold flex items-center gap-3.5 w-full justify-start whitespace-nowrap":"tab-btn px-4 py-3.5 rounded-xl text-base sm:text-lg font-bold flex items-center gap-3.5 w-full justify-start whitespace-nowrap";
             });
             $(`tab-${t}`)?.classList.remove('hidden');
             if(t==='crucible')attachPomoSpectatorListener();
@@ -2012,6 +2083,27 @@
             await db.collection('logs').add({type:'diary',user:loggedInUser,text:text,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
             showToast({title:'📖 Reflection Saved',subtitle:'Reflection updated!',icon:'✍️',tier:'titan',originEvt:e});
             loadUserData();
+        }
+
+        function changeJournalBookPage(delta){
+            const diaryLogs=currentRawLogsCache.filter(l=>l.type==='diary');
+            if(diaryLogs.length===0)return;
+            currentJournalPageIndex=Math.max(0,Math.min(diaryLogs.length-1,currentJournalPageIndex+delta));
+            renderJournalBookView(diaryLogs);playTone('save');
+        }
+
+        function renderJournalBookView(diaryLogs){
+            const label=$('journal-page-number-label'),leftDate=$('book-left-date'),leftContent=$('book-left-content'),leftFooter=$('book-left-footer');
+            if(!leftContent)return;
+            if(!diaryLogs||diaryLogs.length===0){
+                label.innerText="Page 1";leftDate.innerText="---";leftContent.innerHTML='No entries logged yet.';leftFooter.innerText="Page Left";return;
+            }
+            const log=diaryLogs[currentJournalPageIndex];
+            const logDate=getLogDate(log);
+            label.innerText=`Page ${currentJournalPageIndex+1} of ${diaryLogs.length}`;
+            leftDate.innerText=logDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+            leftContent.innerText=`"${log.text}"`;
+            leftFooter.innerText=`Written by ${log.user||viewedUser}`;
         }
 
         async function handleInstantThemeChange(){
@@ -2128,6 +2220,9 @@
                 const todayDiary=rawLogs.find(l=>l.type==='diary'&&getLogDate(l)>=startToday);
                 $('diary-text').value=todayDiary?todayDiary.text:'';
                 $('diary-status-badge').innerText=todayDiary?"Reflection Saved ✨":"Jot down thoughts";
+
+                const diaryLogs=rawLogs.filter(l=>l.type==='diary');
+                renderJournalBookView(diaryLogs);
 
                 populateAndFilterLedger();
                 evaluateBadges(rawLogs,userSettings.completedPomoHistory||[],viewedUser);
