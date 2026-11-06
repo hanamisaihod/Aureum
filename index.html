@@ -1022,6 +1022,12 @@
             return l.timestamp.toDate?l.timestamp.toDate():new Date(l.timestamp);
         }
 
+        function formatHours(val){
+            const num=parseFloat(val)||0;
+            const rounded=Math.round(num*100)/100;
+            return (rounded%1===0)?rounded.toFixed(1):rounded.toString();
+        }
+
         const RATING_DATA={
             results:[{level:1,icon:'⚡',title:'Minimal',desc:'Warmup or light prep'},{level:2,icon:'🌱',title:'Fair Output',desc:'Modest progress made'},{level:3,icon:'🎯',title:'Solid Output',desc:'Standard steady progress'},{level:4,icon:'✨',title:'High Craft',desc:'Exceptional output speed'},{level:5,icon:'👑',title:'Peak Flow',desc:'Flawless breakthrough'}],
             effort:[{level:1,icon:'🍃',title:'Effortless',desc:'Zero resistance or strain'},{level:2,icon:'☁️',title:'Light',desc:'Mild focus required'},{level:3,icon:'🔥',title:'Moderate Strain',desc:'Standard focus effort'},{level:4,icon:'⛰️',title:'Heavy Strain',desc:'Overcame strong fatigue'},{level:5,icon:'🌋',title:'Max Strain',desc:'Intense willpower push'}],
@@ -1491,7 +1497,6 @@
             
             const val = parseInt(input.value) || 3, d = RATING_DATA[field][val-1], p = field === 'results' ? 'q' : 'e';
             
-            // Safely update each element only if it actually exists in the DOM
             const iconEl = $(`${p}-icon`); if (iconEl) iconEl.innerText = d.icon;
             const badgeEl = $(`${p}-badge`); if (badgeEl) badgeEl.innerText = `LVL ${d.level}`;
             const titleEl = $(`${p}-title`); if (titleEl) titleEl.innerText = d.title;
@@ -1572,7 +1577,6 @@
             myPomoInterval=setInterval(()=>{
                 if(!myPomoIsRunning || !myPomoEndTime)return;
                 
-                // Fixes the drift by calculating exact remaining time from wall-clock time
                 myPomoTime = Math.max(0, Math.ceil((myPomoEndTime - Date.now()) / 1000));
                 ticks++;
                 if(ticks>=4){syncMyPomoToCloud();ticks=0}
@@ -1653,7 +1657,7 @@
             const f=parseInt(userSettings.pomoFocus)||25,s=parseInt(userSettings.pomoShort)||5,l=parseInt(userSettings.pomoLong)||15;
             myPomoInitialTime=(mode==='focus'?f:(mode==='short'?s:l))*60;myPomoTime=myPomoInitialTime;syncMyPomoToCloud();
         }
-        // Fixes tab switching freeze / background sleeping
+        
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible' && myPomoIsRunning && myPomoEndTime) {
                 myPomoTime = Math.max(0, Math.ceil((myPomoEndTime - Date.now()) / 1000));
@@ -1666,7 +1670,6 @@
                 myPomoIsRunning=false;currentSessionWasPaused=true;myPomoEndTime=null;clearInterval(myPomoInterval);
             }else{
                 myPomoIsRunning=true;
-                // Sets absolute end time target using current real system time millis
                 myPomoEndTime = Date.now() + (myPomoTime * 1000);
                 startMyPomoBackgroundTimer();
             }
@@ -1973,7 +1976,7 @@
                 }
 
                 $(`hud-pwr-${u.toLowerCase()}`).innerText=`${duoPresenceData[u].powerScore||0} PWR`;
-                $(`hud-hours-${u.toLowerCase()}`).innerText=`${(duoPresenceData[u].hoursToday||0).toFixed(1)}/${(s.dailySoftCap||4)}h`;
+                $(`hud-hours-${u.toLowerCase()}`).innerText=`${formatHours(duoPresenceData[u].hoursToday||0)}/${formatHours(s.dailySoftCap||4)}h`;
             });
         }
 
@@ -2277,7 +2280,7 @@
                 pEl.innerText=`฿${Math.round(finalPayout).toLocaleString()}`;
                 pEl.className=isVaulted?"text-3xl font-extrabold text-amber-400 mt-1.5 opacity-70 line-through":"text-3xl font-extrabold text-emerald-400 mt-1.5";
 
-                $('today-hours-label').innerText=`${todayHours.toFixed(1)} / ${softCap} hrs`;
+                $('today-hours-label').innerText=`${formatHours(todayHours)} / ${formatHours(softCap)} hrs`;
                 $('daily-bar').style.width=`${Math.min((todayHours/softCap)*100,100)}%`;
 
                 const statusEl=$('daily-cap-status'),badge=$('milestone-2h-badge'),notice=$('work-form-softcap-notice'),yieldPill=$('allowance-yield-pill');
@@ -2286,11 +2289,11 @@
                     badge.innerText="✨ Baseline Reached";badge.className="text-[10px] font-bold theme-accent-text";notice?.classList.remove('hidden');
                     yieldPill.innerText="🍵 Soft Cap";yieldPill.className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20";
                 }else if(todayHours>=2.0){
-                    statusEl.innerText=`${(softCap-todayHours).toFixed(1)} hrs remaining today`;statusEl.className="text-xs text-slate-400 font-medium";
+                    statusEl.innerText=`${formatHours(softCap-todayHours)} hrs remaining today`;statusEl.className="text-xs text-slate-400 font-medium";
                     badge.innerText="🎯 2.0h Reached!";badge.className="text-[10px] font-bold text-emerald-400";notice?.classList.add('hidden');
                     yieldPill.innerText="⚡ Standard";yieldPill.className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
                 }else{
-                    statusEl.innerText=`${(softCap-todayHours).toFixed(1)} hrs remaining today`;statusEl.className="text-xs text-slate-400 font-medium";
+                    statusEl.innerText=`${formatHours(softCap-todayHours)} hrs remaining today`;statusEl.className="text-xs text-slate-400 font-medium";
                     badge.innerText="2.0h Base";badge.className="text-[10px] font-semibold text-slate-500";notice?.classList.add('hidden');
                     yieldPill.innerText="⚡ Standard";yieldPill.className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
                 }
