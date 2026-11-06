@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AUREUM — Shared Ledger</title>
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#0a0c10">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AUREUM">
@@ -15,25 +15,61 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
-        :root{--bg-main:#0f172a;--card-bg:rgba(15,23,42,0.92);--card-border:rgba(255,255,255,0.08);--accent-primary:#f59e0b;--accent-secondary:#fef08a;--accent-primary-hover:#d97706;--accent-primary-text:#020617;--accent-glow:rgba(245,158,11,0.28)}
-        body[data-theme="gold"]{--bg-main:#0f172a;--card-bg:rgba(15,23,42,0.92);--card-border:rgba(255,255,255,0.08);--accent-primary:#f59e0b;--accent-secondary:#fef08a;--accent-primary-hover:#d97706;--accent-primary-text:#020617;--accent-glow:rgba(245,158,11,0.28)}
-        body[data-theme="rose"]{--bg-main:#180e15;--card-bg:rgba(30,16,26,0.92);--card-border:rgba(244,114,182,0.18);--accent-primary:#f472b6;--accent-secondary:#fef08a;--accent-primary-hover:#e11d48;--accent-primary-text:#020617;--accent-glow:rgba(244,114,182,0.35)}
-        body[data-theme="emerald"]{--bg-main:#061814;--card-bg:rgba(10,32,27,0.92);--card-border:rgba(16,185,129,0.18);--accent-primary:#10b981;--accent-secondary:#06b6d4;--accent-primary-hover:#059669;--accent-primary-text:#020617;--accent-glow:rgba(16,185,129,0.35)}
-        body[data-theme="cyber"]{--bg-main:#0b0f19;--card-bg:rgba(15,20,34,0.92);--card-border:rgba(168,85,247,0.2);--accent-primary:#a855f7;--accent-secondary:#ec4899;--accent-primary-hover:#9333ea;--accent-primary-text:#ffffff;--accent-glow:rgba(168,85,247,0.4)}
-        body[data-theme="sunset"]{--bg-main:#1a100c;--card-bg:rgba(34,20,15,0.92);--card-border:rgba(249,115,22,0.2);--accent-primary:#f97316;--accent-secondary:#facc15;--accent-primary-hover:#ea580c;--accent-primary-text:#020617;--accent-glow:rgba(249,115,22,0.35)}
-        body[data-theme="amethyst"]{--bg-main:#120d1d;--card-bg:rgba(22,16,36,0.92);--card-border:rgba(192,132,252,0.2);--accent-primary:#c084fc;--accent-secondary:#818cf8;--accent-primary-hover:#a855f7;--accent-primary-text:#020617;--accent-glow:rgba(192,132,252,0.35)}
-        body[data-theme="ocean"]{--bg-main:#0b1920;--card-bg:rgba(12,28,36,0.92);--card-border:rgba(20,184,166,0.2);--accent-primary:#14b8a6;--accent-secondary:#38bdf8;--accent-primary-hover:#0d9488;--accent-primary-text:#020617;--accent-glow:rgba(20,184,166,0.35)}
-        body[data-theme="crimson"]{--bg-main:#1a0c0e;--card-bg:rgba(34,14,17,0.92);--card-border:rgba(239,68,68,0.2);--accent-primary:#ef4444;--accent-secondary:#f59e0b;--accent-primary-hover:#dc2626;--accent-primary-text:#ffffff;--accent-glow:rgba(239,68,68,0.4)}
-        body[data-theme="matcha"]{--bg-main:#121813;--card-bg:rgba(20,28,22,0.92);--card-border:rgba(132,204,22,0.2);--accent-primary:#84cc16;--accent-secondary:#fde047;--accent-primary-hover:#65a30d;--accent-primary-text:#020617;--accent-glow:rgba(132,204,22,0.35)}
-        body[data-theme="monochrome"]{--bg-main:#121212;--card-bg:rgba(24,24,24,0.92);--card-border:rgba(255,255,255,0.12);--accent-primary:#e2e8f0;--accent-secondary:#38bdf8;--accent-primary-hover:#cbd5e1;--accent-primary-text:#0f172a;--accent-glow:rgba(226,232,240,0.3)}
+        :root{--bg-dim-base:#0a0c10;--bg-main:#0a0c10;--card-bg:#141720;--card-border:rgba(255,255,255,0.08);--accent-primary:#f59e0b;--accent-secondary:#fef08a;--accent-primary-hover:#d97706;--accent-primary-text:#020617;--accent-glow:rgba(245,158,11,0.28)}
+        body[data-theme="gold"]{--bg-main:#0a0c10;--card-bg:#141720;--card-border:rgba(255,255,255,0.08);--accent-primary:#f59e0b;--accent-secondary:#fef08a;--accent-primary-hover:#d97706;--accent-primary-text:#020617;--accent-glow:rgba(245,158,11,0.28)}
+        body[data-theme="rose"]{--bg-main:#140a10;--card-bg:#1f121a;--card-border:rgba(244,114,182,0.18);--accent-primary:#f472b6;--accent-secondary:#fef08a;--accent-primary-hover:#e11d48;--accent-primary-text:#020617;--accent-glow:rgba(244,114,182,0.35)}
+        body[data-theme="emerald"]{--bg-main:#04120f;--card-bg:#0d1c18;--card-border:rgba(16,185,129,0.18);--accent-primary:#10b981;--accent-secondary:#06b6d4;--accent-primary-hover:#059669;--accent-primary-text:#020617;--accent-glow:rgba(16,185,129,0.35)}
+        body[data-theme="cyber"]{--bg-main:#070a14;--card-bg:#101524;--card-border:rgba(168,85,247,0.2);--accent-primary:#a855f7;--accent-secondary:#ec4899;--accent-primary-hover:#9333ea;--accent-primary-text:#ffffff;--accent-glow:rgba(168,85,247,0.4)}
+        body[data-theme="sunset"]{--bg-main:#140b08;--card-bg:#211410;--card-border:rgba(249,115,22,0.2);--accent-primary:#f97316;--accent-secondary:#facc15;--accent-primary-hover:#ea580c;--accent-primary-text:#020617;--accent-glow:rgba(249,115,22,0.35)}
+        body[data-theme="amethyst"]{--bg-main:#0e0917;--card-bg:#171124;--card-border:rgba(192,132,252,0.2);--accent-primary:#c084fc;--accent-secondary:#818cf8;--accent-primary-hover:#a855f7;--accent-primary-text:#020617;--accent-glow:rgba(192,132,252,0.35)}
+        body[data-theme="ocean"]{--bg-main:#071217;--card-bg:#0f1d24;--card-border:rgba(20,184,166,0.2);--accent-primary:#14b8a6;--accent-secondary:#38bdf8;--accent-primary-hover:#0d9488;--accent-primary-text:#020617;--accent-glow:rgba(20,184,166,0.35)}
+        body[data-theme="crimson"]{--bg-main:#14080a;--card-bg:#211013;--card-border:rgba(239,68,68,0.2);--accent-primary:#ef4444;--accent-secondary:#f59e0b;--accent-primary-hover:#dc2626;--accent-primary-text:#ffffff;--accent-glow:rgba(239,68,68,0.4)}
+        body[data-theme="matcha"]{--bg-main:#0d120e;--card-bg:#151f16;--card-border:rgba(132,204,22,0.2);--accent-primary:#84cc16;--accent-secondary:#fde047;--accent-primary-hover:#65a30d;--accent-primary-text:#020617;--accent-glow:rgba(132,204,22,0.35)}
+        body[data-theme="monochrome"]{--bg-main:#0a0a0a;--card-bg:#171717;--card-border:rgba(255,255,255,0.12);--accent-primary:#e2e8f0;--accent-secondary:#38bdf8;--accent-primary-hover:#cbd5e1;--accent-primary-text:#0f172a;--accent-glow:rgba(226,232,240,0.3)}
         body[data-cursor="gold"]{cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><polygon points='3,3 21,11 13,13 11,21' fill='%23f59e0b' stroke='%23020617' stroke-width='1.5'/></svg>"),auto}
         body[data-cursor="sparkle"]{cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M12,2 L14.5,9.5 L22,12 L14.5,14.5 L12,22 L9.5,14.5 L2,12 L9.5,9.5 Z' fill='%2338bdf8' stroke='%23020617' stroke-width='1.5'/></svg>"),auto}
         body[data-cursor="quill"]{cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M2,22 L8,20 L20,4 C20,4 22,2 18,2 C14,2 12,4 12,4 L4,16 Z' fill='%23c084fc' stroke='%23020617' stroke-width='1.5'/></svg>"),auto}
         body[data-cursor="crosshair"]{cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><circle cx='12' cy='12' r='8' fill='none' stroke='%2310b981' stroke-width='2'/><circle cx='12' cy='12' r='2' fill='%2310b981'/><line x1='12' y1='2' x2='12' y2='6' stroke='%2310b981' stroke-width='2'/><line x1='12' y1='18' x2='12' y2='22' stroke='%2310b981' stroke-width='2'/><line x1='2' y1='12' x2='6' y2='12' stroke='%2310b981' stroke-width='2'/><line x1='18' y1='12' x2='22' y2='12' stroke='%2310b981' stroke-width='2'/></svg>") 12 12,crosshair}
-        body{background-color:var(--bg-main);color:#f8fafc;font-family:system-ui,-apple-system,sans-serif;transition:background-color 0.3s;-webkit-tap-highlight-color:transparent}
+        body{background-color:var(--bg-main)!important;color:#f8fafc;font-family:system-ui,-apple-system,sans-serif;transition:background-color 0.3s;-webkit-tap-highlight-color:transparent}
         button,input,select{touch-action:manipulation}
-        .card{position:relative;background:var(--card-bg);border:1px solid var(--card-border);box-shadow:0 8px 32px 0 rgba(0,0,0,0.3);transition:box-shadow 0.25s,border-color 0.3s,transform 0.2s;will-change:transform;transform:translateZ(0)}
-        .card:hover{box-shadow:0 12px 36px -8px var(--accent-glow);border-color:rgba(255,255,255,0.18)}
+        
+        /* 100% Solid Cards & Squircles - No Transparency Leak */
+        .card, .glass-card, .hud-card {
+            position:relative;
+            background-color:var(--card-bg)!important;
+            opacity:1!important;
+            backdrop-filter:none!important;
+            -webkit-backdrop-filter:none!important;
+            border:1px solid var(--card-border)!important;
+            box-shadow:0 8px 32px 0 rgba(0,0,0,0.4);
+            transition:box-shadow 0.25s,border-color 0.3s,transform 0.2s;
+            will-change:transform;
+            transform:translateZ(0)
+        }
+        .card:hover{box-shadow:0 12px 36px -8px var(--accent-glow);border-color:rgba(255,255,255,0.18)!important}
+
+        /* Duo HUD Squircle Profile Avatars */
+        .profile-avatar, .hud-avatar, img[id^="hud-avatar-"] {
+            width: 56px !important;
+            height: 56px !important;
+            border-radius: 16px !important;
+            object-fit: cover !important;
+            border: 2px solid rgba(255, 255, 255, 0.15) !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        }
+
+        /* Scroll-locked Task Viewports */
+        #pomo-active-tasks-list, .hourglass-task-scroll, #todo-active-list, #todo-completed-list {
+            max-height: 300px !important;
+            overflow-y: auto !important;
+            padding-right: 4px;
+        }
+        #pomo-active-tasks-list::-webkit-scrollbar, .hourglass-task-scroll::-webkit-scrollbar { width: 5px }
+        #pomo-active-tasks-list::-webkit-scrollbar-thumb, .hourglass-task-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 4px;
+        }
+
         .tab-btn{color:#94a3b8;background-color:transparent;border:1px solid transparent;transition:all 0.2s;user-select:none}
         .tab-btn:hover{color:#f8fafc;background-color:rgba(255,255,255,0.06)}
         .tab-btn.active{background:linear-gradient(135deg,rgba(245,158,11,0.2) 0%,rgba(254,240,138,0.08) 100%)!important;color:var(--accent-primary)!important;border-color:var(--accent-primary)!important;font-weight:700;box-shadow:0 0 14px var(--accent-glow)}
@@ -43,9 +79,9 @@
         .logo-gold{background:linear-gradient(135deg,var(--accent-primary) 0%,var(--accent-secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:0.25em;text-shadow:0 0 16px var(--accent-glow)}
         .gauge-circle{transition:stroke-dashoffset 0.8s ease-in-out,stroke 0.3s}
         .hud-card{transition:all 0.3s ease;user-select:none}
-        .hud-card.active-space{border-color:var(--accent-primary)!important;box-shadow:0 0 22px var(--accent-glow);background:linear-gradient(135deg,rgba(15,23,42,0.95) 0%,rgba(30,41,59,0.9) 100%)}
-        .hud-card.view-space{border-color:rgba(148,163,184,0.2);opacity:0.85}
-        .hud-card.view-space:hover{opacity:1;border-color:rgba(255,255,255,0.3)}
+        .hud-card.active-space{border-color:var(--accent-primary)!important;box-shadow:0 0 22px var(--accent-glow);background:var(--card-bg)!important}
+        .hud-card.view-space{border-color:rgba(148,163,184,0.2)!important;opacity:0.85}
+        .hud-card.view-space:hover{opacity:1;border-color:rgba(255,255,255,0.3)!important}
         .presence-pulse{animation:pulseGlow 2s infinite}
         @keyframes pulseGlow{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.85)}}
         .status-preset-btn{transition:all 0.2s ease;user-select:none}
@@ -60,7 +96,7 @@
         .badge-tier-silver{border-color:#38bdf8!important;box-shadow:0 0 14px rgba(56,189,248,0.25)}
         .badge-tier-gold{border-color:#f59e0b!important;box-shadow:0 0 16px rgba(245,158,11,0.35)}
         .badge-tier-titan{border-color:#10b981!important;box-shadow:0 0 18px rgba(16,185,129,0.4)}
-        .badge-tier-aureum{border-color:#a855f7!important;box-shadow:0 0 22px rgba(168,85,247,0.5);background:linear-gradient(135deg,rgba(30,41,59,0.9) 0%,rgba(88,28,135,0.25) 100%)}
+        .badge-tier-aureum{border-color:#a855f7!important;box-shadow:0 0 22px rgba(168,85,247,0.5)}
         #badge-toast-container{position:fixed;bottom:1.5rem;left:1.5rem;z-index:100;display:flex;flex-direction:column;gap:0.75rem;pointer-events:none}
         .badge-toast{pointer-events:auto;animation:toastSlideIn 0.35s cubic-bezier(0.16,1,0.3,1) forwards;transition:opacity 0.5s ease,transform 0.5s ease;will-change:transform,opacity}
         .badge-toast.toast-hiding{opacity:0!important;transform:translateY(20px) scale(0.9)!important}
@@ -68,8 +104,7 @@
         .todo-item{transition:all 0.2s ease-out}
         .todo-item:hover{border-color:var(--card-border);transform:translateX(2px)}
         .todo-item.done{opacity:0.5;text-decoration:line-through}
-        /* Dynamic Theme-Aware Sticky Navigation Bar */
-        nav.sticky-theme-nav{background-color:var(--bg-main);opacity:0.95;backdrop-filter:blur(12px);border-bottom:1px solid var(--card-border)}
+        nav.sticky-theme-nav{background-color:var(--bg-main);opacity:0.98;border-bottom:1px solid var(--card-border)}
     </style>
 </head>
 <body data-theme="gold" data-cursor="default" class="p-3 sm:p-4 md:p-8 max-w-6xl mx-auto relative min-h-screen">
@@ -108,7 +143,6 @@
                 <button onclick="closeStatusPicker()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-1">✕</button>
             </div>
 
-            <!-- PRESET CATEGORY GRID -->
             <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
                 <div>
                     <div class="text-[11px] font-extrabold text-amber-400 uppercase tracking-wider mb-2">⚡ Work</div>
@@ -159,7 +193,7 @@
 
     <!-- MAIN APP CONTENT -->
     <div id="app-content" class="hidden">
-        <!-- SPATIAL OPTIMIZED DUO PLAYER HERO HUD HEADER -->
+        <!-- DUO PLAYER HERO HUD HEADER -->
         <header class="flex flex-col lg:flex-row justify-between items-stretch mb-5 pb-4 border-b border-slate-800/80 gap-4">
             <div class="flex items-center justify-between lg:w-auto shrink-0">
                 <div>
@@ -172,13 +206,12 @@
                 </div>
             </div>
 
-            <!-- ENHANCED SPATIAL DUO HUD CARDS (UTILIZING HORIZONTAL SPACE EFFICIENTLY) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 flex-1">
                 <!-- NORTH HERO CARD -->
                 <div id="hud-card-north" onclick="switchActiveUser('North')" class="hud-card card p-3 sm:p-3.5 rounded-2xl border flex items-center gap-3 sm:gap-4 relative overflow-hidden group cursor-pointer justify-between">
                     <div class="flex items-center gap-3 min-w-0">
                         <div class="relative shrink-0">
-                            <img id="hud-avatar-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-slate-900 border-2 border-slate-700 object-cover transition-all">
+                            <img id="hud-avatar-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="hud-avatar border-2 border-slate-700 object-cover transition-all">
                             <span id="hud-presence-dot-north" class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md"></span>
                         </div>
                         <div class="min-w-0 space-y-0.5">
@@ -201,7 +234,7 @@
                 <div id="hud-card-cream" onclick="switchActiveUser('Cream')" class="hud-card card p-3 sm:p-3.5 rounded-2xl border flex items-center gap-3 sm:gap-4 relative overflow-hidden group cursor-pointer justify-between">
                     <div class="flex items-center gap-3 min-w-0">
                         <div class="relative shrink-0">
-                            <img id="hud-avatar-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-slate-900 border-2 border-slate-700 object-cover transition-all">
+                            <img id="hud-avatar-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="hud-avatar border-2 border-slate-700 object-cover transition-all">
                             <span id="hud-presence-dot-cream" class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md"></span>
                         </div>
                         <div class="min-w-0 space-y-0.5">
@@ -227,7 +260,7 @@
             </div>
         </header>
 
-        <!-- STICKY TOP NAVIGATION BAR (ADAPTS TO CURRENT THEME) -->
+        <!-- STICKY NAVIGATION BAR -->
         <nav class="sticky top-0 z-40 sticky-theme-nav -mx-3 px-3 sm:-mx-4 sm:px-4 md:-mx-8 md:px-8 py-2.5 mb-6 flex items-center gap-2 overflow-x-auto no-scrollbar transition-colors duration-300">
             <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap"><span>⚗️</span> <span>Crucible</span></button>
             <button onclick="switchTab('hourglass')" id="nav-hourglass" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⏳</span> <span>Hourglass</span></button>
@@ -363,11 +396,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                     <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800/80">
                         <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Pending</div>
-                        <div id="todo-active-list" class="space-y-2 max-h-[280px] overflow-y-auto pr-1"></div>
+                        <div id="todo-active-list" class="space-y-2 pr-1"></div>
                     </div>
                     <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800/80">
                         <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Done</div>
-                        <div id="todo-completed-list" class="space-y-2 max-h-[280px] overflow-y-auto pr-1"></div>
+                        <div id="todo-completed-list" class="space-y-2 pr-1"></div>
                     </div>
                 </div>
             </div>
@@ -393,13 +426,12 @@
             </div>
         </div>
 
-        <!-- TAB 2: HOURGLASS (EFFICIENT MULTI-COLUMN LAYOUT) -->
+        <!-- TAB 2: HOURGLASS -->
         <div id="tab-hourglass" class="hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 
-                <!-- PRIMARY FOCUS COLUMN (7 COLS) -->
+                <!-- PRIMARY FOCUS COLUMN -->
                 <div class="lg:col-span-7 space-y-6">
-                    <!-- UNLOGGED FOCUS EXPORT CARD -->
                     <div id="pomo-unlogged-card" class="card p-4 rounded-xl space-y-3 border border-emerald-500/30 bg-emerald-950/20 shadow-lg">
                         <div class="flex items-center justify-between">
                             <div>
@@ -478,9 +510,9 @@
                     </div>
 
                     <!-- SUBORDINATE TIMER AUDIO CONTROLS -->
-                    <div class="card p-4 rounded-xl border border-slate-800 space-y-3">
+                    <div id="audioSettingsCard" class="card p-4 rounded-xl border border-slate-800 space-y-3">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5"><span>🔔</span> <span>Timer Audio</span></span>
+                            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5"><span>🔔</span> <span>Timer Audio Engine</span></span>
                             <button type="button" onclick="previewPomoSound()" class="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[11px] rounded-lg transition-all flex items-center gap-1">
                                 <span>🔊</span> <span>Test Sound</span>
                             </button>
@@ -511,7 +543,7 @@
                     </div>
                 </div>
 
-                <!-- CONTEXT & TASK COLUMN (5 COLS) -->
+                <!-- CONTEXT & TASK COLUMN -->
                 <div class="lg:col-span-5 space-y-6">
                     <!-- INTEGRATED FOCUS TASKS PANEL -->
                     <div class="card p-5 rounded-xl space-y-4 border border-slate-800">
@@ -523,7 +555,7 @@
                             <input type="text" id="pomo-quick-todo-input" placeholder="Quick task for this session..." class="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                             <button type="submit" class="theme-accent-bg font-bold px-3 py-2 rounded-xl text-xs transition-all shadow-md">+ Add</button>
                         </form>
-                        <div id="pomo-active-tasks-list" class="space-y-2 max-h-[340px] overflow-y-auto pr-1"></div>
+                        <div id="pomo-active-tasks-list" class="space-y-2 pr-1"></div>
                     </div>
 
                     <!-- QUICK TIMER PRESETS BOX -->
@@ -553,7 +585,7 @@
             </div>
         </div>
 
-        <!-- TAB 3: SANCTUARY (STRICTLY PHYSICAL LOGS: FITNESS, CHORES, SNACKS & TRENDS) -->
+        <!-- TAB 3: SANCTUARY -->
         <div id="tab-sanctuary" class="hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                 <div id="workout-form-card" class="card p-6 rounded-xl flex flex-col justify-between relative min-h-[260px]">
@@ -641,7 +673,7 @@
             </div>
         </div>
 
-        <!-- TAB 4: CHRONICLES (POWER METER + DAILY REFLECTION + HISTORY LEDGERS) -->
+        <!-- TAB 4: CHRONICLES -->
         <div id="tab-chronicles" class="hidden space-y-6">
             <div class="card p-6 rounded-xl border border-slate-700/80 space-y-3">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -665,7 +697,7 @@
                 </div>
             </div>
 
-            <!-- DAILY REFLECTION JOURNAL (INTEGRATED INTO CHRONICLES) -->
+            <!-- DAILY REFLECTION JOURNAL -->
             <div id="diary-form-card" class="card p-6 rounded-xl border border-slate-800">
                 <div class="flex justify-between items-center mb-2">
                     <h2 class="text-lg font-semibold text-slate-200 flex items-center gap-2"><span>✍️</span> <span>Reflection</span></h2>
@@ -731,7 +763,7 @@
             </div>
         </div>
 
-        <!-- TAB 6: FORGE SETTINGS (APPEARANCE, BACKGROUND PATTERNS & GOALS) -->
+        <!-- TAB 6: FORGE SETTINGS -->
         <div id="tab-forge" class="hidden space-y-6">
             <form onsubmit="saveAllForgeSettings(event)" class="space-y-6 max-w-2xl">
                 <div class="card p-6 rounded-xl">
@@ -765,7 +797,7 @@
                             </div>
                         </div>
 
-                        <!-- BACKGROUND PATTERN & OPACITY CONTROLS -->
+                        <!-- BACKGROUND PATTERN CONTROLS -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1 border-t border-slate-800">
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1 font-medium">Background Canvas Pattern</label>
@@ -775,6 +807,8 @@
                                     <option value="grid">Blueprint Grid Lines</option>
                                     <option value="hex">Geometric Hex Mesh</option>
                                     <option value="stars">Celestial Stars</option>
+                                    <option value="isometric">Isometric Hex Grid</option>
+                                    <option value="starfield">Deep Space Starfield</option>
                                     <option value="diagonal">Diagonal Crosshatch</option>
                                 </select>
                             </div>
@@ -1016,20 +1050,20 @@
             if(activeCount>0){requestAnimationFrame(animateParticles)}else{isFxAnimating=false}
         }
 
-        // BACKGROUND PATTERN CANVAS ENGINE
+        // BACKGROUND PATTERN CANVAS ENGINE (ESCAPED SVG URIs FIX)
         function applyBackgroundPattern(pattern, opacity){
             const layer=$('bg-pattern-layer');if(!layer)return;
             const op=(opacity??20)/100;
             layer.style.opacity=op;
             let bgStyle='';
-            if(pattern==='dots'){
-                bgStyle='radial-gradient(rgba(255, 255, 255, 0.22) 1.5px, transparent 1.5px) 0 0 / 24px 24px';
-            }else if(pattern==='grid'){
-                bgStyle='linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px); background-size: 32px 32px';
-            }else if(pattern==='hex'){
-                bgStyle=`url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'><path fill='none' stroke='rgba(255,255,255,0.18)' stroke-width='1' d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15zM0 0l13.99 8.07L28 0'/></svg>")`;
-            }else if(pattern==='stars'){
-                bgStyle=`url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'><circle cx='10' cy='10' r='1.2' fill='rgba(255,255,255,0.3)'/><circle cx='40' cy='25' r='1.8' fill='rgba(255,255,255,0.25)'/><circle cx='25' cy='50' r='1' fill='rgba(255,255,255,0.35)'/><circle cx='55' cy='45' r='1.2' fill='rgba(255,255,255,0.2)'/></svg>")`;
+            if(pattern==='dots' || pattern==='dotmatrix'){
+                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='2' fill='%23ffffff' opacity='0.35'/%3E%3C/svg%3E")`;
+            }else if(pattern==='grid' || pattern==='blueprint'){
+                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='%236366f1' stroke-width='1'%3E%3Cpath d='M0 10h40M0 20h40M0 30h40M10 0v40M20 0v40M30 0v40' stroke-dasharray='2 2' opacity='0.3'/%3E%3Crect x='0' y='0' width='40' height='40' stroke-width='1' opacity='0.6'/%3E%3C/g%3E%3C/svg%3E")`;
+            }else if(pattern==='hex' || pattern==='isometric'){
+                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='104' viewBox='0 0 60 104'%3E%3Cpath d='M30 0l30 17.32v34.64L30 69.28 0 51.96V17.32zm0 104l30-17.32V51.96L30 34.64 0 51.96v34.64z' fill='none' stroke='%23818cf8' stroke-width='1' opacity='0.25'/%3E%3C/svg%3E")`;
+            }else if(pattern==='stars' || pattern==='starfield'){
+                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='10' cy='10' r='1' fill='%23ffffff' opacity='0.4'/%3E%3Ccircle cx='50' cy='30' r='1.5' fill='%23818cf8' opacity='0.6'/%3E%3Ccircle cx='20' cy='60' r='1.2' fill='%236366f1' opacity='0.5'/%3E%3C/svg%3E")`;
             }else if(pattern==='diagonal'){
                 bgStyle='repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05) 10px, transparent 10px, transparent 20px)';
             }
@@ -1044,7 +1078,19 @@
             if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({bgPattern:pattern,bgOpacity:opacity},{merge:true});
         }
 
-        // SYNTHESIZER SOUND ENGINE
+        // SYNTHESIZER SOUND ENGINE (INSTANT LATENCY AUDIO CONTEXT)
+        let globalAudioCtx = null;
+        function getAudioContext() {
+            if (!globalAudioCtx) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                globalAudioCtx = new AudioCtx();
+            }
+            if (globalAudioCtx.state === 'suspended') {
+                globalAudioCtx.resume();
+            }
+            return globalAudioCtx;
+        }
+
         function playSingleToneBurst(key,c,now){
             const k=key||userSettings.pomoSound||'zen_bowl';
             if(k==='zen_bowl'){
@@ -1117,8 +1163,7 @@
         function playPomoSound(key,overrideRepeats){
             if(audioMuted)return;
             try{
-                const AudioCtx=window.AudioContext||window.webkitAudioContext;
-                const c=new AudioCtx(),k=key||userSettings.pomoSound||'zen_bowl';
+                const c=getAudioContext(),k=key||userSettings.pomoSound||'zen_bowl';
                 const repeats=overrideRepeats??parseInt(userSettings.pomoSoundRepeats??3);
                 const gapDuration=3.2;
                 for(let r=0;r<repeats;r++){
@@ -1272,7 +1317,7 @@
         function playTone(type){
             if(audioMuted)return;
             try{
-                const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();
+                const c=getAudioContext(),o=c.createOscillator(),g=c.createGain();
                 o.connect(g);g.connect(c.destination);o.type='sine';
                 o.frequency.setValueAtTime(type==='save'?600:(type==='delete'?400:880),c.currentTime);
                 if(type==='save')o.frequency.exponentialRampToValueAtTime(1200,c.currentTime+0.1);
