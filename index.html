@@ -1566,6 +1566,8 @@
             let ticks=0;
             myPomoInterval=setInterval(()=>{
                 if(!myPomoIsRunning || !myPomoEndTime)return;
+                
+                // Fixes the drift by calculating exact remaining time from wall-clock time
                 myPomoTime = Math.max(0, Math.ceil((myPomoEndTime - Date.now()) / 1000));
                 ticks++;
                 if(ticks>=4){syncMyPomoToCloud();ticks=0}
@@ -1580,7 +1582,7 @@
                         userSettings.unloggedFocusSecs=(userSettings.unloggedFocusSecs||0)+myPomoInitialTime;
                         updateUnloggedFocusDisplay();
                         db.collection('settings').doc(loggedInUser).set({unloggedFocusSecs:userSettings.unloggedFocusSecs},{merge:true});
-
+    
                         evaluateBadges(currentRawLogsCache,userSettings.completedPomoHistory,loggedInUser);
                         if(myPomoRound<totalRounds){triggerDesktopNotification("✨ Round Complete!",`Round ${myPomoRound} finished.`);myPomoRound++;setMyPomoMode('short')}
                         else{triggerDesktopNotification("🎉 All Rounds Complete!",`All ${totalRounds} rounds finished!`);myPomoRound=1;setMyPomoMode('long')}
@@ -1646,14 +1648,22 @@
             const f=parseInt(userSettings.pomoFocus)||25,s=parseInt(userSettings.pomoShort)||5,l=parseInt(userSettings.pomoLong)||15;
             myPomoInitialTime=(mode==='focus'?f:(mode==='short'?s:l))*60;myPomoTime=myPomoInitialTime;syncMyPomoToCloud();
         }
-
-        function handleUserSelectPomoMode(m){if(loggedInUser===viewedUser)setMyPomoMode(m)}
+        // Fixes tab switching freeze / background sleeping
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && myPomoIsRunning && myPomoEndTime) {
+                myPomoTime = Math.max(0, Math.ceil((myPomoEndTime - Date.now()) / 1000));
+            }
+        });
+    
         function toggleMyPomoTimer(){
             if(loggedInUser!==viewedUser)return;requestNotificationPermission();
             if(myPomoIsRunning){
                 myPomoIsRunning=false;currentSessionWasPaused=true;myPomoEndTime=null;clearInterval(myPomoInterval);
             }else{
-                myPomoIsRunning=true;myPomoEndTime=Date.now()+(myPomoTime*1000);startMyPomoBackgroundTimer();
+                myPomoIsRunning=true;
+                // Sets absolute end time target using current real system time millis
+                myPomoEndTime = Date.now() + (myPomoTime * 1000);
+                startMyPomoBackgroundTimer();
             }
             syncMyPomoToCloud();
         }
