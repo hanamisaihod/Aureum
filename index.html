@@ -70,7 +70,7 @@
         .todo-item.done{opacity:0.5;text-decoration:line-through}
     </style>
 </head>
-<body data-theme="gold" data-cursor="default" class="p-4 md:p-8 max-w-6xl mx-auto relative min-h-screen">
+<body data-theme="gold" data-cursor="default" class="p-3 sm:p-4 md:p-8 max-w-6xl mx-auto relative min-h-screen">
     <canvas id="fx-canvas" class="fixed inset-0 pointer-events-none z-[200]"></canvas>
 
     <!-- LOGIN MODAL -->
@@ -154,12 +154,12 @@
 
     <!-- MAIN APP CONTENT -->
     <div id="app-content" class="hidden">
-        <!-- PROMINENT DUO PLAYER HERO HUD HEADER -->
-        <header class="flex flex-col lg:flex-row justify-between items-center mb-6 pb-6 border-b border-slate-700/80 gap-6">
+        <!-- COMPACT DUO PLAYER HERO HUD HEADER -->
+        <header class="flex flex-col lg:flex-row justify-between items-center mb-4 pb-4 border-b border-slate-800 gap-4">
             <div class="flex items-center justify-between w-full lg:w-auto">
                 <div>
-                    <h1 class="text-3xl font-black logo-gold uppercase">AUREUM</h1>
-                    <p class="text-xs text-slate-400 tracking-wide mt-0.5">Shared Ledger</p>
+                    <h1 class="text-2xl sm:text-3xl font-black logo-gold uppercase tracking-widest">AUREUM</h1>
+                    <p class="text-[11px] text-slate-400 tracking-wide">Shared Ledger</p>
                 </div>
                 <div class="flex items-center gap-2 lg:hidden">
                     <button onclick="toggleAudioMute()" id="audio-toggle-btn-mobile" class="text-xs text-slate-400 p-2 bg-slate-800 rounded-lg border border-slate-700">🔊</button>
@@ -167,60 +167,61 @@
                 </div>
             </div>
 
-            <!-- PROMINENT DUO HUD CARDS -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full lg:w-auto flex-1 max-w-2xl">
+            <!-- COMPACT RESPONSIVE DUO HUD CARDS -->
+            <div class="grid grid-cols-2 gap-2.5 sm:gap-4 w-full lg:w-auto flex-1 max-w-2xl">
                 <!-- NORTH HERO CARD -->
-                <div id="hud-card-north" onclick="switchActiveUser('North')" class="hud-card card p-3.5 rounded-2xl border flex items-center gap-3.5 relative overflow-hidden group cursor-pointer">
+                <div id="hud-card-north" onclick="switchActiveUser('North')" class="hud-card card p-2.5 sm:p-3 rounded-xl border flex items-center gap-2.5 sm:gap-3.5 relative overflow-hidden group cursor-pointer">
                     <div class="relative shrink-0">
-                        <img id="hud-avatar-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="w-14 h-14 rounded-full bg-slate-900 border-2 border-slate-700 object-cover transition-all">
-                        <span id="hud-presence-dot-north" class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md"></span>
+                        <img id="hud-avatar-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-slate-700 object-cover transition-all">
+                        <span id="hud-presence-dot-north" class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md"></span>
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between gap-1">
-                            <span class="font-bold text-sm text-slate-100 flex items-center gap-1.5">North <span id="hud-badge-north" class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">ACTIVE</span></span>
-                            <span id="hud-pwr-north" class="text-[11px] font-mono font-bold text-amber-400">0 PWR</span>
+                            <span class="font-bold text-xs sm:text-sm text-slate-100 flex items-center gap-1">North <span id="hud-badge-north" class="text-[9px] sm:text-[10px] font-extrabold px-1 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">ACTIVE</span></span>
+                            <span id="hud-pwr-north" class="text-[10px] sm:text-[11px] font-mono font-bold text-amber-400">0 PWR</span>
                         </div>
-                        <div id="hud-status-north" onclick="editUserStatusNote('North', event)" class="text-[11px] text-slate-400 truncate mt-0.5 hover:text-amber-300 transition-colors cursor-pointer" title="Status">Drawing 🎨</div>
-                        <div class="flex items-center justify-between text-[10px] text-slate-400 mt-1.5 pt-1 border-t border-slate-800/80">
+                        <div id="hud-status-north" onclick="editUserStatusNote('North', event)" class="text-[10px] sm:text-[11px] text-slate-400 truncate hover:text-amber-300 transition-colors cursor-pointer" title="Status">Drawing 🎨</div>
+                        <div class="flex items-center justify-between text-[9px] sm:text-[10px] text-slate-400 mt-1 pt-0.5 border-t border-slate-800/80">
                             <span id="hud-hours-north" class="font-mono">0.0 / 4.0h</span>
-                            <span id="hud-pomo-north" class="text-emerald-400 font-semibold truncate max-w-[120px]">Idle</span>
+                            <span id="hud-pomo-north" class="text-emerald-400 font-semibold truncate max-w-[90px] sm:max-w-[120px]">Idle</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- CREAM HERO CARD -->
-                <div id="hud-card-cream" onclick="switchActiveUser('Cream')" class="hud-card card p-3.5 rounded-2xl border flex items-center gap-3.5 relative overflow-hidden group cursor-pointer">
+                <div id="hud-card-cream" onclick="switchActiveUser('Cream')" class="hud-card card p-2.5 sm:p-3 rounded-xl border flex items-center gap-2.5 sm:gap-3.5 relative overflow-hidden group cursor-pointer">
                     <div class="relative shrink-0">
-                        <img id="hud-avatar-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="w-14 h-14 rounded-full bg-slate-900 border-2 border-slate-700 object-cover transition-all">
-                        <span id="hud-presence-dot-cream" class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md"></span>
+                        <img id="hud-avatar-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-slate-700 object-cover transition-all">
+                        <span id="hud-presence-dot-cream" class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md"></span>
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between gap-1">
-                            <span class="font-bold text-sm text-slate-100 flex items-center gap-1.5">Cream <span id="hud-badge-cream" class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase">VIEW</span></span>
-                            <span id="hud-pwr-cream" class="text-[11px] font-mono font-bold text-amber-400">0 PWR</span>
+                            <span class="font-bold text-xs sm:text-sm text-slate-100 flex items-center gap-1">Cream <span id="hud-badge-cream" class="text-[9px] sm:text-[10px] font-extrabold px-1 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase">VIEW</span></span>
+                            <span id="hud-pwr-cream" class="text-[10px] sm:text-[11px] font-mono font-bold text-amber-400">0 PWR</span>
                         </div>
-                        <div id="hud-status-cream" onclick="editUserStatusNote('Cream', event)" class="text-[11px] text-slate-400 truncate mt-0.5 hover:text-amber-300 transition-colors cursor-pointer" title="Status">Writing ✍️</div>
-                        <div class="flex items-center justify-between text-[10px] text-slate-400 mt-1.5 pt-1 border-t border-slate-800/80">
+                        <div id="hud-status-cream" onclick="editUserStatusNote('Cream', event)" class="text-[10px] sm:text-[11px] text-slate-400 truncate hover:text-amber-300 transition-colors cursor-pointer" title="Status">Writing ✍️</div>
+                        <div class="flex items-center justify-between text-[9px] sm:text-[10px] text-slate-400 mt-1 pt-0.5 border-t border-slate-800/80">
                             <span id="hud-hours-cream" class="font-mono">0.0 / 4.0h</span>
-                            <span id="hud-pomo-cream" class="text-emerald-400 font-semibold truncate max-w-[120px]">Idle</span>
+                            <span id="hud-pomo-cream" class="text-emerald-400 font-semibold truncate max-w-[90px] sm:max-w-[120px]">Idle</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="hidden lg:flex items-center gap-3">
-                <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-sm text-slate-400 hover:text-white px-3 py-2 bg-slate-800/80 rounded-xl border border-slate-700">🔊</button>
+                <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-xs text-slate-400 hover:text-white px-3 py-2 bg-slate-800/80 rounded-xl border border-slate-700">🔊</button>
                 <button onclick="handleLogout()" class="text-xs text-slate-400 hover:text-slate-200 px-3 py-2 bg-slate-900 rounded-xl border border-slate-800">Sign Out</button>
             </div>
         </header>
 
-        <nav class="flex items-center gap-2 mb-6 p-1.5 bg-slate-900/80 rounded-2xl border border-slate-800/90 overflow-x-auto no-scrollbar">
-            <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap"><span>⚗️</span> <span>Crucible</span></button>
-            <button onclick="switchTab('hourglass')" id="nav-hourglass" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⏳</span> <span>Hourglass</span></button>
-            <button onclick="switchTab('sanctuary')" id="nav-sanctuary" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🌿</span> <span>Sanctuary</span></button>
-            <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⚙️</span> <span>Forge</span></button>
-            <button onclick="switchTab('chronicles')" id="nav-chronicles" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>📜</span> <span>Chronicles</span></button>
-            <button onclick="switchTab('relics')" id="nav-relics" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🏺</span> <span>Relics</span></button>
+        <!-- STICKY TOP NAVIGATION BAR -->
+        <nav class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md -mx-3 px-3 sm:-mx-4 sm:px-4 md:-mx-8 md:px-8 py-2.5 mb-6 border-b border-slate-800/80 flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap"><span>⚗️</span> <span>Crucible</span></button>
+            <button onclick="switchTab('hourglass')" id="nav-hourglass" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⏳</span> <span>Hourglass</span></button>
+            <button onclick="switchTab('sanctuary')" id="nav-sanctuary" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🌿</span> <span>Sanctuary</span></button>
+            <button onclick="switchTab('chronicles')" id="nav-chronicles" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>📜</span> <span>Chronicles</span></button>
+            <button onclick="switchTab('relics')" id="nav-relics" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🏺</span> <span>Relics</span></button>
+            <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⚙️</span> <span>Forge</span></button>
         </nav>
 
         <div id="read-only-banner" class="hidden card p-3 mb-6 rounded-xl text-center text-slate-400 text-sm">
@@ -330,7 +331,7 @@
                 </form>
             </div>
 
-            <!-- TASKS -->
+            <!-- TASKS SCRATCHPAD -->
             <div id="todo-card" class="card p-6 rounded-xl space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div>
@@ -379,7 +380,7 @@
             </div>
         </div>
 
-        <!-- TAB 2: HOURGLASS -->
+        <!-- TAB 2: HOURGLASS (FOCUS TIMER + AUDIO SETTINGS + INTEGRATED ACTIVE TASKS) -->
         <div id="tab-hourglass" class="hidden space-y-6 max-w-xl mx-auto">
             <div id="pomo-unlogged-card" class="card p-4 rounded-xl space-y-3 border border-emerald-500/30 bg-emerald-950/20 shadow-lg">
                 <div class="flex items-center justify-between">
@@ -431,7 +432,7 @@
                 </div>
             </div>
 
-            <div class="card p-8 rounded-xl text-center space-y-6 shadow-xl relative">
+            <div class="card p-6 sm:p-8 rounded-xl text-center space-y-5 shadow-xl relative">
                 <div id="pomo-spectator-banner" class="hidden p-2.5 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 font-medium">
                     👁️ Viewing <strong><span id="pomo-spectator-target"></span>'s</strong> Timer (View Only)
                 </div>
@@ -444,21 +445,63 @@
                     <span class="text-xs uppercase tracking-widest theme-accent-text font-bold" id="pomo-round-badge">Round 1 of 4</span>
                     <div id="pomo-round-dots" class="flex gap-1.5 ml-2"></div>
                 </div>
-                <div id="pomo-clock-container" onclick="handleClockClick()" class="cursor-pointer group select-none py-4 my-1 rounded-2xl transition-all hover:bg-slate-800/50">
-                    <div id="pomo-timer-display" class="text-7xl font-mono font-black theme-accent-text tracking-wider group-hover:scale-105 transition-transform">25:00</div>
+                <div id="pomo-clock-container" onclick="handleClockClick()" class="cursor-pointer group select-none py-2 my-1 rounded-2xl transition-all hover:bg-slate-800/50">
+                    <div id="pomo-timer-display" class="text-6xl sm:text-7xl font-mono font-black theme-accent-text tracking-wider group-hover:scale-105 transition-transform">25:00</div>
                     <div id="pomo-status-label" class="text-xs text-slate-400 mt-2 uppercase tracking-widest font-semibold group-hover:text-amber-300">Click Timer or Press Spacebar</div>
                 </div>
                 <div class="w-full bg-slate-900/80 h-2.5 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
                     <div id="pomo-progress-bar" class="theme-accent-bg h-full rounded-full transition-all duration-1000 w-full"></div>
                 </div>
-                <div id="pomo-controls-box" class="flex justify-center gap-4 pt-2">
+                <div id="pomo-controls-box" class="flex justify-center gap-4 pt-1">
                     <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="px-8 py-2.5 rounded-lg theme-accent-bg font-bold text-sm transition-all shadow-md">Start Focus</button>
                     <button onclick="resetMyPomoTimer()" class="px-6 py-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium text-sm transition-all">Reset</button>
                 </div>
             </div>
+
+            <!-- INLINE TIMER AUDIO CONTROLS -->
+            <div class="card p-4 rounded-xl border border-slate-800 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5"><span>🔔</span> <span>Timer Audio</span></span>
+                    <button type="button" onclick="previewPomoSound()" class="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[11px] rounded-lg transition-all flex items-center gap-1">
+                        <span>🔊</span> <span>Test Sound</span>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1 font-medium">Sound Preset</label>
+                        <select id="setting-pomo-sound" onchange="handleInstantSoundChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                            <option value="zen_bowl">🥣 Zen Singing Bowl (7s)</option>
+                            <option value="brass_gong">🔔 Celestial Brass Gong (6s)</option>
+                            <option value="arpeggio_chime">✨ Ascending Crystal Chime (5s)</option>
+                            <option value="cosmic_pad">🌊 Cosmic Synth Warm Pad (6s)</option>
+                            <option value="marimba_cascade">🪵 Warm Marimba Cascade (5s)</option>
+                            <option value="harbor_bell">🏛️ Deep Harbor Sanctuary Bell (8s)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1 font-medium">Repeat Loops</label>
+                        <select id="setting-pomo-repeats" onchange="handleInstantSoundRepeatChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                            <option value="1">1x (Play once)</option>
+                            <option value="2">2x (Repeat twice)</option>
+                            <option value="3" selected>3x (Repeat 3 times)</option>
+                            <option value="4">4x (Repeat 4 times)</option>
+                            <option value="5">5x (Repeat 5 times)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INTEGRATED ACTIVE FOCUS TASKS -->
+            <div class="card p-5 rounded-xl space-y-3 border border-slate-800">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5"><span>🎯</span> <span>Active Focus Tasks</span></h3>
+                    <button onclick="switchTab('crucible')" class="text-[11px] text-amber-400 hover:underline">Manage All →</button>
+                </div>
+                <div id="pomo-active-tasks-list" class="space-y-2 max-h-[180px] overflow-y-auto pr-1"></div>
+            </div>
         </div>
 
-        <!-- TAB 3: SANCTUARY -->
+        <!-- TAB 3: SANCTUARY (STRICTLY PHYSICAL LOGS: FITNESS, CHORES, SNACKS & TRENDS) -->
         <div id="tab-sanctuary" class="hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                 <div id="workout-form-card" class="card p-6 rounded-xl flex flex-col justify-between relative min-h-[260px]">
@@ -526,20 +569,6 @@
                 </div>
             </div>
 
-            <!-- DAILY REFLECTION -->
-            <div id="diary-form-card" class="card p-6 rounded-xl">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-lg font-semibold text-slate-200">Reflection</h2>
-                    <span id="diary-status-badge" class="text-xs text-slate-400">Saved ✨</span>
-                </div>
-                <form onsubmit="saveDailyDiary(event)" class="space-y-3 relative">
-                    <textarea id="diary-text" rows="2" placeholder="What went well today? Lessons learned or ideas?" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 resize-none"></textarea>
-                    <div class="flex justify-end">
-                        <button type="submit" class="theme-accent-bg font-medium px-5 py-2 rounded-lg text-xs transition-all">Save</button>
-                    </div>
-                </form>
-            </div>
-
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div class="flex items-center gap-3">
@@ -560,7 +589,97 @@
             </div>
         </div>
 
-        <!-- TAB 4: FORGE SETTINGS -->
+        <!-- TAB 4: CHRONICLES (POWER METER + DAILY REFLECTION + HISTORY LEDGERS) -->
+        <div id="tab-chronicles" class="hidden space-y-6">
+            <div class="card p-6 rounded-xl border border-slate-700/80 space-y-3">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div class="flex items-center gap-3">
+                        <div id="power-rank-icon" class="text-3xl p-2.5 bg-slate-900/80 rounded-xl border border-slate-700/80">⚡</div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs uppercase font-extrabold tracking-widest text-slate-400">Power</span>
+                                <span id="power-rank-title" class="text-xs font-extrabold px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">Awakened Flame</span>
+                            </div>
+                            <div class="text-2xl font-black text-white mt-0.5 flex items-center gap-2">
+                                <span id="power-score-val" class="theme-accent-text font-mono">0</span>
+                                <span class="text-xs text-slate-400 font-normal">PWR</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="power-breakdown-tags" class="flex flex-wrap gap-2 text-[11px] font-semibold text-slate-300"></div>
+                </div>
+                <div class="relative w-full bg-slate-900/90 h-3.5 rounded-full overflow-hidden border border-slate-700/80 p-0.5">
+                    <div id="power-level-bar" class="power-bar-fill h-full rounded-full w-0"></div>
+                </div>
+            </div>
+
+            <!-- DAILY REFLECTION JOURNAL (INTEGRATED INTO CHRONICLES) -->
+            <div id="diary-form-card" class="card p-6 rounded-xl border border-slate-800">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-lg font-semibold text-slate-200 flex items-center gap-2"><span>✍️</span> <span>Reflection</span></h2>
+                    <span id="diary-status-badge" class="text-xs text-slate-400">Saved ✨</span>
+                </div>
+                <form onsubmit="saveDailyDiary(event)" class="space-y-3 relative">
+                    <textarea id="diary-text" rows="2" placeholder="What went well today? Lessons learned or ideas?" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 resize-none"></textarea>
+                    <div class="flex justify-end">
+                        <button type="submit" class="theme-accent-bg font-medium px-5 py-2 rounded-lg text-xs transition-all">Save</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card p-6 rounded-xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-lg font-semibold text-slate-200">History</h2>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-900/80 p-2 rounded-lg border border-slate-700">
+                        <label for="ledger-month-select" class="text-xs text-slate-400 font-medium whitespace-nowrap">Filter:</label>
+                        <select id="ledger-month-select" onchange="applyLedgerFilter()" class="bg-slate-800 border border-slate-700 rounded-md px-3 py-1 text-xs text-white focus:outline-none"></select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                            <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider">⚗️ Work</h3>
+                            <span id="ledger-count-work" class="text-[10px] text-slate-500">0 entries</span>
+                        </div>
+                        <div id="ledger-list-work" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
+                    </div>
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                            <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">🌿 Life Logs</h3>
+                            <span id="ledger-count-sanctuary" class="text-[10px] text-slate-500">0 entries</span>
+                        </div>
+                        <div id="ledger-list-sanctuary" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
+                    </div>
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                            <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider">📖 Reflections</h3>
+                            <span id="ledger-count-diary" class="text-[10px] text-slate-500">0 entries</span>
+                        </div>
+                        <div id="ledger-list-diary" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: RELICS -->
+        <div id="tab-relics" class="hidden space-y-6">
+            <div class="card p-6 rounded-xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-lg font-semibold text-slate-200">Relics</h2>
+                    </div>
+                    <div class="flex items-center gap-3 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-700/80">
+                        <span class="text-xs text-slate-400 font-medium">Unlocked:</span>
+                        <span id="badge-completion-count" class="text-sm font-black theme-accent-text">0 / 24</span>
+                    </div>
+                </div>
+                <div id="badge-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+            </div>
+        </div>
+
+        <!-- TAB 6: FORGE SETTINGS (APPEARANCE & GOALS) -->
         <div id="tab-forge" class="hidden space-y-6">
             <form onsubmit="saveAllForgeSettings(event)" class="space-y-6 max-w-2xl">
                 <div class="card p-6 rounded-xl">
@@ -661,40 +780,7 @@
                 </div>
 
                 <div class="card p-6 rounded-xl space-y-4">
-                    <h2 class="text-lg font-semibold text-slate-200">Timer Audio</h2>
-                    
-                    <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
-                        <label class="block text-xs font-semibold text-amber-400 uppercase tracking-wider">🔔 Audio & Loops</label>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-[11px] text-slate-400 mb-1 font-medium">Sound Preset</label>
-                                <select id="setting-pomo-sound" onchange="handleInstantSoundChange()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
-                                    <option value="zen_bowl">🥣 Zen Singing Bowl (7s)</option>
-                                    <option value="brass_gong">🔔 Celestial Brass Gong (6s)</option>
-                                    <option value="arpeggio_chime">✨ Ascending Crystal Chime (5s)</option>
-                                    <option value="cosmic_pad">🌊 Cosmic Synth Warm Pad (6s)</option>
-                                    <option value="marimba_cascade">🪵 Warm Marimba Cascade (5s)</option>
-                                    <option value="harbor_bell">🏛️ Deep Harbor Sanctuary Bell (8s)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[11px] text-slate-400 mb-1 font-medium">Repeat Loops</label>
-                                <select id="setting-pomo-repeats" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
-                                    <option value="1">1x (Play once)</option>
-                                    <option value="2">2x (Repeat twice)</option>
-                                    <option value="3" selected>3x (Repeat 3 times)</option>
-                                    <option value="4">4x (Repeat 4 times)</option>
-                                    <option value="5">5x (Repeat 5 times)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="flex justify-end pt-1">
-                            <button type="button" onclick="previewPomoSound()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition-all shadow-md flex items-center gap-1.5 shrink-0">
-                                <span>🔊</span> <span>Test Audio</span>
-                            </button>
-                        </div>
-                    </div>
-
+                    <h2 class="text-lg font-semibold text-slate-200">Focus Timing</h2>
                     <div>
                         <span class="block text-xs text-slate-400 mb-2 font-medium">Quick Presets</span>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -759,82 +845,6 @@
             </form>
         </div>
 
-        <!-- TAB 5: CHRONICLES -->
-        <div id="tab-chronicles" class="hidden space-y-6">
-            <div class="card p-6 rounded-xl border border-slate-700/80 space-y-3">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div class="flex items-center gap-3">
-                        <div id="power-rank-icon" class="text-3xl p-2.5 bg-slate-900/80 rounded-xl border border-slate-700/80">⚡</div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs uppercase font-extrabold tracking-widest text-slate-400">Power</span>
-                                <span id="power-rank-title" class="text-xs font-extrabold px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">Awakened Flame</span>
-                            </div>
-                            <div class="text-2xl font-black text-white mt-0.5 flex items-center gap-2">
-                                <span id="power-score-val" class="theme-accent-text font-mono">0</span>
-                                <span class="text-xs text-slate-400 font-normal">PWR</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="power-breakdown-tags" class="flex flex-wrap gap-2 text-[11px] font-semibold text-slate-300"></div>
-                </div>
-                <div class="relative w-full bg-slate-900/90 h-3.5 rounded-full overflow-hidden border border-slate-700/80 p-0.5">
-                    <div id="power-level-bar" class="power-bar-fill h-full rounded-full w-0"></div>
-                </div>
-            </div>
-
-            <div class="card p-6 rounded-xl">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                    <div>
-                        <h2 class="text-lg font-semibold text-slate-200">History</h2>
-                    </div>
-                    <div class="flex items-center gap-2 bg-slate-900/80 p-2 rounded-lg border border-slate-700">
-                        <label for="ledger-month-select" class="text-xs text-slate-400 font-medium whitespace-nowrap">Filter:</label>
-                        <select id="ledger-month-select" onchange="applyLedgerFilter()" class="bg-slate-800 border border-slate-700 rounded-md px-3 py-1 text-xs text-white focus:outline-none"></select>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3">
-                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider">⚗️ Work</h3>
-                            <span id="ledger-count-work" class="text-[10px] text-slate-500">0 entries</span>
-                        </div>
-                        <div id="ledger-list-work" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
-                    </div>
-                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3">
-                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">🌿 Life Logs</h3>
-                            <span id="ledger-count-sanctuary" class="text-[10px] text-slate-500">0 entries</span>
-                        </div>
-                        <div id="ledger-list-sanctuary" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
-                    </div>
-                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3">
-                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider">📖 Reflections</h3>
-                            <span id="ledger-count-diary" class="text-[10px] text-slate-500">0 entries</span>
-                        </div>
-                        <div id="ledger-list-diary" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 6: RELICS -->
-        <div id="tab-relics" class="hidden space-y-6">
-            <div class="card p-6 rounded-xl">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                    <div>
-                        <h2 class="text-lg font-semibold text-slate-200">Relics</h2>
-                    </div>
-                    <div class="flex items-center gap-3 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-700/80">
-                        <span class="text-xs text-slate-400 font-medium">Unlocked:</span>
-                        <span id="badge-completion-count" class="text-sm font-black theme-accent-text">0 / 24</span>
-                    </div>
-                </div>
-                <div id="badge-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
-            </div>
-        </div>
-
         <div id="badge-toast-container"></div>
     </div>
 
@@ -848,7 +858,6 @@
         let loggedInUser='North',viewedUser='North',currentUserUid=null,audioMuted=false;
         let activeHoldTimer=null,activeHoldInterval=null,isTouchScrolling=false;
 
-        // SAFE DATE FALLBACK HELPER
         function getLogDate(l){
             if(!l||!l.timestamp)return new Date();
             return l.timestamp.toDate?l.timestamp.toDate():new Date(l.timestamp);
@@ -1025,6 +1034,10 @@
             const val=$('setting-pomo-sound').value;userSettings.pomoSound=val;
             if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({pomoSound:val},{merge:true});
         }
+        async function handleInstantSoundRepeatChange(){
+            const val=parseInt($('setting-pomo-repeats').value)||3;userSettings.pomoSoundRepeats=val;
+            if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({pomoSoundRepeats:val},{merge:true});
+        }
 
         // TODO SCRATCHPAD ENGINE
         async function syncTodosToFirestore(list){
@@ -1056,14 +1069,22 @@
         }
 
         function renderTodoList(){
-            const activeListEl=$('todo-active-list'),doneListEl=$('todo-completed-list');if(!activeListEl||!doneListEl)return;
+            const activeListEl=$('todo-active-list'),doneListEl=$('todo-completed-list'),pomoTasksEl=$('pomo-active-tasks-list');
             const isSelf=(loggedInUser===viewedUser),todoData=isSelf?(userSettings.scratchpadTodos||[]):(spectatorSettings?.scratchpadTodos||[]);
             const activeItems=[],doneItems=[];
             for(let i=0;i<todoData.length;i++){if(todoData[i].done)doneItems.push(todoData[i]);else activeItems.push(todoData[i])}
-            $('todo-count-active').innerText=`${activeItems.length} Active`;$('todo-count-done').innerText=`${doneItems.length} Done`;
-            const cursorClass=isSelf?"cursor-pointer":"cursor-default";
-            activeListEl.innerHTML=activeItems.length===0?'<div class="text-xs text-slate-500 italic py-2 text-center">No active tasks.</div>':activeItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item ${cursorClass} p-2.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/70 rounded-xl flex items-center justify-between gap-3 text-xs text-slate-200 select-none"><div class="flex items-center gap-2.5 truncate"><span class="w-4 h-4 rounded-md border border-slate-600 flex items-center justify-center shrink-0"></span><span class="truncate font-medium">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-[11px] font-bold">×</button>`:''}</div>`).join('');
-            doneListEl.innerHTML=doneItems.length===0?'<div class="text-xs text-slate-500 italic py-2 text-center">No completed tasks.</div>':doneItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item done ${cursorClass} p-2.5 bg-slate-900/60 border border-slate-800/80 rounded-xl flex items-center justify-between gap-3 text-xs text-slate-400 select-none"><div class="flex items-center gap-2.5 truncate"><span class="w-4 h-4 rounded-md theme-accent-bg text-slate-950 flex items-center justify-center shrink-0 font-bold text-[10px]">✓</span><span class="truncate font-medium">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-[11px] font-bold">×</button>`:''}</div>`).join('');
+            
+            if(activeListEl&&doneListEl){
+                $('todo-count-active').innerText=`${activeItems.length} Active`;$('todo-count-done').innerText=`${doneItems.length} Done`;
+                const cursorClass=isSelf?"cursor-pointer":"cursor-default";
+                activeListEl.innerHTML=activeItems.length===0?'<div class="text-xs text-slate-500 italic py-2 text-center">No active tasks.</div>':activeItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item ${cursorClass} p-2.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/70 rounded-xl flex items-center justify-between gap-3 text-xs text-slate-200 select-none"><div class="flex items-center gap-2.5 truncate"><span class="w-4 h-4 rounded-md border border-slate-600 flex items-center justify-center shrink-0"></span><span class="truncate font-medium">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-[11px] font-bold">×</button>`:''}</div>`).join('');
+                doneListEl.innerHTML=doneItems.length===0?'<div class="text-xs text-slate-500 italic py-2 text-center">No completed tasks.</div>':doneItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item done ${cursorClass} p-2.5 bg-slate-900/60 border border-slate-800/80 rounded-xl flex items-center justify-between gap-3 text-xs text-slate-400 select-none"><div class="flex items-center gap-2.5 truncate"><span class="w-4 h-4 rounded-md theme-accent-bg text-slate-950 flex items-center justify-center shrink-0 font-bold text-[10px]">✓</span><span class="truncate font-medium">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-[11px] font-bold">×</button>`:''}</div>`).join('');
+            }
+
+            if(pomoTasksEl){
+                const cursorClass=isSelf?"cursor-pointer":"cursor-default";
+                pomoTasksEl.innerHTML=activeItems.length===0?'<div class="text-xs text-slate-500 italic py-2 text-center">No active focus tasks.</div>':activeItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item ${cursorClass} p-2 bg-slate-900/90 border border-slate-800 rounded-lg flex items-center justify-between gap-2 text-xs text-slate-200 select-none"><div class="flex items-center gap-2 truncate"><span class="w-3.5 h-3.5 rounded border border-slate-600 flex items-center justify-center shrink-0"></span><span class="truncate font-medium text-[11px]">${t.text}</span></div></div>`).join('');
+            }
         }
 
         // MOUSE & TOUCH HOLD SAFETY LISTENERS
@@ -1625,8 +1646,8 @@
                 
                 const cardEl=$(`hud-card-${u.toLowerCase()}`);
                 if(cardEl){
-                    if(isViewing)cardEl.className="hud-card card active-space p-3.5 rounded-2xl border flex items-center gap-3.5 relative overflow-hidden group cursor-pointer";
-                    else cardEl.className="hud-card card view-space p-3.5 rounded-2xl border flex items-center gap-3.5 relative overflow-hidden group cursor-pointer";
+                    if(isViewing)cardEl.className="hud-card card active-space p-2.5 sm:p-3 rounded-xl border flex items-center gap-2.5 sm:gap-3.5 relative overflow-hidden group cursor-pointer";
+                    else cardEl.className="hud-card card view-space p-2.5 sm:p-3 rounded-xl border flex items-center gap-2.5 sm:gap-3.5 relative overflow-hidden group cursor-pointer";
                 }
 
                 const imgEl=$(`hud-avatar-${u.toLowerCase()}`);
@@ -1638,14 +1659,14 @@
                 if(dotEl){
                     const lastActive=s.lastActiveTimestamp||0;
                     const isOnline=(Date.now()-lastActive)<300000;
-                    dotEl.className=isOnline?"absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md presence-pulse":"absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-slate-600 border-2 border-slate-950 shadow-md";
+                    dotEl.className=isOnline?"absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md presence-pulse":"absolute bottom-0 right-0 w-3 h-3 rounded-full bg-slate-600 border-2 border-slate-950 shadow-md";
                 }
 
                 const badgeEl=$(`hud-badge-${u.toLowerCase()}`);
                 if(badgeEl){
-                    if(isMe){badgeEl.innerText="YOU";badgeEl.className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase"}
-                    else if(isViewing){badgeEl.innerText="VIEWING";badgeEl.className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 uppercase"}
-                    else{badgeEl.innerText="PEER";badgeEl.className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase"}
+                    if(isMe){badgeEl.innerText="YOU";badgeEl.className="text-[9px] sm:text-[10px] font-extrabold px-1 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase"}
+                    else if(isViewing){badgeEl.innerText="VIEWING";badgeEl.className="text-[9px] sm:text-[10px] font-extrabold px-1 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 uppercase"}
+                    else{badgeEl.innerText="PEER";badgeEl.className="text-[9px] sm:text-[10px] font-extrabold px-1 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase"}
                 }
 
                 const statusEl=$(`hud-status-${u.toLowerCase()}`);
@@ -1663,9 +1684,9 @@
                     if(pomo&&pomo.isRunning&&pomo.pomoEndTime){
                         const rem=Math.max(0,Math.ceil((pomo.pomoEndTime-Date.now())/1000));
                         const m=Math.floor(rem/60),sec=(rem%60).toString().padStart(2,'0');
-                        pomoEl.innerText=`⏳ Flow ${m}:${sec}`;pomoEl.className="text-amber-300 font-bold truncate max-w-[120px]";
+                        pomoEl.innerText=`⏳ Flow ${m}:${sec}`;pomoEl.className="text-amber-300 font-bold truncate max-w-[90px] sm:max-w-[120px]";
                     }else{
-                        pomoEl.innerText="Idle";pomoEl.className="text-slate-500 font-semibold truncate max-w-[120px]";
+                        pomoEl.innerText="Idle";pomoEl.className="text-slate-500 font-semibold truncate max-w-[90px] sm:max-w-[120px]";
                     }
                 }
             });
@@ -1776,10 +1797,10 @@
         }
 
         function switchTab(t){
-            ['crucible','hourglass','sanctuary','forge','chronicles','relics'].forEach(x=>{
+            ['crucible','hourglass','sanctuary','chronicles','relics','forge'].forEach(x=>{
                 $(`tab-${x}`)?.classList.add('hidden');
                 const nav=$(`nav-${x}`);
-                if(nav)nav.className=x===t?"tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap":"tab-btn px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap";
+                if(nav)nav.className=x===t?"tab-btn active px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap":"tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap";
             });
             $(`tab-${t}`)?.classList.remove('hidden');
             if(t==='hourglass')attachPomoSpectatorListener();
