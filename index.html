@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AUREUM — Shared Ledger</title>
+    <title>AUREUM — Covenant of Endeavor</title>
     <meta name="theme-color" content="#0e1117">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -48,13 +48,14 @@
         }
         .card:hover{box-shadow:0 14px 40px -6px var(--accent-glow), 0 0 0 1px var(--accent-primary);border-color:var(--accent-primary)!important}
 
+        /* EXPANDED AVATAR SIZE & CLEAN GLOW (NO HARD OUTLINE BORDER) */
         .profile-avatar, .hud-avatar, img[id^="hud-avatar-"] {
-            width: 56px !important;
-            height: 56px !important;
-            border-radius: 16px !important;
+            width: 72px !important;
+            height: 72px !important;
+            border-radius: 20px !important;
             object-fit: cover !important;
-            border: 2px solid rgba(255, 255, 255, 0.25) !important;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+            border: none !important;
+            transition: box-shadow 0.3s ease, transform 0.2s ease;
         }
 
         #pomo-active-tasks-list, .hourglass-task-scroll, #todo-active-list, #todo-completed-list {
@@ -102,7 +103,15 @@
         .todo-item{transition:all 0.2s ease-out}
         .todo-item:hover{border-color:var(--card-border);transform:translateX(2px)}
         .todo-item.done{opacity:0.5;text-decoration:line-through}
-        nav.sticky-theme-nav{background-color:var(--bg-main);opacity:0.98;border-bottom:1.5px solid var(--card-border)}
+
+        /* SOLID STICKY NAVIGATION BAR WITH FULL ALL-SIDE BORDER & HIGH Z-INDEX */
+        nav.sticky-theme-nav{
+            background-color: var(--card-bg) !important;
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
+            border: 1.5px solid var(--card-border) !important;
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08);
+        }
     </style>
 </head>
 <body data-theme="gold" data-cursor="default" class="p-3 sm:p-4 md:p-8 max-w-6xl mx-auto relative min-h-screen">
@@ -115,7 +124,7 @@
     <div id="login-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center z-50">
         <div class="card p-8 rounded-xl max-w-md w-full shadow-2xl">
             <h1 class="text-2xl font-black logo-gold mb-1 uppercase">AUREUM</h1>
-            <p class="text-xs text-slate-400 mb-6">Sign in to continue.</p>
+            <p class="text-xs text-amber-400/90 font-semibold uppercase tracking-wider mb-6">Covenant of Endeavor</p>
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs text-slate-400 mb-1 font-medium">Email</label>
@@ -190,13 +199,13 @@
     </div>
 
     <!-- MAIN APP CONTENT -->
-    <div id="app-content" class="hidden">
-        <!-- DUO PLAYER HERO HUD HEADER -->
-        <header class="flex flex-col lg:flex-row justify-between items-stretch mb-5 pb-4 border-b border-slate-800/80 gap-4">
+    <div id="app-content" class="hidden space-y-6">
+        <!-- DUO PLAYER HERO HUD HEADER ENCLOSED IN SOLID CARD CONTAINER -->
+        <header class="card p-4 sm:p-5 rounded-2xl flex flex-col lg:flex-row justify-between items-stretch gap-4">
             <div class="flex items-center justify-between lg:w-auto shrink-0">
                 <div>
                     <h1 class="text-2xl sm:text-3xl font-black logo-gold uppercase tracking-widest">AUREUM</h1>
-                    <p class="text-[11px] text-slate-400 tracking-wide">Shared Ledger</p>
+                    <p class="text-[11px] font-bold text-amber-400/90 tracking-wider uppercase mt-0.5">Covenant of Endeavor</p>
                 </div>
                 <div class="flex items-center gap-2 lg:hidden">
                     <button onclick="toggleAudioMute()" id="audio-toggle-btn-mobile" class="text-xs text-slate-400 p-2 bg-slate-800 rounded-lg border border-slate-700">🔊</button>
@@ -206,22 +215,22 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 flex-1">
                 <!-- NORTH HERO CARD -->
-                <div id="hud-card-north" onclick="switchActiveUser('North')" class="hud-card card p-3 sm:p-3.5 rounded-2xl border flex items-center gap-3 sm:gap-4 relative overflow-hidden group cursor-pointer justify-between">
-                    <div class="flex items-center gap-3 min-w-0">
-                        <div class="relative shrink-0">
-                            <img id="hud-avatar-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="hud-avatar border-2 border-slate-700 object-cover transition-all">
-                            <span id="hud-presence-dot-north" class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md"></span>
+                <div id="hud-card-north" onclick="switchActiveUser('North')" class="hud-card card p-3 sm:p-4 rounded-2xl border flex items-center gap-3 sm:gap-4 relative overflow-hidden group cursor-pointer justify-between">
+                    <div class="flex items-center gap-3.5 min-w-0">
+                        <div class="relative shrink-0 flex items-center justify-center">
+                            <img id="hud-avatar-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="hud-avatar object-cover transition-all">
+                            <span id="hud-presence-dot-north" class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md"></span>
                         </div>
-                        <div class="min-w-0 space-y-0.5">
+                        <div class="min-w-0 space-y-1">
                             <div class="flex items-center gap-2">
-                                <span class="font-black text-sm text-slate-100">North</span>
+                                <span class="font-black text-base text-slate-100">North</span>
                                 <span id="hud-badge-north" class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">ACTIVE</span>
                             </div>
-                            <div id="hud-status-north" onclick="editUserStatusNote('North', event)" class="text-xs text-slate-400 truncate hover:text-amber-300 transition-colors cursor-pointer max-w-[140px] sm:max-w-[170px]" title="Click to edit status">Drawing 🎨</div>
+                            <div id="hud-status-north" onclick="editUserStatusNote('North', event)" class="text-xs text-slate-400 truncate hover:text-amber-300 transition-colors cursor-pointer max-w-[130px] sm:max-w-[160px]" title="Click to edit status">Drawing 🎨</div>
                         </div>
                     </div>
                     
-                    <div class="flex flex-col items-end shrink-0 pl-2 border-l border-slate-800/80 space-y-1">
+                    <div class="flex flex-col items-end shrink-0 pl-3 border-l border-slate-800/80 space-y-1">
                         <div id="hud-pwr-north" class="text-xs font-mono font-black text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">0 PWR</div>
                         <div class="text-[10px] text-slate-400 font-mono" id="hud-hours-north">0.0 / 4.0h</div>
                         <div id="hud-pomo-north" class="text-[10px] text-emerald-400 font-semibold truncate max-w-[110px]">Idle</div>
@@ -229,22 +238,22 @@
                 </div>
 
                 <!-- CREAM HERO CARD -->
-                <div id="hud-card-cream" onclick="switchActiveUser('Cream')" class="hud-card card p-3 sm:p-3.5 rounded-2xl border flex items-center gap-3 sm:gap-4 relative overflow-hidden group cursor-pointer justify-between">
-                    <div class="flex items-center gap-3 min-w-0">
-                        <div class="relative shrink-0">
-                            <img id="hud-avatar-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="hud-avatar border-2 border-slate-700 object-cover transition-all">
-                            <span id="hud-presence-dot-cream" class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md"></span>
+                <div id="hud-card-cream" onclick="switchActiveUser('Cream')" class="hud-card card p-3 sm:p-4 rounded-2xl border flex items-center gap-3 sm:gap-4 relative overflow-hidden group cursor-pointer justify-between">
+                    <div class="flex items-center gap-3.5 min-w-0">
+                        <div class="relative shrink-0 flex items-center justify-center">
+                            <img id="hud-avatar-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="hud-avatar object-cover transition-all">
+                            <span id="hud-presence-dot-cream" class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md"></span>
                         </div>
-                        <div class="min-w-0 space-y-0.5">
+                        <div class="min-w-0 space-y-1">
                             <div class="flex items-center gap-2">
-                                <span class="font-black text-sm text-slate-100">Cream</span>
+                                <span class="font-black text-base text-slate-100">Cream</span>
                                 <span id="hud-badge-cream" class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase">VIEW</span>
                             </div>
-                            <div id="hud-status-cream" onclick="editUserStatusNote('Cream', event)" class="text-xs text-slate-400 truncate hover:text-amber-300 transition-colors cursor-pointer max-w-[140px] sm:max-w-[170px]" title="Click to edit status">Writing ✍️</div>
+                            <div id="hud-status-cream" onclick="editUserStatusNote('Cream', event)" class="text-xs text-slate-400 truncate hover:text-amber-300 transition-colors cursor-pointer max-w-[130px] sm:max-w-[160px]" title="Click to edit status">Writing ✍️</div>
                         </div>
                     </div>
                     
-                    <div class="flex flex-col items-end shrink-0 pl-2 border-l border-slate-800/80 space-y-1">
+                    <div class="flex flex-col items-end shrink-0 pl-3 border-l border-slate-800/80 space-y-1">
                         <div id="hud-pwr-cream" class="text-xs font-mono font-black text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">0 PWR</div>
                         <div class="text-[10px] text-slate-400 font-mono" id="hud-hours-cream">0.0 / 4.0h</div>
                         <div id="hud-pomo-cream" class="text-[10px] text-emerald-400 font-semibold truncate max-w-[110px]">Idle</div>
@@ -253,22 +262,22 @@
             </div>
 
             <div class="hidden lg:flex items-center gap-3 shrink-0">
-                <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-xs text-slate-400 hover:text-white px-3 py-2 bg-slate-800/80 rounded-xl border border-slate-700">🔊</button>
-                <button onclick="handleLogout()" class="text-xs text-slate-400 hover:text-slate-200 px-3 py-2 bg-slate-900 rounded-xl border border-slate-800">Sign Out</button>
+                <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-xs text-slate-400 hover:text-white px-3.5 py-2.5 bg-slate-800/80 rounded-xl border border-slate-700">🔊</button>
+                <button onclick="handleLogout()" class="text-xs text-slate-400 hover:text-slate-200 px-3.5 py-2.5 bg-slate-900 rounded-xl border border-slate-800">Sign Out</button>
             </div>
         </header>
 
-        <!-- STICKY NAVIGATION BAR -->
-        <nav class="sticky top-0 z-40 sticky-theme-nav -mx-3 px-3 sm:-mx-4 sm:px-4 md:-mx-8 md:px-8 py-2.5 mb-6 flex items-center gap-2 overflow-x-auto no-scrollbar transition-colors duration-300">
-            <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap"><span>⚗️</span> <span>Crucible</span></button>
-            <button onclick="switchTab('hourglass')" id="nav-hourglass" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⏳</span> <span>Hourglass</span></button>
-            <button onclick="switchTab('sanctuary')" id="nav-sanctuary" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🌿</span> <span>Sanctuary</span></button>
-            <button onclick="switchTab('chronicles')" id="nav-chronicles" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>📜</span> <span>Chronicles</span></button>
-            <button onclick="switchTab('relics')" id="nav-relics" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🏺</span> <span>Relics</span></button>
-            <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⚙️</span> <span>Forge</span></button>
+        <!-- STICKY NAVIGATION BAR (FULLY PINNED ON TOP WITH COMPLETE ALL-SIDE OUTLINE & CENTERED TAB BUTTONS) -->
+        <nav class="sticky top-3 z-[100] sticky-theme-nav p-2 rounded-2xl flex items-center justify-center gap-2 overflow-x-auto no-scrollbar shadow-2xl border border-slate-700/80 transition-all duration-300">
+            <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap"><span>⚗️</span> <span>Crucible</span></button>
+            <button onclick="switchTab('hourglass')" id="nav-hourglass" class="tab-btn px-5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⏳</span> <span>Hourglass</span></button>
+            <button onclick="switchTab('sanctuary')" id="nav-sanctuary" class="tab-btn px-5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🌿</span> <span>Sanctuary</span></button>
+            <button onclick="switchTab('chronicles')" id="nav-chronicles" class="tab-btn px-5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>📜</span> <span>Chronicles</span></button>
+            <button onclick="switchTab('relics')" id="nav-relics" class="tab-btn px-5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>🏺</span> <span>Relics</span></button>
+            <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap"><span>⚙️</span> <span>Forge</span></button>
         </nav>
 
-        <div id="read-only-banner" class="hidden card p-3 mb-6 rounded-xl text-center text-slate-400 text-sm">
+        <div id="read-only-banner" class="hidden card p-3 rounded-xl text-center text-slate-400 text-sm">
             🔒 Viewing <strong><span id="view-target-name"></span></strong> (Read-Only)
         </div>
 
@@ -396,12 +405,40 @@
             </div>
         </div>
 
-        <!-- TAB 2: HOURGLASS -->
+        <!-- TAB 2: HOURGLASS (SWAPPED HERO CLOCK CARD FIRST, UNLOGGED FOCUS SECOND) -->
         <div id="tab-hourglass" class="hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 
                 <!-- PRIMARY FOCUS COLUMN -->
                 <div class="lg:col-span-7 space-y-6">
+                    <!-- HERO CLOCK CARD (NOW FIRST) -->
+                    <div class="card p-6 sm:p-8 rounded-xl text-center space-y-5 shadow-xl relative">
+                        <div id="pomo-spectator-banner" class="hidden p-2.5 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 font-medium">
+                            👁️ Viewing <strong><span id="pomo-spectator-target"></span>'s</strong> Timer (View Only)
+                        </div>
+                        <div id="pomo-mode-box" class="flex justify-center gap-2 bg-slate-900/80 p-1.5 rounded-lg border border-slate-700 text-xs w-fit mx-auto">
+                            <button onclick="handleUserSelectPomoMode('focus')" id="pomo-mode-focus" class="px-4 py-1.5 rounded-md font-medium transition-all bg-blue-600 text-white">Focus</button>
+                            <button onclick="handleUserSelectPomoMode('short')" id="pomo-mode-short" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Short Break</button>
+                            <button onclick="handleUserSelectPomoMode('long')" id="pomo-mode-long" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Long Break</button>
+                        </div>
+                        <div class="flex items-center justify-center gap-2">
+                            <span class="text-xs uppercase tracking-widest theme-accent-text font-bold" id="pomo-round-badge">Round 1 of 4</span>
+                            <div id="pomo-round-dots" class="flex gap-1.5 ml-2"></div>
+                        </div>
+                        <div id="pomo-clock-container" onclick="handleClockClick()" class="cursor-pointer group select-none py-2 my-1 rounded-2xl transition-all hover:bg-slate-800/50">
+                            <div id="pomo-timer-display" class="text-6xl sm:text-7xl font-mono font-black theme-accent-text tracking-wider group-hover:scale-105 transition-transform">25:00</div>
+                            <div id="pomo-status-label" class="text-xs text-slate-400 mt-2 uppercase tracking-widest font-semibold group-hover:text-amber-300">Click Timer or Press Spacebar</div>
+                        </div>
+                        <div class="w-full bg-slate-900/80 h-2.5 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
+                            <div id="pomo-progress-bar" class="theme-accent-bg h-full rounded-full transition-all duration-1000 w-full"></div>
+                        </div>
+                        <div id="pomo-controls-box" class="flex justify-center gap-4 pt-1">
+                            <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="px-8 py-2.5 rounded-lg theme-accent-bg font-bold text-sm transition-all shadow-md">Start Focus</button>
+                            <button onclick="resetMyPomoTimer()" class="px-6 py-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium text-sm transition-all">Reset</button>
+                        </div>
+                    </div>
+
+                    <!-- UNLOGGED FOCUS CARD (NOW SECOND) -->
                     <div id="pomo-unlogged-card" class="card p-4 rounded-xl space-y-3 border border-emerald-500/30 bg-emerald-950/20 shadow-lg">
                         <div class="flex items-center justify-between">
                             <div>
@@ -451,33 +488,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- HERO CLOCK CARD -->
-                    <div class="card p-6 sm:p-8 rounded-xl text-center space-y-5 shadow-xl relative">
-                        <div id="pomo-spectator-banner" class="hidden p-2.5 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 font-medium">
-                            👁️ Viewing <strong><span id="pomo-spectator-target"></span>'s</strong> Timer (View Only)
-                        </div>
-                        <div id="pomo-mode-box" class="flex justify-center gap-2 bg-slate-900/80 p-1.5 rounded-lg border border-slate-700 text-xs w-fit mx-auto">
-                            <button onclick="handleUserSelectPomoMode('focus')" id="pomo-mode-focus" class="px-4 py-1.5 rounded-md font-medium transition-all bg-blue-600 text-white">Focus</button>
-                            <button onclick="handleUserSelectPomoMode('short')" id="pomo-mode-short" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Short Break</button>
-                            <button onclick="handleUserSelectPomoMode('long')" id="pomo-mode-long" class="px-4 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-all">Long Break</button>
-                        </div>
-                        <div class="flex items-center justify-center gap-2">
-                            <span class="text-xs uppercase tracking-widest theme-accent-text font-bold" id="pomo-round-badge">Round 1 of 4</span>
-                            <div id="pomo-round-dots" class="flex gap-1.5 ml-2"></div>
-                        </div>
-                        <div id="pomo-clock-container" onclick="handleClockClick()" class="cursor-pointer group select-none py-2 my-1 rounded-2xl transition-all hover:bg-slate-800/50">
-                            <div id="pomo-timer-display" class="text-6xl sm:text-7xl font-mono font-black theme-accent-text tracking-wider group-hover:scale-105 transition-transform">25:00</div>
-                            <div id="pomo-status-label" class="text-xs text-slate-400 mt-2 uppercase tracking-widest font-semibold group-hover:text-amber-300">Click Timer or Press Spacebar</div>
-                        </div>
-                        <div class="w-full bg-slate-900/80 h-2.5 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
-                            <div id="pomo-progress-bar" class="theme-accent-bg h-full rounded-full transition-all duration-1000 w-full"></div>
-                        </div>
-                        <div id="pomo-controls-box" class="flex justify-center gap-4 pt-1">
-                            <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="px-8 py-2.5 rounded-lg theme-accent-bg font-bold text-sm transition-all shadow-md">Start Focus</button>
-                            <button onclick="resetMyPomoTimer()" class="px-6 py-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium text-sm transition-all">Reset</button>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- RIGHT SIDE PANEL COLUMN -->
@@ -510,7 +520,7 @@
                         </div>
                     </div>
 
-                    <!-- TIMER AUDIO CONTROLS (MOVED TO RIGHT SIDE) -->
+                    <!-- TIMER AUDIO CONTROLS -->
                     <div id="audioSettingsCard" class="card p-4 rounded-xl border border-slate-800 space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5"><span>🔔</span> <span>Timer Audio Engine</span></span>
@@ -748,9 +758,9 @@
             </div>
         </div>
 
-        <!-- TAB 6: FORGE SETTINGS -->
+        <!-- TAB 6: FORGE SETTINGS (CENTERED LAYOUT) -->
         <div id="tab-forge" class="hidden space-y-6">
-            <form onsubmit="saveAllForgeSettings(event)" class="space-y-6 max-w-2xl">
+            <form onsubmit="saveAllForgeSettings(event)" class="space-y-6 max-w-2xl mx-auto">
                 <div class="card p-6 rounded-xl">
                     <h2 class="text-lg font-semibold mb-5 text-slate-200">Appearance & Canvas Layer</h2>
                     <div class="space-y-4">
@@ -1079,7 +1089,7 @@
             if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({bgPattern:pattern,bgOpacity:opacity},{merge:true});
         }
 
-        // SYNTHESIZER SOUND ENGINE (INSTANT LATENCY & UNLOCKED AUDIO CONTEXT)
+        // SYNTHESIZER SOUND ENGINE
         let globalAudioCtx = null;
         function getAudioContext() {
             if (!globalAudioCtx) {
@@ -1244,7 +1254,7 @@
             }
         }
 
-        // MOUSE & TOUCH HOLD SAFETY LISTENERS
+        // MOUSE & TOUCH HOLD LISTENERS
         let isRightDragging=false,dragStartX=0,dragStartY=0,dragScrollX=0,dragScrollY=0,didRightDrag=false;
         window.addEventListener('mousedown',e=>{if(e.button===2){isRightDragging=true;didRightDrag=false;dragStartX=e.clientX;dragStartY=e.clientY;dragScrollX=window.scrollX;dragScrollY=window.scrollY}},{passive:true});
         window.addEventListener('mousemove',e=>{if(!isRightDragging)return;const dx=e.clientX-dragStartX,dy=e.clientY-dragStartY;if(Math.abs(dx)>4||Math.abs(dy)>4)didRightDrag=true;window.scrollTo(dragScrollX-dx,dragScrollY-dy)},{passive:true});
@@ -1811,8 +1821,8 @@
                 
                 const cardEl=$(`hud-card-${u.toLowerCase()}`);
                 if(cardEl){
-                    if(isViewing)cardEl.className="hud-card card active-space p-3 sm:p-3.5 rounded-2xl border flex items-center gap-3 sm:gap-4 relative overflow-hidden group cursor-pointer justify-between";
-                    else cardEl.className="hud-card card view-space p-3 sm:p-3.5 rounded-2xl border flex items-center gap-3 sm:gap-4 relative overflow-hidden group cursor-pointer justify-between";
+                    if(isViewing)cardEl.className="hud-card card active-space p-3 sm:p-4 rounded-2xl border flex items-center gap-3 sm:gap-4 relative overflow-hidden group cursor-pointer justify-between";
+                    else cardEl.className="hud-card card view-space p-3 sm:p-4 rounded-2xl border flex items-center gap-3 sm:gap-4 relative overflow-hidden group cursor-pointer justify-between";
                 }
 
                 const imgEl=$(`hud-avatar-${u.toLowerCase()}`);
@@ -1824,7 +1834,7 @@
                 if(dotEl){
                     const lastActive=s.lastActiveTimestamp||0;
                     const isOnline=(Date.now()-lastActive)<300000;
-                    dotEl.className=isOnline?"absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md presence-pulse":"absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-slate-600 border-2 border-slate-950 shadow-md";
+                    dotEl.className=isOnline?"absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-slate-950 shadow-md presence-pulse":"absolute bottom-0 right-0 w-4 h-4 rounded-full bg-slate-600 border-2 border-slate-950 shadow-md";
                 }
 
                 const badgeEl=$(`hud-badge-${u.toLowerCase()}`);
@@ -1916,17 +1926,20 @@
             return Math.round((workH*100)+(workoutH*120)+(choreH*80)+(snackC*15));
         }
 
+        // SMOOTH GLOW DYNAMICS (APPLIED TO SHADOW ONLY, NO HARD BORDER)
         function applyDynamicAvatarGlow(el,hours){
             const softCap=userSettings.dailySoftCap||4;
-            if(hours<=0){el.style.boxShadow="0 0 0 2px rgba(100, 116, 139, 0.4)";el.style.opacity="0.6";return}
+            if(hours<=0){el.style.boxShadow="0 0 0 2px rgba(100, 116, 139, 0.4)";el.style.opacity="0.7";return}
             el.style.opacity="1";
             if(hours<2.0){
-                const p=hours/2.0,r=Math.round(59*p),g=Math.round(130*p+100*(1-p)),b=246,blur=Math.round(8+p*10);
-                el.style.boxShadow=`0 0 ${blur}px ${Math.round(2+p*3)}px rgba(${r}, ${g}, ${b}, ${0.5+p*0.35})`;el.style.borderColor=`rgba(${r}, ${g}, ${b}, 0.8)`;
+                const p=hours/2.0,r=Math.round(59*p),g=Math.round(130*p+100*(1-p)),b=246,blur=Math.round(10+p*12);
+                el.style.boxShadow=`0 0 ${blur}px ${Math.round(2+p*4)}px rgba(${r}, ${g}, ${b}, ${0.5+p*0.35})`;
             }else if(hours<softCap){
-                const p=(hours-2.0)/(softCap-2.0),r=Math.round(16+(245-16)*p),g=Math.round(185+(158-185)*p),b=Math.round(129+(11-129)*p),blur=Math.round(18+p*6);
-                el.style.boxShadow=`0 0 ${blur}px ${Math.round(4+p*2)}px rgba(${r}, ${g}, ${b}, ${0.75+p*0.2})`;el.style.borderColor=`rgba(${r}, ${g}, ${b}, 0.9)`;
-            }else{el.style.boxShadow="0 0 24px 6px rgba(245, 158, 11, 0.95)";el.style.borderColor="rgba(245, 158, 11, 1)"}
+                const p=(hours-2.0)/(softCap-2.0),r=Math.round(16+(245-16)*p),g=Math.round(185+(158-185)*p),b=Math.round(129+(11-129)*p),blur=Math.round(20+p*8);
+                el.style.boxShadow=`0 0 ${blur}px ${Math.round(4+p*3)}px rgba(${r}, ${g}, ${b}, ${0.75+p*0.2})`;
+            }else{
+                el.style.boxShadow="0 0 28px 8px rgba(245, 158, 11, 0.95)";
+            }
         }
 
         function updateSettingsUI(){
@@ -1977,7 +1990,7 @@
             ['crucible','hourglass','sanctuary','chronicles','relics','forge'].forEach(x=>{
                 $(`tab-${x}`)?.classList.add('hidden');
                 const nav=$(`nav-${x}`);
-                if(nav)nav.className=x===t?"tab-btn active px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap":"tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap";
+                if(nav)nav.className=x===t?"tab-btn active px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap":"tab-btn px-5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap";
             });
             $(`tab-${t}`)?.classList.remove('hidden');
             if(t==='hourglass')attachPomoSpectatorListener();
