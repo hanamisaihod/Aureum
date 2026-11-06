@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AUREUM — Autonomous Living & Creative Ledger</title>
+    <title>AUREUM 2.0 — Autonomous Living & Creative Ledger</title>
     <meta name="theme-color" content="#0f172a">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23fef08a%22%2F%3E%3Cstop%20offset%3D%2250%25%22%20stop-color%3D%22%23f59e0b%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23b45309%22%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%22b%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%220%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231e293b%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23020617%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22110%22%20fill%3D%22url(%23b)%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%2214%22%20width%3D%22484%22%20height%3D%22484%22%20rx%3D%2296%22%20fill%3D%22none%22%20stroke%3D%22url(%23g)%22%20stroke-width%3D%2210%22%20stroke-opacity%3D%220.45%22%2F%3E%3Cpolygon%20points%3D%22256%2C80%20276%2C118%20256%2C108%20236%2C118%22%20fill%3D%22url(%23g)%22%2F%3E%3Cpath%20d%3D%22M%20256%2C122%20L%20378%2C412%20L%20316%2C412%20L%20286%2C336%20L%20226%2C336%20L%20196%2C412%20L%20134%2C412%20Z%20M%20256%2C212%20L%20240%2C276%20L%20272%2C276%20Z%22%20fill%3D%22url(%23g)%22%2F%3E%3C%2Fsvg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,7 +24,7 @@
         body[data-theme="matcha"]{--bg-main:#121813;--card-bg:rgba(20,28,22,0.92);--card-border:rgba(132,204,22,0.2);--accent-primary:#84cc16;--accent-secondary:#fde047;--accent-glow:rgba(132,204,22,0.35);--accent-text:#020617}
         body[data-theme="monochrome"]{--bg-main:#121212;--card-bg:rgba(24,24,24,0.92);--card-border:rgba(255,255,255,0.12);--accent-primary:#e2e8f0;--accent-secondary:#38bdf8;--accent-glow:rgba(226,232,240,0.3);--accent-text:#0f172a}
 
-        /* REMOVE UGLY BROWSER NUMBER SPINNERS */
+        /* HIDE DEFAULT BROWSER NUMBER SPINNERS */
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
@@ -104,7 +104,7 @@
     <div id="app-content" class="hidden space-y-4">
         <!-- SPECTATOR READ-ONLY BANNER -->
         <div id="read-only-banner" class="hidden card p-3 rounded-xl text-center text-amber-300 bg-amber-500/10 border-amber-500/30 text-xs font-medium">
-            🔒 Spectator Mode: Viewing <strong><span id="view-target-name"></span>'s</strong> live UI page. Controls and log edits are disabled.
+            🔒 Spectator Mode: Viewing <strong><span id="view-target-name"></span>'s</strong> live workspace. Edits are disabled.
         </div>
 
         <!-- HEADER WITH DUO HUD CARDS -->
@@ -211,7 +211,7 @@
                     </div>
 
                     <div onclick="handleClockClick()" class="cursor-pointer text-center py-2 select-none">
-                        <div id="pomo-timer-display" class="text-6xl font-mono font-black theme-accent-text">25:00</div>
+                        <div id="pomo-timer-display" class="text-6xl font-mono font-black theme-accent-text">30:00</div>
                         <div id="pomo-status-label" class="text-[10px] text-slate-400 mt-2 uppercase font-semibold">Click Timer or Press Start</div>
                     </div>
 
@@ -360,7 +360,7 @@
                 </div>
             </div>
 
-            <!-- LIFE LOGGERS GRID (WITH RESTORED RATING SELECTORS) -->
+            <!-- LIFE LOGGERS GRID -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <!-- FITNESS LOG -->
                 <div class="card p-4 rounded-xl space-y-3 border border-slate-800">
@@ -434,7 +434,7 @@
                 </div>
             </div>
 
-            <!-- ANALYTICS CHARTS (FIXED RE-INITIALIZATION & DATASETS) -->
+            <!-- ANALYTICS CHARTS -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="card p-4 rounded-xl space-y-2 border border-slate-800">
                     <div class="flex justify-between items-center">
@@ -473,7 +473,7 @@
                 <div id="badge-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"></div>
             </div>
 
-            <!-- CHRONICLES REGISTRY WITH LOG DELETION -->
+            <!-- CHRONICLES REGISTRY -->
             <div class="card p-5 rounded-2xl border border-slate-800 space-y-3">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                     <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Chronicles Registry</h2>
@@ -495,7 +495,7 @@
             </div>
         </div>
 
-        <!-- PAGE 4: FORGE SETTINGS (RESTORED FULL CONTROL ENGINE) -->
+        <!-- PAGE 4: FORGE SETTINGS -->
         <div id="tab-forge" class="hidden space-y-4 max-w-2xl">
             <form onsubmit="saveAllForgeSettings(event)" class="space-y-4">
                 <div class="card p-5 rounded-xl border border-slate-800 space-y-3">
@@ -528,7 +528,7 @@
                     <div class="grid grid-cols-3 gap-3">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Focus (Mins)</label>
-                            <input type="number" id="setting-pomo-focus" value="25" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono font-bold">
+                            <input type="number" id="setting-pomo-focus" value="30" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono font-bold">
                         </div>
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Short Break</label>
@@ -583,7 +583,7 @@
         </div>
     </div>
 
-    <!-- REPAIRED ENGINE SCRIPT -->
+    <!-- ENGINE SCRIPT -->
     <script>
         const $=(i)=>document.getElementById(i);
         const firebaseConfig={apiKey:"AIzaSyAJ7cVPRiJfiShTKFi___pJ9VZHEcLM47Q",authDomain:"aureum-214d1.firebaseapp.com",projectId:"aureum-214d1",storageBucket:"aureum-214d1.firebasestorage.app",messagingSenderId:"967566110651",appId:"1:967566110651:web:4ee66bc4a6afd271b45e9e"};
@@ -645,7 +645,7 @@
             $(`${p}-icon`).innerText=d.icon;$(`${p}-badge`).innerText=`LVL ${d.level}`;$(`${p}-title`).innerText=d.title;
         }
 
-        // TODO ENGINE WITH WORD WRAPPING
+        // TODO ENGINE
         async function syncTodosToFirestore(list){
             if(loggedInUser!==viewedUser)return;
             userSettings.scratchpadTodos=list;renderTodoList();
@@ -684,7 +684,7 @@
             doneListEl.innerHTML=doneItems.length===0?'<div class="text-[11px] text-slate-500 italic py-1 text-center">No completed tasks.</div>':doneItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item done p-2 bg-slate-900/60 border border-slate-800/80 rounded-lg flex items-start justify-between gap-2 text-xs text-slate-400 select-none ${isSelf?'cursor-pointer':'cursor-default'}"><div class="flex items-start gap-2 min-w-0"><span class="w-3.5 h-3.5 rounded theme-accent-bg text-slate-950 flex items-center justify-center shrink-0 font-bold text-[9px] mt-0.5">✓</span><span class="font-medium break-words whitespace-normal leading-tight">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 text-[10px] font-bold shrink-0 ml-1">×</button>`:''}</div>`).join('');
         }
 
-        // TIMER LOGIC WITH DEFAULT SETTINGS SYNC
+        // TIMER LOGIC
         let myPomoMode='focus',myPomoTime=1800,myPomoIsRunning=false,myPomoInterval=null;
         function initTimerFromSettings(){
             if(myPomoIsRunning)return;
@@ -752,7 +752,7 @@
             $('pomo-export-panel').classList.add('hidden');loadUserData();
         }
 
-        // CHARTS ENGINE WITH REPAIRED DATASETS & BUTTONS
+        // CHARTS ENGINE
         let charts={},chartTimeframes={work:'daily',sanctuary:'daily'};
         function initCharts(){
             const opts={responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'#334155'},ticks:{color:'#94a3b8'}},y:{grid:{color:'#334155'},ticks:{color:'#94a3b8'},beginAtZero:true}},plugins:{legend:{display:true,labels:{color:'#cbd5e1',font:{size:10}}}}};
@@ -772,7 +772,6 @@
 
         function updateCharts(logs){
             if(!charts['work']||!charts['sanctuary'])return;
-            const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
             const wData=[0,0,0,0,0,0,0], fData=[0,0,0,0,0,0,0], cData=[0,0,0,0,0,0,0], sData=[0,0,0,0,0,0,0];
             logs.forEach(l=>{
                 const date=l.timestamp?.toDate ? l.timestamp.toDate() : new Date();
@@ -786,7 +785,7 @@
             charts['sanctuary'].data.datasets[0].data=fData;charts['sanctuary'].data.datasets[1].data=cData;charts['sanctuary'].data.datasets[2].data=sData;charts['sanctuary'].update();
         }
 
-        // FORGE SETTINGS SAVE & LOAD
+        // FORGE SETTINGS LOAD & SAVE
         function populateForgeForm(){
             $('setting-user-theme').value=userSettings.userTheme||'gold';
             $('setting-particle-intensity').value=userSettings.particleIntensity??15;
@@ -967,7 +966,7 @@
                 $('today-hours-label').innerText=`${todayHours.toFixed(2)} / ${softCap.toFixed(2)} hrs`;
                 $('daily-cap-status').innerText=`${Math.max(0,softCap-todayHours).toFixed(2)}h remaining`;
 
-                // CORRECTED MONTHLY GOAL PERCENTAGE MATH
+                // ACCURATE MONTHLY GOAL PERCENTAGE
                 const monthlyPct=Math.min(100, Math.max(0, Math.round((finalPayout / monthlyCashTarget) * 100)));
                 $('gauge-tier-badge').innerText=`${monthlyPct}%`;
                 $('gauge-percent-text').innerText=`${monthlyPct}%`;
