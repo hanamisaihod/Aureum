@@ -47,7 +47,7 @@
         }
         .card:hover{box-shadow:0 14px 40px -6px var(--accent-glow), 0 0 0 1px var(--accent-primary);border-color:var(--accent-primary)!important}
 
-        /* EXPANDED SIDEBAR PROFILE AVATARS */
+        /* SIDEBAR AVATARS */
         .hud-avatar {
             width: 64px !important;
             height: 64px !important;
@@ -102,6 +102,22 @@
         
         .presence-pulse{animation:pulseGlow 2s infinite}
         @keyframes pulseGlow{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.85)}}
+        
+        /* RHYTHMICALLY SMOOTH SPINNING HOURGLASS ANIMATION */
+        .hourglass-spin-active {
+            display: inline-block;
+            animation: hourglassRhythmicSpin 3.5s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+            transform-origin: center center;
+            filter: drop-shadow(0 0 8px var(--accent-glow));
+        }
+        @keyframes hourglassRhythmicSpin {
+            0% { transform: rotate(0deg) scale(1); }
+            40% { transform: rotate(0deg) scale(1.12); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            90% { transform: rotate(180deg) scale(1.12); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
         .status-preset-btn{transition:all 0.2s ease;user-select:none}
         .status-preset-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,0.4);border-color:var(--accent-primary)}
         .no-scrollbar::-webkit-scrollbar{display:none}
@@ -241,10 +257,10 @@
         </div>
     </div>
 
-    <!-- MAIN APP WRAPPER WITH RESPONSIVE TWO-COLUMN SIDEBAR LAYOUT -->
+    <!-- MAIN APP WRAPPER -->
     <div id="app-content" class="hidden flex flex-col md:flex-row gap-6 max-w-7xl mx-auto">
         
-        <!-- VERTICAL SIDEBAR PANEL WITH PROMINENT NAV BUTTONS -->
+        <!-- VERTICAL SIDEBAR PANEL -->
         <aside class="app-sidebar p-4 sm:p-5 rounded-2xl md:w-72 lg:w-80 shrink-0 space-y-6 md:sticky md:top-6 md:h-[calc(100vh-3rem)] flex flex-col overflow-y-auto no-scrollbar">
             <!-- BRAND HEADER -->
             <div class="flex items-center justify-between pb-3 border-b border-slate-800">
@@ -265,7 +281,10 @@
                         </div>
                         <div class="min-w-0 flex-1 space-y-1">
                             <div class="flex items-center justify-between gap-1">
-                                <span class="font-black text-sm text-slate-100">North</span>
+                                <span class="font-black text-sm text-slate-100 flex items-center gap-1">
+                                    <span>North</span>
+                                    <span id="hud-timer-spin-north" class="hidden text-xs text-amber-400">⏳</span>
+                                </span>
                                 <span id="hud-badge-north" class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">YOU</span>
                             </div>
                             <div id="hud-status-north" onclick="editUserStatusNote('North', event)" class="text-xs text-slate-300 truncate hover:text-amber-300 cursor-pointer font-medium" title="Click to edit status">Drawing 🎨</div>
@@ -286,7 +305,10 @@
                         </div>
                         <div class="min-w-0 flex-1 space-y-1">
                             <div class="flex items-center justify-between gap-1">
-                                <span class="font-black text-sm text-slate-100">Cream</span>
+                                <span class="font-black text-sm text-slate-100 flex items-center gap-1">
+                                    <span>Cream</span>
+                                    <span id="hud-timer-spin-cream" class="hidden text-xs text-amber-400">⏳</span>
+                                </span>
                                 <span id="hud-badge-cream" class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">PEER</span>
                             </div>
                             <div id="hud-status-cream" onclick="editUserStatusNote('Cream', event)" class="text-xs text-slate-300 truncate hover:text-amber-300 cursor-pointer font-medium" title="Click to edit status">Writing ✍️</div>
@@ -368,10 +390,10 @@
 
                 <!-- MAIN WORK & FOCUS HUB (2-COLUMN GRID) -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    <!-- LEFT COLUMN: FOCUS TIMER & AUDIO -->
+                    <!-- LEFT COLUMN: FOCUS TIMER & HOURGLASS PRESETS -->
                     <div class="lg:col-span-7 space-y-5">
-                        <!-- HERO TIMER CLOCK CARD -->
-                        <div class="card p-6 sm:p-7 rounded-2xl text-center space-y-4 shadow-xl relative">
+                        <!-- HERO TIMER CLOCK CARD WITH RHYTHMIC HOURGLASS ANIMATION -->
+                        <div class="card p-6 sm:p-7 rounded-2xl text-center space-y-4 shadow-xl relative overflow-hidden">
                             <div id="pomo-spectator-banner" class="hidden p-2 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 font-medium">
                                 👁️ Viewing <strong><span id="pomo-spectator-target"></span>'s</strong> Timer
                             </div>
@@ -380,20 +402,54 @@
                                 <button onclick="handleUserSelectPomoMode('short')" id="pomo-mode-short" class="px-4 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition-all">Short Break</button>
                                 <button onclick="handleUserSelectPomoMode('long')" id="pomo-mode-long" class="px-4 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition-all">Long Break</button>
                             </div>
+                            
+                            <!-- CLOCK DISPLAY WITH RHYTHMIC SPINNING HOURGLASS -->
                             <div class="flex items-center justify-center gap-2">
+                                <span id="timer-active-hourglass" class="text-xl text-amber-400 hidden">⏳</span>
                                 <span class="text-xs uppercase tracking-widest theme-accent-text font-black" id="pomo-round-badge">Round 1 of 4</span>
                                 <div id="pomo-round-dots" class="flex gap-1.5 ml-2"></div>
                             </div>
+
                             <div id="pomo-clock-container" onclick="handleClockClick()" class="cursor-pointer group select-none py-1 my-1 rounded-2xl transition-all hover:bg-slate-800/50">
                                 <div id="pomo-timer-display" class="text-6xl sm:text-7xl font-mono font-black theme-accent-text tracking-wider group-hover:scale-105 transition-transform">25:00</div>
                                 <div id="pomo-status-label" class="text-xs text-slate-300 mt-2 uppercase tracking-widest font-bold group-hover:text-amber-300">Click Timer or Press Spacebar</div>
                             </div>
+                            
                             <div class="w-full bg-slate-900/80 h-2.5 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
                                 <div id="pomo-progress-bar" class="theme-accent-bg h-full rounded-full transition-all duration-1000 w-full"></div>
                             </div>
+                            
                             <div id="pomo-controls-box" class="flex justify-center gap-3 pt-1">
                                 <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="px-8 py-2.5 rounded-xl theme-accent-btn font-extrabold text-xs transition-all shadow-md">Start Focus</button>
                                 <button onclick="resetMyPomoTimer()" class="px-5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-xs transition-all">Reset</button>
+                            </div>
+                        </div>
+
+                        <!-- HOURGLASS PRESETS CARD (15M MULTIPLES) -->
+                        <div id="hourglass-presets-card" class="card p-4 rounded-2xl border border-slate-800 space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                                <span class="text-xs font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
+                                    <span>⏳</span> <span>Hourglass Presets</span>
+                                </span>
+                                <span class="text-[10px] text-slate-500 font-mono font-semibold">15m Multiples (0.25h aligned)</span>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                                <button type="button" onclick="applyPomoPreset(15, 5, 10)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-left transition-all group">
+                                    <div class="text-xs font-black text-amber-400 group-hover:text-amber-300">15m / 5m</div>
+                                    <div class="text-[10px] text-slate-400 font-mono font-medium">0.25h Focus</div>
+                                </button>
+                                <button type="button" onclick="applyPomoPreset(30, 5, 15)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-left transition-all group">
+                                    <div class="text-xs font-black text-amber-400 group-hover:text-amber-300">30m / 5m</div>
+                                    <div class="text-[10px] text-slate-400 font-mono font-medium">0.50h Focus</div>
+                                </button>
+                                <button type="button" onclick="applyPomoPreset(45, 15, 20)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-left transition-all group">
+                                    <div class="text-xs font-black text-amber-400 group-hover:text-amber-300">45m / 15m</div>
+                                    <div class="text-[10px] text-slate-400 font-mono font-medium">0.75h Focus</div>
+                                </button>
+                                <button type="button" onclick="applyPomoPreset(60, 15, 30)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-left transition-all group">
+                                    <div class="text-xs font-black text-amber-400 group-hover:text-amber-300">60m / 15m</div>
+                                    <div class="text-[10px] text-slate-400 font-mono font-medium">1.00h Focus</div>
+                                </button>
                             </div>
                         </div>
 
@@ -444,45 +500,6 @@
                                     <button type="button" onclick="confirmLogUnloggedFocusToCrucible(event)" class="px-4 py-1.5 theme-accent-btn font-black text-xs rounded-lg shadow transition-all">
                                         Export
                                     </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- MELODIC AUDIO ENGINE CARD -->
-                        <div id="audioSettingsCard" class="card p-4 rounded-2xl border border-slate-800 space-y-3">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-1.5"><span>🔔</span> <span>Audio Engine</span></span>
-                                <button type="button" onclick="previewPomoSound()" class="px-3 py-1.5 theme-accent-btn font-black text-xs rounded-lg transition-all flex items-center gap-1">
-                                    <span>🔊</span> <span>Test Sound</span>
-                                </button>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Sound Tone</label>
-                                    <select id="setting-pomo-sound" onchange="handleInstantSoundChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                                        <option value="zen_bowl">Zen Bowl</option>
-                                        <option value="ethereal_synth">✨ Ethereal Synth</option>
-                                        <option value="arpeggio_chime">Crystal Chime</option>
-                                        <option value="cosmic_pad">Cosmic Pad</option>
-                                        <option value="marimba_cascade">Warm Marimba</option>
-                                        <option value="harp_glissando">🎵 Harp Glissando</option>
-                                        <option value="celeste_melody">Celeste Melody</option>
-                                        <option value="starlight_chords">Starlight Chords</option>
-                                        <option value="aureate_fanfare">Aureate Fanfare</option>
-                                        <option value="luminous_bell">💎 Luminous Bell</option>
-                                        <option value="chime_cascade">🔔 Chime Cascade</option>
-                                        <option value="lullaby_arpeggio">Lullaby Arpeggio</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Loop Repeats</label>
-                                    <select id="setting-pomo-repeats" onchange="handleInstantSoundRepeatChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                                        <option value="1">1x Loop</option>
-                                        <option value="2">2x Loops</option>
-                                        <option value="3" selected>3x Loops</option>
-                                        <option value="4">4x Loops</option>
-                                        <option value="5">5x Loops</option>
-                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -652,7 +669,7 @@
                     </div>
                 </div>
 
-                <!-- INTERACTIVE IMMERSIVE TWO-PAGE REFLECTION BOOK -->
+                <!-- INTERACTIVE IMMERSIVE TWO-PAGE REFLECTION BOOK (SWAPPED PLACES & HOLDABLE NAV) -->
                 <div class="journal-book p-6 sm:p-8 rounded-3xl relative overflow-hidden space-y-4">
                     <div class="journal-spine hidden sm:block"></div>
                     
@@ -661,29 +678,16 @@
                             <span class="text-2xl">📖</span>
                             <h2 class="text-xl font-black text-slate-100">Chronicle Journal</h2>
                         </div>
+                        <!-- HOLDABLE PAGINATION CONTROLS -->
                         <div class="flex items-center gap-2">
-                            <button onclick="changeJournalBookPage(-1)" class="px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-xl text-xs font-bold transition-all select-none">◀ Prev</button>
+                            <button onmousedown="startHoldJournalPage(-1, event)" ontouchstart="startHoldJournalPage(-1, event)" class="px-3.5 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-xl text-xs font-bold transition-all select-none">◀ Prev</button>
                             <span id="journal-page-number-label" class="text-xs font-mono font-bold text-amber-400 px-2">Page 1</span>
-                            <button onclick="changeJournalBookPage(1)" class="px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-xl text-xs font-bold transition-all select-none">Next ▶</button>
+                            <button onmousedown="startHoldJournalPage(1, event)" ontouchstart="startHoldJournalPage(1, event)" class="px-3.5 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-xl text-xs font-bold transition-all select-none">Next ▶</button>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10 pt-2">
-                        <!-- LEFT PAGE: PREVIOUS REFLECTION ENTRY LOG -->
-                        <div class="journal-page p-5 sm:p-6 rounded-2xl flex flex-col justify-between min-h-[320px]">
-                            <div class="space-y-3">
-                                <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
-                                    <span class="text-xs font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5"><span>📜</span> <span>Previous Entry</span></span>
-                                    <span id="book-left-date" class="text-xs font-mono text-slate-400">---</span>
-                                </div>
-                                <div id="book-left-content" class="text-sm text-slate-200 italic leading-relaxed font-serif pt-1 max-h-[240px] overflow-y-auto">
-                                    No entry logged for this page.
-                                </div>
-                            </div>
-                            <div class="text-right border-t border-slate-800/80 pt-2 text-[10px] text-slate-500 font-mono" id="book-left-footer">Page Left</div>
-                        </div>
-
-                        <!-- RIGHT PAGE: TODAY'S WRITE & SAVE PAGE -->
+                        <!-- LEFT PAGE: WRITE & SAVE TODAY's PAGE -->
                         <div class="journal-page p-5 sm:p-6 rounded-2xl flex flex-col justify-between min-h-[320px]">
                             <form id="diary-form-card" onsubmit="saveDailyDiary(event)" class="space-y-3 flex-1 flex flex-col justify-between">
                                 <div class="space-y-2 flex-1">
@@ -694,10 +698,24 @@
                                     <textarea id="diary-text" rows="7" placeholder="Write today's reflection..." class="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-sm text-slate-100 font-serif focus:outline-none focus:border-amber-500 resize-none flex-1 leading-relaxed"></textarea>
                                 </div>
                                 <div class="flex justify-between items-center border-t border-slate-800/80 pt-2">
-                                    <span class="text-[10px] text-slate-500 font-mono">Page Right</span>
+                                    <span class="text-[10px] text-slate-500 font-mono">Page Left</span>
                                     <button type="submit" class="theme-accent-btn font-black px-6 py-2 rounded-xl text-xs transition-all">Sign & Save Page</button>
                                 </div>
                             </form>
+                        </div>
+
+                        <!-- RIGHT PAGE: PREVIOUS REFLECTION ENTRY LOG (ALIGNED UNDER CONTROLS) -->
+                        <div class="journal-page p-5 sm:p-6 rounded-2xl flex flex-col justify-between min-h-[320px]">
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
+                                    <span class="text-xs font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5"><span>📜</span> <span>Chronicle Reader</span></span>
+                                    <span id="book-right-date" class="text-xs font-mono text-slate-400">---</span>
+                                </div>
+                                <div id="book-right-content" class="text-sm text-slate-200 italic leading-relaxed font-serif pt-1 max-h-[240px] overflow-y-auto">
+                                    No entry logged for this page.
+                                </div>
+                            </div>
+                            <div class="text-right border-t border-slate-800/80 pt-2 text-[10px] text-slate-500 font-mono" id="book-right-footer">Page Right</div>
                         </div>
                     </div>
                 </div>
@@ -799,9 +817,48 @@
                 </div>
             </div>
 
-            <!-- TAB 5: FORGE SETTINGS -->
+            <!-- TAB 5: FORGE SETTINGS (WITH INTEGRATED AUDIO ENGINE) -->
             <div id="tab-forge" class="hidden space-y-6">
                 <form onsubmit="saveAllForgeSettings(event)" class="space-y-6 max-w-2xl mx-auto">
+                    <!-- AUDIO ENGINE CARD MOVED TO FORGE -->
+                    <div id="audioSettingsCard" class="card p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h2 class="text-xl font-black text-slate-100 flex items-center gap-2"><span>🔔</span> <span>Audio Engine</span></h2>
+                            <button type="button" onclick="previewPomoSound()" class="px-3 py-1.5 theme-accent-btn font-black text-xs rounded-lg transition-all flex items-center gap-1">
+                                <span>🔊</span> <span>Test Sound</span>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Sound Tone</label>
+                                <select id="setting-pomo-sound" onchange="handleInstantSoundChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                                    <option value="zen_bowl">Zen Bowl</option>
+                                    <option value="ethereal_synth">✨ Ethereal Synth</option>
+                                    <option value="arpeggio_chime">Crystal Chime</option>
+                                    <option value="cosmic_pad">Cosmic Pad</option>
+                                    <option value="marimba_cascade">Warm Marimba</option>
+                                    <option value="harp_glissando">🎵 Harp Glissando</option>
+                                    <option value="celeste_melody">Celeste Melody</option>
+                                    <option value="starlight_chords">Starlight Chords</option>
+                                    <option value="aureate_fanfare">Aureate Fanfare</option>
+                                    <option value="luminous_bell">💎 Luminous Bell</option>
+                                    <option value="chime_cascade">🔔 Chime Cascade</option>
+                                    <option value="lullaby_arpeggio">Lullaby Arpeggio</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Loop Repeats</label>
+                                <select id="setting-pomo-repeats" onchange="handleInstantSoundRepeatChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                                    <option value="1">1x Loop</option>
+                                    <option value="2">2x Loops</option>
+                                    <option value="3" selected>3x Loops</option>
+                                    <option value="4">4x Loops</option>
+                                    <option value="5">5x Loops</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="card p-6 rounded-2xl">
                         <h2 class="text-xl font-black mb-5 text-slate-100">Appearance & Themes</h2>
                         <div class="space-y-4">
@@ -1438,6 +1495,17 @@
             executeStep();
             activeHoldTimer=setTimeout(()=>{activeHoldInterval=setInterval(executeStep,mode==='value'?80:120)},280);
         }
+
+        function startHoldJournalPage(delta,e){
+            if(isTouchScrolling)return;
+            const evt=e||window.event;
+            if(evt){if(evt.type==='touchstart'){if(evt.cancelable)evt.preventDefault()}else if(evt.type==='mousedown'&&('ontouchstart'in window)){return}}
+            stopHold();
+            const executeStep=()=>{ changeJournalBookPage(delta); };
+            executeStep();
+            activeHoldTimer=setTimeout(()=>{activeHoldInterval=setInterval(executeStep,140)},300);
+        }
+
         function stopHold(){if(activeHoldTimer){clearTimeout(activeHoldTimer);activeHoldTimer=null}if(activeHoldInterval){clearInterval(activeHoldInterval);activeHoldInterval=null}}
 
         function updateRatingUI(field){
@@ -1619,8 +1687,8 @@
             userSettings.pomoFocus=f;userSettings.pomoShort=s;userSettings.pomoLong=l;
             $('setting-pomo-focus').value=f;$('setting-pomo-short').value=s;$('setting-pomo-long').value=l;
             await db.collection('settings').doc(loggedInUser).set({pomoFocus:f,pomoShort:s,pomoLong:l},{merge:true});
-            playTone('save');setMyPomoMode(myPomoMode);
-            showToast({title:'⏱️ Preset Applied',subtitle:`${f}m Focus / ${s}m Short / ${l}m Long`,icon:'⚙️',tier:'gold'});
+            playTone('save');setMyPomoMode('focus');
+            showToast({title:'⏳ Preset Applied',subtitle:`${f}m Focus (${(f/60).toFixed(2)}h) / ${s}m Break`,icon:'⌛',tier:'gold'});
         }
 
         async function initAndRecoverMyPomoState(){
@@ -1660,6 +1728,18 @@
                 $('pomo-mode-focus').innerText=`Focus (${f}m)`;$('pomo-mode-short').innerText=`Short (${s}m)`;$('pomo-mode-long').innerText=`Long (${l}m)`;
                 $('pomo-timer-display').innerText=`${Math.floor(secs/60).toString().padStart(2,'0')}:${(secs%60).toString().padStart(2,'0')}`;
                 $('pomo-progress-bar').style.width=`${initT>0?(secs/initT)*100:0}%`;
+
+                // ANIMATED RHYTHMIC HOURGLASS INDICATORS
+                const activeHgIcon=$('timer-active-hourglass');
+                if(activeHgIcon){
+                    if(isR){
+                        activeHgIcon.classList.remove('hidden');
+                        activeHgIcon.classList.add('hourglass-spin-active');
+                    }else{
+                        activeHgIcon.classList.add('hidden');
+                        activeHgIcon.classList.remove('hourglass-spin-active');
+                    }
+                }
 
                 const statusEl=$('pomo-status-label'),toggleBtn=$('pomo-toggle-btn');
                 if(isSelf){
@@ -1874,6 +1954,19 @@
                     const lastActive=s.lastActiveTimestamp||0;
                     const isOnline=(Date.now()-lastActive)<300000;
                     dotEl.className=isOnline?"absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950 presence-pulse":"absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-slate-600 border-2 border-slate-950";
+                }
+
+                // ANIMATED PROFILE HOURGLASS SPINNER
+                const spinIcon=$(`hud-timer-spin-${u.toLowerCase()}`);
+                if(spinIcon){
+                    const isRunningTimer = isMe ? myPomoIsRunning : !!s.livePomoState?.isRunning;
+                    if(isRunningTimer){
+                        spinIcon.classList.remove('hidden');
+                        spinIcon.classList.add('hourglass-spin-active');
+                    }else{
+                        spinIcon.classList.add('hidden');
+                        spinIcon.classList.remove('hourglass-spin-active');
+                    }
                 }
 
                 const badgeEl=$(`hud-badge-${u.toLowerCase()}`);
@@ -2093,17 +2186,17 @@
         }
 
         function renderJournalBookView(diaryLogs){
-            const label=$('journal-page-number-label'),leftDate=$('book-left-date'),leftContent=$('book-left-content'),leftFooter=$('book-left-footer');
-            if(!leftContent)return;
+            const label=$('journal-page-number-label'),rightDate=$('book-right-date'),rightContent=$('book-right-content'),rightFooter=$('book-right-footer');
+            if(!rightContent)return;
             if(!diaryLogs||diaryLogs.length===0){
-                label.innerText="Page 1";leftDate.innerText="---";leftContent.innerHTML='No entries logged yet.';leftFooter.innerText="Page Left";return;
+                label.innerText="Page 1";rightDate.innerText="---";rightContent.innerHTML='No entries logged yet.';rightFooter.innerText="Page Right";return;
             }
             const log=diaryLogs[currentJournalPageIndex];
             const logDate=getLogDate(log);
             label.innerText=`Page ${currentJournalPageIndex+1} of ${diaryLogs.length}`;
-            leftDate.innerText=logDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-            leftContent.innerText=`"${log.text}"`;
-            leftFooter.innerText=`Written by ${log.user||viewedUser}`;
+            rightDate.innerText=logDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+            rightContent.innerText=`"${log.text}"`;
+            rightFooter.innerText=`Written by ${log.user||viewedUser}`;
         }
 
         async function handleInstantThemeChange(){
