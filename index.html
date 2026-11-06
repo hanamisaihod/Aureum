@@ -23,6 +23,12 @@
         body[data-theme="crimson"]{--bg-main:#1a0c0e;--card-bg:rgba(34,14,17,0.92);--card-border:rgba(239,68,68,0.2);--accent-primary:#ef4444;--accent-secondary:#f59e0b;--accent-glow:rgba(239,68,68,0.4);--accent-text:#ffffff}
         body[data-theme="matcha"]{--bg-main:#121813;--card-bg:rgba(20,28,22,0.92);--card-border:rgba(132,204,22,0.2);--accent-primary:#84cc16;--accent-secondary:#fde047;--accent-glow:rgba(132,204,22,0.35);--accent-text:#020617}
         body[data-theme="monochrome"]{--bg-main:#121212;--card-bg:rgba(24,24,24,0.92);--card-border:rgba(255,255,255,0.12);--accent-primary:#e2e8f0;--accent-secondary:#38bdf8;--accent-glow:rgba(226,232,240,0.3);--accent-text:#0f172a}
+
+        /* REMOVE UGLY BROWSER NUMBER SPINNERS */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
         body{background-color:var(--bg-main);color:#f8fafc;font-family:system-ui,-apple-system,sans-serif;transition:background-color 0.3s}
         .card{background:var(--card-bg);border:1px solid var(--card-border);box-shadow:0 8px 32px 0 rgba(0,0,0,0.3);transition:box-shadow 0.25s,border-color 0.3s}
         .card:hover{box-shadow:0 12px 36px -8px var(--accent-glow);border-color:rgba(255,255,255,0.18)}
@@ -96,6 +102,11 @@
 
     <!-- MAIN APP CONTENT -->
     <div id="app-content" class="hidden space-y-4">
+        <!-- SPECTATOR READ-ONLY BANNER -->
+        <div id="read-only-banner" class="hidden card p-3 rounded-xl text-center text-amber-300 bg-amber-500/10 border-amber-500/30 text-xs font-medium">
+            🔒 Spectator Mode: Viewing <strong><span id="view-target-name"></span>'s</strong> live UI page. Controls and log edits are disabled.
+        </div>
+
         <!-- HEADER WITH DUO HUD CARDS -->
         <header class="flex flex-col lg:flex-row justify-between items-center pb-4 border-b border-slate-700/80 gap-4">
             <div class="flex items-center justify-between w-full lg:w-auto">
@@ -174,7 +185,7 @@
                 <div class="card p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
                     <div>
                         <div class="text-[10px] font-bold text-slate-400 uppercase">Monthly Goal</div>
-                        <div id="gauge-tier-badge" class="text-sm font-black theme-accent-text mt-0.5">Initiate</div>
+                        <div id="gauge-tier-badge" class="text-sm font-black theme-accent-text mt-0.5">0%</div>
                     </div>
                     <div class="relative w-10 h-10 flex-shrink-0 flex items-center justify-center">
                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
@@ -209,8 +220,8 @@
                     </div>
 
                     <div class="flex justify-center gap-3">
-                        <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="px-6 py-2 rounded-xl theme-accent-bg font-bold text-xs shadow-md">Start Focus</button>
-                        <button onclick="resetMyPomoTimer()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs">Reset</button>
+                        <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="spectator-disable px-6 py-2 rounded-xl theme-accent-bg font-bold text-xs shadow-md">Start Focus</button>
+                        <button onclick="resetMyPomoTimer()" class="spectator-disable px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs">Reset</button>
                     </div>
 
                     <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
@@ -219,8 +230,8 @@
                             <div class="text-base font-black text-white font-mono" id="pomo-unlogged-hours">0.00 hrs</div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button onclick="resetUnloggedFocusTime(event)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-red-900/40 text-slate-400 text-xs rounded-lg border border-slate-700">🗑️</button>
-                            <button onclick="togglePomoExportDrawer()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg shadow">Log to Crucible</button>
+                            <button onclick="resetUnloggedFocusTime(event)" class="spectator-disable px-2.5 py-1.5 bg-slate-800 hover:bg-red-900/40 text-slate-400 text-xs rounded-lg border border-slate-700">🗑️</button>
+                            <button onclick="togglePomoExportDrawer()" class="spectator-disable px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg shadow">Log to Crucible</button>
                         </div>
                     </div>
 
@@ -247,7 +258,7 @@
                                 </select>
                             </div>
                         </div>
-                        <button type="button" onclick="confirmLogUnloggedFocusToCrucible(event)" class="w-full py-2 bg-emerald-500 text-slate-950 font-bold text-xs rounded-lg shadow">Confirm Export</button>
+                        <button type="button" onclick="confirmLogUnloggedFocusToCrucible(event)" class="spectator-disable w-full py-2 bg-emerald-500 text-slate-950 font-bold text-xs rounded-lg shadow">Confirm Export</button>
                     </div>
                 </div>
 
@@ -264,9 +275,9 @@
                         <div>
                             <label class="block text-xs text-slate-400 mb-1 font-medium">Time Spent (Hours)</label>
                             <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden max-w-xs">
-                                <button type="button" onclick="adjustTimeInput('work-time', -0.25)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
+                                <button type="button" onclick="adjustTimeInput('work-time', -0.25)" class="spectator-disable px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">-</button>
                                 <input type="number" id="work-time" step="0.25" min="0.25" value="1.00" required class="w-full text-center bg-transparent py-1.5 text-sm text-white font-mono font-bold focus:outline-none">
-                                <button type="button" onclick="adjustTimeInput('work-time', 0.25)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
+                                <button type="button" onclick="adjustTimeInput('work-time', 0.25)" class="spectator-disable px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold select-none">+</button>
                             </div>
                         </div>
 
@@ -274,7 +285,7 @@
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1 font-medium">Quality Rating</label>
                                 <div class="flex items-center bg-slate-900 rounded-xl border border-slate-800 p-1 min-h-[72px]">
-                                    <button type="button" onclick="adjustRating('results', -1)" class="px-2.5 py-3 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold">◀</button>
+                                    <button type="button" onclick="adjustRating('results', -1)" class="spectator-disable px-2.5 py-3 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold">◀</button>
                                     <div class="flex-1 text-center">
                                         <div class="flex items-center justify-center gap-1">
                                             <span id="q-icon" class="text-lg">🎯</span>
@@ -282,13 +293,13 @@
                                         </div>
                                         <div id="q-title" class="text-xs font-bold text-slate-100 mt-0.5">Solid Output</div>
                                     </div>
-                                    <button type="button" onclick="adjustRating('results', 1)" class="px-2.5 py-3 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold">▶</button>
+                                    <button type="button" onclick="adjustRating('results', 1)" class="spectator-disable px-2.5 py-3 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold">▶</button>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1 font-medium">Focus Effort</label>
                                 <div class="flex items-center bg-slate-900 rounded-xl border border-slate-800 p-1 min-h-[72px]">
-                                    <button type="button" onclick="adjustRating('effort', -1)" class="px-2.5 py-3 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold">◀</button>
+                                    <button type="button" onclick="adjustRating('effort', -1)" class="spectator-disable px-2.5 py-3 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold">◀</button>
                                     <div class="flex-1 text-center">
                                         <div class="flex items-center justify-center gap-1">
                                             <span id="e-icon" class="text-lg">🔥</span>
@@ -296,12 +307,12 @@
                                         </div>
                                         <div id="e-title" class="text-xs font-bold text-slate-100 mt-0.5">Moderate Strain</div>
                                     </div>
-                                    <button type="button" onclick="adjustRating('effort', 1)" class="px-2.5 py-3 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold">▶</button>
+                                    <button type="button" onclick="adjustRating('effort', 1)" class="spectator-disable px-2.5 py-3 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold">▶</button>
                                 </div>
                             </div>
                         </div>
 
-                        <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-md">Save Work Session</button>
+                        <button type="submit" class="spectator-disable w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-md">Save Work Session</button>
                     </form>
                 </div>
             </div>
@@ -309,28 +320,28 @@
 
         <!-- PAGE 2: SANCTUARY -->
         <div id="tab-sanctuary" class="hidden space-y-4">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
                 <!-- TODOS SCRATCHPAD -->
                 <div class="card p-5 rounded-2xl flex flex-col justify-between space-y-3 border border-slate-800">
                     <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
                         <h2 class="text-sm font-bold text-slate-200 uppercase flex items-center gap-2"><span>📝</span> <span>Todos</span></h2>
                         <div class="flex items-center gap-2">
                             <span id="todo-count-active" class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">0 Active</span>
-                            <button onclick="clearCompletedTodos()" class="text-[10px] text-slate-400 hover:text-red-400 px-2 py-0.5 rounded bg-slate-800 border border-slate-700">Clear Done</button>
+                            <button onclick="clearCompletedTodos()" class="spectator-disable text-[10px] text-slate-400 hover:text-red-400 px-2 py-0.5 rounded bg-slate-800 border border-slate-700">Clear Done</button>
                         </div>
                     </div>
                     <form onsubmit="addTodoItem(event)" class="flex gap-2">
                         <input type="text" id="todo-input" placeholder="Add a quick task..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                        <button type="submit" class="theme-accent-bg font-bold px-4 py-2 rounded-xl text-xs shadow-md">+ Add</button>
+                        <button type="submit" class="spectator-disable theme-accent-bg font-bold px-4 py-2 rounded-xl text-xs shadow-md">+ Add</button>
                     </form>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                         <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800">
                             <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Pending</div>
-                            <div id="todo-active-list" class="space-y-1.5 max-h-[220px] overflow-y-auto pr-1"></div>
+                            <div id="todo-active-list" class="space-y-1.5 max-h-[260px] overflow-y-auto pr-1"></div>
                         </div>
                         <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800">
                             <div class="text-[10px] font-bold text-slate-500 uppercase mb-2">Done</div>
-                            <div id="todo-completed-list" class="space-y-1.5 max-h-[220px] overflow-y-auto pr-1"></div>
+                            <div id="todo-completed-list" class="space-y-1.5 max-h-[260px] overflow-y-auto pr-1"></div>
                         </div>
                     </div>
                 </div>
@@ -341,41 +352,64 @@
                         <h2 class="text-sm font-bold text-slate-200 uppercase flex items-center gap-2"><span>📖</span> <span>Daily Reflection</span></h2>
                     </div>
                     <form onsubmit="saveDailyDiary(event)" class="space-y-3">
-                        <textarea id="diary-text" rows="4" placeholder="What went well today? Lessons learned or ideas?" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500 resize-none"></textarea>
+                        <textarea id="diary-text" rows="5" placeholder="What went well today? Lessons learned or ideas?" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500 resize-none"></textarea>
                         <div class="flex justify-end">
-                            <button type="submit" class="theme-accent-bg font-bold px-4 py-2 rounded-xl text-xs shadow">Save Reflection</button>
+                            <button type="submit" class="spectator-disable theme-accent-bg font-bold px-4 py-2 rounded-xl text-xs shadow">Save Reflection</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- LIFE LOGGERS GRID -->
+            <!-- LIFE LOGGERS GRID (WITH RESTORED RATING SELECTORS) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- FITNESS LOG -->
                 <div class="card p-4 rounded-xl space-y-3 border border-slate-800">
                     <h3 class="text-xs font-bold text-slate-200 flex items-center gap-1.5"><span>🏃</span> <span>Fitness Log</span></h3>
                     <form onsubmit="logWorkout(event)" class="space-y-3">
                         <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
-                            <button type="button" onclick="adjustTimeInput('workout-time', -0.25)" class="px-3 py-1.5 bg-slate-800 text-slate-200 font-bold">-</button>
+                            <button type="button" onclick="adjustTimeInput('workout-time', -0.25)" class="spectator-disable px-3 py-1.5 bg-slate-800 text-slate-200 font-bold">-</button>
                             <input type="number" id="workout-time" step="0.25" min="0.25" value="0.75" required class="w-full text-center bg-transparent text-xs text-white font-mono font-bold focus:outline-none">
-                            <button type="button" onclick="adjustTimeInput('workout-time', 0.25)" class="px-3 py-1.5 bg-slate-800 text-slate-200 font-bold">+</button>
+                            <button type="button" onclick="adjustTimeInput('workout-time', 0.25)" class="spectator-disable px-3 py-1.5 bg-slate-800 text-slate-200 font-bold">+</button>
                         </div>
-                        <button type="submit" class="w-full theme-accent-bg font-bold py-2 rounded-xl text-xs">Save Workout</button>
+                        <button type="submit" class="spectator-disable w-full theme-accent-bg font-bold py-2 rounded-xl text-xs">Save Workout</button>
                     </form>
                 </div>
 
+                <!-- HOUSE CHORES LOG -->
                 <div class="card p-4 rounded-xl space-y-3 border border-slate-800">
                     <h3 class="text-xs font-bold text-slate-200 flex items-center gap-1.5"><span>🧹</span> <span>House Chores</span></h3>
                     <form onsubmit="logChore(event)" class="space-y-3">
                         <input type="text" id="chore-note" placeholder="Task details..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white">
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-xl text-xs">Save Chore</button>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-1">Chore Strain Level</label>
+                            <select id="chore-effort" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-1.5 text-xs text-white">
+                                <option value="1">LVL 1 (Light tidying)</option>
+                                <option value="2">LVL 2 (Routine cleaning)</option>
+                                <option value="3" selected>LVL 3 (Deep house chore)</option>
+                                <option value="4">LVL 4 (Heavy organizing)</option>
+                                <option value="5">LVL 5 (Full home reset)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="spectator-disable w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-xl text-xs">Save Chore</button>
                     </form>
                 </div>
 
+                <!-- SNACKS LOG -->
                 <div class="card p-4 rounded-xl space-y-3 border border-slate-800">
                     <h3 class="text-xs font-bold text-slate-200 flex items-center gap-1.5"><span>🍨</span> <span>Snacks & Treats</span></h3>
                     <form onsubmit="logHealth(event)" class="space-y-3">
                         <input type="text" id="health-note" placeholder="Snack name..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white">
-                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-xl text-xs">Save Snack</button>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-1">Treat Rating Level</label>
+                            <select id="health-level" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-1.5 text-xs text-white">
+                                <option value="1">LVL 1 (Healthy snack)</option>
+                                <option value="2">LVL 2 (Light bite)</option>
+                                <option value="3" selected>LVL 3 (Standard treat)</option>
+                                <option value="4">LVL 4 (Rich dessert)</option>
+                                <option value="5">LVL 5 (Grand reward)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="spectator-disable w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-xl text-xs">Save Snack</button>
                     </form>
                 </div>
             </div>
@@ -400,15 +434,15 @@
                 </div>
             </div>
 
-            <!-- ANALYTICS CHARTS -->
+            <!-- ANALYTICS CHARTS (FIXED RE-INITIALIZATION & DATASETS) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="card p-4 rounded-xl space-y-2 border border-slate-800">
                     <div class="flex justify-between items-center">
                         <h3 class="text-xs font-bold text-slate-200 uppercase">Work Analytics</h3>
                         <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 text-[10px]">
-                            <button onclick="setChartRange('work', 'daily')" class="px-2 py-0.5 rounded text-slate-400">Daily</button>
-                            <button onclick="setChartRange('work', 'weekly')" class="px-2 py-0.5 rounded text-slate-400">Weekly</button>
-                            <button onclick="setChartRange('work', 'monthly')" class="px-2 py-0.5 rounded text-slate-400">Monthly</button>
+                            <button onclick="setChartRange('work', 'daily')" id="btn-work-daily" class="px-2 py-0.5 rounded text-white bg-blue-600">Daily</button>
+                            <button onclick="setChartRange('work', 'weekly')" id="btn-work-weekly" class="px-2 py-0.5 rounded text-slate-400">Weekly</button>
+                            <button onclick="setChartRange('work', 'monthly')" id="btn-work-monthly" class="px-2 py-0.5 rounded text-slate-400">Monthly</button>
                         </div>
                     </div>
                     <div class="h-48 w-full"><canvas id="workChart"></canvas></div>
@@ -418,9 +452,9 @@
                     <div class="flex justify-between items-center">
                         <h3 class="text-xs font-bold text-slate-200 uppercase">Activity Trends</h3>
                         <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700 text-[10px]">
-                            <button onclick="setChartRange('sanctuary', 'daily')" class="px-2 py-0.5 rounded text-slate-400">Daily</button>
-                            <button onclick="setChartRange('sanctuary', 'weekly')" class="px-2 py-0.5 rounded text-slate-400">Weekly</button>
-                            <button onclick="setChartRange('sanctuary', 'monthly')" class="px-2 py-0.5 rounded text-slate-400">Monthly</button>
+                            <button onclick="setChartRange('sanctuary', 'daily')" id="btn-sanctuary-daily" class="px-2 py-0.5 rounded text-white bg-blue-600">Daily</button>
+                            <button onclick="setChartRange('sanctuary', 'weekly')" id="btn-sanctuary-weekly" class="px-2 py-0.5 rounded text-slate-400">Weekly</button>
+                            <button onclick="setChartRange('sanctuary', 'monthly')" id="btn-sanctuary-monthly" class="px-2 py-0.5 rounded text-slate-400">Monthly</button>
                         </div>
                     </div>
                     <div class="h-48 w-full"><canvas id="sanctuaryChart"></canvas></div>
@@ -439,7 +473,7 @@
                 <div id="badge-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"></div>
             </div>
 
-            <!-- CHRONICLES REGISTRY -->
+            <!-- CHRONICLES REGISTRY WITH LOG DELETION -->
             <div class="card p-5 rounded-2xl border border-slate-800 space-y-3">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                     <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Chronicles Registry</h2>
@@ -461,7 +495,7 @@
             </div>
         </div>
 
-        <!-- PAGE 4: FORGE SETTINGS (RESTORED FULL OPTIONS) -->
+        <!-- PAGE 4: FORGE SETTINGS (RESTORED FULL CONTROL ENGINE) -->
         <div id="tab-forge" class="hidden space-y-4 max-w-2xl">
             <form onsubmit="saveAllForgeSettings(event)" class="space-y-4">
                 <div class="card p-5 rounded-xl border border-slate-800 space-y-3">
@@ -490,7 +524,7 @@
                 </div>
 
                 <div class="card p-5 rounded-xl border border-slate-800 space-y-3">
-                    <h2 class="text-sm font-bold text-slate-200 uppercase">Hourglass Timer Parameters</h2>
+                    <h2 class="text-sm font-bold text-slate-200 uppercase">Hourglass Timer & Audio Settings</h2>
                     <div class="grid grid-cols-3 gap-3">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Focus (Mins)</label>
@@ -503,6 +537,21 @@
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Long Break</label>
                             <input type="number" id="setting-pomo-long" value="15" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono font-bold">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Alarm Tone Preset</label>
+                            <select id="setting-pomo-sound" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
+                                <option value="zen_bowl">🥣 Zen Chime Bowl</option>
+                                <option value="digital_alarm">⏰ Digital Alarm</option>
+                                <option value="gong">🔔 Temple Gong</option>
+                                <option value="soft_chime">✨ Soft Bell Chime</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Tone Repetitions</label>
+                            <input type="number" id="setting-sound-repeats" min="1" max="5" value="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono font-bold">
                         </div>
                     </div>
                 </div>
@@ -529,12 +578,12 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full theme-accent-bg font-bold p-2.5 rounded-xl text-xs shadow-lg">Save Forge Settings</button>
+                <button type="submit" class="spectator-disable w-full theme-accent-bg font-bold p-2.5 rounded-xl text-xs shadow-lg">Save Forge Settings</button>
             </form>
         </div>
     </div>
 
-    <!-- REPAIRED ENGINE -->
+    <!-- REPAIRED ENGINE SCRIPT -->
     <script>
         const $=(i)=>document.getElementById(i);
         const firebaseConfig={apiKey:"AIzaSyAJ7cVPRiJfiShTKFi___pJ9VZHEcLM47Q",authDomain:"aureum-214d1.firebaseapp.com",projectId:"aureum-214d1",storageBucket:"aureum-214d1.firebasestorage.app",messagingSenderId:"967566110651",appId:"1:967566110651:web:4ee66bc4a6afd271b45e9e"};
@@ -575,17 +624,20 @@
             {id:'streak_100',tier:'aureum',icon:'🌋',title:'Monolith of Eternity',desc:'Maintain a 100-day active streak.'}
         ];
 
-        let userSettings={monthlyCash:8000,weeklyHours:10,dailySoftCap:4,maxBonusCapPct:125,pomoFocus:25,pomoShort:5,pomoLong:15,unloggedFocusSecs:0,userTheme:'gold',particleIntensity:15,statusNote:'',unlockedBadges:[],scratchpadTodos:[]};
+        let userSettings={monthlyCash:8000,weeklyHours:10,dailySoftCap:4,maxBonusCapPct:125,pomoFocus:30,pomoShort:5,pomoLong:15,pomoSound:'zen_bowl',pomoSoundRepeats:3,unloggedFocusSecs:0,userTheme:'gold',particleIntensity:15,statusNote:'',unlockedBadges:[],scratchpadTodos:[]};
         let spectatorSettings=null;
         let duoPresenceData={North:{settings:{},hoursToday:0,powerScore:0},Cream:{settings:{},hoursToday:0,powerScore:0}};
+        let currentRawLogsCache=[];
 
         function adjustTimeInput(id, delta){
+            if(loggedInUser!==viewedUser)return;
             const el=$(id);if(!el)return;
             let val=(parseFloat(el.value)||0)+delta;
             el.value=Math.max(0.25, val).toFixed(2);
         }
 
         function adjustRating(field, delta){
+            if(loggedInUser!==viewedUser)return;
             const input=$(`work-${field}`);if(!input)return;
             let val=Math.max(1, Math.min(5, (parseInt(input.value)||3)+delta));
             input.value=val;
@@ -593,14 +645,14 @@
             $(`${p}-icon`).innerText=d.icon;$(`${p}-badge`).innerText=`LVL ${d.level}`;$(`${p}-title`).innerText=d.title;
         }
 
-        // TODO ENGINE
+        // TODO ENGINE WITH WORD WRAPPING
         async function syncTodosToFirestore(list){
             if(loggedInUser!==viewedUser)return;
             userSettings.scratchpadTodos=list;renderTodoList();
             try{await db.collection('settings').doc(loggedInUser).set({scratchpadTodos:list},{merge:true})}catch(e){}
         }
         function addTodoItem(e){
-            if(e)e.preventDefault();
+            if(e)e.preventDefault();if(loggedInUser!==viewedUser)return;
             const input=$('todo-input');if(!input)return;
             const text=input.value.trim();if(!text)return;
             const list=[...(userSettings.scratchpadTodos||[])];
@@ -628,13 +680,21 @@
             const activeItems=[],doneItems=[];
             for(let i=0;i<todoData.length;i++){if(todoData[i].done)doneItems.push(todoData[i]);else activeItems.push(todoData[i])}
             $('todo-count-active').innerText=`${activeItems.length} Active`;
-            activeListEl.innerHTML=activeItems.length===0?'<div class="text-[11px] text-slate-500 italic py-1 text-center">No active tasks.</div>':activeItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item p-2 bg-slate-800/80 border border-slate-700/70 rounded-lg flex items-center justify-between gap-2 text-xs text-slate-200 select-none cursor-pointer"><div class="flex items-center gap-2 truncate"><span class="w-3.5 h-3.5 rounded border border-slate-600 shrink-0"></span><span class="truncate font-medium">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 text-[10px] font-bold">×</button>`:''}</div>`).join('');
-            doneListEl.innerHTML=doneItems.length===0?'<div class="text-[11px] text-slate-500 italic py-1 text-center">No completed tasks.</div>':doneItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item done p-2 bg-slate-900/60 border border-slate-800/80 rounded-lg flex items-center justify-between gap-2 text-xs text-slate-400 select-none cursor-pointer"><div class="flex items-center gap-2 truncate"><span class="w-3.5 h-3.5 rounded theme-accent-bg text-slate-950 flex items-center justify-center shrink-0 font-bold text-[9px]">✓</span><span class="truncate font-medium">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 text-[10px] font-bold">×</button>`:''}</div>`).join('');
+            activeListEl.innerHTML=activeItems.length===0?'<div class="text-[11px] text-slate-500 italic py-1 text-center">No active tasks.</div>':activeItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item p-2 bg-slate-800/80 border border-slate-700/70 rounded-lg flex items-start justify-between gap-2 text-xs text-slate-200 select-none ${isSelf?'cursor-pointer':'cursor-default'}"><div class="flex items-start gap-2 min-w-0"><span class="w-3.5 h-3.5 rounded border border-slate-600 shrink-0 mt-0.5"></span><span class="font-medium break-words whitespace-normal leading-tight">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 text-[10px] font-bold shrink-0 ml-1">×</button>`:''}</div>`).join('');
+            doneListEl.innerHTML=doneItems.length===0?'<div class="text-[11px] text-slate-500 italic py-1 text-center">No completed tasks.</div>':doneItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item done p-2 bg-slate-900/60 border border-slate-800/80 rounded-lg flex items-start justify-between gap-2 text-xs text-slate-400 select-none ${isSelf?'cursor-pointer':'cursor-default'}"><div class="flex items-start gap-2 min-w-0"><span class="w-3.5 h-3.5 rounded theme-accent-bg text-slate-950 flex items-center justify-center shrink-0 font-bold text-[9px] mt-0.5">✓</span><span class="font-medium break-words whitespace-normal leading-tight">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 text-[10px] font-bold shrink-0 ml-1">×</button>`:''}</div>`).join('');
         }
 
-        // TIMER LOGIC
-        let myPomoMode='focus',myPomoTime=1500,myPomoIsRunning=false,myPomoInterval=null;
+        // TIMER LOGIC WITH DEFAULT SETTINGS SYNC
+        let myPomoMode='focus',myPomoTime=1800,myPomoIsRunning=false,myPomoInterval=null;
+        function initTimerFromSettings(){
+            if(myPomoIsRunning)return;
+            const f=parseInt(userSettings.pomoFocus)||30,s=parseInt(userSettings.pomoShort)||5,l=parseInt(userSettings.pomoLong)||15;
+            myPomoTime=(myPomoMode==='focus'?f:(myPomoMode==='short'?s:l))*60;
+            renderTimerUI();
+        }
+
         function toggleMyPomoTimer(){
+            if(loggedInUser!==viewedUser)return;
             if(myPomoIsRunning){clearInterval(myPomoInterval);myPomoIsRunning=false}
             else{
                 myPomoIsRunning=true;
@@ -643,7 +703,7 @@
                     else{
                         clearInterval(myPomoInterval);myPomoIsRunning=false;
                         if(myPomoMode==='focus'){
-                            userSettings.unloggedFocusSecs=(userSettings.unloggedFocusSecs||0)+((userSettings.pomoFocus||25)*60);
+                            userSettings.unloggedFocusSecs=(userSettings.unloggedFocusSecs||0)+((userSettings.pomoFocus||30)*60);
                             updateUnloggedFocusDisplay();
                             db.collection('settings').doc(loggedInUser).set({unloggedFocusSecs:userSettings.unloggedFocusSecs},{merge:true});
                             handleUserSelectPomoMode('short');
@@ -654,11 +714,11 @@
             }
             renderTimerUI();
         }
-        function resetMyPomoTimer(){clearInterval(myPomoInterval);myPomoIsRunning=false;handleUserSelectPomoMode('focus')}
+        function resetMyPomoTimer(){if(loggedInUser!==viewedUser)return;clearInterval(myPomoInterval);myPomoIsRunning=false;handleUserSelectPomoMode('focus')}
         function handleClockClick(){if(loggedInUser===viewedUser)toggleMyPomoTimer()}
         function handleUserSelectPomoMode(m){
             myPomoMode=m;clearInterval(myPomoInterval);myPomoIsRunning=false;
-            const f=parseInt(userSettings.pomoFocus)||25,s=parseInt(userSettings.pomoShort)||5,l=parseInt(userSettings.pomoLong)||15;
+            const f=parseInt(userSettings.pomoFocus)||30,s=parseInt(userSettings.pomoShort)||5,l=parseInt(userSettings.pomoLong)||15;
             myPomoTime=(m==='focus'?f:(m==='short'?s:l))*60;
             ['focus','short','long'].forEach(x=>{$(`pomo-mode-${x}`)?.classList.remove('bg-blue-600','text-white');$(`pomo-mode-${x}`)?.classList.add('text-slate-400')});
             $(`pomo-mode-${m}`)?.classList.add('bg-blue-600','text-white');$(`pomo-mode-${m}`)?.classList.remove('text-slate-400');
@@ -672,7 +732,7 @@
             const secs=(loggedInUser===viewedUser?userSettings:spectatorSettings)?.unloggedFocusSecs||0;
             $('pomo-unlogged-hours').innerText=`${(secs/3600).toFixed(2)} hrs`;
         }
-        function togglePomoExportDrawer(){$('pomo-export-panel')?.classList.toggle('hidden')}
+        function togglePomoExportDrawer(){if(loggedInUser===viewedUser)$('pomo-export-panel')?.classList.toggle('hidden')}
         async function resetUnloggedFocusTime(e){
             if(loggedInUser!==viewedUser)return;
             userSettings.unloggedFocusSecs=0;updateUnloggedFocusDisplay();
@@ -692,22 +752,49 @@
             $('pomo-export-panel').classList.add('hidden');loadUserData();
         }
 
-        // CHARTS ENGINE
+        // CHARTS ENGINE WITH REPAIRED DATASETS & BUTTONS
         let charts={},chartTimeframes={work:'daily',sanctuary:'daily'};
         function initCharts(){
-            const opts={responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'#334155'},ticks:{color:'#94a3b8'}},y:{grid:{color:'#334155'},ticks:{color:'#94a3b8'},beginAtZero:true}},plugins:{legend:{display:false}}};
-            charts['work']=new Chart($('workChart').getContext('2d'),{type:'bar',data:{labels:[],datasets:[{data:[],backgroundColor:'#10b981'}]},options:opts});
-            charts['sanctuary']=new Chart($('sanctuaryChart').getContext('2d'),{type:'bar',data:{labels:[],datasets:[{label:'Fitness',data:[],backgroundColor:'#f59e0b'},{label:'Chores',data:[],backgroundColor:'#38bdf8'}]},options:{...opts,plugins:{legend:{display:true}}}});
+            const opts={responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'#334155'},ticks:{color:'#94a3b8'}},y:{grid:{color:'#334155'},ticks:{color:'#94a3b8'},beginAtZero:true}},plugins:{legend:{display:true,labels:{color:'#cbd5e1',font:{size:10}}}}};
+            charts['work']=new Chart($('workChart').getContext('2d'),{type:'bar',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'Work Hours',data:[0,0,0,0,0,0,0],backgroundColor:'#10b981'}]},options:opts});
+            charts['sanctuary']=new Chart($('sanctuaryChart').getContext('2d'),{type:'bar',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'Fitness (h)',data:[0,0,0,0,0,0,0],backgroundColor:'#f59e0b'},{label:'Chores (h)',data:[0,0,0,0,0,0,0],backgroundColor:'#38bdf8'},{label:'Snacks (Qty)',data:[0,0,0,0,0,0,0],backgroundColor:'#ec4899'}]},options:opts});
         }
-        function setChartRange(t,r){chartTimeframes[t]=r;loadUserData()}
+        function setChartRange(type, range){
+            chartTimeframes[type]=range;
+            ['daily','weekly','monthly'].forEach(r=>{
+                const btn=$(`btn-${type}-${r}`);if(btn){
+                    btn.classList.toggle('bg-blue-600', r===range);btn.classList.toggle('text-white', r===range);
+                    btn.classList.toggle('text-slate-400', r!==range);
+                }
+            });
+            updateCharts(currentRawLogsCache);
+        }
+
+        function updateCharts(logs){
+            if(!charts['work']||!charts['sanctuary'])return;
+            const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+            const wData=[0,0,0,0,0,0,0], fData=[0,0,0,0,0,0,0], cData=[0,0,0,0,0,0,0], sData=[0,0,0,0,0,0,0];
+            logs.forEach(l=>{
+                const date=l.timestamp?.toDate ? l.timestamp.toDate() : new Date();
+                const dayIdx=date.getDay();
+                if(l.type==='work') wData[dayIdx]+=(l.hours||0);
+                if(l.type==='workout') fData[dayIdx]+=(l.hours||0);
+                if(l.type==='chore') cData[dayIdx]+=(l.hours||0.5);
+                if(l.type==='health') sData[dayIdx]+=1;
+            });
+            charts['work'].data.datasets[0].data=wData;charts['work'].update();
+            charts['sanctuary'].data.datasets[0].data=fData;charts['sanctuary'].data.datasets[1].data=cData;charts['sanctuary'].data.datasets[2].data=sData;charts['sanctuary'].update();
+        }
 
         // FORGE SETTINGS SAVE & LOAD
         function populateForgeForm(){
             $('setting-user-theme').value=userSettings.userTheme||'gold';
             $('setting-particle-intensity').value=userSettings.particleIntensity??15;
-            $('setting-pomo-focus').value=userSettings.pomoFocus||25;
+            $('setting-pomo-focus').value=userSettings.pomoFocus||30;
             $('setting-pomo-short').value=userSettings.pomoShort||5;
             $('setting-pomo-long').value=userSettings.pomoLong||15;
+            $('setting-pomo-sound').value=userSettings.pomoSound||'zen_bowl';
+            $('setting-sound-repeats').value=userSettings.pomoSoundRepeats||3;
             $('setting-monthly-cash').value=userSettings.monthlyCash||8000;
             $('setting-daily-soft-cap').value=(userSettings.dailySoftCap||4).toFixed(2);
             $('setting-weekly-hours').value=userSettings.weeklyHours||10;
@@ -724,15 +811,17 @@
             e.preventDefault();if(loggedInUser!==viewedUser)return;
             userSettings.userTheme=$('setting-user-theme').value;
             userSettings.particleIntensity=parseInt($('setting-particle-intensity').value)||15;
-            userSettings.pomoFocus=parseInt($('setting-pomo-focus').value)||25;
+            userSettings.pomoFocus=parseInt($('setting-pomo-focus').value)||30;
             userSettings.pomoShort=parseInt($('setting-pomo-short').value)||5;
             userSettings.pomoLong=parseInt($('setting-pomo-long').value)||15;
+            userSettings.pomoSound=$('setting-pomo-sound').value;
+            userSettings.pomoSoundRepeats=parseInt($('setting-sound-repeats').value)||3;
             userSettings.monthlyCash=parseFloat($('setting-monthly-cash').value)||8000;
             userSettings.dailySoftCap=parseFloat($('setting-daily-soft-cap').value)||4.0;
             userSettings.weeklyHours=parseFloat($('setting-weekly-hours').value)||10;
             userSettings.maxBonusCapPct=parseFloat($('setting-max-bonus-cap').value)||125;
 
-            handleInstantThemeChange();
+            handleInstantThemeChange();initTimerFromSettings();
             await db.collection('settings').doc(loggedInUser).set(userSettings,{merge:true});
             loadUserData();
         }
@@ -765,6 +854,16 @@
             });
         }
 
+        function applySpectatorModeLocks(){
+            const isSpectator=(loggedInUser!==viewedUser);
+            $('read-only-banner').classList.toggle('hidden', !isSpectator);
+            if(isSpectator)$('view-target-name').innerText=viewedUser;
+            document.querySelectorAll('.spectator-disable').forEach(el=>{
+                if(isSpectator){el.setAttribute('disabled','true');el.classList.add('opacity-50','cursor-not-allowed')}
+                else{el.removeAttribute('disabled');el.classList.remove('opacity-50','cursor-not-allowed')}
+            });
+        }
+
         function initRealtimeSettingsListener(){
             db.collection('settings').doc(viewedUser).onSnapshot(doc=>{
                 if(doc.exists){
@@ -772,10 +871,10 @@
                     if(loggedInUser===viewedUser){
                         userSettings={...userSettings,...data};
                         document.body.setAttribute('data-theme',userSettings.userTheme||'gold');
-                        populateForgeForm();
+                        populateForgeForm();initTimerFromSettings();
                     } else spectatorSettings=data;
                 }
-                renderTodoList();renderDuoHUDCards();
+                renderTodoList();renderDuoHUDCards();applySpectatorModeLocks();
             });
         }
 
@@ -789,11 +888,12 @@
         function editUserStatusNote(user,e){if(e)e.stopPropagation();if(user===loggedInUser)$('status-picker-modal').classList.remove('hidden')}
         function closeStatusPicker(){$('status-picker-modal').classList.add('hidden')}
         async function selectStatusPreset(noteText){
-            if(!noteText)return;userSettings.statusNote=noteText;closeStatusPicker();renderDuoHUDCards();
+            if(!noteText||loggedInUser!==viewedUser)return;userSettings.statusNote=noteText;closeStatusPicker();renderDuoHUDCards();
             await db.collection('settings').doc(loggedInUser).set({statusNote:noteText},{merge:true});
         }
         async function promptCustomStatus(){
-            closeStatusPicker();const current=userSettings.statusNote||(loggedInUser==='North'?'Drawing 🎨':'Writing ✍️');
+            if(loggedInUser!==viewedUser)return;closeStatusPicker();
+            const current=userSettings.statusNote||(loggedInUser==='North'?'Drawing 🎨':'Writing ✍️');
             const customNote=prompt('Enter custom status:',current);
             if(customNote!==null&&customNote.trim())await selectStatusPreset(customNote.trim().substring(0,25));
         }
@@ -801,7 +901,7 @@
         // LOGGING ACTIONS
         let currentTodayHoursLogged=0;
         async function logWork(e){
-            e.preventDefault();
+            e.preventDefault();if(loggedInUser!==viewedUser)return;
             const T=parseFloat($('work-time').value),R=parseFloat($('work-results').value),E=parseFloat($('work-effort').value);
             const softCap=userSettings.dailySoftCap||4,baseRate=(R+E)/2;
             const normH=Math.min(T,Math.max(0,softCap-currentTodayHoursLogged)),overH=T-normH;
@@ -810,24 +910,32 @@
             loadUserData();
         }
         async function logWorkout(e){
-            e.preventDefault();const hrs=parseFloat($('workout-time').value);
+            e.preventDefault();if(loggedInUser!==viewedUser)return;const hrs=parseFloat($('workout-time').value);
             await db.collection('logs').add({type:'workout',user:loggedInUser,hours:hrs,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
             loadUserData();
         }
         async function logHealth(e){
-            e.preventDefault();const note=$('health-note').value.trim();
-            await db.collection('logs').add({type:'health',user:loggedInUser,level:1,note:note,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
+            e.preventDefault();if(loggedInUser!==viewedUser)return;const note=$('health-note').value.trim(),lvl=parseInt($('health-level').value)||3;
+            await db.collection('logs').add({type:'health',user:loggedInUser,level:lvl,note:note,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
             $('health-note').value='';loadUserData();
         }
         async function logChore(e){
-            e.preventDefault();const note=$('chore-note').value.trim();
-            await db.collection('logs').add({type:'chore',user:loggedInUser,hours:0.5,note:note,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
+            e.preventDefault();if(loggedInUser!==viewedUser)return;const note=$('chore-note').value.trim(),eff=parseInt($('chore-effort').value)||3;
+            await db.collection('logs').add({type:'chore',user:loggedInUser,hours:0.5,effort:eff,note:note,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
             $('chore-note').value='';loadUserData();
         }
         async function saveDailyDiary(e){
-            e.preventDefault();const text=$('diary-text').value.trim();if(!text)return;
+            e.preventDefault();if(loggedInUser!==viewedUser)return;const text=$('diary-text').value.trim();if(!text)return;
             await db.collection('logs').add({type:'diary',user:loggedInUser,text:text,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
             $('diary-text').value='';loadUserData();
+        }
+
+        async function deleteLogItem(logId, e){
+            if(e)e.stopPropagation();if(loggedInUser!==viewedUser)return;
+            if(confirm('Delete this record entry?')){
+                await db.collection('logs').doc(logId).delete();
+                loadUserData();
+            }
         }
 
         function loadUserData(){
@@ -845,37 +953,44 @@
                     }
                 });
 
+                currentRawLogsCache=rawLogs;
                 currentTodayHoursLogged=todayHours;
                 duoPresenceData[viewedUser].hoursToday=todayHours;
                 duoPresenceData[viewedUser].powerScore=totalPowerScore;
 
                 const softCap=userSettings.dailySoftCap||4;
-                const targetPts=userSettings.weeklyHours*12,pointRate=userSettings.monthlyCash/targetPts;
+                const monthlyCashTarget=userSettings.monthlyCash||8000;
+                const targetPts=userSettings.weeklyHours*12,pointRate=monthlyCashTarget/targetPts;
                 const finalPayout=monthlyPoints*pointRate;
 
                 $('monthly-payout').innerText=`฿${Math.round(finalPayout).toLocaleString()}`;
                 $('today-hours-label').innerText=`${todayHours.toFixed(2)} / ${softCap.toFixed(2)} hrs`;
                 $('daily-cap-status').innerText=`${Math.max(0,softCap-todayHours).toFixed(2)}h remaining`;
 
-                // Update Gauge & Power
-                const monthlyPct=Math.min(100, Math.round((monthlyPoints/(targetPts*4))*100));
+                // CORRECTED MONTHLY GOAL PERCENTAGE MATH
+                const monthlyPct=Math.min(100, Math.max(0, Math.round((finalPayout / monthlyCashTarget) * 100)));
+                $('gauge-tier-badge').innerText=`${monthlyPct}%`;
                 $('gauge-percent-text').innerText=`${monthlyPct}%`;
                 $('gauge-circle-path').style.strokeDashoffset=100-monthlyPct;
+
                 $('power-score-val').innerText=totalPowerScore;
                 $('power-level-bar').style.width=`${Math.min(100, (totalPowerScore/1000)*100)}%`;
 
                 renderBadgeGrid(new Set(userSettings.unlockedBadges||[]));
                 renderLedgerLists(rawLogs);
+                updateCharts(rawLogs);
                 renderDuoHUDCards();
+                applySpectatorModeLocks();
             });
         }
 
         function renderLedgerLists(logs){
             const wEl=$('ledger-list-work'),sEl=$('ledger-list-sanctuary'),dEl=$('ledger-list-diary');
             if(!wEl||!sEl||!dEl)return;
-            wEl.innerHTML=logs.filter(l=>l.type==='work').slice(-10).reverse().map(l=>`<div class="p-2 bg-slate-900 border border-slate-800 rounded text-[11px] flex justify-between"><span>${(l.hours||0).toFixed(2)}h Work (LVL ${l.results||3})</span><span class="text-amber-400 font-bold">+${Math.round(l.points||0)} pts</span></div>`).join('');
-            sEl.innerHTML=logs.filter(l=>l.type==='workout'||l.type==='chore'||l.type==='health').slice(-10).reverse().map(l=>`<div class="p-2 bg-slate-900 border border-slate-800 rounded text-[11px] flex justify-between"><span class="capitalize">${l.type}: ${l.note||((l.hours||0).toFixed(2)+'h')}</span></div>`).join('');
-            dEl.innerHTML=logs.filter(l=>l.type==='diary').slice(-10).reverse().map(l=>`<div class="p-2 bg-slate-900 border border-slate-800 rounded text-[11px] text-slate-300">${l.text}</div>`).join('');
+            const isSelf=(loggedInUser===viewedUser);
+            wEl.innerHTML=logs.filter(l=>l.type==='work').slice(-10).reverse().map(l=>`<div class="p-2 bg-slate-900 border border-slate-800 rounded text-[11px] flex justify-between items-center"><span>${(l.hours||0).toFixed(2)}h Work (LVL ${l.results||3})</span><div class="flex items-center gap-2"><span class="text-amber-400 font-bold">+${Math.round(l.points||0)} pts</span>${isSelf?`<button onclick="deleteLogItem('${l.id}', event)" class="text-slate-500 hover:text-red-400 text-xs">🗑️</button>`:''}</div></div>`).join('');
+            sEl.innerHTML=logs.filter(l=>l.type==='workout'||l.type==='chore'||l.type==='health').slice(-10).reverse().map(l=>`<div class="p-2 bg-slate-900 border border-slate-800 rounded text-[11px] flex justify-between items-center"><span class="capitalize">${l.type}: ${l.note||((l.hours||0).toFixed(2)+'h')}</span>${isSelf?`<button onclick="deleteLogItem('${l.id}', event)" class="text-slate-500 hover:text-red-400 text-xs">🗑️</button>`:''}</div>`).join('');
+            dEl.innerHTML=logs.filter(l=>l.type==='diary').slice(-10).reverse().map(l=>`<div class="p-2 bg-slate-900 border border-slate-800 rounded text-[11px] text-slate-300 flex justify-between items-start"><p class="flex-1 pr-2">${l.text}</p>${isSelf?`<button onclick="deleteLogItem('${l.id}', event)" class="text-slate-500 hover:text-red-400 text-xs shrink-0">🗑️</button>`:''}</div>`).join('');
         }
 
         function renderBadgeGrid(unlockedSet){
