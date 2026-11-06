@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AUREUM — Shared Ledger</title>
-    <meta name="theme-color" content="#0a0c10">
+    <meta name="theme-color" content="#0e1117">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AUREUM">
@@ -15,17 +15,17 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
-        :root{--bg-dim-base:#0a0c10;--bg-main:#0a0c10;--card-bg:#141720;--card-border:rgba(255,255,255,0.08);--accent-primary:#f59e0b;--accent-secondary:#fef08a;--accent-primary-hover:#d97706;--accent-primary-text:#020617;--accent-glow:rgba(245,158,11,0.28)}
-        body[data-theme="gold"]{--bg-main:#0a0c10;--card-bg:#141720;--card-border:rgba(255,255,255,0.08);--accent-primary:#f59e0b;--accent-secondary:#fef08a;--accent-primary-hover:#d97706;--accent-primary-text:#020617;--accent-glow:rgba(245,158,11,0.28)}
-        body[data-theme="rose"]{--bg-main:#140a10;--card-bg:#1f121a;--card-border:rgba(244,114,182,0.18);--accent-primary:#f472b6;--accent-secondary:#fef08a;--accent-primary-hover:#e11d48;--accent-primary-text:#020617;--accent-glow:rgba(244,114,182,0.35)}
-        body[data-theme="emerald"]{--bg-main:#04120f;--card-bg:#0d1c18;--card-border:rgba(16,185,129,0.18);--accent-primary:#10b981;--accent-secondary:#06b6d4;--accent-primary-hover:#059669;--accent-primary-text:#020617;--accent-glow:rgba(16,185,129,0.35)}
-        body[data-theme="cyber"]{--bg-main:#070a14;--card-bg:#101524;--card-border:rgba(168,85,247,0.2);--accent-primary:#a855f7;--accent-secondary:#ec4899;--accent-primary-hover:#9333ea;--accent-primary-text:#ffffff;--accent-glow:rgba(168,85,247,0.4)}
-        body[data-theme="sunset"]{--bg-main:#140b08;--card-bg:#211410;--card-border:rgba(249,115,22,0.2);--accent-primary:#f97316;--accent-secondary:#facc15;--accent-primary-hover:#ea580c;--accent-primary-text:#020617;--accent-glow:rgba(249,115,22,0.35)}
-        body[data-theme="amethyst"]{--bg-main:#0e0917;--card-bg:#171124;--card-border:rgba(192,132,252,0.2);--accent-primary:#c084fc;--accent-secondary:#818cf8;--accent-primary-hover:#a855f7;--accent-primary-text:#020617;--accent-glow:rgba(192,132,252,0.35)}
-        body[data-theme="ocean"]{--bg-main:#071217;--card-bg:#0f1d24;--card-border:rgba(20,184,166,0.2);--accent-primary:#14b8a6;--accent-secondary:#38bdf8;--accent-primary-hover:#0d9488;--accent-primary-text:#020617;--accent-glow:rgba(20,184,166,0.35)}
-        body[data-theme="crimson"]{--bg-main:#14080a;--card-bg:#211013;--card-border:rgba(239,68,68,0.2);--accent-primary:#ef4444;--accent-secondary:#f59e0b;--accent-primary-hover:#dc2626;--accent-primary-text:#ffffff;--accent-glow:rgba(239,68,68,0.4)}
-        body[data-theme="matcha"]{--bg-main:#0d120e;--card-bg:#151f16;--card-border:rgba(132,204,22,0.2);--accent-primary:#84cc16;--accent-secondary:#fde047;--accent-primary-hover:#65a30d;--accent-primary-text:#020617;--accent-glow:rgba(132,204,22,0.35)}
-        body[data-theme="monochrome"]{--bg-main:#0a0a0a;--card-bg:#171717;--card-border:rgba(255,255,255,0.12);--accent-primary:#e2e8f0;--accent-secondary:#38bdf8;--accent-primary-hover:#cbd5e1;--accent-primary-text:#0f172a;--accent-glow:rgba(226,232,240,0.3)}
+        :root{--bg-dim-base:#0e1117;--bg-main:#0e1117;--card-bg:#161a24;--card-border:rgba(245,158,11,0.3);--accent-primary:#f59e0b;--accent-secondary:#fef08a;--accent-primary-hover:#d97706;--accent-primary-text:#020617;--accent-glow:rgba(245,158,11,0.35)}
+        body[data-theme="gold"]{--bg-main:#0e1117;--card-bg:#161a24;--card-border:rgba(245,158,11,0.3);--accent-primary:#f59e0b;--accent-secondary:#fef08a;--accent-primary-hover:#d97706;--accent-primary-text:#020617;--accent-glow:rgba(245,158,11,0.35)}
+        body[data-theme="rose"]{--bg-main:#1a1017;--card-bg:#251620;--card-border:rgba(244,114,182,0.35);--accent-primary:#f472b6;--accent-secondary:#fef08a;--accent-primary-hover:#e11d48;--accent-primary-text:#020617;--accent-glow:rgba(244,114,182,0.4)}
+        body[data-theme="emerald"]{--bg-main:#091b17;--card-bg:#11241f;--card-border:rgba(16,185,129,0.35);--accent-primary:#10b981;--accent-secondary:#06b6d4;--accent-primary-hover:#059669;--accent-primary-text:#020617;--accent-glow:rgba(16,185,129,0.4)}
+        body[data-theme="cyber"]{--bg-main:#0d1120;--card-bg:#171d30;--card-border:rgba(168,85,247,0.4);--accent-primary:#a855f7;--accent-secondary:#ec4899;--accent-primary-hover:#9333ea;--accent-primary-text:#ffffff;--accent-glow:rgba(168,85,247,0.45)}
+        body[data-theme="sunset"]{--bg-main:#1c100c;--card-bg:#281812;--card-border:rgba(249,115,22,0.35);--accent-primary:#f97316;--accent-secondary:#facc15;--accent-primary-hover:#ea580c;--accent-primary-text:#020617;--accent-glow:rgba(249,115,22,0.4)}
+        body[data-theme="amethyst"]{--bg-main:#140e20;--card-bg:#1e172e;--card-border:rgba(192,132,252,0.35);--accent-primary:#c084fc;--accent-secondary:#818cf8;--accent-primary-hover:#a855f7;--accent-primary-text:#020617;--accent-glow:rgba(192,132,252,0.4)}
+        body[data-theme="ocean"]{--bg-main:#0a1920;--card-bg:#13242e;--card-border:rgba(20,184,166,0.35);--accent-primary:#14b8a6;--accent-secondary:#38bdf8;--accent-primary-hover:#0d9488;--accent-primary-text:#020617;--accent-glow:rgba(20,184,166,0.4)}
+        body[data-theme="crimson"]{--bg-main:#1c0c0f;--card-bg:#291418;--card-border:rgba(239,68,68,0.4);--accent-primary:#ef4444;--accent-secondary:#f59e0b;--accent-primary-hover:#dc2626;--accent-primary-text:#ffffff;--accent-glow:rgba(239,68,68,0.45)}
+        body[data-theme="matcha"]{--bg-main:#121a14;--card-bg:#1c271e;--card-border:rgba(132,204,22,0.35);--accent-primary:#84cc16;--accent-secondary:#fde047;--accent-primary-hover:#65a30d;--accent-primary-text:#020617;--accent-glow:rgba(132,204,22,0.4)}
+        body[data-theme="monochrome"]{--bg-main:#141619;--card-bg:#202329;--card-border:rgba(255,255,255,0.25);--accent-primary:#e2e8f0;--accent-secondary:#38bdf8;--accent-primary-hover:#cbd5e1;--accent-primary-text:#0f172a;--accent-glow:rgba(226,232,240,0.35)}
         body[data-cursor="gold"]{cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><polygon points='3,3 21,11 13,13 11,21' fill='%23f59e0b' stroke='%23020617' stroke-width='1.5'/></svg>"),auto}
         body[data-cursor="sparkle"]{cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M12,2 L14.5,9.5 L22,12 L14.5,14.5 L12,22 L9.5,14.5 L2,12 L9.5,9.5 Z' fill='%2338bdf8' stroke='%23020617' stroke-width='1.5'/></svg>"),auto}
         body[data-cursor="quill"]{cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M2,22 L8,20 L20,4 C20,4 22,2 18,2 C14,2 12,4 12,4 L4,16 Z' fill='%23c084fc' stroke='%23020617' stroke-width='1.5'/></svg>"),auto}
@@ -33,55 +33,53 @@
         body{background-color:var(--bg-main)!important;color:#f8fafc;font-family:system-ui,-apple-system,sans-serif;transition:background-color 0.3s;-webkit-tap-highlight-color:transparent}
         button,input,select{touch-action:manipulation}
         
-        /* 100% Solid Cards & Squircles - No Transparency Leak */
+        /* Crisper Outlines & High Contrast Cards */
         .card, .glass-card, .hud-card {
             position:relative;
             background-color:var(--card-bg)!important;
             opacity:1!important;
             backdrop-filter:none!important;
             -webkit-backdrop-filter:none!important;
-            border:1px solid var(--card-border)!important;
-            box-shadow:0 8px 32px 0 rgba(0,0,0,0.4);
+            border:1.5px solid var(--card-border)!important;
+            box-shadow:0 10px 30px -5px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.05);
             transition:box-shadow 0.25s,border-color 0.3s,transform 0.2s;
             will-change:transform;
             transform:translateZ(0)
         }
-        .card:hover{box-shadow:0 12px 36px -8px var(--accent-glow);border-color:rgba(255,255,255,0.18)!important}
+        .card:hover{box-shadow:0 14px 40px -6px var(--accent-glow), 0 0 0 1px var(--accent-primary);border-color:var(--accent-primary)!important}
 
-        /* Duo HUD Squircle Profile Avatars */
         .profile-avatar, .hud-avatar, img[id^="hud-avatar-"] {
             width: 56px !important;
             height: 56px !important;
             border-radius: 16px !important;
             object-fit: cover !important;
-            border: 2px solid rgba(255, 255, 255, 0.15) !important;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+            border: 2px solid rgba(255, 255, 255, 0.25) !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
         }
 
-        /* Scroll-locked Task Viewports */
         #pomo-active-tasks-list, .hourglass-task-scroll, #todo-active-list, #todo-completed-list {
-            max-height: 300px !important;
+            max-height: 280px !important;
             overflow-y: auto !important;
             padding-right: 4px;
         }
-        #pomo-active-tasks-list::-webkit-scrollbar, .hourglass-task-scroll::-webkit-scrollbar { width: 5px }
-        #pomo-active-tasks-list::-webkit-scrollbar-thumb, .hourglass-task-scroll::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.18);
+        #todo-active-list::-webkit-scrollbar, #todo-completed-list::-webkit-scrollbar, #pomo-active-tasks-list::-webkit-scrollbar { width: 5px }
+        #todo-active-list::-webkit-scrollbar-thumb, #todo-completed-list::-webkit-scrollbar-thumb, #pomo-active-tasks-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.22);
             border-radius: 4px;
         }
 
         .tab-btn{color:#94a3b8;background-color:transparent;border:1px solid transparent;transition:all 0.2s;user-select:none}
-        .tab-btn:hover{color:#f8fafc;background-color:rgba(255,255,255,0.06)}
-        .tab-btn.active{background:linear-gradient(135deg,rgba(245,158,11,0.2) 0%,rgba(254,240,138,0.08) 100%)!important;color:var(--accent-primary)!important;border-color:var(--accent-primary)!important;font-weight:700;box-shadow:0 0 14px var(--accent-glow)}
+        .tab-btn:hover{color:#f8fafc;background-color:rgba(255,255,255,0.08)}
+        .tab-btn.active{background:linear-gradient(135deg,rgba(245,158,11,0.22) 0%,rgba(254,240,138,0.1) 100%)!important;color:var(--accent-primary)!important;border-color:var(--accent-primary)!important;font-weight:700;box-shadow:0 0 16px var(--accent-glow)}
         .theme-accent-bg{background:linear-gradient(135deg,var(--accent-primary) 0%,var(--accent-secondary) 100%)!important;color:var(--accent-primary-text)!important}
         .theme-accent-bg:hover{opacity:0.92}
         .theme-accent-text{background:linear-gradient(135deg,var(--accent-primary) 0%,var(--accent-secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
         .logo-gold{background:linear-gradient(135deg,var(--accent-primary) 0%,var(--accent-secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:0.25em;text-shadow:0 0 16px var(--accent-glow)}
         .gauge-circle{transition:stroke-dashoffset 0.8s ease-in-out,stroke 0.3s}
         .hud-card{transition:all 0.3s ease;user-select:none}
-        .hud-card.active-space{border-color:var(--accent-primary)!important;box-shadow:0 0 22px var(--accent-glow);background:var(--card-bg)!important}
-        .hud-card.view-space{border-color:rgba(148,163,184,0.2)!important;opacity:0.85}
-        .hud-card.view-space:hover{opacity:1;border-color:rgba(255,255,255,0.3)!important}
+        .hud-card.active-space{border-color:var(--accent-primary)!important;box-shadow:0 0 24px var(--accent-glow);background:var(--card-bg)!important}
+        .hud-card.view-space{border-color:rgba(148,163,184,0.3)!important;opacity:0.85}
+        .hud-card.view-space:hover{opacity:1;border-color:rgba(255,255,255,0.4)!important}
         .presence-pulse{animation:pulseGlow 2s infinite}
         @keyframes pulseGlow{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.85)}}
         .status-preset-btn{transition:all 0.2s ease;user-select:none}
@@ -89,14 +87,14 @@
         .no-scrollbar::-webkit-scrollbar{display:none}
         .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
         .power-bar-fill{background:linear-gradient(90deg,#38bdf8 0%,#10b981 50%,#f59e0b 80%,#a855f7 100%);box-shadow:0 0 14px var(--accent-glow);transition:width 0.8s cubic-bezier(0.16,1,0.3,1)}
-        .badge-card{background:var(--card-bg);border:1px solid var(--card-border);transition:all 0.25s ease-out}
+        .badge-card{background:var(--card-bg);border:1.5px solid var(--card-border);transition:all 0.25s ease-out}
         .badge-card:hover:not(.locked){transform:translateY(-2px)}
-        .badge-card.locked{opacity:0.35;filter:grayscale(0.9);border-color:rgba(255,255,255,0.05)!important}
-        .badge-tier-bronze{border-color:#d97706!important;box-shadow:0 0 12px rgba(217,119,6,0.2)}
-        .badge-tier-silver{border-color:#38bdf8!important;box-shadow:0 0 14px rgba(56,189,248,0.25)}
-        .badge-tier-gold{border-color:#f59e0b!important;box-shadow:0 0 16px rgba(245,158,11,0.35)}
-        .badge-tier-titan{border-color:#10b981!important;box-shadow:0 0 18px rgba(16,185,129,0.4)}
-        .badge-tier-aureum{border-color:#a855f7!important;box-shadow:0 0 22px rgba(168,85,247,0.5)}
+        .badge-card.locked{opacity:0.35;filter:grayscale(0.9);border-color:rgba(255,255,255,0.08)!important}
+        .badge-tier-bronze{border-color:#d97706!important;box-shadow:0 0 12px rgba(217,119,6,0.25)}
+        .badge-tier-silver{border-color:#38bdf8!important;box-shadow:0 0 14px rgba(56,189,248,0.3)}
+        .badge-tier-gold{border-color:#f59e0b!important;box-shadow:0 0 16px rgba(245,158,11,0.4)}
+        .badge-tier-titan{border-color:#10b981!important;box-shadow:0 0 18px rgba(16,185,129,0.45)}
+        .badge-tier-aureum{border-color:#a855f7!important;box-shadow:0 0 22px rgba(168,85,247,0.55)}
         #badge-toast-container{position:fixed;bottom:1.5rem;left:1.5rem;z-index:100;display:flex;flex-direction:column;gap:0.75rem;pointer-events:none}
         .badge-toast{pointer-events:auto;animation:toastSlideIn 0.35s cubic-bezier(0.16,1,0.3,1) forwards;transition:opacity 0.5s ease,transform 0.5s ease;will-change:transform,opacity}
         .badge-toast.toast-hiding{opacity:0!important;transform:translateY(20px) scale(0.9)!important}
@@ -104,7 +102,7 @@
         .todo-item{transition:all 0.2s ease-out}
         .todo-item:hover{border-color:var(--card-border);transform:translateX(2px)}
         .todo-item.done{opacity:0.5;text-decoration:line-through}
-        nav.sticky-theme-nav{background-color:var(--bg-main);opacity:0.98;border-bottom:1px solid var(--card-border)}
+        nav.sticky-theme-nav{background-color:var(--bg-main);opacity:0.98;border-bottom:1.5px solid var(--card-border)}
     </style>
 </head>
 <body data-theme="gold" data-cursor="default" class="p-3 sm:p-4 md:p-8 max-w-6xl mx-auto relative min-h-screen">
@@ -377,34 +375,6 @@
                 </form>
             </div>
 
-            <!-- TASKS SCRATCHPAD -->
-            <div id="todo-card" class="card p-6 rounded-xl space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div>
-                        <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>📝</span> <span>Tasks</span></h2>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span id="todo-count-active" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">0 Active</span>
-                        <span id="todo-count-done" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">0 Done</span>
-                        <button id="todo-clear-btn" onclick="clearCompletedTodos()" class="text-xs text-slate-400 hover:text-red-400 px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all">Clear</button>
-                    </div>
-                </div>
-                <form id="todo-form" onsubmit="addTodoItem(event)" class="flex gap-2">
-                    <input type="text" id="todo-input" placeholder="Add a quick task..." class="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
-                    <button type="submit" class="theme-accent-bg font-bold px-5 py-2.5 rounded-xl text-xs transition-all shadow-md">+ Add</button>
-                </form>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800/80">
-                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Pending</div>
-                        <div id="todo-active-list" class="space-y-2 pr-1"></div>
-                    </div>
-                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800/80">
-                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Done</div>
-                        <div id="todo-completed-list" class="space-y-2 pr-1"></div>
-                    </div>
-                </div>
-            </div>
-
             <div class="card p-6 rounded-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div class="flex items-center gap-3">
@@ -508,8 +478,39 @@
                             <button onclick="resetMyPomoTimer()" class="px-6 py-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium text-sm transition-all">Reset</button>
                         </div>
                     </div>
+                </div>
 
-                    <!-- SUBORDINATE TIMER AUDIO CONTROLS -->
+                <!-- RIGHT SIDE PANEL COLUMN -->
+                <div class="lg:col-span-5 space-y-6">
+                    <!-- FULL TASKS SCRATCHPAD CARD -->
+                    <div id="todo-card" class="card p-6 rounded-xl space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <div>
+                                <h2 class="text-md font-bold text-slate-200 flex items-center gap-2"><span>📝</span> <span>Tasks Scratchpad</span></h2>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="todo-count-active" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">0 Active</span>
+                                <span id="todo-count-done" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">0 Done</span>
+                                <button id="todo-clear-btn" onclick="clearCompletedTodos()" class="text-xs text-slate-400 hover:text-red-400 px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all">Clear</button>
+                            </div>
+                        </div>
+                        <form id="todo-form" onsubmit="addTodoItem(event)" class="flex gap-2">
+                            <input type="text" id="todo-input" placeholder="Add a task for this session..." class="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                            <button type="submit" class="theme-accent-bg font-bold px-5 py-2.5 rounded-xl text-xs transition-all shadow-md">+ Add</button>
+                        </form>
+                        <div class="grid grid-cols-1 gap-4 pt-1">
+                            <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800/80">
+                                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Pending</div>
+                                <div id="todo-active-list" class="space-y-2 pr-1"></div>
+                            </div>
+                            <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800/80">
+                                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Done</div>
+                                <div id="todo-completed-list" class="space-y-2 pr-1"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TIMER AUDIO CONTROLS (MOVED TO RIGHT SIDE) -->
                     <div id="audioSettingsCard" class="card p-4 rounded-xl border border-slate-800 space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5"><span>🔔</span> <span>Timer Audio Engine</span></span>
@@ -540,22 +541,6 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- CONTEXT & TASK COLUMN -->
-                <div class="lg:col-span-5 space-y-6">
-                    <!-- INTEGRATED FOCUS TASKS PANEL -->
-                    <div class="card p-5 rounded-xl space-y-4 border border-slate-800">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5"><span>🎯</span> <span>Active Focus Tasks</span></h3>
-                            <button onclick="switchTab('crucible')" class="text-[11px] text-amber-400 hover:underline">Manage All →</button>
-                        </div>
-                        <form onsubmit="addTodoItem(event)" class="flex gap-2">
-                            <input type="text" id="pomo-quick-todo-input" placeholder="Quick task for this session..." class="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                            <button type="submit" class="theme-accent-bg font-bold px-3 py-2 rounded-xl text-xs transition-all shadow-md">+ Add</button>
-                        </form>
-                        <div id="pomo-active-tasks-list" class="space-y-2 pr-1"></div>
                     </div>
 
                     <!-- QUICK TIMER PRESETS BOX -->
@@ -978,6 +963,19 @@
             workoutStrain:[{level:1,icon:'🍃',title:'Light Recovery',desc:'Mobility & gentle movement'},{level:2,icon:'☁️',title:'Steady Pace',desc:'Aerobic endurance flow'},{level:3,icon:'🔥',title:'Moderate Effort',desc:'Standard workout circuit'},{level:4,icon:'⛰️',title:'High Intensity',desc:'Heavy strength & calisthenics'},{level:5,icon:'🌋',title:'Max Strain',desc:'Maximum effort conditioning'}]
         };
 
+        const THEME_PATTERN_COLORS={
+            gold:'%23f59e0b',
+            rose:'%23f472b6',
+            emerald:'%2310b981',
+            cyber:'%23a855f7',
+            sunset:'%23f97316',
+            amethyst:'%23c084fc',
+            ocean:'%2314b8a6',
+            crimson:'%23ef4444',
+            matcha:'%2384cc16',
+            monochrome:'%23cbd5e1'
+        };
+
         const BADGE_CATALOG=[
             {id:'work_1',tier:'bronze',icon:'🌱',title:"Spark of Endeavor",desc:'Log your very first work session.'},
             {id:'work_cap',tier:'silver',icon:'🍵',title:'Crucible Mastered',desc:'Reach daily Soft Cap (4.0h) in a single day.'},
@@ -1050,22 +1048,25 @@
             if(activeCount>0){requestAnimationFrame(animateParticles)}else{isFxAnimating=false}
         }
 
-        // BACKGROUND PATTERN CANVAS ENGINE (ESCAPED SVG URIs FIX)
+        // DYNAMIC THEME-MATCHED BACKGROUND PATTERN ENGINE
         function applyBackgroundPattern(pattern, opacity){
             const layer=$('bg-pattern-layer');if(!layer)return;
             const op=(opacity??20)/100;
             layer.style.opacity=op;
+            const currentTheme=document.body.getAttribute('data-theme')||userSettings.userTheme||'gold';
+            const colorHex=THEME_PATTERN_COLORS[currentTheme]||'%23f59e0b';
             let bgStyle='';
             if(pattern==='dots' || pattern==='dotmatrix'){
-                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='2' fill='%23ffffff' opacity='0.35'/%3E%3C/svg%3E")`;
+                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='2' fill='${colorHex}' opacity='0.5'/%3E%3C/svg%3E")`;
             }else if(pattern==='grid' || pattern==='blueprint'){
-                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='%236366f1' stroke-width='1'%3E%3Cpath d='M0 10h40M0 20h40M0 30h40M10 0v40M20 0v40M30 0v40' stroke-dasharray='2 2' opacity='0.3'/%3E%3Crect x='0' y='0' width='40' height='40' stroke-width='1' opacity='0.6'/%3E%3C/g%3E%3C/svg%3E")`;
+                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='${colorHex}' stroke-width='1'%3E%3Cpath d='M0 10h40M0 20h40M0 30h40M10 0v40M20 0v40M30 0v40' stroke-dasharray='2 2' opacity='0.4'/%3E%3Crect x='0' y='0' width='40' height='40' stroke-width='1' opacity='0.7'/%3E%3C/g%3E%3C/svg%3E")`;
             }else if(pattern==='hex' || pattern==='isometric'){
-                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='104' viewBox='0 0 60 104'%3E%3Cpath d='M30 0l30 17.32v34.64L30 69.28 0 51.96V17.32zm0 104l30-17.32V51.96L30 34.64 0 51.96v34.64z' fill='none' stroke='%23818cf8' stroke-width='1' opacity='0.25'/%3E%3C/svg%3E")`;
+                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='104' viewBox='0 0 60 104'%3E%3Cpath d='M30 0l30 17.32v34.64L30 69.28 0 51.96V17.32zm0 104l30-17.32V51.96L30 34.64 0 51.96v34.64z' fill='none' stroke='${colorHex}' stroke-width='1' opacity='0.45'/%3E%3C/svg%3E")`;
             }else if(pattern==='stars' || pattern==='starfield'){
-                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='10' cy='10' r='1' fill='%23ffffff' opacity='0.4'/%3E%3Ccircle cx='50' cy='30' r='1.5' fill='%23818cf8' opacity='0.6'/%3E%3Ccircle cx='20' cy='60' r='1.2' fill='%236366f1' opacity='0.5'/%3E%3C/svg%3E")`;
+                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='10' cy='10' r='1.2' fill='${colorHex}' opacity='0.6'/%3E%3Ccircle cx='50' cy='30' r='1.8' fill='${colorHex}' opacity='0.8'/%3E%3Ccircle cx='20' cy='60' r='1.5' fill='${colorHex}' opacity='0.7'/%3E%3C/svg%3E")`;
             }else if(pattern==='diagonal'){
-                bgStyle='repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05) 10px, transparent 10px, transparent 20px)';
+                const rawHex=colorHex.replace('%23','#');
+                bgStyle=`repeating-linear-gradient(45deg, ${rawHex}25, ${rawHex}25 10px, transparent 10px, transparent 20px)`;
             }
             layer.style.background=bgStyle;
         }
@@ -1078,7 +1079,7 @@
             if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({bgPattern:pattern,bgOpacity:opacity},{merge:true});
         }
 
-        // SYNTHESIZER SOUND ENGINE (INSTANT LATENCY AUDIO CONTEXT)
+        // SYNTHESIZER SOUND ENGINE (INSTANT LATENCY & UNLOCKED AUDIO CONTEXT)
         let globalAudioCtx = null;
         function getAudioContext() {
             if (!globalAudioCtx) {
@@ -1090,6 +1091,17 @@
             }
             return globalAudioCtx;
         }
+
+        function unlockAudioContext(){
+            if(globalAudioCtx && globalAudioCtx.state==='suspended'){
+                globalAudioCtx.resume();
+            }else if(!globalAudioCtx){
+                getAudioContext();
+            }
+        }
+        window.addEventListener('click', unlockAudioContext, {passive:true});
+        window.addEventListener('keydown', unlockAudioContext, {passive:true});
+        window.addEventListener('touchstart', unlockAudioContext, {passive:true});
 
         function playSingleToneBurst(key,c,now){
             const k=key||userSettings.pomoSound||'zen_bowl';
@@ -1195,12 +1207,11 @@
         }
         function addTodoItem(e){
             if(e)e.preventDefault();if(loggedInUser!==viewedUser)return;
-            const input=$('todo-input') || $('pomo-quick-todo-input');if(!input)return;
+            const input=$('todo-input');if(!input)return;
             const text=input.value.trim();if(!text)return;
             const list=[...(userSettings.scratchpadTodos||[])];
             list.push({id:Date.now().toString(),text,done:false});
-            if($('todo-input'))$('todo-input').value='';
-            if($('pomo-quick-todo-input'))$('pomo-quick-todo-input').value='';
+            input.value='';
             playTone('save');
             syncTodosToFirestore(list);
         }
@@ -1220,7 +1231,7 @@
         }
 
         function renderTodoList(){
-            const activeListEl=$('todo-active-list'),doneListEl=$('todo-completed-list'),pomoTasksEl=$('pomo-active-tasks-list');
+            const activeListEl=$('todo-active-list'),doneListEl=$('todo-completed-list');
             const isSelf=(loggedInUser===viewedUser),todoData=isSelf?(userSettings.scratchpadTodos||[]):(spectatorSettings?.scratchpadTodos||[]);
             const activeItems=[],doneItems=[];
             for(let i=0;i<todoData.length;i++){if(todoData[i].done)doneItems.push(todoData[i]);else activeItems.push(todoData[i])}
@@ -1230,11 +1241,6 @@
                 const cursorClass=isSelf?"cursor-pointer":"cursor-default";
                 activeListEl.innerHTML=activeItems.length===0?'<div class="text-xs text-slate-500 italic py-2 text-center">No active tasks.</div>':activeItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item ${cursorClass} p-2.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/70 rounded-xl flex items-center justify-between gap-3 text-xs text-slate-200 select-none"><div class="flex items-center gap-2.5 truncate"><span class="w-4 h-4 rounded-md border border-slate-600 flex items-center justify-center shrink-0"></span><span class="truncate font-medium">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-[11px] font-bold">×</button>`:''}</div>`).join('');
                 doneListEl.innerHTML=doneItems.length===0?'<div class="text-xs text-slate-500 italic py-2 text-center">No completed tasks.</div>':doneItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item done ${cursorClass} p-2.5 bg-slate-900/60 border border-slate-800/80 rounded-xl flex items-center justify-between gap-3 text-xs text-slate-400 select-none"><div class="flex items-center gap-2.5 truncate"><span class="w-4 h-4 rounded-md theme-accent-bg text-slate-950 flex items-center justify-center shrink-0 font-bold text-[10px]">✓</span><span class="truncate font-medium">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-[11px] font-bold">×</button>`:''}</div>`).join('');
-            }
-
-            if(pomoTasksEl){
-                const cursorClass=isSelf?"cursor-pointer":"cursor-default";
-                pomoTasksEl.innerHTML=activeItems.length===0?'<div class="text-xs text-slate-500 italic py-3 text-center">No active focus tasks. Add one above!</div>':activeItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item ${cursorClass} p-2.5 bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 rounded-xl flex items-center justify-between gap-2 text-xs text-slate-200 select-none"><div class="flex items-center gap-2.5 truncate"><span class="w-4 h-4 rounded border border-slate-600 flex items-center justify-center shrink-0"></span><span class="truncate font-medium text-[11px]">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1 text-[11px] font-bold">×</button>`:''}</div>`).join('');
             }
         }
 
@@ -1371,7 +1377,11 @@
             const val=parseInt(input.value)||3,d=RATING_DATA.workoutStrain[val-1];
             $('w-icon').innerText=d.icon;$('w-badge').innerText=`LVL ${d.level}`;$('w-title').innerText=d.title;
         }
-        function applyThemeToBody(t){document.body.setAttribute('data-theme',t||'gold')}
+        function applyThemeToBody(t){
+            const targetTheme=t||'gold';
+            document.body.setAttribute('data-theme',targetTheme);
+            applyBackgroundPattern(userSettings.bgPattern, userSettings.bgOpacity);
+        }
         function applyCursorToBody(c){document.body.setAttribute('data-cursor',c||'default')}
 
         // POMODORO ENGINE
@@ -1774,7 +1784,10 @@
                 updateRatingUI('results');updateRatingUI('effort');updateWorkoutStrainUI();
                 startGlobalUIRenderer();attachPomoSpectatorListener();
                 updatePresenceTimestamp();
-            }else{if(modal)modal.classList.add('hidden');if(app)app.classList.add('hidden')}
+            }else{
+                if(modal)modal.classList.remove('hidden');
+                if(app)app.classList.add('hidden');
+            }
         });
 
         function initDuoHUDListeners(){
