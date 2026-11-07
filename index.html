@@ -563,7 +563,8 @@
                                 <input type="text" id="todo-input" placeholder="Add task..." class="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                                 <button type="submit" class="theme-accent-btn font-black px-5 py-2 rounded-xl text-xs transition-all shadow-md">+ Add</button>
                             </form>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                            <!-- RESTRUCTURED: VERTICAL STACK CARDS -->
+                            <div class="flex flex-col gap-3 pt-1">
                                 <div class="bg-slate-900/50 p-3.5 rounded-xl border border-slate-800">
                                     <div class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-2">Pending</div>
                                     <div id="todo-active-list" class="space-y-2 pr-1 max-h-[240px] overflow-y-auto"></div>
@@ -707,8 +708,14 @@
             <div id="tab-chronicles" class="space-y-6 hidden">
                 <div class="card p-6 rounded-2xl">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                        <div class="flex items-center gap-3">
+                        <div class="flex flex-wrap items-center gap-3">
                             <h3 class="text-lg font-black text-slate-100">⚗️ Work Analytics</h3>
+                            <!-- UNIT TOGGLE (MONEY VS HOURS) -->
+                            <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700 text-xs gap-1">
+                                <button type="button" onclick="setWorkChartUnit('money')" id="btn-work-unit-money" class="px-3 py-1.5 rounded-lg font-bold transition-all theme-accent-btn flex items-center gap-1"><span>฿</span> <span>Money</span></button>
+                                <button type="button" onclick="setWorkChartUnit('hours')" id="btn-work-unit-hours" class="px-3 py-1.5 rounded-lg font-bold transition-all text-slate-400 hover:text-white flex items-center gap-1"><span>⏱️</span> <span>Hours</span></button>
+                            </div>
+                            <!-- TYPE TOGGLE -->
                             <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700 text-xs gap-1">
                                 <button type="button" onclick="setWorkChartMode('bar')" id="btn-work-mode-bar" class="px-3 py-1.5 rounded-lg font-bold transition-all theme-accent-btn flex items-center gap-1"><span>📊</span> <span>Bar</span></button>
                                 <button type="button" onclick="setWorkChartMode('line')" id="btn-work-mode-line" class="px-3 py-1.5 rounded-lg font-bold transition-all text-slate-400 hover:text-white flex items-center gap-1"><span>📈</span> <span>Line</span></button>
@@ -1119,11 +1126,11 @@
             if(pattern==='dots'||pattern==='dotmatrix'){
                 bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='2' fill='${colorHex}' opacity='0.5'/%3E%3C/svg%3E")`;
             }else if(pattern==='grid'||pattern==='blueprint'){
-                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='${colorHex}' stroke-width='1'%3E%3Cpath d='M0 10h40M0 20h40M0 30h40M10 0v40M20 0v40M30 0v40' stroke-dasharray='2 2' opacity='0.4'/%3E%3Crect x='0' y='0' width='40' height='40' stroke-width='1' opacity='0.7'/%3E%3C/g%3E%3C/svg%3E")`;
+                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='${colorHex}' stroke-width='1'%3E%3Cpath d='M0 10h40M0 20h40M0 30h40M10 0v40M20 0v40M30 0v40' stroke-dasharray='2 2' opacity='0.4'/%3E%3Crect x='0' y='0' width='40' height='40' stroke-width='1' opacity='0.7'/%3E%3C%g%3E%3C%svg%3E")`;
             }else if(pattern==='hex'||pattern==='isometric'){
-                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='104' viewBox='0 0 60 104'%3E%3Cpath d='M30 0l30 17.32v34.64L30 69.28 0 51.96V17.32zm0 104l30-17.32V51.96L30 34.64 0 51.96v34.64z' fill='none' stroke='${colorHex}' stroke-width='1' opacity='0.45'/%3E%3C/svg%3E")`;
+                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='104' viewBox='0 0 60 104'%3E%3Cpath d='M30 0l30 17.32v34.64L30 69.28 0 51.96V17.32zm0 104l30-17.32V51.96L30 34.64 0 51.96v34.64z' fill='none' stroke='${colorHex}' stroke-width='1' opacity='0.45'/%3E%3C%svg%3E")`;
             }else if(pattern==='stars'||pattern==='starfield'){
-                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='10' cy='10' r='1.2' fill='${colorHex}' opacity='0.6'/%3E%3Ccircle cx='50' cy='30' r='1.8' fill='${colorHex}' opacity='0.8'/%3E%3Ccircle cx='20' cy='60' r='1.5' fill='${colorHex}' opacity='0.7'/%3E%3C/svg%3E")`;
+                bgStyle=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='10' cy='10' r='1.2' fill='${colorHex}' opacity='0.6'/%3E%3Ccircle cx='50' cy='30' r='1.8' fill='${colorHex}' opacity='0.8'/%3E%3Ccircle cx='20' cy='60' r='1.5' fill='${colorHex}' opacity='0.7'/%3E%3C%svg%3E")`;
             }else if(pattern==='diagonal'){
                 const rawHex=colorHex.replace('%23','#');
                 bgStyle=`repeating-linear-gradient(45deg, ${rawHex}25, ${rawHex}25 10px, transparent 10px, transparent 20px)`;
@@ -1358,8 +1365,8 @@
             if(activeListEl&&doneListEl){
                 $('todo-count-active').innerText=`${activeItems.length} Active`;$('todo-count-done').innerText=`${doneItems.length} Done`;
                 const cursorClass=isSelf?"cursor-pointer":"cursor-default";
-                activeListEl.innerHTML=activeItems.length===0?'<div class="text-xs text-slate-500 italic py-2 text-center">No active tasks.</div>':activeItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item ${cursorClass} p-2.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/70 rounded-xl flex items-center justify-between gap-2 text-xs text-slate-200 select-none"><div class="flex items-center gap-2.5 truncate"><span class="w-4 h-4 rounded border border-slate-600 flex items-center justify-center shrink-0"></span><span class="truncate font-semibold text-xs">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-xs font-bold">×</button>`:''}</div>`).join('');
-                doneListEl.innerHTML=doneItems.length===0?'<div class="text-xs text-slate-500 italic py-2 text-center">No completed tasks.</div>':doneItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item done ${cursorClass} p-2.5 bg-slate-900/60 border border-slate-800/80 rounded-xl flex items-center justify-between gap-2 text-xs text-slate-400 select-none"><div class="flex items-center gap-2.5 truncate"><span class="w-4 h-4 rounded theme-accent-bg text-slate-950 flex items-center justify-center shrink-0 font-bold text-[10px]">✓</span><span class="truncate font-semibold text-xs">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-xs font-bold">×</button>`:''}</div>`).join('');
+                activeListEl.innerHTML=activeItems.length===0?'<div class="text-xs text-slate-500 italic py-2 text-center">No active tasks.</div>':activeItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item ${cursorClass} p-2.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/70 rounded-xl flex items-center justify-between gap-2 text-xs text-slate-200 select-none"><div class="flex items-center gap-2.5 min-w-0 flex-1"><span class="w-4 h-4 rounded border border-slate-600 flex items-center justify-center shrink-0"></span><span class="font-semibold text-xs leading-relaxed break-words">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-xs font-bold shrink-0">×</button>`:''}</div>`).join('');
+                doneListEl.innerHTML=doneItems.length===0?'<div class="text-xs text-slate-500 italic py-2 text-center">No completed tasks.</div>':doneItems.map(t=>`<div ${isSelf?`onclick="toggleTodoStatus('${t.id}')"`:''} class="todo-item done ${cursorClass} p-2.5 bg-slate-900/60 border border-slate-800/80 rounded-xl flex items-center justify-between gap-2 text-xs text-slate-400 select-none"><div class="flex items-center gap-2.5 min-w-0 flex-1"><span class="w-4 h-4 rounded theme-accent-bg text-slate-950 flex items-center justify-center shrink-0 font-bold text-[10px]">✓</span><span class="font-semibold text-xs leading-relaxed break-words">${t.text}</span></div>${isSelf?`<button onclick="removeTodoItem('${t.id}', event)" class="text-slate-500 hover:text-red-400 px-1.5 py-0.5 rounded text-xs font-bold shrink-0">×</button>`:''}</div>`).join('');
             }
         }
 
@@ -1529,6 +1536,12 @@
             }
         });
 
+        // HANDLER FIX FOR MODE BUTTONS
+        function handleUserSelectPomoMode(mode) {
+            if (loggedInUser !== viewedUser) return;
+            setMyPomoMode(mode);
+        }
+
         async function updatePresenceTimestamp(){
             if(!loggedInUser)return;
             try{await db.collection('settings').doc(loggedInUser).set({lastActiveTimestamp:Date.now()},{merge:true})}catch(e){}
@@ -1590,7 +1603,12 @@
                         userSettings.completedPomoHistory.push({durationSecs:myPomoInitialTime,wasPaused:currentSessionWasPaused,timestamp:Date.now()});
                         userSettings.unloggedFocusSecs=(userSettings.unloggedFocusSecs||0)+myPomoInitialTime;
                         updateUnloggedFocusDisplay();
-                        db.collection('settings').doc(loggedInUser).set({unloggedFocusSecs:userSettings.unloggedFocusSecs},{merge:true});
+                        
+                        // FIX: PERSIST completedPomoHistory TO FIRESTORE SO RELICS UNLOCK PERMANENTLY
+                        db.collection('settings').doc(loggedInUser).set({
+                            unloggedFocusSecs:userSettings.unloggedFocusSecs,
+                            completedPomoHistory:userSettings.completedPomoHistory
+                        },{merge:true});
     
                         evaluateBadges(currentRawLogsCache,userSettings.completedPomoHistory,loggedInUser);
                         if(myPomoRound<totalRounds){triggerDesktopNotification("✨ Round Complete!",`Round ${myPomoRound} finished.`);myPomoRound++;setMyPomoMode('short')}
@@ -1657,12 +1675,6 @@
             const f=parseInt(userSettings.pomoFocus)||25,s=parseInt(userSettings.pomoShort)||5,l=parseInt(userSettings.pomoLong)||15;
             myPomoInitialTime=(mode==='focus'?f:(mode==='short'?s:l))*60;myPomoTime=myPomoInitialTime;syncMyPomoToCloud();
         }
-        
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible' && myPomoIsRunning && myPomoEndTime) {
-                myPomoTime = Math.max(0, Math.ceil((myPomoEndTime - Date.now()) / 1000));
-            }
-        });
     
         function toggleMyPomoTimer(){
             if(loggedInUser!==viewedUser)return;requestNotificationPermission();
@@ -1779,7 +1791,7 @@
             }else{applyThemeToBody(userSettings.userTheme);applyCursorToBody(userSettings.userCursor);applyBackgroundPattern(userSettings.bgPattern,userSettings.bgOpacity);renderTodoList()}
         }
 
-        let charts={},chartTimeframes={work:'daily',sanctuary:'daily'},workChartMode='bar',sanctuaryChartSubmode='bar';
+        let charts={},chartTimeframes={work:'daily',sanctuary:'daily'},workChartMode='bar',sanctuaryChartSubmode='bar',workChartUnit='money';
 
         function initCharts(){
             const opts={responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'#334155'},ticks:{color:'#94a3b8'}},y:{grid:{color:'#334155'},ticks:{color:'#94a3b8'},beginAtZero:true}},plugins:{legend:{display:false}}};
@@ -1798,6 +1810,13 @@
                 data:{labels:[],datasets:[{label:'🏃 Fitness (h)',data:[],backgroundColor:'#f59e0b',borderColor:'#f59e0b',borderRadius:4,fill:false},{label:'🧹 Chores (h)',data:[],backgroundColor:'#38bdf8',borderColor:'#38bdf8',borderRadius:4,fill:false},{label:'🍨 Snacks',data:[],backgroundColor:'#10b981',borderColor:'#10b981',borderRadius:4,fill:false}]},
                 options:{...opts,plugins:{legend:{display:true,labels:{color:'#94a3b8',font:{size:11,weight:'bold'}}}}}
             });
+        }
+
+        // WORK CHART UNIT SWITCHER (MONEY VS HOURS)
+        function setWorkChartUnit(u){
+            workChartUnit=u;
+            ['money','hours'].forEach(unit=>{const btn=$(`btn-work-unit-${unit}`);if(btn)btn.className=unit===u?"px-3 py-1.5 rounded-lg font-bold transition-all theme-accent-btn flex items-center gap-1":"px-3 py-1.5 rounded-lg font-bold transition-all text-slate-400 hover:text-white flex items-center gap-1"});
+            loadUserData();
         }
 
         function setWorkChartMode(m){
@@ -1853,9 +1872,17 @@
                     }else if(range==='yearly'){
                         idx=labels.indexOf(d.getFullYear().toString());
                     }
-                    if(idx>=0&&idx<values.length){values[idx]+=(l.points||0)*pointRate}
+                    if(idx>=0&&idx<values.length){
+                        if(workChartUnit==='money'){
+                            values[idx]+=(l.points||0)*pointRate;
+                        }else{
+                            values[idx]+=(l.hours||0);
+                        }
+                    }
                 });
-                values=values.map(v=>Math.min(v,maxCash));
+                if(workChartUnit==='money'){
+                    values=values.map(v=>Math.min(v,maxCash));
+                }
                 charts['work'].data.labels=labels;
                 charts['work'].data.datasets[0].backgroundColor=range==='monthly'?labels.map((_,i)=>userSettings.vaultedMonths?.[`${now.getFullYear()}-${i}`]?'#f59e0b':'#10b981'):'#10b981';
                 charts['work'].data.datasets[0].data=values;charts['work'].update();
