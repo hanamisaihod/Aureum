@@ -313,114 +313,165 @@
     <div id="app-content" class="hidden flex flex-col md:flex-row gap-6 max-w-7xl mx-auto">
         
         <!-- VERTICAL SIDEBAR PANEL -->
-        <aside class="app-sidebar p-4 sm:p-5 rounded-2xl md:w-72 lg:w-80 shrink-0 space-y-6 md:sticky md:top-6 md:h-[calc(100vh-3rem)] flex flex-col overflow-y-auto no-scrollbar">
+        <aside class="app-sidebar p-3.5 sm:p-4 rounded-2xl md:w-72 lg:w-80 shrink-0 space-y-4 md:sticky md:top-6 md:h-[calc(100vh-3rem)] flex flex-col overflow-y-auto no-scrollbar">
             <!-- BRAND HEADER -->
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
                 <div>
                     <h1 class="text-2xl font-black logo-gold uppercase tracking-widest">AUREUM</h1>
                 </div>
-                <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-sm text-slate-300 hover:text-white p-2.5 bg-slate-900 rounded-xl border border-slate-800 transition-all">🔊</button>
+                <button onclick="toggleAudioMute()" id="audio-toggle-btn" class="text-sm text-slate-300 hover:text-white p-2 bg-slate-900 rounded-xl border border-slate-800 transition-all">🔊</button>
             </div>
 
             <!-- DUO USER HUD STATUS CARDS -->
-            <div class="space-y-3">
+            <div class="space-y-2.5">
                 <!-- NORTH HUD CARD -->
-                <div id="hud-card-north" onclick="switchActiveUser('North')" class="hud-card card p-3.5 rounded-2xl border flex flex-col gap-2.5 cursor-pointer">
-                    <div class="flex items-start gap-3">
-                        <div class="relative shrink-0 flex items-center justify-center mt-0.5">
+                <div id="hud-card-north" onclick="switchActiveUser('North')" class="hud-card card p-3 rounded-2xl border flex flex-col gap-2 cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <div class="relative shrink-0 flex items-center justify-center">
                             <img id="hud-avatar-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="hud-avatar">
                             <span id="hud-presence-dot-north" class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950"></span>
                         </div>
                         <div class="min-w-0 flex-1 space-y-1">
-                            <div class="flex items-center justify-between gap-1">
-                                <span class="font-black text-sm text-slate-100 flex items-center gap-1">
-                                    <span>North</span>
-                                    <span id="hud-timer-spin-north" class="hidden text-xs text-amber-400">⏳</span>
-                                </span>
-                                <span id="hud-badge-north" class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">YOU</span>
+                            <div class="flex items-center justify-between gap-1 min-w-0">
+                                <div class="flex items-center gap-1.5 min-w-0 flex-1">
+                                    <span class="font-black text-sm text-slate-100 flex items-center gap-1 shrink-0">
+                                        <span>North</span>
+                                        <span id="hud-timer-spin-north" class="hidden text-xs text-amber-400">⏳</span>
+                                    </span>
+                                    <span class="text-slate-600 text-xs shrink-0">•</span>
+                                    <span id="hud-status-north" onclick="editUserStatusNote('North', event)" class="text-xs text-slate-400 truncate hover:text-amber-300 cursor-pointer font-medium" title="Click to edit status">Drawing 🎨</span>
+                                </div>
+                                <span id="hud-badge-north" class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase shrink-0">YOU</span>
                             </div>
 
                             <!-- ACTIVE TITLE & CURRENT RANK DIRECTLY UNDER USER NAME -->
-                            <div onclick="openRankRoadmapModal('North', event)" class="flex items-center gap-1.5 text-xs cursor-pointer hover:opacity-85 transition-opacity" title="Click to view Rank Progression">
-                                <span id="hud-rank-north" class="font-black theme-accent-text text-[11px] shrink-0">Rank 1</span>
+                            <div onclick="openRankRoadmapModal('North', event)" class="flex items-center gap-1.5 text-xs cursor-pointer hover:opacity-85 transition-opacity pt-0.5" title="Click to view 100-Tier Rank Progression">
+                                <span id="hud-rank-north" class="font-black theme-accent-text text-xs shrink-0">Rank 1</span>
                                 <span class="text-slate-600 text-[10px]">•</span>
-                                <span id="hud-title-north" class="text-slate-300 font-semibold text-[11px] truncate" title="The Unbound Spark">The Unbound Spark</span>
+                                <span id="hud-title-north" class="text-slate-300 font-semibold text-xs truncate" title="The Unbound Spark">The Unbound Spark</span>
                             </div>
-
-                            <!-- PROGRESS INDICATOR TOWARD NEXT MILESTONE -->
-                            <div onclick="openRankRoadmapModal('North', event)" class="space-y-0.5 pt-0.5 cursor-pointer hover:opacity-85 transition-opacity" title="Click to view Rank Progression">
-                                <div class="flex justify-between items-center text-[10px] font-mono text-slate-400">
-                                    <span id="hud-rank-progress-label-north" class="truncate">Next: Rank 2</span>
-                                    <span id="hud-rank-progress-pct-north" class="font-bold shrink-0 ml-1">0%</span>
-                                </div>
-                                <div class="w-full bg-slate-900/90 h-1.5 rounded-full overflow-hidden border border-slate-700/60 p-[1px]">
-                                    <div id="hud-rank-bar-north" class="theme-accent-bg h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-                                </div>
-                            </div>
-
-                            <div id="hud-status-north" onclick="editUserStatusNote('North', event)" class="text-xs text-slate-400 truncate hover:text-amber-300 cursor-pointer font-medium pt-0.5" title="Click to edit status">Drawing 🎨</div>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center pt-2 border-t border-slate-800/80 text-xs font-mono">
-                        <span id="hud-pwr-north" class="font-black text-amber-400 text-xs">0 PWR</span>
-                        <span id="hud-hours-north" class="text-slate-400 font-bold text-xs">0.0/4.0h</span>
+
+                    <!-- NEXT RANK + EXP BAR ALONGSIDE CURRENT PWR LEVEL -->
+                    <div onclick="openRankRoadmapModal('North', event)" class="pt-2 border-t border-slate-800/80 space-y-1.5 cursor-pointer hover:opacity-90 transition-opacity" title="Click to view 100-Tier Rank Progression">
+                        <div class="flex justify-between items-center text-xs font-mono">
+                            <span id="hud-pwr-north" class="font-black text-amber-400 text-xs">0 PWR</span>
+                            <div class="flex items-center gap-1 text-[10px] text-slate-400 font-mono">
+                                <span id="hud-rank-progress-label-north" class="text-slate-400">Next: R2</span>
+                                <span class="text-slate-600">•</span>
+                                <span id="hud-rank-progress-pct-north" class="font-bold text-slate-300">0%</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-slate-900/90 h-1.5 rounded-full overflow-hidden border border-slate-700/60 p-[1px]">
+                            <div id="hud-rank-bar-north" class="theme-accent-bg h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- CREAM HUD CARD -->
-                <div id="hud-card-cream" onclick="switchActiveUser('Cream')" class="hud-card card p-3.5 rounded-2xl border flex flex-col gap-2.5 cursor-pointer">
-                    <div class="flex items-start gap-3">
-                        <div class="relative shrink-0 flex items-center justify-center mt-0.5">
+                <div id="hud-card-cream" onclick="switchActiveUser('Cream')" class="hud-card card p-3 rounded-2xl border flex flex-col gap-2 cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <div class="relative shrink-0 flex items-center justify-center">
                             <img id="hud-avatar-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="hud-avatar">
                             <span id="hud-presence-dot-cream" class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950"></span>
                         </div>
                         <div class="min-w-0 flex-1 space-y-1">
-                            <div class="flex items-center justify-between gap-1">
-                                <span class="font-black text-sm text-slate-100 flex items-center gap-1">
-                                    <span>Cream</span>
-                                    <span id="hud-timer-spin-cream" class="hidden text-xs text-amber-400">⏳</span>
-                                </span>
-                                <span id="hud-badge-cream" class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">PEER</span>
+                            <div class="flex items-center justify-between gap-1 min-w-0">
+                                <div class="flex items-center gap-1.5 min-w-0 flex-1">
+                                    <span class="font-black text-sm text-slate-100 flex items-center gap-1 shrink-0">
+                                        <span>Cream</span>
+                                        <span id="hud-timer-spin-cream" class="hidden text-xs text-amber-400">⏳</span>
+                                    </span>
+                                    <span class="text-slate-600 text-xs shrink-0">•</span>
+                                    <span id="hud-status-cream" onclick="editUserStatusNote('Cream', event)" class="text-xs text-slate-400 truncate hover:text-amber-300 cursor-pointer font-medium" title="Click to edit status">Writing ✍️</span>
+                                </div>
+                                <span id="hud-badge-cream" class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase shrink-0">PEER</span>
                             </div>
 
                             <!-- ACTIVE TITLE & CURRENT RANK DIRECTLY UNDER USER NAME -->
-                            <div onclick="openRankRoadmapModal('Cream', event)" class="flex items-center gap-1.5 text-xs cursor-pointer hover:opacity-85 transition-opacity" title="Click to view Rank Progression">
-                                <span id="hud-rank-cream" class="font-black theme-accent-text text-[11px] shrink-0">Rank 1</span>
+                            <div onclick="openRankRoadmapModal('Cream', event)" class="flex items-center gap-1.5 text-xs cursor-pointer hover:opacity-85 transition-opacity pt-0.5" title="Click to view 100-Tier Rank Progression">
+                                <span id="hud-rank-cream" class="font-black theme-accent-text text-xs shrink-0">Rank 1</span>
                                 <span class="text-slate-600 text-[10px]">•</span>
-                                <span id="hud-title-cream" class="text-slate-300 font-semibold text-[11px] truncate" title="The Unbound Spark">The Unbound Spark</span>
+                                <span id="hud-title-cream" class="text-slate-300 font-semibold text-xs truncate" title="The Unbound Spark">The Unbound Spark</span>
                             </div>
-
-                            <!-- PROGRESS INDICATOR TOWARD NEXT MILESTONE -->
-                            <div onclick="openRankRoadmapModal('Cream', event)" class="space-y-0.5 pt-0.5 cursor-pointer hover:opacity-85 transition-opacity" title="Click to view Rank Progression">
-                                <div class="flex justify-between items-center text-[10px] font-mono text-slate-400">
-                                    <span id="hud-rank-progress-label-cream" class="truncate">Next: Rank 2</span>
-                                    <span id="hud-rank-progress-pct-cream" class="font-bold shrink-0 ml-1">0%</span>
-                                </div>
-                                <div class="w-full bg-slate-900/90 h-1.5 rounded-full overflow-hidden border border-slate-700/60 p-[1px]">
-                                    <div id="hud-rank-bar-cream" class="theme-accent-bg h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-                                </div>
-                            </div>
-
-                            <div id="hud-status-cream" onclick="editUserStatusNote('Cream', event)" class="text-xs text-slate-400 truncate hover:text-amber-300 cursor-pointer font-medium pt-0.5" title="Click to edit status">Writing ✍️</div>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center pt-2 border-t border-slate-800/80 text-xs font-mono">
-                        <span id="hud-pwr-cream" class="font-black text-amber-400 text-xs">0 PWR</span>
-                        <span id="hud-hours-cream" class="text-slate-400 font-bold text-xs">0.0/4.0h</span>
+
+                    <!-- NEXT RANK + EXP BAR ALONGSIDE CURRENT PWR LEVEL -->
+                    <div onclick="openRankRoadmapModal('Cream', event)" class="pt-2 border-t border-slate-800/80 space-y-1.5 cursor-pointer hover:opacity-90 transition-opacity" title="Click to view 100-Tier Rank Progression">
+                        <div class="flex justify-between items-center text-xs font-mono">
+                            <span id="hud-pwr-cream" class="font-black text-amber-400 text-xs">0 PWR</span>
+                            <div class="flex items-center gap-1 text-[10px] text-slate-400 font-mono">
+                                <span id="hud-rank-progress-label-cream" class="text-slate-400">Next: R2</span>
+                                <span class="text-slate-600">•</span>
+                                <span id="hud-rank-progress-pct-cream" class="font-bold text-slate-300">0%</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-slate-900/90 h-1.5 rounded-full overflow-hidden border border-slate-700/60 p-[1px]">
+                            <div id="hud-rank-bar-cream" class="theme-accent-bg h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ENLARGED PROMINENT TAB SELECTORS -->
-            <nav class="flex flex-row md:flex-col gap-2.5 overflow-x-auto md:overflow-visible no-scrollbar py-1">
-                <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-4 py-3.5 rounded-xl text-base sm:text-lg font-bold flex items-center gap-3.5 w-full justify-start whitespace-nowrap"><span class="text-xl sm:text-2xl">⚗️</span> <span>Crucible</span></button>
-                <button onclick="switchTab('sanctuary')" id="nav-sanctuary" class="tab-btn px-4 py-3.5 rounded-xl text-base sm:text-lg font-bold flex items-center gap-3.5 w-full justify-start whitespace-nowrap"><span class="text-xl sm:text-2xl">🌿</span> <span>Sanctuary</span></button>
-                <button onclick="switchTab('chronicles')" id="nav-chronicles" class="tab-btn px-4 py-3.5 rounded-xl text-base sm:text-lg font-bold flex items-center gap-3.5 w-full justify-start whitespace-nowrap"><span class="text-xl sm:text-2xl">📜</span> <span>Chronicles</span></button>
-                <button onclick="switchTab('relics')" id="nav-relics" class="tab-btn px-4 py-3.5 rounded-xl text-base sm:text-lg font-bold flex items-center gap-3.5 w-full justify-start whitespace-nowrap"><span class="text-xl sm:text-2xl">🏺</span> <span>Relics</span></button>
-                <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-4 py-3.5 rounded-xl text-base sm:text-lg font-bold flex items-center gap-3.5 w-full justify-start whitespace-nowrap"><span class="text-xl sm:text-2xl">⚙️</span> <span>Forge</span></button>
+            <!-- PROMINENT TAB SELECTORS (STREAMLINED) -->
+            <nav class="flex flex-row md:flex-col gap-1.5 overflow-x-auto md:overflow-visible no-scrollbar py-0.5">
+                <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span class="text-lg">⚗️</span> <span>Crucible</span></button>
+                <button onclick="switchTab('sanctuary')" id="nav-sanctuary" class="tab-btn px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span class="text-lg">🌿</span> <span>Sanctuary</span></button>
+                <button onclick="switchTab('chronicles')" id="nav-chronicles" class="tab-btn px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span class="text-lg">📜</span> <span>Chronicles</span></button>
+                <button onclick="switchTab('relics')" id="nav-relics" class="tab-btn px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span class="text-lg">🏺</span> <span>Relics</span></button>
+                <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span class="text-lg">⚙️</span> <span>Forge</span></button>
             </nav>
 
-            <div class="mt-auto pt-4 border-t border-slate-800 flex justify-between items-center text-xs">
+            <!-- AUREATE INSIGHTS BANNER IN SIDEBAR (COMPACT & FITTING) -->
+            <div id="aureate-insights-banner" class="card relative overflow-hidden rounded-xl p-3 border border-amber-500/25 bg-gradient-to-r from-amber-950/25 via-slate-900/85 to-slate-900/40 shadow-md space-y-2">
+                <div class="flex items-center justify-between gap-1 pb-1.5 border-b border-slate-800/80">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <span class="text-[9px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1 shrink-0">
+                            <span>✨</span> INSIGHTS
+                        </span>
+                        <span id="insights-counter" class="text-[10px] font-mono text-slate-400">1 of 6</span>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button type="button" onclick="cycleAureateInsight(-1)" class="w-5 h-5 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs transition-all border border-slate-700/60" title="Previous Insight">‹</button>
+                        <button type="button" onclick="cycleAureateInsight(1)" class="w-5 h-5 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs transition-all border border-slate-700/60" title="Next Insight">›</button>
+                        <button type="button" onclick="toggleAureateInsightsAutoPlay()" id="insights-autoplay-btn" class="w-5 h-5 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-[9px] transition-all border border-slate-700/60" title="Auto-cycle toggle">
+                            <span id="insights-autoplay-icon">⏸</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FADE TRANSITION CONTENT CONTAINER -->
+                <div id="insights-content-container" class="relative insight-fade opacity-100 transform translate-y-0 flex items-center min-h-[46px]">
+                    <div class="flex items-center gap-2.5 w-full min-w-0">
+                        <div id="insight-icon-box" class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-base shrink-0">
+                            ⚡
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-[9px] uppercase tracking-wider font-extrabold text-amber-400/90 truncate" id="insight-category">
+                                Peak Window
+                            </div>
+                            <div class="text-sm font-black text-slate-100 truncate" id="insight-value">
+                                Awaiting Logs
+                            </div>
+                            <div class="text-[10px] text-slate-400 truncate font-medium" id="insight-description">
+                                Synthesizing real-time logs...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBTLE PROGRESS / DOTS -->
+                <div class="flex items-center justify-between pt-1.5 border-t border-slate-800/50 text-[9px] text-slate-500">
+                    <div id="insights-dots-container" class="flex items-center gap-1">
+                        <!-- Injected dynamically via JS -->
+                    </div>
+                    <span class="font-mono text-[9px] text-slate-500">⚡ Realtime</span>
+                </div>
+            </div>
+
+            <div class="mt-auto pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
                 <button onclick="handleLogout()" class="text-slate-400 hover:text-slate-200 font-semibold underline">Sign Out</button>
                 <span class="text-[10px] text-slate-500 font-mono">v2.1 Standard</span>
             </div>
@@ -434,57 +485,6 @@
 
             <!-- TAB 1: CRUCIBLE -->
             <div id="tab-crucible" class="space-y-6">
-                <!-- AUREATE INSIGHTS BANNER -->
-                <div id="aureate-insights-banner" class="card relative overflow-hidden rounded-2xl p-4 sm:p-5 border border-amber-500/25 bg-gradient-to-r from-amber-950/20 via-slate-900/85 to-slate-900/40 shadow-lg">
-                    <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-black tracking-widest uppercase px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1.5 shadow-sm">
-                                <span class="animate-pulse">✨</span> AUREATE INSIGHTS
-                            </span>
-                            <span id="insights-counter" class="text-[11px] font-mono text-slate-400">1 of 5</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <button type="button" onclick="cycleAureateInsight(-1)" class="w-7 h-7 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs transition-all border border-slate-700/60" title="Previous Insight">
-                                ‹
-                            </button>
-                            <button type="button" onclick="cycleAureateInsight(1)" class="w-7 h-7 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs transition-all border border-slate-700/60" title="Next Insight">
-                                ›
-                            </button>
-                            <button type="button" onclick="toggleAureateInsightsAutoPlay()" id="insights-autoplay-btn" class="px-2 h-7 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center gap-1 text-[11px] font-semibold transition-all border border-slate-700/60" title="Auto-cycle toggle">
-                                <span id="insights-autoplay-icon">⏸</span>
-                            </button>
-                        </div>
-                    </div>
-                    <!-- FADE TRANSITION CONTENT CONTAINER -->
-                    <div id="insights-content-container" class="relative pt-3.5 insight-fade opacity-100 transform translate-y-0 min-h-[64px] flex items-center">
-                        <div class="flex items-center gap-4 w-full">
-                            <div id="insight-icon-box" class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-2xl shrink-0 shadow-inner">
-                                ⚡
-                            </div>
-                            <div class="min-w-0 flex-1 space-y-0.5">
-                                <div class="flex items-center gap-2">
-                                    <span id="insight-category" class="text-[11px] uppercase tracking-wider font-extrabold text-amber-400/90">Peak Productive Window</span>
-                                </div>
-                                <div id="insight-value" class="text-lg sm:text-xl font-black text-slate-100 truncate">
-                                    Awaiting Logs
-                                </div>
-                                <div id="insight-description" class="text-xs text-slate-400 truncate font-medium">
-                                    Synthesizing real-time logs from Firestore...
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- SUBTLE PROGRESS / DOTS -->
-                    <div class="flex items-center justify-between pt-3 mt-1 border-t border-slate-800/50 text-[10px] text-slate-500">
-                        <div id="insights-dots-container" class="flex items-center gap-1.5">
-                            <!-- Injected dynamically via JS -->
-                        </div>
-                        <span class="font-mono text-[10px] text-slate-500 flex items-center gap-1">
-                            <span>⚡ Realtime Firestore Synthesis</span>
-                        </span>
-                    </div>
-                </div>
-
                 <!-- TOP METRICS STATS CARDS -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
                     <div id="payout-card-box" class="card p-6 rounded-2xl flex flex-col justify-between text-center md:text-left min-h-[145px]">
@@ -1292,16 +1292,16 @@
                 const endStr = formatHourAmPm((maxHour + 2) % 24);
                 insights.push({
                     icon: '⚡',
-                    category: 'Peak Productive Window',
+                    category: 'Peak Window',
                     value: `${startStr} – ${endStr}`,
-                    detail: `${formatHours(maxHourVal)}h logged in this high-craft diurnal window`
+                    detail: `${formatHours(maxHourVal)}h in this window`
                 });
             } else {
                 insights.push({
                     icon: '⚡',
-                    category: 'Peak Productive Window',
+                    category: 'Peak Window',
                     value: '9:00 AM – 11:00 AM',
-                    detail: 'Diurnal productivity window calibrates as work logs accumulate'
+                    detail: 'Diurnal rhythm calibrating'
                 });
             }
 
@@ -1322,16 +1322,16 @@
             if (maxDay >= 0 && maxDayVal > 0) {
                 insights.push({
                     icon: '📅',
-                    category: 'Top Focus Day of the Week',
+                    category: 'Top Focus Day',
                     value: `${dayNames[maxDay]}`,
-                    detail: `${formatHours(maxDayVal)}h deep craft accumulated • Your highest momentum day`
+                    detail: `${formatHours(maxDayVal)}h cumulative work`
                 });
             } else {
                 insights.push({
                     icon: '📅',
-                    category: 'Top Focus Day of the Week',
+                    category: 'Top Focus Day',
                     value: 'Midweek Cadence',
-                    detail: 'Weekly cadence analytics activate with logged sessions'
+                    detail: 'Calibrating with logged work'
                 });
             }
 
@@ -1350,24 +1350,24 @@
             if (maxPomoSecs > 0 || maxWorkH > 0) {
                 let displayVal = '';
                 if (maxPomoSecs >= 3600) {
-                    displayVal = `${formatHours(maxPomoSecs / 3600)} Hours (Continuous Focus)`;
+                    displayVal = `${formatHours(maxPomoSecs / 3600)} Hours (Clock)`;
                 } else if (maxPomoSecs > 0 && (maxPomoSecs / 3600) >= maxWorkH) {
-                    displayVal = `${Math.round(maxPomoSecs / 60)} Minutes (Continuous Focus)`;
+                    displayVal = `${Math.round(maxPomoSecs / 60)} Mins (Focus)`;
                 } else {
-                    displayVal = `${formatHours(maxWorkH)} Hours (Work Session)`;
+                    displayVal = `${formatHours(maxWorkH)} Hours (Work)`;
                 }
                 insights.push({
                     icon: '🛡️',
-                    category: 'Longest Unbroken Session',
+                    category: 'Longest Flow',
                     value: displayVal,
-                    detail: 'Flawless unbroken flow achieved without a single pause interruption'
+                    detail: '0 pause interruptions'
                 });
             } else {
                 insights.push({
                     icon: '🛡️',
-                    category: 'Longest Unbroken Session',
-                    value: '50 Minutes (Target Flow)',
-                    detail: 'Complete a continuous focus run without pausing to seal this milestone'
+                    category: 'Longest Flow',
+                    value: '50 Mins (Target)',
+                    detail: 'Flow with zero pauses'
                 });
             }
 
@@ -1378,16 +1378,16 @@
                 const cleanRate = Math.round((cleanPomoCount / totalPomoCount) * 100);
                 insights.push({
                     icon: '💎',
-                    category: 'Clean Session Rate',
-                    value: `${cleanRate}% Clean Rate`,
-                    detail: `${cleanPomoCount} of ${totalPomoCount} sessions completed without any pause`
+                    category: 'Clean Flow Rate',
+                    value: `${cleanRate}% Clean`,
+                    detail: `${cleanPomoCount}/${totalPomoCount} clean rounds`
                 });
             } else {
                 insights.push({
                     icon: '💎',
-                    category: 'Clean Session Rate',
-                    value: '100% Clean Rate',
-                    detail: 'Zero pause interruptions recorded across completed focus intervals'
+                    category: 'Clean Flow Rate',
+                    value: '100% Clean',
+                    detail: '0 pauses recorded'
                 });
             }
 
@@ -1409,9 +1409,9 @@
 
             insights.push({
                 icon: '👑',
-                category: 'Lifetime Career Earnings',
+                category: 'Career Earnings',
                 value: `฿${Math.round(lifetimeEarnings).toLocaleString()}`,
-                detail: `Accumulated across ${Math.max(1, activeMonths)} alchemical cycle${activeMonths === 1 ? '' : 's'}`
+                detail: `Over ${Math.max(1, activeMonths)} active cycle${activeMonths === 1 ? '' : 's'}`
             });
 
             // 6. Bonus Insight: Ascension Milestone & Lifetime PWR
@@ -1419,9 +1419,9 @@
             const rankInfo = getRankDetails(lifetimePWR);
             insights.push({
                 icon: '🏺',
-                category: 'Ascension Status',
-                value: `Rank ${rankInfo.rank} • ${rankInfo.title}`,
-                detail: `${lifetimePWR.toLocaleString()} Lifetime PWR (${Math.round(rankInfo.progressPct)}% to next milestone)`
+                category: 'Ascension Rank',
+                value: `R${rankInfo.rank} • ${rankInfo.title}`,
+                detail: `${lifetimePWR.toLocaleString()} Lifetime PWR`
             });
 
             return insights;
@@ -1462,7 +1462,7 @@
             let html = '';
             for (let i = 0; i < total; i++) {
                 const isActive = (i === activeIdx);
-                html += `<button type="button" onclick="selectAureateInsight(${i})" class="h-1.5 rounded-full transition-all duration-300 ${isActive ? 'w-5 bg-amber-400' : 'w-1.5 bg-slate-700 hover:bg-slate-500'}" title="Go to insight ${i + 1}"></button>`;
+                html += `<button type="button" onclick="selectAureateInsight(${i})" class="h-1 rounded-full transition-all duration-300 ${isActive ? 'w-3.5 bg-amber-400' : 'w-1 bg-slate-700 hover:bg-slate-500'}" title="Go to insight ${i + 1}"></button>`;
             }
             dotsEl.innerHTML = html;
         }
@@ -2545,9 +2545,9 @@
                 const progLabelEl = $(`hud-rank-progress-label-${u.toLowerCase()}`);
                 if(progLabelEl) {
                     if(rankDetails.nextThreshold !== null) {
-                        progLabelEl.innerText = `Next: R${rankDetails.rank + 1} (${rankDetails.neededPWR.toLocaleString()} PWR)`;
+                        progLabelEl.innerText = `Next: R${rankDetails.rank + 1}`;
                     } else {
-                        progLabelEl.innerText = 'Max Rank Achieved 👑';
+                        progLabelEl.innerText = 'Max Rank 👑';
                     }
                 }
 
@@ -2562,7 +2562,7 @@
                 }
 
                 $(`hud-pwr-${u.toLowerCase()}`).innerText=`${pwr.toLocaleString()} PWR`;
-                $(`hud-hours-${u.toLowerCase()}`).innerText=`${formatHours(duoPresenceData[u].hoursToday||0)}/${formatHours(s.dailySoftCap||4)}h`;
+                if($(`hud-hours-${u.toLowerCase()}`)) $(`hud-hours-${u.toLowerCase()}`).innerText=`${formatHours(duoPresenceData[u].hoursToday||0)}/${formatHours(s.dailySoftCap||4)}h`;
             });
         }
 
