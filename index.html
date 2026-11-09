@@ -1172,6 +1172,13 @@
         let activeHoldTimer=null,activeHoldInterval=null,isTouchScrolling=false;
         let currentJournalPageIndex=0;
 
+        let _cachedFocus=25,_cachedShort=5,_cachedLong=15;
+        try{
+            const _sf=localStorage.getItem('aureum_pomo_focus');if(_sf)_cachedFocus=parseInt(_sf)||25;
+            const _ss=localStorage.getItem('aureum_pomo_short');if(_ss)_cachedShort=parseInt(_ss)||5;
+            const _sl=localStorage.getItem('aureum_pomo_long');if(_sl)_cachedLong=parseInt(_sl)||15;
+        }catch(e){}
+
         function getLogDate(l){
             if(!l||!l.timestamp)return new Date();
             return l.timestamp.toDate?l.timestamp.toDate():new Date(l.timestamp);
@@ -1221,7 +1228,7 @@
             {id:'streak_100',tier:'aureum',icon:'🌋',title:'Monolith of Eternity',desc:'Maintain a 100-day active streak.'}
         ];
 
-        let userSettings={monthlyCash:8000,weeklyHours:10,dailySoftCap:4,maxBonusCapPct:125,pomoFocus:25,pomoShort:5,pomoLong:15,pomoRounds:4,pomoSound:'zen_bowl',pomoSoundRepeats:3,unloggedFocusSecs:0,userTheme:'gold',userCursor:'default',bgPattern:'dots',bgOpacity:20,avatarUrl:'',particleIntensity:15,statusNote:'',vaultedMonths:{},unlockedBadges:[],completedPomoHistory:[],scratchpadTodos:[]};
+        let userSettings={monthlyCash:8000,weeklyHours:10,dailySoftCap:4,maxBonusCapPct:125,pomoFocus:_cachedFocus,pomoShort:_cachedShort,pomoLong:_cachedLong,pomoRounds:4,pomoSound:'zen_bowl',pomoSoundRepeats:3,unloggedFocusSecs:0,userTheme:'gold',userCursor:'default',bgPattern:'dots',bgOpacity:20,avatarUrl:'',particleIntensity:15,statusNote:'',vaultedMonths:{},unlockedBadges:[],completedPomoHistory:[],scratchpadTodos:[]};
         // 100-TIER MILESTONE RANK SYSTEM (0 to 1,000,000 Lifetime PWR)
         const RANK_TITLES = ["The Unbound Spark", "Ember Initiate", "Apprentice of the Flame", "Hearth Warden", "Crucible Aspirant", "Alloy Seeker", "Alchemical Neophyte", "Forge Tender", "Zephyr Walker", "Copper Artisan", "Ironclad Striker", "Cinder Weaver", "Pyre Adept", "Calcinated Mind", "Argent Novice", "Crucible Journeyman", "Gilded Wayfarer", "Silver Sentinel", "Mercury Scholar", "Auric Disciple", "Athanor Craftsman", "Transmutation Prowler", "Goldforged Knight", "Solar Initiate", "Electrum Warden", "Prismatic Shaper", "Radiant Adept", "Luminary Vanguard", "Astral Smelter", "Ether Alchemist", "Meridian Sage", "Solstice Harvester", "Aureate Stasis Master", "Chrysalis Champion", "Resonant Artificer", "Dawnstrider", "Sunstone Guardian", "Gilded Templar", "Stellar Weaver", "Alchemical Magus", "Celestial Metallurgist", "Void Refiner", "Golden Zenith", "Chrono Weaver", "Eclipse Conqueror", "Solarian Prelate", "Aurora Commander", "Epoch Walker", "Zenith Alchemist", "Aegis of the Sun", "Prime Transmuter", "Crucible Chancellor", "Auric Archon", "Astral Luminary", "Singularity Pioneer", "Solar Vanguard", "Nova Architect", "Ethereal Sovereign", "Dawn Paragon", "Quintessence Keeper", "Grand Artificer", "Golden Imperator", "Primordial Refiner", "Celestial Chancellor", "Starforged Hierarch", "Meridian Overlord", "Astral Viceroy", "Sol Invictus", "Empyrean Warden", "Crowned Alchemist", "Hyperion Ascendant", "Solar Dominus", "Aether Sovereign", "Chronos Patriarch", "Celestial Paragon", "Stellar Warlord", "Infinite Transmuter", "Zenith Monarch", "Sunfire Primarch", "Seraph of Aureum", "Architect of Cosmos", "Astral Demiurge", "Gilded Colossus", "Cosmic Overseer", "Primordial Dawn", "Eternal Forgemaster", "Horizon Sovereign", "Supernova Regent", "Empyrean Overlord", "Master of Infinity", "Celestial Primarch", "Omnipresent Luminary", "Godforged Emperor", "Sol Sovereign", "Astral Omnipotent", "Lord of the Crucible", "Crown of the Cosmos", "Alpha and Omega", "Immortal of Aureum", "Grand Sovereign of Eternity"];
         const RANK_THRESHOLDS = [0, 80, 340, 770, 1400, 2200, 3200, 4400, 5750, 7350, 9100, 11100, 13200, 15600, 18100, 20900, 23800, 27000, 30400, 33900, 37700, 41600, 45800, 50200, 54700, 59500, 64500, 69700, 75100, 80700, 86500, 92500, 98700, 105000, 112000, 118500, 125500, 133000, 140500, 148000, 156000, 164000, 172500, 181000, 189500, 198500, 208000, 217000, 226500, 236500, 246500, 256500, 267000, 278000, 288500, 299500, 311000, 322500, 334000, 346000, 358000, 370500, 383000, 396000, 409000, 422000, 435500, 449000, 463000, 477000, 491500, 506000, 520500, 535500, 550500, 566000, 581500, 597500, 613500, 629500, 646000, 662500, 679500, 696500, 714000, 731500, 749500, 767500, 785500, 804000, 822500, 841500, 860500, 879500, 899000, 919000, 939000, 959000, 979500, 1000000];
@@ -2049,8 +2056,13 @@
         function applyCursorToBody(c){document.body.setAttribute('data-cursor',c||'default')}
 
         // POMODORO ENGINE
-        let myPomoMode='focus',myPomoRound=1,myPomoTime=1500,myPomoEndTime=null,myPomoInitialTime=1500,myPomoIsRunning=false,myPomoInterval=null,currentSessionWasPaused=false;
-        let pomoUIRenderInterval=null,pomoSyncUnsubscribe=null,spectatorSettings=null,shadowSpectatorTime=1500,shadowSpectatorIsRunning=false,shadowSpectatorInterval=null;
+        let myPomoMode='focus',myPomoRound=1,myPomoTime=_cachedFocus*60,myPomoEndTime=null,myPomoInitialTime=_cachedFocus*60,myPomoIsRunning=false,myPomoInterval=null,currentSessionWasPaused=false;
+        let pomoUIRenderInterval=null,pomoSyncUnsubscribe=null,spectatorSettings=null,shadowSpectatorTime=_cachedFocus*60,shadowSpectatorIsRunning=false,shadowSpectatorInterval=null;
+        try{
+            const _initTEl=$('pomo-timer-display'),_initFBtn=$('pomo-mode-focus');
+            if(_initTEl)_initTEl.innerText=`${_cachedFocus.toString().padStart(2,'0')}:00`;
+            if(_initFBtn)_initFBtn.innerText=`Focus (${_cachedFocus}m)`;
+        }catch(e){}
 
         document.addEventListener('keydown',e=>{
             if(e.code==='Space'&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){
@@ -2189,8 +2201,12 @@
             const netCashEarned=Math.max(0,cashAfter-cashBefore);
 
             await db.collection('logs').add({type:'work',user:loggedInUser,hours:hours,normalHours:normH,overCapHours:overH,results:R,effort:E,points:pts,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
-            userSettings.unloggedFocusSecs=0;updateUnloggedFocusDisplay();
+            userSettings.unloggedFocusSecs=0;
+            updateUnloggedFocusDisplay();
             await db.collection('settings').doc(loggedInUser).set({unloggedFocusSecs:0},{merge:true});
+            if($('work-time'))$('work-time').value="1.00";
+            if($('pomo-export-quality'))$('pomo-export-quality').value="3";
+            if($('pomo-export-effort'))$('pomo-export-effort').value="3";
             
             $('pomo-export-panel').classList.add('hidden');
             showToast({title:'🚀 Exported to Crucible',subtitle:`<strong>+฿${Math.round(netCashEarned).toLocaleString()} Earned</strong> (${hours}h @ Lvl ${R}/${E})`,icon:'🎯',tier:'gold',originEvt:e});
@@ -2221,6 +2237,11 @@
         async function applyPomoPreset(f,s,l){
             if(loggedInUser!==viewedUser)return;
             userSettings.pomoFocus=f;userSettings.pomoShort=s;userSettings.pomoLong=l;
+            try{
+                localStorage.setItem('aureum_pomo_focus',f);
+                localStorage.setItem('aureum_pomo_short',s);
+                localStorage.setItem('aureum_pomo_long',l);
+            }catch(e){}
             $('setting-pomo-focus').value=f;$('setting-pomo-short').value=s;$('setting-pomo-long').value=l;
             await db.collection('settings').doc(loggedInUser).set({pomoFocus:f,pomoShort:s,pomoLong:l},{merge:true});
             playTone('save');setMyPomoMode('focus');
@@ -2230,16 +2251,25 @@
         async function initAndRecoverMyPomoState(){
             try{
                 const docSnap=await db.collection('settings').doc(loggedInUser).get();
-                if(docSnap.exists&&docSnap.data().livePomoState){
-                    const d=docSnap.data().livePomoState;
-                    myPomoMode=d.mode||'focus';myPomoRound=parseInt(d.round)||1;
+                if(docSnap.exists){
+                    const data=docSnap.data();
+                    userSettings={...userSettings,...data};
+                    try{
+                        if(userSettings.pomoFocus)localStorage.setItem('aureum_pomo_focus',userSettings.pomoFocus);
+                        if(userSettings.pomoShort)localStorage.setItem('aureum_pomo_short',userSettings.pomoShort);
+                        if(userSettings.pomoLong)localStorage.setItem('aureum_pomo_long',userSettings.pomoLong);
+                    }catch(e){}
+                    const d=data.livePomoState;
+                    myPomoMode=d?.mode||'focus';myPomoRound=parseInt(d?.round)||1;
                     const f=parseInt(userSettings.pomoFocus)||25,s=parseInt(userSettings.pomoShort)||5,l=parseInt(userSettings.pomoLong)||15;
                     myPomoInitialTime=(myPomoMode==='focus'?f:(myPomoMode==='short'?s:l))*60;
-                    if(d.isRunning&&d.pomoEndTime){
+                    if(d&&d.isRunning&&d.pomoEndTime){
                         const rem=Math.max(0,Math.ceil((d.pomoEndTime-Date.now())/1000));
                         if(rem>0){myPomoTime=rem;myPomoEndTime=d.pomoEndTime;myPomoIsRunning=true;startMyPomoBackgroundTimer()}
-                        else{myPomoTime=0;myPomoIsRunning=false;myPomoEndTime=null;setMyPomoMode('focus')}
-                    }else{myPomoTime=d.pomoTime!==undefined?d.pomoTime:myPomoInitialTime;myPomoIsRunning=false;myPomoEndTime=null;syncMyPomoToCloud()}
+                        else{myPomoTime=myPomoInitialTime;myPomoIsRunning=false;myPomoEndTime=null;syncMyPomoToCloud()}
+                    }else{
+                        myPomoTime=myPomoInitialTime;myPomoIsRunning=false;myPomoEndTime=null;syncMyPomoToCloud();
+                    }
                 }else{setMyPomoMode('focus')}
             }catch(e){setMyPomoMode('focus')}
         }
@@ -2828,6 +2858,13 @@
             userSettings.bgOpacity=parseInt($('setting-bg-opacity').value)||20;
             userSettings.avatarUrl=$('setting-avatar-url').value.trim();
             userSettings.particleIntensity=parseInt($('setting-particle-intensity').value)||0;
+
+            // Persist pomo defaults to localStorage for quick reload
+            try{
+                localStorage.setItem('aureum_pomo_focus',userSettings.pomoFocus);
+                localStorage.setItem('aureum_pomo_short',userSettings.pomoShort);
+                localStorage.setItem('aureum_pomo_long',userSettings.pomoLong);
+            }catch(e){}
 
             await db.collection('settings').doc(loggedInUser).set(userSettings,{merge:true});
             showToast({title:'⚙️ Settings Saved',subtitle:'Options saved successfully.',icon:'🔧',tier:'gold',duration:3000,originEvt:e});
