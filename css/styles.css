@@ -62,6 +62,25 @@ aside.app-sidebar {
     background-color: var(--card-bg) !important;border: 1.5px solid var(--card-border) !important;
     box-shadow: 0 10px 30px -5px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08);
 }
+aside.app-sidebar > * {
+    flex-shrink: 0 !important;
+}
+#aureate-insights-banner {
+    flex-shrink: 0 !important;
+    min-height: fit-content !important;
+}
+@media (min-width: 1024px) and (min-height: 860px) {
+    aside.app-sidebar {
+        position: sticky;
+        top: 1.5rem;
+    }
+}
+.goals-locked-field {
+    opacity: 0.55;
+    pointer-events: none;
+    user-select: none;
+    filter: saturate(0.6);
+}
 .journal-book {
     background: linear-gradient(90deg, #10141e 0%, #161b26 48%, #090c12 50%, #161b26 52%, #10141e 100%);
     border: 2px solid var(--card-border);box-shadow: 0 20px 50px rgba(0,0,0,0.85), inset 0 0 40px rgba(0,0,0,0.6);

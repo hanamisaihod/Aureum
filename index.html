@@ -43,43 +43,50 @@
 
     <!-- 100-TIER RANK ROADMAP MODAL -->
     <div id="rank-roadmap-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 hidden p-4">
-        <div class="card p-5 sm:p-6 rounded-2xl max-w-xl w-full shadow-2xl border border-amber-500/30 space-y-4 max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="card p-5 sm:p-6 rounded-2xl max-w-2xl w-full shadow-2xl border border-amber-500/30 space-y-4 max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 shrink-0">
                 <div class="flex items-center gap-2.5">
                     <span class="text-2xl">👑</span>
                     <div>
-                        <h3 class="text-base sm:text-lg font-black text-slate-100 flex items-center gap-2">
-                            <span>Aureate Level &amp; Work Style</span>
+                        <h3 class="text-base sm:text-lg font-black text-slate-100 flex items-center gap-2 flex-wrap">
+                            <span>Aureate Level, Stats &amp; Work Style</span>
                             <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">10 TIERS • 100 LVLS</span>
                         </h3>
-                        <p class="text-[11px] text-slate-400">10 Rank Tiers × 30-Day Rolling Work Style Archetype (0 to 1,000,000 EXP)</p>
+                        <p class="text-[11px] text-slate-400">RPG Ability Matrix, Power Level &amp; 10-Tier Progression (0 to 1,000,000 EXP)</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeRankRoadmapModal()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-1">✕</button>
             </div>
 
-            <!-- USER ACTIVE STATUS SUMMARY CARD -->
-            <div id="rank-modal-summary" class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
-                <!-- Injected dynamically via JS -->
-            </div>
-
-            <!-- CURRENT WORK STYLE EXPLAINER CARD -->
-            <div id="rank-modal-style-card" class="p-3.5 rounded-xl bg-slate-900/80 border border-amber-500/25">
-                <!-- Injected dynamically via JS -->
-            </div>
-
-            <!-- 10-TIER SCROLLABLE LIST -->
-            <div class="flex-1 overflow-hidden flex flex-col min-h-0 space-y-2">
-                <div class="flex items-center justify-between text-xs font-bold text-slate-400 px-2">
-                    <span>10 Rank Tiers &amp; Dynamic Title</span>
-                    <span>Required EXP</span>
+            <div class="flex-1 overflow-y-auto pr-1 space-y-4 custom-scroll min-h-0">
+                <!-- USER ACTIVE STATUS SUMMARY CARD -->
+                <div id="rank-modal-summary" class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
+                    <!-- Injected dynamically via JS -->
                 </div>
-                <div id="rank-roadmap-list" class="space-y-1.5 overflow-y-auto pr-1 flex-1 custom-scroll">
-                    <!-- 10 rank tiers injected dynamically via JS -->
+
+                <!-- RPG ABILITIES & POWER STATS CHART CARD -->
+                <div id="rank-modal-abilities-card" class="p-4 rounded-xl bg-slate-900/90 border border-amber-500/30 space-y-3">
+                    <!-- Injected dynamically via JS -->
+                </div>
+
+                <!-- CURRENT WORK STYLE EXPLAINER CARD -->
+                <div id="rank-modal-style-card" class="p-3.5 rounded-xl bg-slate-900/80 border border-amber-500/25">
+                    <!-- Injected dynamically via JS -->
+                </div>
+
+                <!-- 10-TIER LIST -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between text-xs font-bold text-slate-400 px-2">
+                        <span>10 Rank Tiers &amp; Dynamic Title</span>
+                        <span>Required EXP</span>
+                    </div>
+                    <div id="rank-roadmap-list" class="space-y-1.5 max-h-64 overflow-y-auto pr-1 custom-scroll">
+                        <!-- 10 rank tiers injected dynamically via JS -->
+                    </div>
                 </div>
             </div>
 
-            <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
+            <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs shrink-0">
                 <span class="text-[10px] text-slate-400 font-mono">Lifetime PWR = (Work×100) + (Workout×120) + (Chore×80)</span>
                 <button type="button" onclick="closeRankRoadmapModal()" class="px-4 py-1.5 rounded-lg theme-accent-btn font-extrabold text-xs">Close</button>
             </div>
@@ -169,12 +176,12 @@
     </div>
 
     <!-- MAIN APP WRAPPER -->
-    <div id="app-content" class="hidden flex flex-col md:flex-row gap-6 max-w-7xl mx-auto">
+    <div id="app-content" class="hidden flex flex-col md:flex-row items-start gap-6 max-w-7xl mx-auto">
         
         <!-- VERTICAL SIDEBAR PANEL -->
-        <aside class="app-sidebar p-3.5 sm:p-4 rounded-2xl md:w-72 lg:w-80 shrink-0 space-y-4 md:sticky md:top-6 md:h-[calc(100vh-3rem)] flex flex-col overflow-y-auto no-scrollbar">
+        <aside class="app-sidebar p-3.5 sm:p-4 rounded-2xl w-full md:w-72 lg:w-80 shrink-0 space-y-4 flex flex-col">
             <!-- BRAND HEADER -->
-            <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
+            <div class="flex items-center justify-between pb-2.5 border-b border-slate-800 shrink-0">
                 <div>
                     <h1 class="text-2xl font-black logo-gold uppercase tracking-widest">AUREUM</h1>
                 </div>
@@ -182,7 +189,7 @@
             </div>
 
             <!-- DUO USER HUD STATUS CARDS -->
-            <div class="space-y-2.5">
+            <div class="space-y-2.5 shrink-0">
                 <!-- NORTH HUD CARD (3 VERTICAL ZONES) -->
                 <div id="hud-card-north" onclick="switchActiveUser('North')" class="hud-card card p-3.5 rounded-2xl border flex flex-col gap-2.5 cursor-pointer">
                     <!-- ZONE 1: HEADER ZONE (Avatar, Display Name, Live Status) -->
@@ -194,7 +201,7 @@
                         <div class="min-w-0 flex-1 space-y-1">
                             <div class="flex items-center justify-between gap-1 min-w-0">
                                 <span class="font-black text-sm text-slate-100 flex items-center gap-1 truncate">
-                                    <span>North</span>
+                                    <span id="hud-name-north">North</span>
                                     <span id="hud-timer-spin-north" class="hidden text-xs text-amber-400">⏳</span>
                                 </span>
                                 <span id="hud-badge-north" class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase shrink-0">YOU</span>
@@ -234,7 +241,7 @@
                         <div class="min-w-0 flex-1 space-y-1">
                             <div class="flex items-center justify-between gap-1 min-w-0">
                                 <span class="font-black text-sm text-slate-100 flex items-center gap-1 truncate">
-                                    <span>Cream</span>
+                                    <span id="hud-name-cream">Cream</span>
                                     <span id="hud-timer-spin-cream" class="hidden text-xs text-amber-400">⏳</span>
                                 </span>
                                 <span id="hud-badge-cream" class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase shrink-0">PEER</span>
@@ -265,7 +272,7 @@
             </div>
 
             <!-- PROMINENT TAB SELECTORS (STREAMLINED) -->
-            <nav class="flex flex-row md:flex-col gap-1.5 overflow-x-auto md:overflow-visible no-scrollbar py-0.5">
+            <nav class="flex flex-row md:flex-col gap-1.5 overflow-x-auto md:overflow-visible no-scrollbar py-0.5 shrink-0">
                 <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span class="text-lg">⚗️</span> <span>Crucible</span></button>
                 <button onclick="switchTab('sanctuary')" id="nav-sanctuary" class="tab-btn px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span class="text-lg">🌿</span> <span>Sanctuary</span></button>
                 <button onclick="switchTab('chronicles')" id="nav-chronicles" class="tab-btn px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span class="text-lg">📜</span> <span>Chronicles</span></button>
@@ -274,7 +281,7 @@
             </nav>
 
             <!-- AUREATE INSIGHTS BANNER IN SIDEBAR (COMPACT & FITTING) -->
-            <div id="aureate-insights-banner" class="card relative overflow-hidden rounded-xl p-3 border border-amber-500/25 bg-gradient-to-r from-amber-950/25 via-slate-900/85 to-slate-900/40 shadow-md space-y-2">
+            <div id="aureate-insights-banner" class="card relative shrink-0 rounded-xl p-3 border border-amber-500/25 bg-gradient-to-r from-amber-950/25 via-slate-900/85 to-slate-900/40 shadow-md space-y-2">
                 <div class="flex items-center justify-between gap-1 pb-1.5 border-b border-slate-800/80">
                     <div class="flex items-center gap-1.5 min-w-0">
                         <span class="text-[9px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1 shrink-0">
@@ -292,19 +299,19 @@
                 </div>
 
                 <!-- FADE TRANSITION CONTENT CONTAINER -->
-                <div id="insights-content-container" class="relative insight-fade opacity-100 transform translate-y-0 flex items-center min-h-[46px]">
-                    <div class="flex items-center gap-2.5 w-full min-w-0">
-                        <div id="insight-icon-box" class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-base shrink-0">
+                <div id="insights-content-container" class="relative insight-fade opacity-100 transform translate-y-0 flex items-center min-h-[52px]">
+                    <div class="flex items-start gap-2.5 w-full min-w-0">
+                        <div id="insight-icon-box" class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-base shrink-0 mt-0.5">
                             ⚡
                         </div>
-                        <div class="min-w-0 flex-1">
-                            <div class="text-[9px] uppercase tracking-wider font-extrabold text-amber-400/90 truncate" id="insight-category">
+                        <div class="min-w-0 flex-1 space-y-0.5">
+                            <div class="text-[9px] uppercase tracking-wider font-extrabold text-amber-400/90 break-words leading-tight" id="insight-category">
                                 The Catalyst Hour
                             </div>
-                            <div class="text-sm font-black text-slate-100 truncate" id="insight-value">
+                            <div class="text-sm font-black text-slate-100 break-words leading-snug" id="insight-value">
                                 Awaiting Logs
                             </div>
-                            <div class="text-[10px] text-slate-400 truncate font-medium" id="insight-description">
+                            <div class="text-[10px] text-slate-400 break-words leading-snug font-medium" id="insight-description">
                                 Synthesizing real-time logs...
                             </div>
                         </div>
@@ -320,7 +327,7 @@
                 </div>
             </div>
 
-            <div class="mt-auto pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
+            <div class="pt-3 border-t border-slate-800 flex justify-between items-center text-xs shrink-0">
                 <button onclick="handleLogout()" class="text-slate-400 hover:text-slate-200 font-semibold underline">Sign Out</button>
                 <span class="text-[10px] text-slate-500 font-mono">v2.1 Standard</span>
             </div>
@@ -812,6 +819,14 @@
                     <div class="card p-6 rounded-2xl">
                         <h2 class="text-xl font-black mb-5 text-slate-100">Appearance &amp; Themes</h2>
                         <div class="space-y-4">
+                            <div class="pb-4 border-b border-slate-800">
+                                <label for="setting-display-name" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Display Name</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="setting-display-name" maxlength="24" placeholder="Enter your display name..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-xs text-white font-bold focus:outline-none focus:border-amber-500">
+                                    <button type="button" onclick="applyCustomDisplayName()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-amber-300 font-bold rounded-xl whitespace-nowrap transition-all">Update Name</button>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-1">Customizes how your name appears across the HUD, Chronicles, and Rank cards.</p>
+                            </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Dual-Tone Theme</label>
@@ -899,35 +914,69 @@
                         </div>
                     </div>
 
-                    <div class="card p-6 rounded-2xl">
-                        <h2 class="text-xl font-black mb-4 text-slate-100">Goals & Targets</h2>
-                        <div class="space-y-4">
+                    <div id="goals-targets-card" class="card p-6 rounded-2xl border transition-all">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-800">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h2 class="text-xl font-black text-slate-100">Goals &amp; Targets</h2>
+                                    <span id="goals-lock-status-badge" class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 uppercase tracking-wider flex items-center gap-1">
+                                        <span>🔒</span> <span>Locked</span>
+                                    </span>
+                                </div>
+                                <p id="goals-lock-helper-text" class="text-[11px] text-slate-400 mt-0.5">Protected against accidental changes. Unlock deliberately to modify sensitive targets.</p>
+                            </div>
+
+                            <div id="goals-lock-action-area" class="flex items-center gap-2 shrink-0">
+                                <button type="button" id="goals-unlock-request-btn" onclick="requestUnlockGoalsTargets()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-extrabold text-amber-300 flex items-center gap-1.5 transition-all">
+                                    <span>🔒</span> <span>Unlock to Edit</span>
+                                </button>
+
+                                <div id="goals-unlock-confirm-bar" class="hidden items-center gap-1.5 bg-amber-950/40 border border-amber-500/40 px-2.5 py-1.5 rounded-xl">
+                                    <span class="text-[11px] font-bold text-amber-300 mr-1">Confirm unlock?</span>
+                                    <button type="button" onclick="confirmUnlockGoalsTargets()" class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-[11px] font-black transition-all">Yes, Unlock</button>
+                                    <button type="button" onclick="cancelUnlockGoalsTargets()" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold transition-all">Cancel</button>
+                                </div>
+
+                                <div id="goals-unlocked-controls" class="hidden items-center gap-2">
+                                    <button type="button" onclick="resetGoalsTargetsToSaved()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-slate-300 transition-all" title="Revert unsaved changes">↺ Revert</button>
+                                    <button type="button" onclick="lockGoalsTargets()" class="px-3.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-xs font-extrabold text-emerald-300 flex items-center gap-1 transition-all">
+                                        <span>🔒</span> <span>Lock Values</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="goals-targets-fields" class="space-y-4 goals-locked-field">
                             <div>
                                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Target Allowance (฿)</label>
-                                <input type="number" id="setting-monthly-cash" min="1000" step="500" value="8000" required class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-sm text-white font-mono font-bold focus:outline-none focus:border-amber-500">
+                                <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
+                                    <button type="button" onmousedown="startHold('value', 'setting-monthly-cash', -1, 500, 1000, 1000000, event)" ontouchstart="startHold('value', 'setting-monthly-cash', -1, 500, 1000, 1000000, event)" class="goals-step-btn px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none" disabled>-</button>
+                                    <input type="number" id="setting-monthly-cash" min="1000" step="500" value="8000" required disabled readonly onwheel="this.blur()" class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
+                                    <button type="button" onmousedown="startHold('value', 'setting-monthly-cash', 1, 500, 1000, 1000000, event)" ontouchstart="startHold('value', 'setting-monthly-cash', 1, 500, 1000, 1000000, event)" class="goals-step-btn px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none" disabled>+</button>
+                                </div>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Target Weekly Hours</label>
                                 <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
-                                    <button type="button" onmousedown="startHold('value', 'setting-weekly-hrs', -1, 1, 1, 80, event)" ontouchstart="startHold('value', 'setting-weekly-hrs', -1, 1, 1, 80, event)" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
-                                    <input type="number" id="setting-weekly-hrs" min="1" max="80" step="1" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                    <button type="button" onmousedown="startHold('value', 'setting-weekly-hrs', 1, 1, 1, 80, event)" ontouchstart="startHold('value', 'setting-weekly-hrs', 1, 1, 1, 80, event)" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
+                                    <button type="button" onmousedown="startHold('value', 'setting-weekly-hrs', -1, 1, 1, 80, event)" ontouchstart="startHold('value', 'setting-weekly-hrs', -1, 1, 1, 80, event)" class="goals-step-btn px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none" disabled>-</button>
+                                    <input type="number" id="setting-weekly-hrs" min="1" max="80" step="1" required disabled readonly onwheel="this.blur()" class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
+                                    <button type="button" onmousedown="startHold('value', 'setting-weekly-hrs', 1, 1, 1, 80, event)" ontouchstart="startHold('value', 'setting-weekly-hrs', 1, 1, 1, 80, event)" class="goals-step-btn px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none" disabled>+</button>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Daily Soft Cap (Hours)</label>
                                 <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
-                                    <button type="button" onmousedown="startHold('value', 'setting-daily-soft-cap', -1, 0.5, 1, 16, event)" ontouchstart="startHold('value', 'setting-daily-soft-cap', -1, 0.5, 1, 16, event)" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
-                                    <input type="number" id="setting-daily-soft-cap" min="1" max="16" step="0.5" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                    <button type="button" onmousedown="startHold('value', 'setting-daily-soft-cap', 1, 0.5, 1, 16, event)" ontouchstart="startHold('value', 'setting-daily-soft-cap', 1, 0.5, 1, 16, event)" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
+                                    <button type="button" onmousedown="startHold('value', 'setting-daily-soft-cap', -1, 0.5, 1, 16, event)" ontouchstart="startHold('value', 'setting-daily-soft-cap', -1, 0.5, 1, 16, event)" class="goals-step-btn px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none" disabled>-</button>
+                                    <input type="number" id="setting-daily-soft-cap" min="1" max="16" step="0.5" required disabled readonly onwheel="this.blur()" class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
+                                    <button type="button" onmousedown="startHold('value', 'setting-daily-soft-cap', 1, 0.5, 1, 16, event)" ontouchstart="startHold('value', 'setting-daily-soft-cap', 1, 0.5, 1, 16, event)" class="goals-step-btn px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none" disabled>+</button>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Max Bonus Cap (%)</label>
                                 <div class="flex items-center bg-slate-900/80 border border-slate-700 rounded-xl overflow-hidden">
-                                    <button type="button" onmousedown="startHold('value', 'setting-bonus-cap', -1, 5, 100, 300, event)" ontouchstart="startHold('value', 'setting-bonus-cap', -1, 5, 100, 300, event)" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">-</button>
-                                    <input type="number" id="setting-bonus-cap" min="100" max="300" step="5" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
-                                    <button type="button" onmousedown="startHold('value', 'setting-bonus-cap', 1, 5, 100, 300, event)" ontouchstart="startHold('value', 'setting-bonus-cap', 1, 5, 100, 300, event)" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
+                                    <button type="button" onmousedown="startHold('value', 'setting-bonus-cap', -1, 5, 100, 300, event)" ontouchstart="startHold('value', 'setting-bonus-cap', -1, 5, 100, 300, event)" class="goals-step-btn px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none" disabled>-</button>
+                                    <input type="number" id="setting-bonus-cap" min="100" max="300" step="5" required disabled readonly onwheel="this.blur()" class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
+                                    <button type="button" onmousedown="startHold('value', 'setting-bonus-cap', 1, 5, 100, 300, event)" ontouchstart="startHold('value', 'setting-bonus-cap', 1, 5, 100, 300, event)" class="goals-step-btn px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none" disabled>+</button>
                                 </div>
                             </div>
                         </div>

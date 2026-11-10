@@ -26,6 +26,7 @@ try {
 } catch (e) {}
 
 let userSettings = {
+    displayName: '',
     monthlyCash: 8000,
     weeklyHours: 10,
     dailySoftCap: 4,
@@ -49,6 +50,9 @@ let userSettings = {
     completedPomoHistory: [],
     scratchpadTodos: []
 };
+
+let goalsTargetsLocked = true;
+let goalsUnlockConfirmPending = false;
 
 let duoPresenceData = {
     North: { settings: {}, hoursToday: 0, powerScore: 0, logs: [], workStyle: 'Tactician' },

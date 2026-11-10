@@ -48,5 +48,5 @@ function renderJournalBookView(diaryLogs) {
     label.innerText = `Page ${currentJournalPageIndex + 1} of ${diaryLogs.length}`;
     rightDate.innerText = logDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     rightContent.innerText = `"${log.text}"`;
-    rightFooter.innerText = `Written by ${log.user || viewedUser}`;
+    rightFooter.innerText = `Written by ${getUserDisplayName(log.user || viewedUser)}`;
 }

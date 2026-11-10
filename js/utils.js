@@ -19,6 +19,32 @@ function formatHourAmPm(h) {
     return `${hr}:00 ${ampm}`;
 }
 
+function escapeHtml(str) {
+    return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function getUserDisplayName(userKey) {
+    const u = userKey || viewedUser || loggedInUser || 'North';
+    if (u === loggedInUser && userSettings && typeof userSettings.displayName === 'string' && userSettings.displayName.trim()) {
+        return userSettings.displayName.trim();
+    }
+    if (typeof spectatorSettings !== 'undefined' && spectatorSettings && u === viewedUser && typeof spectatorSettings.displayName === 'string' && spectatorSettings.displayName.trim()) {
+        return spectatorSettings.displayName.trim();
+    }
+    const s = duoPresenceData[u]?.settings;
+    if (s && typeof s.displayName === 'string' && s.displayName.trim()) {
+        return s.displayName.trim();
+    }
+    return u;
+}
+
+const GOALS_TARGET_FIELD_IDS = ['setting-monthly-cash', 'setting-weekly-hrs', 'setting-daily-soft-cap', 'setting-bonus-cap'];
+
 // Right-Click Drag Window Scrolling & Hold Cleanup
 let isRightDragging = false;
 let dragStartX = 0;
@@ -85,8 +111,15 @@ function startHold(mode, fieldOrId, delta, step = 1, min = 1, max = 5, e) {
     stopHold();
     const executeStep = () => {
         if (mode === 'value') {
+            if (typeof goalsTargetsLocked !== 'undefined' && goalsTargetsLocked && GOALS_TARGET_FIELD_IDS.includes(fieldOrId)) {
+                stopHold();
+                return;
+            }
             const el = $(fieldOrId);
-            if (!el) return;
+            if (!el || el.disabled || el.readOnly) {
+                stopHold();
+                return;
+            }
             let val = (parseFloat(el.value) || 0) + (delta * step);
             if (min !== undefined) val = Math.max(min, val);
             if (max !== undefined) val = Math.min(max, val);

@@ -47,9 +47,14 @@ function renderDuoHUDCards(){
         }
 
         // ZONE 1: Header Zone (Avatar, Display Name, Live Status Indicator)
+        const nameEl=$(`hud-name-${u.toLowerCase()}`);
+        const dispName=getUserDisplayName(u);
+        if(nameEl)nameEl.innerText=dispName;
+
         const imgEl=$(`hud-avatar-${u.toLowerCase()}`);
         if(imgEl){
             imgEl.src=s.avatarUrl||`https://api.dicebear.com/7.x/bottts/svg?seed=${u}`;
+            imgEl.alt=dispName;
             applyDynamicAvatarGlow(imgEl,duoPresenceData[u].hoursToday||0);
         }
         const dotEl=$(`hud-presence-dot-${u.toLowerCase()}`);
@@ -186,19 +191,25 @@ function updateUserSwitcherUI(){
     const clearBtn=$('todo-clear-btn');if(clearBtn)clearBtn.style.display=isSelf?'inline-block':'none';
     document.querySelectorAll('#tab-forge input, #tab-forge select').forEach(i=>{i.disabled=!isSelf;i.classList.toggle('opacity-50',!isSelf)});
     document.querySelectorAll('#tab-forge button').forEach(b=>b.style.display=isSelf?'inline-block':'none');
+    if(typeof applyGoalsTargetsLockUI==='function')applyGoalsTargetsLockUI();
     $('read-only-banner').classList.toggle('hidden',isSelf);
-    if(!isSelf)$('view-target-name').innerText=viewedUser;
+    if(!isSelf)$('view-target-name').innerText=getUserDisplayName(viewedUser);
     renderTodoList();renderDuoHUDCards();
 }
 
 function switchTab(t){
     if(t==='hourglass')t='crucible';
+    if(t!=='forge'){
+        goalsTargetsLocked=true;
+        goalsUnlockConfirmPending=false;
+    }
     ['crucible','sanctuary','chronicles','relics','forge'].forEach(x=>{
         $(`tab-${x}`)?.classList.add('hidden');
         const nav=$(`nav-${x}`);
         if(nav)nav.className=x===t?"tab-btn active px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap":"tab-btn px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap";
     });
     $(`tab-${t}`)?.classList.remove('hidden');
+    if(t==='forge'&&typeof applyGoalsTargetsLockUI==='function')applyGoalsTargetsLockUI();
     if(t==='crucible')attachPomoSpectatorListener();
 }
 

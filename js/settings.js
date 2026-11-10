@@ -31,6 +31,141 @@ async function promptCustomStatus(){
     }
 }
 
+async function applyCustomDisplayName(){
+    if(loggedInUser!==viewedUser)return;
+    const input=$('setting-display-name');
+    if(!input)return;
+    const cleaned=input.value.trim().substring(0,24);
+    const finalName=cleaned||loggedInUser;
+    userSettings.displayName=finalName;
+    input.value=finalName;
+    if(duoPresenceData[loggedInUser]){
+        duoPresenceData[loggedInUser].settings=duoPresenceData[loggedInUser].settings||{};
+        duoPresenceData[loggedInUser].settings.displayName=finalName;
+    }
+    renderDuoHUDCards();
+    updateUserSwitcherUI();
+    await db.collection('settings').doc(loggedInUser).set({displayName:finalName},{merge:true});
+    showToast({title:'🪪 Display Name Updated',subtitle:`You are now known as "${escapeHtml(finalName)}"`,icon:'✨',tier:'gold'});
+}
+
+function requestUnlockGoalsTargets(){
+    if(loggedInUser!==viewedUser)return;
+    goalsUnlockConfirmPending=true;
+    playTone('save');
+    applyGoalsTargetsLockUI();
+}
+
+function cancelUnlockGoalsTargets(){
+    goalsUnlockConfirmPending=false;
+    applyGoalsTargetsLockUI();
+}
+
+function confirmUnlockGoalsTargets(){
+    if(loggedInUser!==viewedUser)return;
+    goalsUnlockConfirmPending=false;
+    goalsTargetsLocked=false;
+    playTone('save');
+    applyGoalsTargetsLockUI();
+    showToast({title:'🔓 Targets Unlocked',subtitle:'You may now carefully edit Goals & Targets.',icon:'⚠️',tier:'gold',duration:3000});
+}
+
+function lockGoalsTargets(){
+    goalsUnlockConfirmPending=false;
+    goalsTargetsLocked=true;
+    playTone('save');
+    applyGoalsTargetsLockUI();
+    showToast({title:'🔒 Targets Locked',subtitle:'Goals & Targets are now protected from accidental changes.',icon:'🛡️',tier:'emerald',duration:2500});
+}
+
+function resetGoalsTargetsToSaved(){
+    if($('setting-monthly-cash'))$('setting-monthly-cash').value=userSettings.monthlyCash||8000;
+    if($('setting-weekly-hrs'))$('setting-weekly-hrs').value=userSettings.weeklyHours||10;
+    if($('setting-daily-soft-cap'))$('setting-daily-soft-cap').value=userSettings.dailySoftCap||4;
+    if($('setting-bonus-cap'))$('setting-bonus-cap').value=userSettings.maxBonusCapPct||125;
+    playTone('delete');
+    showToast({title:'↺ Values Reverted',subtitle:'Restored Goals & Targets to last saved values.',icon:'🛡️',tier:'silver',duration:2500});
+}
+
+function applyGoalsTargetsLockUI(){
+    const isSelf=(loggedInUser===viewedUser);
+    const locked=!isSelf||!!goalsTargetsLocked;
+    const fieldsBox=$('goals-targets-fields');
+    const card=$('goals-targets-card');
+    const badge=$('goals-lock-status-badge');
+    const helper=$('goals-lock-helper-text');
+    const reqBtn=$('goals-unlock-request-btn');
+    const confirmBar=$('goals-unlock-confirm-bar');
+    const unlockedCtrls=$('goals-unlocked-controls');
+    const actionArea=$('goals-lock-action-area');
+
+    if(actionArea){
+        actionArea.style.display=isSelf?'flex':'none';
+    }
+
+    GOALS_TARGET_FIELD_IDS.forEach(id=>{
+        const el=$(id);
+        if(el){
+            el.disabled=locked;
+            el.readOnly=locked;
+        }
+    });
+
+    document.querySelectorAll('#goals-targets-fields .goals-step-btn').forEach(btn=>{
+        btn.disabled=locked;
+        btn.style.display=isSelf?'inline-block':'none';
+        btn.classList.toggle('opacity-40',locked);
+        btn.classList.toggle('cursor-not-allowed',locked);
+    });
+
+    if(fieldsBox)fieldsBox.classList.toggle('goals-locked-field',locked);
+    if(card)card.classList.toggle('border-amber-500/50',!locked);
+    if(badge){
+        if(locked){
+            badge.className='text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 uppercase tracking-wider flex items-center gap-1';
+            badge.innerHTML='<span>🔒</span> <span>Locked</span>';
+        }else{
+            badge.className='text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase tracking-wider flex items-center gap-1';
+            badge.innerHTML='<span>🔓</span> <span>Unlocked for Editing</span>';
+        }
+    }
+    if(helper){
+        helper.innerText=locked
+            ?'Protected against accidental changes. Unlock deliberately to modify sensitive targets.'
+            :'Unlocked! Modify your targets carefully, then click Save All Settings or Lock Values.';
+        helper.className=locked?'text-[11px] text-slate-400 mt-0.5':'text-[11px] text-amber-300/90 font-semibold mt-0.5';
+    }
+    if(reqBtn&&confirmBar&&unlockedCtrls){
+        if(!isSelf){
+            reqBtn.style.display='none';
+            confirmBar.classList.add('hidden');
+            confirmBar.classList.remove('flex');
+            unlockedCtrls.classList.add('hidden');
+            unlockedCtrls.classList.remove('flex');
+        }else if(locked){
+            unlockedCtrls.classList.add('hidden');
+            unlockedCtrls.classList.remove('flex');
+            if(goalsUnlockConfirmPending){
+                reqBtn.style.display='none';
+                confirmBar.classList.remove('hidden');
+                confirmBar.classList.add('flex');
+                confirmBar.querySelectorAll('button').forEach(b=>b.style.display='inline-block');
+            }else{
+                reqBtn.style.display='inline-flex';
+                confirmBar.classList.add('hidden');
+                confirmBar.classList.remove('flex');
+            }
+        }else{
+            reqBtn.style.display='none';
+            confirmBar.classList.add('hidden');
+            confirmBar.classList.remove('flex');
+            unlockedCtrls.classList.remove('hidden');
+            unlockedCtrls.classList.add('flex');
+            unlockedCtrls.querySelectorAll('button').forEach(b=>b.style.display='inline-flex');
+        }
+    }
+}
+
 async function handleInstantBgPatternChange(){
     const pattern=$('setting-bg-pattern').value;
     const opacity=parseInt($('setting-bg-opacity').value)||0;
@@ -165,10 +300,16 @@ async function randomizeAvatar(){
 function updateSettingsUI(){
     $('label-weekly-hrs').innerText=userSettings.weeklyHours;
     $('label-monthly-cash').innerText=userSettings.monthlyCash.toLocaleString();
-    $('setting-monthly-cash').value=userSettings.monthlyCash;
-    $('setting-weekly-hrs').value=userSettings.weeklyHours;
-    $('setting-daily-soft-cap').value=userSettings.dailySoftCap||4;
-    $('setting-bonus-cap').value=userSettings.maxBonusCapPct;
+    const dispInput=$('setting-display-name');
+    if(dispInput&&document.activeElement!==dispInput){
+        dispInput.value=userSettings.displayName||loggedInUser;
+    }
+    if(goalsTargetsLocked){
+        $('setting-monthly-cash').value=userSettings.monthlyCash;
+        $('setting-weekly-hrs').value=userSettings.weeklyHours;
+        $('setting-daily-soft-cap').value=userSettings.dailySoftCap||4;
+        $('setting-bonus-cap').value=userSettings.maxBonusCapPct;
+    }
     $('setting-pomo-focus').value=userSettings.pomoFocus||25;
     $('setting-pomo-short').value=userSettings.pomoShort||5;
     $('setting-pomo-long').value=userSettings.pomoLong||15;
@@ -184,15 +325,21 @@ function updateSettingsUI(){
     $('setting-avatar-url').value=userSettings.avatarUrl||'';
     const particle=userSettings.particleIntensity??15;
     $('setting-particle-intensity').value=particle;$('label-particle-val').innerText=`${particle}%`;
+    applyGoalsTargetsLockUI();
     updateUnloggedFocusDisplay();
 }
 
 async function saveAllForgeSettings(e){
     if(e)e.preventDefault();
-    userSettings.monthlyCash=parseFloat($('setting-monthly-cash').value)||8000;
-    userSettings.weeklyHours=parseFloat($('setting-weekly-hrs').value)||10;
-    userSettings.dailySoftCap=parseFloat($('setting-daily-soft-cap').value)||4;
-    userSettings.maxBonusCapPct=parseFloat($('setting-bonus-cap').value)||125;
+    const dispInput=$('setting-display-name');
+    if(dispInput){
+        const cleanedName=dispInput.value.trim().substring(0,24);
+        userSettings.displayName=cleanedName||loggedInUser;
+    }
+    userSettings.monthlyCash=parseFloat($('setting-monthly-cash').value)||userSettings.monthlyCash||8000;
+    userSettings.weeklyHours=parseFloat($('setting-weekly-hrs').value)||userSettings.weeklyHours||10;
+    userSettings.dailySoftCap=parseFloat($('setting-daily-soft-cap').value)||userSettings.dailySoftCap||4;
+    userSettings.maxBonusCapPct=parseFloat($('setting-bonus-cap').value)||userSettings.maxBonusCapPct||125;
     userSettings.pomoFocus=parseInt($('setting-pomo-focus').value)||25;
     userSettings.pomoShort=parseInt($('setting-pomo-short').value)||5;
     userSettings.pomoLong=parseInt($('setting-pomo-long').value)||15;
@@ -206,14 +353,21 @@ async function saveAllForgeSettings(e){
     userSettings.avatarUrl=$('setting-avatar-url').value.trim();
     userSettings.particleIntensity=parseInt($('setting-particle-intensity').value)||0;
 
+    goalsTargetsLocked=true;
+    goalsUnlockConfirmPending=false;
+
     try{
         localStorage.setItem('aureum_pomo_focus',userSettings.pomoFocus);
         localStorage.setItem('aureum_pomo_short',userSettings.pomoShort);
         localStorage.setItem('aureum_pomo_long',userSettings.pomoLong);
     }catch(e){}
 
+    if(duoPresenceData[loggedInUser]){
+        duoPresenceData[loggedInUser].settings={...(duoPresenceData[loggedInUser].settings||{}),...userSettings};
+    }
+
     await db.collection('settings').doc(loggedInUser).set(userSettings,{merge:true});
-    showToast({title:'⚙️ Settings Saved',subtitle:'Options saved successfully.',icon:'🔧',tier:'gold',duration:3000,originEvt:e});
-    updateSettingsUI();loadUserData();setMyPomoMode('focus');
+    showToast({title:'⚙️ Settings Saved',subtitle:'Options saved & Goals locked safely.',icon:'🔧',tier:'gold',duration:3000,originEvt:e});
+    updateSettingsUI();renderDuoHUDCards();updateUserSwitcherUI();loadUserData();setMyPomoMode('focus');
 }
 

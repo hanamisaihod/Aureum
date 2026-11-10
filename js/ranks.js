@@ -136,9 +136,148 @@ const WORK_STYLE_INFO = {
     }
 };
 
+function getStatGrade(val) {
+    if (val >= 90) return { grade: 'S+', color: '#f59e0b', bg: 'rgba(245,158,11,0.18)', border: 'rgba(245,158,11,0.45)' };
+    if (val >= 80) return { grade: 'S', color: '#fbbf24', bg: 'rgba(251,191,36,0.15)', border: 'rgba(251,191,36,0.4)' };
+    if (val >= 65) return { grade: 'A', color: '#10b981', bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.35)' };
+    if (val >= 50) return { grade: 'B', color: '#38bdf8', bg: 'rgba(56,189,248,0.15)', border: 'rgba(56,189,248,0.35)' };
+    if (val >= 35) return { grade: 'C', color: '#a855f7', bg: 'rgba(168,85,247,0.15)', border: 'rgba(168,85,247,0.35)' };
+    return { grade: 'D', color: '#94a3b8', bg: 'rgba(148,163,184,0.12)', border: 'rgba(148,163,184,0.25)' };
+}
+
+function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
+    const safeLogs = Array.isArray(logs) ? logs : [];
+    const safeSettings = settings || {};
+    const workLogs = safeLogs.filter(l => l.type === 'work');
+    const workoutLogs = safeLogs.filter(l => l.type === 'workout');
+    const choreLogs = safeLogs.filter(l => l.type === 'chore');
+    const diaryLogs = safeLogs.filter(l => l.type === 'diary');
+    const healthLogs = safeLogs.filter(l => l.type === 'health');
+    const pomoList = Array.isArray(safeSettings.completedPomoHistory) ? safeSettings.completedPomoHistory : [];
+    const unlockedBadges = Array.isArray(safeSettings.unlockedBadges) ? safeSettings.unlockedBadges : [];
+    const todos = Array.isArray(safeSettings.scratchpadTodos) ? safeSettings.scratchpadTodos : [];
+
+    const workoutHours = workoutLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
+    const avgStrain = workoutLogs.length > 0
+        ? workoutLogs.reduce((acc, l) => acc + (parseFloat(l.strain) || 3), 0) / workoutLogs.length : 3.0;
+    const heavyWorkHours = workLogs.filter(l => (parseFloat(l.effort) || 3) >= 4).reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
+    const strRaw = (workoutHours * 4.2 * (avgStrain / 3)) + (workoutLogs.length * 1.8) + (heavyWorkHours * 1.4);
+    const strVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-strRaw / 38)))));
+
+    const avgQ = workLogs.length > 0 ? workLogs.reduce((acc, l) => acc + (parseFloat(l.results) || 3), 0) / workLogs.length : 3.0;
+    const avgE = workLogs.length > 0 ? workLogs.reduce((acc, l) => acc + (parseFloat(l.effort) || 3), 0) / workLogs.length : 3.0;
+    const effRatio = avgQ / Math.max(1, avgE);
+    const doneTodos = todos.filter(t => t.done).length;
+    const dexQualityPart = workLogs.length > 0 ? ((avgQ - 1) / 4) * 48 : 14;
+    const dexEffPart = workLogs.length > 0 ? Math.min(26, effRatio * 15) : 8;
+    const dexMasteryPart = Math.min(25, Math.sqrt(workLogs.length) * 3.2 + doneTodos * 0.8);
+    const dexVal = Math.min(99, Math.max(12, Math.round(dexQualityPart + dexEffPart + dexMasteryPart)));
+
+    const totalWorkHours = workLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
+    const unbrokenPomos = pomoList.filter(p => !p.wasPaused).length;
+    const intRaw = (totalWorkHours * 1.6) + (pomoList.length * 2.2) + (unbrokenPomos * 1.4);
+    const intVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-intRaw / 55)))));
+
+    const totalChoreHours = choreLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
+    const softCap = parseFloat(safeSettings.dailySoftCap) || 4;
+    const workByDay = {};
+    workLogs.forEach(l => {
+        const d = getLogDate(l);
+        const k = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        workByDay[k] = (workByDay[k] || 0) + (parseFloat(l.hours) || 0);
+    });
+    const balancedDays = Object.values(workByDay).filter(h => h >= 1.5 && h <= softCap + 1).length;
+    const vitRaw = (totalChoreHours * 3.6) + (choreLogs.length * 1.5) + (balancedDays * 2.2) + (healthLogs.length * 0.8);
+    const vitVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-vitRaw / 38)))));
+
+    const wisRaw = (diaryLogs.length * 3.5) + (unlockedBadges.length * 4.2);
+    const wisVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-wisRaw / 42)))));
+
+    const activeDaySet = new Set();
+    safeLogs.forEach(l => {
+        const d = getLogDate(l);
+        activeDaySet.add(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime());
+    });
+    const sortedDays = Array.from(activeDaySet).sort((a, b) => a - b);
+    let bestStreak = sortedDays.length > 0 ? 1 : 0, curRun = sortedDays.length > 0 ? 1 : 0;
+    for (let i = 1; i < sortedDays.length; i++) {
+        const diff = Math.round((sortedDays[i] - sortedDays[i - 1]) / 86400000);
+        if (diff === 1) { curRun++; if (curRun > bestStreak) bestStreak = curRun; }
+        else if (diff > 1) curRun = 1;
+    }
+    const softCapHits = Object.values(workByDay).filter(h => h >= softCap).length;
+    const wilRaw = (sortedDays.length * 2.0) + (bestStreak * 3.8) + (softCapHits * 3.0);
+    const wilVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-wilRaw / 42)))));
+
+    const stats = [
+        { key: 'STR', name: 'Strength', icon: '⚔️', val: strVal, color: '#ef4444', detail: `${formatHours(workoutHours)}h Fitness • ${formatHours(heavyWorkHours)}h High-Strain` },
+        { key: 'DEX', name: 'Dexterity', icon: '🎯', val: dexVal, color: '#10b981', detail: `${avgQ.toFixed(1)}/5 Craft • ${effRatio.toFixed(2)}x Eff.` },
+        { key: 'INT', name: 'Intelligence', icon: '🧠', val: intVal, color: '#38bdf8', detail: `${formatHours(totalWorkHours)}h Work • ${pomoList.length} Focus Rnds` },
+        { key: 'VIT', name: 'Vitality', icon: '🛡️', val: vitVal, color: '#f59e0b', detail: `${formatHours(totalChoreHours)}h Chores • ${balancedDays}d Paced` },
+        { key: 'WIS', name: 'Wisdom', icon: '📖', val: wisVal, color: '#a855f7', detail: `${diaryLogs.length} Chronicles • ${unlockedBadges.length} Relics` },
+        { key: 'WIL', name: 'Willpower', icon: '🔥', val: wilVal, color: '#f97316', detail: `${sortedDays.length}d Active • ${bestStreak}d Best Streak` }
+    ];
+
+    const avgStat = Math.round(stats.reduce((s, x) => s + x.val, 0) / stats.length);
+    const powerLevel = Math.round((pwr || 0) + (avgStat * 25) + ((rankInfo?.level || 1) * 120));
+    const overallGrade = getStatGrade(avgStat);
+    const topStat = [...stats].sort((a, b) => b.val - a.val)[0];
+    const specialtyMap = {
+        STR: 'Titan Vanguard (Physical & Grit)',
+        DEX: 'Grand Artisan (Craft & Precision)',
+        INT: 'Arcane Scholar (Deep Focus)',
+        VIT: 'Sanctuary Warden (Harmony & Keep)',
+        WIS: 'Chronicle Sage (Lore & Insight)',
+        WIL: 'Unyielding Sovereign (Endurance)'
+    };
+
+    return { stats, avgStat, powerLevel, overallGrade, dominantSpecialty: `${topStat.icon} ${specialtyMap[topStat.key] || topStat.name}` };
+}
+
+function renderRPGAbilitiesCard(abilities) {
+    const stats = abilities.stats;
+    const cx = 115, cy = 105, maxR = 68;
+    const angles = [-90, -30, 30, 90, 150, 210].map(deg => (deg * Math.PI) / 180);
+
+    const rings = [0.25, 0.5, 0.75, 1.0].map(scale => {
+        const pts = angles.map(a => `${(cx + Math.cos(a) * maxR * scale).toFixed(1)},${(cy + Math.sin(a) * maxR * scale).toFixed(1)}`).join(' ');
+        return `<polygon points="${pts}" fill="none" stroke="rgba(148,163,184,0.18)" stroke-width="1" ${scale === 1 ? 'stroke-dasharray="none"' : 'stroke-dasharray="2,2"'} />`;
+    }).join('');
+
+    const axes = angles.map(a =>
+        `<line x1="${cx}" y1="${cy}" x2="${(cx + Math.cos(a) * maxR).toFixed(1)}" y2="${(cy + Math.sin(a) * maxR).toFixed(1)}" stroke="rgba(148,163,184,0.22)" stroke-width="1" />`
+    ).join('');
+
+    const dataCoords = stats.map((st, i) => {
+        const ratio = Math.max(0.12, Math.min(1, st.val / 99));
+        return { x: cx + Math.cos(angles[i]) * maxR * ratio, y: cy + Math.sin(angles[i]) * maxR * ratio, st };
+    });
+
+    const dataPolygonPts = dataCoords.map(c => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
+    const vertexDots = dataCoords.map(c =>
+        `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="3.5" fill="${c.st.color}" stroke="#0f172a" stroke-width="1.5" />`
+    ).join('');
+
+    const labelNodes = stats.map((st, i) => {
+        const labelR = maxR + 22;
+        const lx = (cx + Math.cos(angles[i]) * labelR).toFixed(1);
+        const ly = cy + Math.sin(angles[i]) * labelR;
+        return `<text x="${lx}" y="${(ly - 3).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" fill="#e2e8f0" font-size="9.5" font-weight="900" font-family="monospace">${st.key}</text><text x="${lx}" y="${(ly + 8).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" fill="${st.color}" font-size="9" font-weight="800" font-family="monospace">${st.val}</text>`;
+    }).join('');
+
+    const statBarsHtml = stats.map(st => {
+        const g = getStatGrade(st.val);
+        return `<div class="p-2 rounded-lg bg-slate-950/70 border border-slate-800/90 space-y-1"><div class="flex items-center justify-between text-xs"><div class="flex items-center gap-1.5 min-w-0"><span class="text-sm shrink-0">${st.icon}</span><span class="font-black text-slate-100 text-[11px] font-mono">${st.key}</span><span class="text-[10px] text-slate-400 font-semibold truncate">${st.name}</span></div><div class="flex items-center gap-1.5 shrink-0 font-mono"><span class="text-[9px] font-black px-1.5 py-0.2 rounded" style="background:${g.bg};color:${g.color};border:1px solid ${g.border}">${g.grade}</span><span class="text-xs font-black text-white">${st.val}<span class="text-[9px] text-slate-500">/99</span></span></div></div><div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800"><div class="h-full rounded-full transition-all duration-500" style="width:${Math.min(100, Math.round((st.val / 99) * 100))}%;background:${st.color}"></div></div><div class="text-[9px] text-slate-400 font-mono truncate">${st.detail}</div></div>`;
+    }).join('');
+
+    const og = abilities.overallGrade;
+    return `<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-800"><div><div class="flex items-center gap-2"><span class="text-xs font-black uppercase tracking-wider text-slate-100">⚡ Aureate Ability Matrix &amp; Stats</span><span class="text-[10px] font-black font-mono px-2 py-0.5 rounded" style="background:${og.bg};color:${og.color};border:1px solid ${og.border}">CLASS ${og.grade} • AVG ${abilities.avgStat}</span></div><div class="text-[11px] text-amber-300/90 font-semibold mt-0.5">Specialty: ${abilities.dominantSpecialty}</div></div><div class="bg-slate-950/90 border border-amber-500/40 rounded-xl px-3 py-1.5 text-right shrink-0"><div class="text-[9px] uppercase tracking-widest font-extrabold text-slate-400">Combat Power Level</div><div class="text-base font-black font-mono text-amber-400">⚡ ${abilities.powerLevel.toLocaleString()} <span class="text-[10px] text-amber-200/80">PWR</span></div></div></div><div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center pt-1"><div class="sm:col-span-5 flex flex-col items-center justify-center bg-slate-950/60 rounded-xl border border-slate-800/80 p-2"><svg viewBox="0 0 230 210" class="w-full max-w-[220px] h-auto select-none overflow-visible"><defs><radialGradient id="abilityRadarGrad" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f59e0b" stop-opacity="0.48" /><stop offset="100%" stop-color="#38bdf8" stop-opacity="0.20" /></radialGradient></defs>${rings}${axes}<polygon points="${dataPolygonPts}" fill="url(#abilityRadarGrad)" stroke="#fbbf24" stroke-width="2" stroke-linejoin="round" />${vertexDots}${labelNodes}</svg><div class="text-[9px] font-mono text-slate-400 text-center -mt-1">6-Axis Attribute Radar (1–99 Scale)</div></div><div class="sm:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-2">${statBarsHtml}</div></div>`;
+}
+
 function openRankRoadmapModal(targetUser, evt) {
     if (evt && evt.stopPropagation) evt.stopPropagation();
     const u = targetUser || viewedUser || loggedInUser;
+    const dispName = escapeHtml(getUserDisplayName(u));
     const pwr = duoPresenceData[u]?.powerScore || 0;
     const uLogs = duoPresenceData[u]?.logs || (u === viewedUser ? currentRawLogsCache : []);
     const rankInfo = getRankDetails(pwr, uLogs);
@@ -152,10 +291,10 @@ function openRankRoadmapModal(targetUser, evt) {
         sumEl.innerHTML = `
             <div class="flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3 min-w-0">
-                    <img src="${s.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${u}`}" alt="${u}" class="w-12 h-12 rounded-xl border border-slate-700 shrink-0">
+                    <img src="${s.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${u}`}" alt="${dispName}" class="w-12 h-12 rounded-xl border border-slate-700 shrink-0">
                     <div class="min-w-0">
                         <div class="flex items-center gap-2">
-                            <span class="font-black text-sm text-slate-100">${u}</span>
+                            <span class="font-black text-sm text-slate-100">${dispName}</span>
                             <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">Lvl ${rankInfo.level}</span>
                         </div>
                         <div class="text-xs font-bold theme-accent-text truncate">${rankInfo.title}</div>
@@ -176,6 +315,12 @@ function openRankRoadmapModal(targetUser, evt) {
                 </div>
             </div>
         `;
+    }
+
+    const abilitiesEl = $('rank-modal-abilities-card');
+    if (abilitiesEl) {
+        const abilities = calculateRPGAbilities(uLogs, s, pwr, rankInfo);
+        abilitiesEl.innerHTML = renderRPGAbilitiesCard(abilities);
     }
 
     const styleEl = $('rank-modal-style-card');

@@ -243,10 +243,13 @@ function attachPomoSpectatorListener(){
     const isSelf=(loggedInUser===viewedUser);
     $('pomo-spectator-banner').classList.toggle('hidden',isSelf);$('pomo-controls-box').classList.toggle('hidden',!isSelf);
     if(!isSelf){
-        $('pomo-spectator-target').innerText=viewedUser;
+        $('pomo-spectator-target').innerText=getUserDisplayName(viewedUser);
         pomoSyncUnsubscribe=db.collection('settings').doc(viewedUser).onSnapshot(doc=>{
             if(doc.exists){
-                spectatorSettings=doc.data();applyThemeToBody(userSettings.userTheme);applyCursorToBody(userSettings.userCursor);
+                spectatorSettings=doc.data();
+                $('pomo-spectator-target').innerText=getUserDisplayName(viewedUser);
+                if($('view-target-name'))$('view-target-name').innerText=getUserDisplayName(viewedUser);
+                applyThemeToBody(userSettings.userTheme);applyCursorToBody(userSettings.userCursor);
                 applyBackgroundPattern(userSettings.bgPattern,userSettings.bgOpacity);
                 renderBadgeGrid(new Set(spectatorSettings.unlockedBadges||[]));renderTodoList();
                 const live=spectatorSettings.livePomoState;
