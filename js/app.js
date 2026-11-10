@@ -42,10 +42,11 @@ function renderDuoHUDCards(){
         
         const cardEl=$(`hud-card-${u.toLowerCase()}`);
         if(cardEl){
-            if(isViewing)cardEl.className="hud-card card active-space p-3.5 rounded-2xl border flex flex-col gap-3 cursor-pointer";
-            else cardEl.className="hud-card card view-space p-3.5 rounded-2xl border flex flex-col gap-3 cursor-pointer";
+            if(isViewing)cardEl.className="hud-card card active-space p-3.5 rounded-2xl border flex flex-col gap-2.5 cursor-pointer";
+            else cardEl.className="hud-card card view-space p-3.5 rounded-2xl border flex flex-col gap-2.5 cursor-pointer";
         }
 
+        // ZONE 1: Header Zone (Avatar, Display Name, Live Status Indicator)
         const imgEl=$(`hud-avatar-${u.toLowerCase()}`);
         if(imgEl){
             imgEl.src=s.avatarUrl||`https://api.dicebear.com/7.x/bottts/svg?seed=${u}`;
@@ -72,9 +73,9 @@ function renderDuoHUDCards(){
 
         const badgeEl=$(`hud-badge-${u.toLowerCase()}`);
         if(badgeEl){
-            if(isMe){badgeEl.innerText="YOU";badgeEl.className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase"}
-            else if(isViewing){badgeEl.innerText="VIEW";badgeEl.className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 uppercase"}
-            else{badgeEl.innerText="PEER";badgeEl.className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase"}
+            if(isMe){badgeEl.innerText="YOU";badgeEl.className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase shrink-0"}
+            else if(isViewing){badgeEl.innerText="VIEW";badgeEl.className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 uppercase shrink-0"}
+            else{badgeEl.innerText="PEER";badgeEl.className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase shrink-0"}
         }
 
         const statusEl=$(`hud-status-${u.toLowerCase()}`);
@@ -83,24 +84,27 @@ function renderDuoHUDCards(){
             statusEl.innerText=note;
         }
 
+        // ZONE 2: Dynamic Title & Level Zone ([Rank Tier] [Work Style] + Lvl X badge)
         const pwr = duoPresenceData[u].powerScore || 0;
-        const rankDetails = getRankDetails(pwr);
-
-        const rankEl = $(`hud-rank-${u.toLowerCase()}`);
-        if(rankEl) rankEl.innerText = `Rank ${rankDetails.rank}`;
+        const uLogs = duoPresenceData[u].logs || (u === viewedUser ? currentRawLogsCache : []);
+        const rankDetails = getRankDetails(pwr, uLogs);
 
         const titleEl = $(`hud-title-${u.toLowerCase()}`);
         if(titleEl) {
             titleEl.innerText = rankDetails.title;
-            titleEl.title = rankDetails.title;
+            titleEl.title = `${rankDetails.title} (30d: ${rankDetails.avgQuality30d ? rankDetails.avgQuality30d.toFixed(1) : '3.0'} Q / ${rankDetails.avgEffort30d ? rankDetails.avgEffort30d.toFixed(1) : '3.0'} E)`;
         }
 
-        const progLabelEl = $(`hud-rank-progress-label-${u.toLowerCase()}`);
-        if(progLabelEl) {
+        const rankEl = $(`hud-rank-${u.toLowerCase()}`);
+        if(rankEl) rankEl.innerText = `Lvl ${rankDetails.level}`;
+
+        // ZONE 3: Progress Zone (Accumulated Power EXP vs Target EXP + Single Progress Bar)
+        const pwrEl = $(`hud-pwr-${u.toLowerCase()}`);
+        if(pwrEl) {
             if(rankDetails.nextThreshold !== null) {
-                progLabelEl.innerText = `Next: R${rankDetails.rank + 1}`;
+                pwrEl.innerText = `${pwr.toLocaleString()} / ${rankDetails.nextThreshold.toLocaleString()} EXP`;
             } else {
-                progLabelEl.innerText = 'Max Rank 👑';
+                pwrEl.innerText = `${pwr.toLocaleString()} EXP (MAX)`;
             }
         }
 
@@ -114,7 +118,6 @@ function renderDuoHUDCards(){
             progBarEl.style.width = `${Math.min(100, Math.max(0, rankDetails.progressPct))}%`;
         }
 
-        $(`hud-pwr-${u.toLowerCase()}`).innerText=`${pwr.toLocaleString()} PWR`;
         if($(`hud-hours-${u.toLowerCase()}`)) $(`hud-hours-${u.toLowerCase()}`).innerText=`${formatHours(duoPresenceData[u].hoursToday||0)}/${formatHours(s.dailySoftCap||4)}h`;
     });
 }
@@ -159,8 +162,11 @@ function initGlobalHeaderGlowListener(){
             }
         });
         duoPresenceData.North.hoursToday=nH;duoPresenceData.Cream.hoursToday=cH;
+        duoPresenceData.North.logs=nLogs;duoPresenceData.Cream.logs=cLogs;
         duoPresenceData.North.powerScore=calculateLifetimePWR(nLogs);
         duoPresenceData.Cream.powerScore=calculateLifetimePWR(cLogs);
+        duoPresenceData.North.workStyle=calculateRolling30DayQE(nLogs).archetype;
+        duoPresenceData.Cream.workStyle=calculateRolling30DayQE(cLogs).archetype;
         renderDuoHUDCards();
     });
 }
@@ -243,6 +249,8 @@ function loadUserData(){
         const lifetimePWR=calculateLifetimePWR(rawLogs);
         if(duoPresenceData[viewedUser]){
             duoPresenceData[viewedUser].powerScore=lifetimePWR;
+            duoPresenceData[viewedUser].logs=rawLogs;
+            duoPresenceData[viewedUser].workStyle=calculateRolling30DayQE(rawLogs).archetype;
         }
         renderDuoHUDCards();
         calculateAndRenderPowerMeter(rawLogs);

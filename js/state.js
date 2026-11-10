@@ -51,8 +51,8 @@ let userSettings = {
 };
 
 let duoPresenceData = {
-    North: { settings: {}, hoursToday: 0, powerScore: 0 },
-    Cream: { settings: {}, hoursToday: 0, powerScore: 0 }
+    North: { settings: {}, hoursToday: 0, powerScore: 0, logs: [], workStyle: 'Tactician' },
+    Cream: { settings: {}, hoursToday: 0, powerScore: 0, logs: [], workStyle: 'Tactician' }
 };
 
 let currentTodayHoursLogged = 0;

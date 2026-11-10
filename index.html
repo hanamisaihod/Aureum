@@ -49,10 +49,10 @@
                     <span class="text-2xl">👑</span>
                     <div>
                         <h3 class="text-base sm:text-lg font-black text-slate-100 flex items-center gap-2">
-                            <span>Aureate Rank Progression</span>
-                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">100 TIERS</span>
+                            <span>Aureate Level &amp; Work Style</span>
+                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">10 TIERS • 100 LVLS</span>
                         </h3>
-                        <p class="text-[11px] text-slate-400">Non-linear scaling from 0 to 1,000,000 Lifetime PWR</p>
+                        <p class="text-[11px] text-slate-400">10 Rank Tiers × 30-Day Rolling Work Style Archetype (0 to 1,000,000 EXP)</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeRankRoadmapModal()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-1">✕</button>
@@ -66,8 +66,8 @@
             <!-- 100-TIER SCROLLABLE LIST -->
             <div class="flex-1 overflow-hidden flex flex-col min-h-0 space-y-2">
                 <div class="flex items-center justify-between text-xs font-bold text-slate-400 px-2">
-                    <span>Rank & Milestone Title</span>
-                    <span>Required PWR</span>
+                    <span>Level &amp; Dynamic Title</span>
+                    <span>Required EXP</span>
                 </div>
                 <div id="rank-roadmap-list" class="space-y-1.5 overflow-y-auto pr-1 flex-1 custom-scroll">
                     <!-- 100 ranks injected dynamically via JS -->
@@ -154,8 +154,9 @@
 
             <!-- DUO USER HUD STATUS CARDS -->
             <div class="space-y-2.5">
-                <!-- NORTH HUD CARD -->
-                <div id="hud-card-north" onclick="switchActiveUser('North')" class="hud-card card p-3 rounded-2xl border flex flex-col gap-2 cursor-pointer">
+                <!-- NORTH HUD CARD (3 VERTICAL ZONES) -->
+                <div id="hud-card-north" onclick="switchActiveUser('North')" class="hud-card card p-3.5 rounded-2xl border flex flex-col gap-2.5 cursor-pointer">
+                    <!-- ZONE 1: HEADER ZONE (Avatar, Display Name, Live Status) -->
                     <div class="flex items-center gap-3">
                         <div class="relative shrink-0 flex items-center justify-center">
                             <img id="hud-avatar-north" src="https://api.dicebear.com/7.x/bottts/svg?seed=North" alt="North" class="hud-avatar">
@@ -163,35 +164,29 @@
                         </div>
                         <div class="min-w-0 flex-1 space-y-1">
                             <div class="flex items-center justify-between gap-1 min-w-0">
-                                <div class="flex items-center gap-1.5 min-w-0 flex-1">
-                                    <span class="font-black text-sm text-slate-100 flex items-center gap-1 shrink-0">
-                                        <span>North</span>
-                                        <span id="hud-timer-spin-north" class="hidden text-xs text-amber-400">⏳</span>
-                                    </span>
-                                    <span class="text-slate-600 text-xs shrink-0">•</span>
-                                    <span id="hud-status-north" onclick="editUserStatusNote('North', event)" class="text-xs text-slate-400 truncate hover:text-amber-300 cursor-pointer font-medium" title="Click to edit status">Drawing 🎨</span>
-                                </div>
+                                <span class="font-black text-sm text-slate-100 flex items-center gap-1 truncate">
+                                    <span>North</span>
+                                    <span id="hud-timer-spin-north" class="hidden text-xs text-amber-400">⏳</span>
+                                </span>
                                 <span id="hud-badge-north" class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase shrink-0">YOU</span>
                             </div>
-
-                            <!-- ACTIVE TITLE & CURRENT RANK DIRECTLY UNDER USER NAME -->
-                            <div onclick="openRankRoadmapModal('North', event)" class="flex items-center gap-1.5 text-xs cursor-pointer hover:opacity-85 transition-opacity pt-0.5" title="Click to view 100-Tier Rank Progression">
-                                <span id="hud-rank-north" class="font-black theme-accent-text text-xs shrink-0">Rank 1</span>
-                                <span class="text-slate-600 text-[10px]">•</span>
-                                <span id="hud-title-north" class="text-slate-300 font-semibold text-xs truncate" title="The Unbound Spark">The Unbound Spark</span>
+                            <div class="flex items-center min-w-0">
+                                <span id="hud-status-north" onclick="editUserStatusNote('North', event)" class="text-xs text-slate-400 truncate hover:text-amber-300 cursor-pointer font-medium" title="Click to edit status">Drawing 🎨</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- NEXT RANK + EXP BAR ALONGSIDE CURRENT PWR LEVEL -->
-                    <div onclick="openRankRoadmapModal('North', event)" class="pt-2 border-t border-slate-800/80 space-y-1.5 cursor-pointer hover:opacity-90 transition-opacity" title="Click to view 100-Tier Rank Progression">
-                        <div class="flex justify-between items-center text-xs font-mono">
-                            <span id="hud-pwr-north" class="font-black text-amber-400 text-xs">0 PWR</span>
-                            <div class="flex items-center gap-1 text-[10px] text-slate-400 font-mono">
-                                <span id="hud-rank-progress-label-north" class="text-slate-400">Next: R2</span>
-                                <span class="text-slate-600">•</span>
-                                <span id="hud-rank-progress-pct-north" class="font-bold text-slate-300">0%</span>
-                            </div>
+                    <!-- ZONE 2: DYNAMIC TITLE & LEVEL ZONE ([Rank Tier] [Work Style] + Lvl Badge) -->
+                    <div onclick="openRankRoadmapModal('North', event)" class="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2 cursor-pointer hover:opacity-90 transition-opacity" title="Click to view Level & Work Style Progression">
+                        <span id="hud-title-north" class="text-xs font-extrabold theme-accent-text truncate" title="Initiate Tactician">Initiate Tactician</span>
+                        <span id="hud-rank-north" class="text-[10px] font-black font-mono px-2 py-0.5 rounded-md bg-slate-900 text-amber-300 border border-amber-500/30 shrink-0">Lvl 1</span>
+                    </div>
+
+                    <!-- ZONE 3: PROGRESS ZONE (Power EXP vs Target EXP + Single Percentage Progress Bar) -->
+                    <div onclick="openRankRoadmapModal('North', event)" class="pt-2 border-t border-slate-800/80 space-y-1.5 cursor-pointer hover:opacity-90 transition-opacity" title="Click to view Level & Work Style Progression">
+                        <div class="flex justify-between items-center text-[11px] font-mono">
+                            <span id="hud-pwr-north" class="font-black text-amber-400">0 / 80 EXP</span>
+                            <span id="hud-rank-progress-pct-north" class="font-bold text-slate-300">0%</span>
                         </div>
                         <div class="w-full bg-slate-900/90 h-1.5 rounded-full overflow-hidden border border-slate-700/60 p-[1px]">
                             <div id="hud-rank-bar-north" class="theme-accent-bg h-full rounded-full transition-all duration-500" style="width: 0%"></div>
@@ -199,8 +194,9 @@
                     </div>
                 </div>
 
-                <!-- CREAM HUD CARD -->
-                <div id="hud-card-cream" onclick="switchActiveUser('Cream')" class="hud-card card p-3 rounded-2xl border flex flex-col gap-2 cursor-pointer">
+                <!-- CREAM HUD CARD (3 VERTICAL ZONES) -->
+                <div id="hud-card-cream" onclick="switchActiveUser('Cream')" class="hud-card card p-3.5 rounded-2xl border flex flex-col gap-2.5 cursor-pointer">
+                    <!-- ZONE 1: HEADER ZONE (Avatar, Display Name, Live Status) -->
                     <div class="flex items-center gap-3">
                         <div class="relative shrink-0 flex items-center justify-center">
                             <img id="hud-avatar-cream" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cream" alt="Cream" class="hud-avatar">
@@ -208,35 +204,29 @@
                         </div>
                         <div class="min-w-0 flex-1 space-y-1">
                             <div class="flex items-center justify-between gap-1 min-w-0">
-                                <div class="flex items-center gap-1.5 min-w-0 flex-1">
-                                    <span class="font-black text-sm text-slate-100 flex items-center gap-1 shrink-0">
-                                        <span>Cream</span>
-                                        <span id="hud-timer-spin-cream" class="hidden text-xs text-amber-400">⏳</span>
-                                    </span>
-                                    <span class="text-slate-600 text-xs shrink-0">•</span>
-                                    <span id="hud-status-cream" onclick="editUserStatusNote('Cream', event)" class="text-xs text-slate-400 truncate hover:text-amber-300 cursor-pointer font-medium" title="Click to edit status">Writing ✍️</span>
-                                </div>
+                                <span class="font-black text-sm text-slate-100 flex items-center gap-1 truncate">
+                                    <span>Cream</span>
+                                    <span id="hud-timer-spin-cream" class="hidden text-xs text-amber-400">⏳</span>
+                                </span>
                                 <span id="hud-badge-cream" class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase shrink-0">PEER</span>
                             </div>
-
-                            <!-- ACTIVE TITLE & CURRENT RANK DIRECTLY UNDER USER NAME -->
-                            <div onclick="openRankRoadmapModal('Cream', event)" class="flex items-center gap-1.5 text-xs cursor-pointer hover:opacity-85 transition-opacity pt-0.5" title="Click to view 100-Tier Rank Progression">
-                                <span id="hud-rank-cream" class="font-black theme-accent-text text-xs shrink-0">Rank 1</span>
-                                <span class="text-slate-600 text-[10px]">•</span>
-                                <span id="hud-title-cream" class="text-slate-300 font-semibold text-xs truncate" title="The Unbound Spark">The Unbound Spark</span>
+                            <div class="flex items-center min-w-0">
+                                <span id="hud-status-cream" onclick="editUserStatusNote('Cream', event)" class="text-xs text-slate-400 truncate hover:text-amber-300 cursor-pointer font-medium" title="Click to edit status">Writing ✍️</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- NEXT RANK + EXP BAR ALONGSIDE CURRENT PWR LEVEL -->
-                    <div onclick="openRankRoadmapModal('Cream', event)" class="pt-2 border-t border-slate-800/80 space-y-1.5 cursor-pointer hover:opacity-90 transition-opacity" title="Click to view 100-Tier Rank Progression">
-                        <div class="flex justify-between items-center text-xs font-mono">
-                            <span id="hud-pwr-cream" class="font-black text-amber-400 text-xs">0 PWR</span>
-                            <div class="flex items-center gap-1 text-[10px] text-slate-400 font-mono">
-                                <span id="hud-rank-progress-label-cream" class="text-slate-400">Next: R2</span>
-                                <span class="text-slate-600">•</span>
-                                <span id="hud-rank-progress-pct-cream" class="font-bold text-slate-300">0%</span>
-                            </div>
+                    <!-- ZONE 2: DYNAMIC TITLE & LEVEL ZONE ([Rank Tier] [Work Style] + Lvl Badge) -->
+                    <div onclick="openRankRoadmapModal('Cream', event)" class="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2 cursor-pointer hover:opacity-90 transition-opacity" title="Click to view Level & Work Style Progression">
+                        <span id="hud-title-cream" class="text-xs font-extrabold theme-accent-text truncate" title="Initiate Tactician">Initiate Tactician</span>
+                        <span id="hud-rank-cream" class="text-[10px] font-black font-mono px-2 py-0.5 rounded-md bg-slate-900 text-amber-300 border border-amber-500/30 shrink-0">Lvl 1</span>
+                    </div>
+
+                    <!-- ZONE 3: PROGRESS ZONE (Power EXP vs Target EXP + Single Percentage Progress Bar) -->
+                    <div onclick="openRankRoadmapModal('Cream', event)" class="pt-2 border-t border-slate-800/80 space-y-1.5 cursor-pointer hover:opacity-90 transition-opacity" title="Click to view Level & Work Style Progression">
+                        <div class="flex justify-between items-center text-[11px] font-mono">
+                            <span id="hud-pwr-cream" class="font-black text-amber-400">0 / 80 EXP</span>
+                            <span id="hud-rank-progress-pct-cream" class="font-bold text-slate-300">0%</span>
                         </div>
                         <div class="w-full bg-slate-900/90 h-1.5 rounded-full overflow-hidden border border-slate-700/60 p-[1px]">
                             <div id="hud-rank-bar-cream" class="theme-accent-bg h-full rounded-full transition-all duration-500" style="width: 0%"></div>
@@ -280,7 +270,7 @@
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="text-[9px] uppercase tracking-wider font-extrabold text-amber-400/90 truncate" id="insight-category">
-                                Peak Window
+                                The Catalyst Hour
                             </div>
                             <div class="text-sm font-black text-slate-100 truncate" id="insight-value">
                                 Awaiting Logs
