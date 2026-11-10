@@ -1,0 +1,83 @@
+/* AUREUM — Core Layout, Components, Animations & Scrollbars */
+body{background-color:var(--bg-main)!important;color:#f8fafc;font-family:system-ui,-apple-system,sans-serif;transition:background-color 0.3s;-webkit-tap-highlight-color:transparent}
+button,input,select{touch-action:manipulation}
+.card, .glass-card, .hud-card {
+    position:relative;background-color:var(--card-bg)!important;opacity:1!important;
+    border:1.5px solid var(--card-border)!important;
+    box-shadow:0 10px 30px -5px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.05);
+    transition:box-shadow 0.25s,border-color 0.3s,transform 0.2s;will-change:transform;transform:translateZ(0)
+}
+.card:hover{box-shadow:0 14px 40px -6px var(--accent-glow), 0 0 0 1px var(--accent-primary);border-color:var(--accent-primary)!important}
+.hud-avatar {
+    width: 64px !important;height: 64px !important;border-radius: 16px !important;
+    object-fit: cover !important;border: 2px solid rgba(255,255,255,0.1) !important;
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+#pomo-active-tasks-list, .hourglass-task-scroll, #todo-active-list, #todo-completed-list {
+    max-height: 240px !important;overflow-y: auto !important;padding-right: 4px;
+}
+#todo-active-list::-webkit-scrollbar, #todo-completed-list::-webkit-scrollbar, #pomo-active-tasks-list::-webkit-scrollbar { width: 5px }
+#todo-active-list::-webkit-scrollbar-thumb, #todo-completed-list::-webkit-scrollbar-thumb, #pomo-active-tasks-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.22);border-radius: 4px;
+}
+.tab-btn{color:#94a3b8;background-color:transparent;border:1px solid transparent;transition:all 0.2s;user-select:none}
+.tab-btn:hover{color:#f8fafc;background-color:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.1)}
+.tab-btn.active{background:linear-gradient(135deg,var(--accent-glow) 0%,rgba(255,255,255,0.05) 100%)!important;color:var(--accent-primary)!important;border-color:var(--accent-primary)!important;font-weight:800;box-shadow:0 0 18px var(--accent-glow)}
+.gauge-circle{transition:stroke-dashoffset 0.8s ease-in-out,stroke 0.3s}
+.hud-card{transition:all 0.3s ease;user-select:none}
+.hud-card.active-space{border-color:var(--accent-primary)!important;box-shadow:0 0 20px var(--accent-glow);background:var(--card-bg)!important}
+.hud-card.view-space{border-color:rgba(148,163,184,0.3)!important;opacity:0.85}
+.hud-card.view-space:hover{opacity:1;border-color:rgba(255,255,255,0.4)!important}
+.presence-pulse{animation:pulseGlow 2s infinite}
+@keyframes pulseGlow{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.85)}}
+.hourglass-spin-active {
+    display: inline-block;animation: hourglassRhythmicSpin 3.5s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+    transform-origin: center center;filter: drop-shadow(0 0 8px var(--accent-glow));
+}
+@keyframes hourglassRhythmicSpin {
+    0% { transform: rotate(0deg) scale(1); } 40% { transform: rotate(0deg) scale(1.12); }
+    50% { transform: rotate(180deg) scale(1.2); } 90% { transform: rotate(180deg) scale(1.12); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+.status-preset-btn{transition:all 0.2s ease;user-select:none}
+.status-preset-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,0.4);border-color:var(--accent-primary)}
+.no-scrollbar::-webkit-scrollbar{display:none}
+.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
+.badge-card{background:var(--card-bg);border:1.5px solid var(--card-border);transition:all 0.25s ease-out}
+.badge-card:hover:not(.locked){transform:translateY(-2px)}
+.badge-card.locked{opacity:0.35;filter:grayscale(0.9);border-color:rgba(255,255,255,0.08)!important}
+.badge-tier-bronze{border-color:#d97706!important;box-shadow:0 0 12px rgba(217,119,6,0.25)}
+.badge-tier-silver{border-color:#38bdf8!important;box-shadow:0 0 14px rgba(56,189,248,0.3)}
+.badge-tier-gold{border-color:#f59e0b!important;box-shadow:0 0 16px rgba(245,158,11,0.4)}
+.badge-tier-titan{border-color:#10b981!important;box-shadow:0 0 18px rgba(16,185,129,0.45)}
+.badge-tier-aureum{border-color:#a855f7!important;box-shadow:0 0 22px rgba(168,85,247,0.55)}
+#badge-toast-container{position:fixed;bottom:1.5rem;left:1.5rem;z-index:100;display:flex;flex-direction:column;gap:0.75rem;pointer-events:none}
+.badge-toast{pointer-events:auto;animation:toastSlideIn 0.35s cubic-bezier(0.16,1,0.3,1) forwards;transition:opacity 0.5s ease,transform 0.5s ease;will-change:transform,opacity}
+.badge-toast.toast-hiding{opacity:0!important;transform:translateY(20px) scale(0.9)!important}
+@keyframes toastSlideIn{from{opacity:0;transform:translateY(25px) scale(0.92)}to{opacity:1;transform:translateY(0) scale(1)}}
+.todo-item{transition:all 0.2s ease-out}
+.todo-item:hover{border-color:var(--card-border);transform:translateX(2px)}
+.todo-item.done{opacity:0.5;text-decoration:line-through}
+aside.app-sidebar {
+    background-color: var(--card-bg) !important;border: 1.5px solid var(--card-border) !important;
+    box-shadow: 0 10px 30px -5px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08);
+}
+.journal-book {
+    background: linear-gradient(90deg, #10141e 0%, #161b26 48%, #090c12 50%, #161b26 52%, #10141e 100%);
+    border: 2px solid var(--card-border);box-shadow: 0 20px 50px rgba(0,0,0,0.85), inset 0 0 40px rgba(0,0,0,0.6);
+    border-radius: 1.5rem;position: relative;
+}
+.journal-spine {
+    position: absolute;left: 50%;top: 0;bottom: 0;width: 8px;transform: translateX(-50%);
+    background: linear-gradient(90deg, rgba(0,0,0,0.6), rgba(245,158,11,0.3), rgba(0,0,0,0.6));
+    box-shadow: 0 0 10px rgba(0,0,0,0.8);z-index: 10;
+}
+.journal-page {
+    background: rgba(18, 23, 33, 0.92);border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.4);transition: all 0.3s ease;
+}
+.custom-scroll::-webkit-scrollbar { width: 6px; }
+.custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 9999px; }
+.custom-scroll::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.4); border-radius: 9999px; }
+.custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(245, 158, 11, 0.5); }
+.insight-fade { transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1), transform 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
