@@ -47,8 +47,90 @@ async function handleInstantSoundRepeatChange(){
     const val=parseInt($('setting-pomo-repeats').value)||3;userSettings.pomoSoundRepeats=val;
     if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({pomoSoundRepeats:val},{merge:true});
 }
+const THEME_CATALOG = [
+    { id: 'gold', name: 'Aureum Gold', subtitle: 'Amber + Champagne Gold', bgMain: '#0e1117', cardBg: '#161a24', primary: '#f59e0b', secondary: '#fef08a' },
+    { id: 'rose', name: 'Rose Quartz', subtitle: 'Rose Pink + Warm Amber Gold', bgMain: '#180e15', cardBg: '#251422', primary: '#f472b6', secondary: '#fbbf24' },
+    { id: 'emerald', name: 'Emerald Grove', subtitle: 'Mint + Warm Amber Gold', bgMain: '#071a17', cardBg: '#0f2924', primary: '#10b981', secondary: '#fef08a' },
+    { id: 'cyber', name: 'Midnight Cyber', subtitle: 'Neon Violet + Electric Cyan', bgMain: '#0b0f20', cardBg: '#141930', primary: '#a855f7', secondary: '#38bdf8' },
+    { id: 'sunset', name: 'Sunset Terracotta', subtitle: 'Peach + Rose Pink', bgMain: '#1c0f0a', cardBg: '#2a160e', primary: '#f97316', secondary: '#f472b6' },
+    { id: 'amethyst', name: 'Amethyst Dusk', subtitle: 'Lavender + Mint Emerald', bgMain: '#120e20', cardBg: '#1d1530', primary: '#c084fc', secondary: '#34d399' },
+    { id: 'ocean', name: 'Ocean Abyss', subtitle: 'Deep Teal + Solar Gold', bgMain: '#081820', cardBg: '#102633', primary: '#14b8a6', secondary: '#fbbf24' },
+    { id: 'crimson', name: 'Crimson Forge', subtitle: 'Ruby Red + Cyan Spark', bgMain: '#1c0a0e', cardBg: '#2b1016', primary: '#ef4444', secondary: '#38bdf8' },
+    { id: 'matcha', name: 'Matcha Latte', subtitle: 'Lime Sage + Lavender Bloom', bgMain: '#101c13', cardBg: '#1a2b1d', primary: '#84cc16', secondary: '#c084fc' },
+    { id: 'monochrome', name: 'Monochrome Slate', subtitle: 'Obsidian + Amber Glow', bgMain: '#12151c', cardBg: '#1e222d', primary: '#e2e8f0', secondary: '#f59e0b' }
+];
+
+function updateThemeTriggerButtonUI(themeId) {
+    const t = THEME_CATALOG.find(x => x.id === (themeId || 'gold')) || THEME_CATALOG[0];
+    if ($('setting-user-theme')) $('setting-user-theme').value = t.id;
+    if ($('theme-btn-name')) $('theme-btn-name').innerText = t.name;
+    if ($('theme-btn-sub')) $('theme-btn-sub').innerText = t.subtitle;
+    const sw1 = $('theme-btn-swatch-1'), sw2 = $('theme-btn-swatch-2');
+    if (sw1) sw1.style.backgroundColor = t.primary;
+    if (sw2) sw2.style.backgroundColor = t.secondary;
+}
+
+function openThemePickerModal() {
+    if (loggedInUser !== viewedUser) return;
+    renderThemePickerCards();
+    $('theme-picker-modal')?.classList.remove('hidden');
+}
+
+function closeThemePickerModal() {
+    $('theme-picker-modal')?.classList.add('hidden');
+}
+
+function renderThemePickerCards() {
+    const grid = $('theme-picker-grid');
+    if (!grid) return;
+    const activeId = userSettings.userTheme || 'gold';
+    grid.innerHTML = THEME_CATALOG.map(t => {
+        const isSelected = (t.id === activeId);
+        return `
+            <button type="button" onclick="selectThemeFromModal('${t.id}')" class="p-3.5 rounded-2xl border text-left transition-all flex flex-col gap-2.5 group relative overflow-hidden" style="background-color: ${t.cardBg}; border-color: ${isSelected ? t.primary : 'rgba(148,163,184,0.22)'}; box-shadow: ${isSelected ? `0 0 18px ${t.primary}44` : 'none'};">
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="w-4 h-4 rounded-full border border-white/20 shrink-0" style="background: linear-gradient(135deg, ${t.primary} 0%, ${t.secondary} 100%);"></span>
+                        <span class="text-xs font-black text-slate-100 truncate">${t.name}</span>
+                    </div>
+                    ${isSelected ? `<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase shrink-0" style="background: ${t.primary}; color: #020617;">Active</span>` : ''}
+                </div>
+                <div class="text-[10px] text-slate-400 font-medium truncate">${t.subtitle}</div>
+                <!-- Mini UI Preview Box -->
+                <div class="p-2 rounded-xl border border-white/10 space-y-1.5" style="background-color: ${t.bgMain};">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-3 h-3 rounded-md inline-block" style="background-color: ${t.primary};"></span>
+                            <span class="w-3 h-3 rounded-md inline-block" style="background-color: ${t.secondary};"></span>
+                        </div>
+                        <span class="text-[9px] font-mono font-bold" style="color: ${t.primary};">100%</span>
+                    </div>
+                    <div class="w-full h-1.5 rounded-full overflow-hidden bg-slate-900">
+                        <div class="h-full rounded-full" style="width: 78%; background: linear-gradient(135deg, ${t.primary} 0%, ${t.secondary} 100%);"></div>
+                    </div>
+                </div>
+            </button>
+        `;
+    }).join('');
+}
+
+async function selectThemeFromModal(themeId) {
+    if (loggedInUser !== viewedUser) return;
+    userSettings.userTheme = themeId;
+    updateThemeTriggerButtonUI(themeId);
+    applyThemeToBody(themeId);
+    renderThemePickerCards();
+    playTone('save');
+    closeThemePickerModal();
+    if (loggedInUser === viewedUser) {
+        await db.collection('settings').doc(loggedInUser).set({ userTheme: themeId }, { merge: true });
+    }
+}
+
 async function handleInstantThemeChange(){
-    const val=$('setting-user-theme').value;userSettings.userTheme=val;applyThemeToBody(val);
+    const val=$('setting-user-theme').value;userSettings.userTheme=val;
+    updateThemeTriggerButtonUI(val);
+    applyThemeToBody(val);
     if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({userTheme:val},{merge:true});
 }
 async function handleInstantCursorChange(){
@@ -94,6 +176,7 @@ function updateSettingsUI(){
     $('setting-pomo-sound').value=userSettings.pomoSound||'zen_bowl';
     $('setting-pomo-repeats').value=userSettings.pomoSoundRepeats||3;
     $('setting-user-theme').value=userSettings.userTheme||'gold';
+    updateThemeTriggerButtonUI(userSettings.userTheme||'gold');
     $('setting-user-cursor').value=userSettings.userCursor||'default';
     $('setting-bg-pattern').value=userSettings.bgPattern||'dots';
     const bgOp=userSettings.bgOpacity??20;

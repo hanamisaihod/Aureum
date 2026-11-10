@@ -81,10 +81,13 @@ function applyLedgerFilter(){
     renderLedgerLists(logs);
 }
 
-function renderSegmentedBar(val,max=5,activeColor='#10b981'){
+function renderSegmentedBar(val,max=5,activeColor='#10b981',useDynamicLevelColors=false){
+    const levelPalette=['#38bdf8','#10b981','#f59e0b','#f97316','#ef4444'];
+    const resolvedColor=useDynamicLevelColors?(levelPalette[Math.max(0,Math.min(levelPalette.length-1,(parseInt(val)||1)-1))]||activeColor):activeColor;
     let bars='';
     for(let i=1;i<=max;i++){
-        bars+=i<=val?`<span class="inline-block w-2.5 h-1.5 rounded-sm mr-0.5" style="background-color: ${activeColor};"></span>`:`<span class="inline-block w-2.5 h-1.5 rounded-sm mr-0.5 bg-slate-800 border border-slate-700/60"></span>`;
+        const segColor=useDynamicLevelColors?(levelPalette[i-1]||resolvedColor):resolvedColor;
+        bars+=i<=val?`<span class="inline-block w-2.5 h-1.5 rounded-sm mr-0.5" style="background-color: ${segColor};"></span>`:`<span class="inline-block w-2.5 h-1.5 rounded-sm mr-0.5 bg-slate-800 border border-slate-700/60"></span>`;
     }
     return bars;
 }
@@ -112,9 +115,19 @@ function renderLedgerLists(logs){
     });
 
     render('ledger-list-sanctuary',s,'No entries found.',l=>{
-        if(l.type==='workout')return `<div class="flex justify-between font-medium"><span class="text-amber-300">🏃 Fitness (${l.hours}h)</span><span class="text-slate-400 font-bold">Effort Lvl ${l.strain||3}</span></div>`;
-        if(l.type==='chore')return `<div class="flex justify-between font-medium"><span class="text-sky-300">🧹 House Chore (${l.hours}h)</span><span class="text-slate-300 italic truncate max-w-[100px]">${l.note||'No note'}</span></div>`;
-        return `<div class="flex justify-between font-medium"><span class="text-emerald-300">🍨 Snack (Lvl ${l.level})</span><span class="text-slate-300 italic truncate max-w-[100px]">${l.note||'No note'}</span></div>`;
+        if(l.type==='workout'){
+            const st=l.strain||3;
+            const stBars=renderSegmentedBar(st,5,'#f59e0b',true);
+            return `<div class="space-y-1"><div class="flex justify-between font-medium"><span class="text-amber-300">🏃 Fitness (${l.hours}h)</span><span class="text-slate-400 font-bold">Effort Lvl ${st}</span></div><div class="flex items-center gap-1 font-mono text-[10px]"><span class="text-slate-500 font-bold uppercase tracking-wider mr-1">INT</span>${stBars}</div></div>`;
+        }
+        if(l.type==='chore'){
+            const chLvl=Math.min(5,Math.max(1,Math.ceil((l.hours||0.5)*2)));
+            const chBars=renderSegmentedBar(chLvl,5,'#38bdf8',true);
+            return `<div class="space-y-1"><div class="flex justify-between font-medium"><span class="text-sky-300">🧹 House Chore (${l.hours}h)</span><span class="text-slate-300 italic truncate max-w-[100px]">${l.note||'No note'}</span></div><div class="flex items-center gap-1 font-mono text-[10px]"><span class="text-slate-500 font-bold uppercase tracking-wider mr-1">DUR</span>${chBars}</div></div>`;
+        }
+        const hLvl=l.level||1;
+        const hBars=renderSegmentedBar(hLvl,3,'#f43f5e',true);
+        return `<div class="space-y-1"><div class="flex justify-between font-medium"><span class="text-rose-300">🍨 Snack (Lvl ${hLvl})</span><span class="text-slate-300 italic truncate max-w-[100px]">${l.note||'No note'}</span></div><div class="flex items-center gap-1 font-mono text-[10px]"><span class="text-slate-500 font-bold uppercase tracking-wider mr-1">PRT</span>${hBars}</div></div>`;
     });
 
     render('ledger-list-diary',d,'No reflections.',l=>`<div class="text-slate-200 italic leading-snug break-words">"${l.text}"</div>`);

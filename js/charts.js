@@ -41,7 +41,7 @@ function initCharts() {
             datasets: [
                 { label: '🏃 Fitness (h)', data: [], backgroundColor: '#f59e0b', borderColor: '#f59e0b', borderRadius: 4, fill: false },
                 { label: '🧹 Chores (h)', data: [], backgroundColor: '#38bdf8', borderColor: '#38bdf8', borderRadius: 4, fill: false },
-                { label: '🍨 Snacks', data: [], backgroundColor: '#10b981', borderColor: '#10b981', borderRadius: 4, fill: false }
+                { label: '🍨 Snacks', data: [], backgroundColor: '#f43f5e', borderColor: '#f43f5e', borderRadius: 4, fill: false }
             ]
         },
         options: { ...opts, plugins: { legend: { display: true, labels: { color: '#94a3b8', font: { size: 11, weight: 'bold' } } } } }

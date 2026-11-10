@@ -113,6 +113,29 @@ function calculateAndRenderPowerMeter(logs) {
     if ($('power-level-bar')) $('power-level-bar').style.width = `${Math.min(100, Math.round(rankDetails.progressPct))}%`;
 }
 
+const WORK_STYLE_INFO = {
+    Virtuoso: {
+        icon: '✨',
+        tagline: 'High Quality (≥ 4.0) + Low Effort (≤ 2.8)',
+        desc: 'Efficient, high craft — delivering peak output with minimal strain and effortless flow.'
+    },
+    Stalwart: {
+        icon: '🛡️',
+        tagline: 'High Quality (≥ 4.0) + High Effort (≥ 3.5)',
+        desc: 'High craft, maximum dedication — forging top-tier results through relentless grit and focus.'
+    },
+    Grinder: {
+        icon: '⛏️',
+        tagline: 'Low Quality (≤ 2.8) + High Effort (≥ 3.5)',
+        desc: 'High volume, brute force — pushing through heavy resistance and foundational groundwork.'
+    },
+    Tactician: {
+        icon: '⚖️',
+        tagline: 'Balanced Quality & Effort Distribution',
+        desc: 'Steady, measured cadence — maintaining a sustainable equilibrium across output and energy.'
+    }
+};
+
 function openRankRoadmapModal(targetUser, evt) {
     if (evt && evt.stopPropagation) evt.stopPropagation();
     const u = targetUser || viewedUser || loggedInUser;
@@ -155,38 +178,64 @@ function openRankRoadmapModal(targetUser, evt) {
         `;
     }
 
+    const styleEl = $('rank-modal-style-card');
+    if (styleEl) {
+        const ws = WORK_STYLE_INFO[rankInfo.workStyle] || WORK_STYLE_INFO.Tactician;
+        const avgQStr = rankInfo.avgQuality30d > 0 ? rankInfo.avgQuality30d.toFixed(1) : '3.0';
+        const avgEStr = rankInfo.avgEffort30d > 0 ? rankInfo.avgEffort30d.toFixed(1) : '3.0';
+        styleEl.innerHTML = `
+            <div class="flex items-start justify-between gap-3">
+                <div class="flex items-start gap-2.5 min-w-0">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-lg shrink-0">${ws.icon}</div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-xs font-black text-slate-100 uppercase tracking-wider">Current Style: <span class="theme-accent-text">${rankInfo.workStyle}</span></span>
+                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-700">30d Avg: ${avgQStr} Q / ${avgEStr} E</span>
+                        </div>
+                        <div class="text-[11px] font-semibold text-amber-400/90 mt-0.5">${ws.tagline}</div>
+                        <p class="text-[11px] text-slate-400 leading-snug mt-0.5">${ws.desc}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
     const listEl = $('rank-roadmap-list');
     if (listEl) {
         let itemsHtml = '';
-        for (let i = 0; i < 100; i++) {
-            const rNum = i + 1;
-            const rTier = getRankTierName(rNum);
-            const rTitle = `${rTier} ${rankInfo.workStyle}`;
-            const rThresh = RANK_THRESHOLDS[i];
-            const isActive = (rNum === rankInfo.level);
-            const isUnlocked = (rNum <= rankInfo.level);
+        const currentTierIdx = Math.min(9, Math.floor((rankInfo.level - 1) / 10));
+        for (let i = 0; i < RANK_TIER_BANDS.length; i++) {
+            const band = RANK_TIER_BANDS[i];
+            const tierNum = i + 1;
+            const rTitle = `${band.tier} ${rankInfo.workStyle}`;
+            const startExp = RANK_THRESHOLDS[band.min - 1];
+            const isActive = (i === currentTierIdx);
+            const isUnlocked = (i <= currentTierIdx);
 
-            let cardClass = 'p-2.5 rounded-xl border flex items-center justify-between text-xs transition-all ';
+            let cardClass = 'p-3 rounded-xl border flex items-center justify-between text-xs transition-all ';
             let badgeHtml = '';
             if (isActive) {
                 cardClass += 'bg-amber-500/15 border-amber-500/80 shadow-md';
-                badgeHtml = '<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 uppercase shrink-0">Active</span>';
+                badgeHtml = `<span class="text-[9px] font-extrabold px-2 py-0.5 rounded bg-amber-500 text-slate-950 uppercase shrink-0">Active (Lvl ${rankInfo.level})</span>`;
             } else if (isUnlocked) {
                 cardClass += 'bg-slate-900/60 border-slate-800 text-slate-200';
-                badgeHtml = '<span class="text-[10px] text-emerald-400 font-bold shrink-0">✓</span>';
+                badgeHtml = '<span class="text-[10px] text-emerald-400 font-bold shrink-0">✓ Unlocked</span>';
             } else {
                 cardClass += 'bg-slate-950/40 border-slate-900/80 text-slate-500';
-                badgeHtml = '<span class="text-[10px] text-slate-600 shrink-0">🔒</span>';
+                badgeHtml = '<span class="text-[10px] text-slate-600 shrink-0">🔒 Locked</span>';
             }
 
             itemsHtml += `
-                <div id="roadmap-rank-item-${rNum}" class="${cardClass}">
-                    <div class="flex items-center gap-2.5 min-w-0 pr-2">
-                        <span class="font-mono font-bold text-[11px] ${isActive ? 'text-amber-400' : (isUnlocked ? 'text-slate-300' : 'text-slate-600')} shrink-0">Lvl ${rNum}</span>
-                        <span class="font-bold truncate ${isActive ? 'text-white' : ''}">${rTitle}</span>
+                <div id="roadmap-tier-item-${tierNum}" class="${cardClass}">
+                    <div class="flex items-center gap-3 min-w-0 pr-2">
+                        <span class="font-mono font-bold text-[11px] px-2 py-0.5 rounded bg-slate-900 border border-slate-800 ${isActive ? 'text-amber-400 border-amber-500/40' : (isUnlocked ? 'text-slate-300' : 'text-slate-600')} shrink-0">Lvls ${band.min}–${band.max}</span>
+                        <div class="min-w-0">
+                            <div class="font-extrabold truncate ${isActive ? 'text-white' : ''}">${rTitle}</div>
+                            <div class="text-[10px] text-slate-500 font-mono">Tier ${tierNum} • ${band.tier}</div>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <span class="font-mono text-[11px] ${isActive ? 'text-amber-300 font-extrabold' : 'text-slate-400'}">${rThresh.toLocaleString()} EXP</span>
+                    <div class="flex items-center gap-2.5 shrink-0">
+                        <span class="font-mono text-[11px] ${isActive ? 'text-amber-300 font-extrabold' : 'text-slate-400'}">${startExp.toLocaleString()}+ EXP</span>
                         ${badgeHtml}
                     </div>
                 </div>
@@ -195,7 +244,7 @@ function openRankRoadmapModal(targetUser, evt) {
         listEl.innerHTML = itemsHtml;
 
         setTimeout(() => {
-            const activeItem = $(`roadmap-rank-item-${rankInfo.level}`);
+            const activeItem = $(`roadmap-tier-item-${currentTierIdx + 1}`);
             if (activeItem) {
                 activeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }

@@ -63,20 +63,49 @@
                 <!-- Injected dynamically via JS -->
             </div>
 
-            <!-- 100-TIER SCROLLABLE LIST -->
+            <!-- CURRENT WORK STYLE EXPLAINER CARD -->
+            <div id="rank-modal-style-card" class="p-3.5 rounded-xl bg-slate-900/80 border border-amber-500/25">
+                <!-- Injected dynamically via JS -->
+            </div>
+
+            <!-- 10-TIER SCROLLABLE LIST -->
             <div class="flex-1 overflow-hidden flex flex-col min-h-0 space-y-2">
                 <div class="flex items-center justify-between text-xs font-bold text-slate-400 px-2">
-                    <span>Level &amp; Dynamic Title</span>
+                    <span>10 Rank Tiers &amp; Dynamic Title</span>
                     <span>Required EXP</span>
                 </div>
                 <div id="rank-roadmap-list" class="space-y-1.5 overflow-y-auto pr-1 flex-1 custom-scroll">
-                    <!-- 100 ranks injected dynamically via JS -->
+                    <!-- 10 rank tiers injected dynamically via JS -->
                 </div>
             </div>
 
             <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
                 <span class="text-[10px] text-slate-400 font-mono">Lifetime PWR = (Work×100) + (Workout×120) + (Chore×80)</span>
                 <button type="button" onclick="closeRankRoadmapModal()" class="px-4 py-1.5 rounded-lg theme-accent-btn font-extrabold text-xs">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DUAL-TONE THEME PICKER MODAL -->
+    <div id="theme-picker-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 hidden p-4">
+        <div class="card p-5 sm:p-6 rounded-2xl max-w-2xl w-full shadow-2xl border border-amber-500/30 space-y-4 max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">🎨</span>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-black text-slate-100">Dual-Tone Theme Palette</h3>
+                        <p class="text-[11px] text-slate-400">Select a card to preview &amp; apply its dual-tone color scheme</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeThemePickerModal()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-1">✕</button>
+            </div>
+
+            <div id="theme-picker-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto pr-1 flex-1 custom-scroll">
+                <!-- 10 Theme Preview Cards injected dynamically via JS -->
+            </div>
+
+            <div class="pt-3 border-t border-slate-800 flex justify-end">
+                <button type="button" onclick="closeThemePickerModal()" class="px-4 py-1.5 rounded-lg theme-accent-btn font-extrabold text-xs">Close</button>
             </div>
         </div>
     </div>
@@ -383,34 +412,6 @@
                             </div>
                         </div>
 
-                        <!-- HOURGLASS PRESETS CARD -->
-                        <div id="hourglass-presets-card" class="card p-4 rounded-2xl border border-slate-800 space-y-3">
-                            <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
-                                <span class="text-xs font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
-                                    <span>⏳</span> <span>Hourglass Presets</span>
-                                </span>
-                                <span class="text-[10px] text-slate-500 font-mono font-semibold">15m Multiples (0.25h aligned)</span>
-                            </div>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                                <button type="button" onclick="applyPomoPreset(15, 5, 10)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-left transition-all group">
-                                    <div class="text-xs font-black text-amber-400 group-hover:text-amber-300">15m / 5m</div>
-                                    <div class="text-[10px] text-slate-400 font-mono font-medium">0.25h Focus</div>
-                                </button>
-                                <button type="button" onclick="applyPomoPreset(30, 5, 15)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-left transition-all group">
-                                    <div class="text-xs font-black text-amber-400 group-hover:text-amber-300">30m / 5m</div>
-                                    <div class="text-[10px] text-slate-400 font-mono font-medium">0.50h Focus</div>
-                                </button>
-                                <button type="button" onclick="applyPomoPreset(45, 15, 20)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-left transition-all group">
-                                    <div class="text-xs font-black text-amber-400 group-hover:text-amber-300">45m / 15m</div>
-                                    <div class="text-[10px] text-slate-400 font-mono font-medium">0.75h Focus</div>
-                                </button>
-                                <button type="button" onclick="applyPomoPreset(60, 15, 30)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-left transition-all group">
-                                    <div class="text-xs font-black text-amber-400 group-hover:text-amber-300">60m / 15m</div>
-                                    <div class="text-[10px] text-slate-400 font-mono font-medium">1.00h Focus</div>
-                                </button>
-                            </div>
-                        </div>
-
                         <!-- UNLOGGED FOCUS CARD -->
                         <div id="pomo-unlogged-card" class="card p-4 rounded-2xl space-y-3 border-emerald-500/30 bg-emerald-950/20 shadow-lg">
                             <div class="flex items-center justify-between">
@@ -459,6 +460,34 @@
                                         Export
                                     </button>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- HOURGLASS PRESETS CARD -->
+                        <div id="hourglass-presets-card" class="card p-4 rounded-2xl border border-slate-800 space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                                <span class="text-xs font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
+                                    <span>⏳</span> <span>Hourglass Presets</span>
+                                </span>
+                                <span class="text-[10px] text-slate-500 font-mono font-semibold">15m Multiples (0.25h aligned)</span>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                                <button type="button" onclick="applyPomoPreset(15, 5, 10)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-left transition-all group">
+                                    <div class="text-xs font-black text-amber-400 group-hover:text-amber-300">15m / 5m</div>
+                                    <div class="text-[10px] text-slate-400 font-mono font-medium">0.25h Focus</div>
+                                </button>
+                                <button type="button" onclick="applyPomoPreset(30, 5, 15)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-left transition-all group">
+                                    <div class="text-xs font-black text-amber-400 group-hover:text-amber-300">30m / 5m</div>
+                                    <div class="text-[10px] text-slate-400 font-mono font-medium">0.50h Focus</div>
+                                </button>
+                                <button type="button" onclick="applyPomoPreset(45, 15, 20)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-left transition-all group">
+                                    <div class="text-xs font-black text-amber-400 group-hover:text-amber-300">45m / 15m</div>
+                                    <div class="text-[10px] text-slate-400 font-mono font-medium">0.75h Focus</div>
+                                </button>
+                                <button type="button" onclick="applyPomoPreset(60, 15, 30)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-left transition-all group">
+                                    <div class="text-xs font-black text-amber-400 group-hover:text-amber-300">60m / 15m</div>
+                                    <div class="text-[10px] text-slate-400 font-mono font-medium">1.00h Focus</div>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -512,7 +541,10 @@
                                 </div>
 
                                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-2 border-t border-slate-800">
-                                    <div id="q-title" class="text-xs text-slate-400 font-medium"><span id="q-desc">Solid Output</span> · <span id="e-desc">Standard focus</span></div>
+                                    <div class="text-xs text-slate-400 font-medium space-y-0.5">
+                                        <div><span class="text-slate-200 font-bold" id="q-title-label">Solid Output</span>: <span id="q-desc">Standard steady progress</span></div>
+                                        <div><span class="text-slate-200 font-bold" id="e-title-label">Moderate Strain</span>: <span id="e-desc">Standard focus effort</span></div>
+                                    </div>
                                     <button type="submit" id="work-submit-btn" class="w-full sm:w-auto px-6 py-2.5 theme-accent-btn font-extrabold rounded-xl text-xs transition-all shadow-md shrink-0">Save Work Log</button>
                                 </div>
                             </form>
@@ -565,7 +597,10 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Intensity Level</label>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">Intensity Level</label>
+                                    <div id="workout-strain-bars" class="flex items-center"></div>
+                                </div>
                                 <div class="flex items-center bg-slate-900/90 rounded-xl border border-slate-700 p-1 h-11">
                                     <button type="button" onmousedown="startHold('strain', 'workout-strain', -1, null, null, null, event)" ontouchstart="startHold('strain', 'workout-strain', -1, null, null, null, event)" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none flex items-center justify-center">◀</button>
                                     <div id="selector-box-workout" class="flex-1 text-center">
@@ -774,62 +809,27 @@
             <!-- TAB 5: FORGE SETTINGS -->
             <div id="tab-forge" class="hidden space-y-6">
                 <form onsubmit="saveAllForgeSettings(event)" class="space-y-6 max-w-2xl mx-auto">
-                    <div id="audioSettingsCard" class="card p-6 rounded-2xl border border-slate-800 space-y-4">
-                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                            <h2 class="text-xl font-black text-slate-100 flex items-center gap-2"><span>🔔</span> <span>Audio Engine</span></h2>
-                            <button type="button" onclick="previewPomoSound()" class="px-3 py-1.5 theme-accent-btn font-black text-xs rounded-lg transition-all flex items-center gap-1">
-                                <span>🔊</span> <span>Test Sound</span>
-                            </button>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Sound Tone</label>
-                                <select id="setting-pomo-sound" onchange="handleInstantSoundChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
-                                    <option value="zen_bowl">Zen Bowl</option>
-                                    <option value="ethereal_synth">✨ Ethereal Synth</option>
-                                    <option value="arpeggio_chime">Crystal Chime</option>
-                                    <option value="cosmic_pad">Cosmic Pad</option>
-                                    <option value="marimba_cascade">Warm Marimba</option>
-                                    <option value="harp_glissando">🎵 Harp Glissando</option>
-                                    <option value="celeste_melody">Celeste Melody</option>
-                                    <option value="starlight_chords">Starlight Chords</option>
-                                    <option value="aureate_fanfare">Aureate Fanfare</option>
-                                    <option value="luminous_bell">💎 Luminous Bell</option>
-                                    <option value="chime_cascade">🔔 Chime Cascade</option>
-                                    <option value="lullaby_arpeggio">Lullaby Arpeggio</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Loop Repeats</label>
-                                <select id="setting-pomo-repeats" onchange="handleInstantSoundRepeatChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
-                                    <option value="1">1x Loop</option>
-                                    <option value="2">2x Loops</option>
-                                    <option value="3" selected>3x Loops</option>
-                                    <option value="4">4x Loops</option>
-                                    <option value="5">5x Loops</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="card p-6 rounded-2xl">
-                        <h2 class="text-xl font-black mb-5 text-slate-100">Appearance & Themes</h2>
+                        <h2 class="text-xl font-black mb-5 text-slate-100">Appearance &amp; Themes</h2>
                         <div class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Dual-Tone Theme</label>
-                                    <select id="setting-user-theme" onchange="handleInstantThemeChange()" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
-                                        <option value="gold">Aureum Gold (Amber + Champagne Gold)</option>
-                                        <option value="rose">Rose Quartz (Rose Pink + Warm Amber Gold)</option>
-                                        <option value="emerald">Emerald Grove (Mint + Warm Amber Gold)</option>
-                                        <option value="cyber">Midnight Cyber (Neon Violet + Electric Cyan)</option>
-                                        <option value="sunset">Sunset Terracotta (Peach + Rose Pink)</option>
-                                        <option value="amethyst">Amethyst Dusk (Lavender + Mint Emerald)</option>
-                                        <option value="ocean">Ocean Abyss (Deep Teal + Solar Gold)</option>
-                                        <option value="crimson">Crimson Forge (Ruby Red + Cyan Spark)</option>
-                                        <option value="matcha">Matcha Latte (Lime Sage + Lavender Bloom)</option>
-                                        <option value="monochrome">Monochrome Slate (Obsidian + Amber Glow)</option>
-                                    </select>
+                                    <input type="hidden" id="setting-user-theme" value="gold">
+                                    <button type="button" id="theme-picker-trigger-btn" onclick="openThemePickerModal()" class="w-full bg-slate-900/80 hover:bg-slate-800/90 border border-slate-700 hover:border-amber-500/60 rounded-xl p-2.5 text-xs text-white transition-all flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-2.5 min-w-0">
+                                            <div class="flex items-center -space-x-1 shrink-0">
+                                                <span id="theme-btn-swatch-1" class="w-4 h-4 rounded-full border border-slate-950 inline-block" style="background-color: #f59e0b;"></span>
+                                                <span id="theme-btn-swatch-2" class="w-4 h-4 rounded-full border border-slate-950 inline-block" style="background-color: #fef08a;"></span>
+                                            </div>
+                                            <div class="truncate text-left">
+                                                <span id="theme-btn-name" class="font-bold text-slate-100">Aureum Gold</span>
+                                                <span class="text-slate-500 mx-1">·</span>
+                                                <span id="theme-btn-sub" class="text-[11px] text-slate-400">Amber + Champagne Gold</span>
+                                            </div>
+                                        </div>
+                                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-700 shrink-0">Choose 🎨</span>
+                                    </button>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Cursor Style</label>
@@ -967,6 +967,44 @@
                                     <input type="number" id="setting-pomo-rounds" min="1" max="12" required class="w-full text-center bg-transparent py-2 text-sm text-white font-mono font-bold focus:outline-none [appearance:textfield]">
                                     <button type="button" onmousedown="startHold('value', 'setting-pomo-rounds', 1, 1, 1, 12, event)" ontouchstart="startHold('value', 'setting-pomo-rounds', 1, 1, 1, 12, event)" class="px-4 py-2 bg-slate-800 text-slate-200 font-bold select-none">+</button>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="audioSettingsCard" class="card p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h2 class="text-xl font-black text-slate-100 flex items-center gap-2"><span>🔔</span> <span>Audio Engine</span></h2>
+                            <button type="button" onclick="previewPomoSound()" class="px-3 py-1.5 theme-accent-btn font-black text-xs rounded-lg transition-all flex items-center gap-1">
+                                <span>🔊</span> <span>Test Sound</span>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Sound Tone</label>
+                                <select id="setting-pomo-sound" onchange="handleInstantSoundChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                                    <option value="zen_bowl">Zen Bowl</option>
+                                    <option value="ethereal_synth">✨ Ethereal Synth</option>
+                                    <option value="arpeggio_chime">Crystal Chime</option>
+                                    <option value="cosmic_pad">Cosmic Pad</option>
+                                    <option value="marimba_cascade">Warm Marimba</option>
+                                    <option value="harp_glissando">🎵 Harp Glissando</option>
+                                    <option value="celeste_melody">Celeste Melody</option>
+                                    <option value="starlight_chords">Starlight Chords</option>
+                                    <option value="aureate_fanfare">Aureate Fanfare</option>
+                                    <option value="luminous_bell">💎 Luminous Bell</option>
+                                    <option value="chime_cascade">🔔 Chime Cascade</option>
+                                    <option value="lullaby_arpeggio">Lullaby Arpeggio</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Loop Repeats</label>
+                                <select id="setting-pomo-repeats" onchange="handleInstantSoundRepeatChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                                    <option value="1">1x Loop</option>
+                                    <option value="2">2x Loops</option>
+                                    <option value="3" selected>3x Loops</option>
+                                    <option value="4">4x Loops</option>
+                                    <option value="5">5x Loops</option>
+                                </select>
                             </div>
                         </div>
                     </div>

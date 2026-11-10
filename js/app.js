@@ -196,7 +196,7 @@ function switchTab(t){
     ['crucible','sanctuary','chronicles','relics','forge'].forEach(x=>{
         $(`tab-${x}`)?.classList.add('hidden');
         const nav=$(`nav-${x}`);
-        if(nav)nav.className=x===t?"tab-btn active px-4 py-3.5 rounded-xl text-base sm:text-lg font-bold flex items-center gap-3.5 w-full justify-start whitespace-nowrap":"tab-btn px-4 py-3.5 rounded-xl text-base sm:text-lg font-bold flex items-center gap-3.5 w-full justify-start whitespace-nowrap";
+        if(nav)nav.className=x===t?"tab-btn active px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap":"tab-btn px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap";
     });
     $(`tab-${t}`)?.classList.remove('hidden');
     if(t==='crucible')attachPomoSpectatorListener();

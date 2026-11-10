@@ -152,18 +152,30 @@ function updateRatingUI(field) {
     if (iconEl) iconEl.innerText = d.icon;
     const badgeEl = $(`${p}-badge`);
     if (badgeEl) badgeEl.innerText = `LVL ${d.level}`;
-    const titleEl = $(`${p}-title`);
+    const titleEl = $(`${p}-title-label`);
     if (titleEl) titleEl.innerText = d.title;
     const descEl = $(`${p}-desc`);
     if (descEl) descEl.innerText = d.desc;
 }
+
+const STRAIN_LEVEL_COLORS = ['#38bdf8', '#10b981', '#f59e0b', '#f97316', '#ef4444'];
 
 function updateWorkoutStrainUI() {
     const input = $('workout-strain');
     if (!input) return;
     const val = parseInt(input.value) || 3;
     const d = RATING_DATA.workoutStrain[val - 1];
+    const color = STRAIN_LEVEL_COLORS[val - 1] || '#f59e0b';
     $('w-icon').innerText = d.icon;
-    $('w-badge').innerText = `LVL ${d.level}`;
+    const wBadge = $('w-badge');
+    if (wBadge) {
+        wBadge.innerText = `LVL ${d.level}`;
+        wBadge.className = 'font-black';
+        wBadge.style.color = color;
+    }
     $('w-title').innerText = d.title;
+    const barEl = $('workout-strain-bars');
+    if (barEl && typeof renderSegmentedBar === 'function') {
+        barEl.innerHTML = renderSegmentedBar(val, 5, color);
+    }
 }
