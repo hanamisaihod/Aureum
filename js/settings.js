@@ -310,12 +310,8 @@ function updateSettingsUI(){
         $('setting-daily-soft-cap').value=userSettings.dailySoftCap||4;
         $('setting-bonus-cap').value=userSettings.maxBonusCapPct;
     }
-    $('setting-pomo-focus').value=userSettings.pomoFocus||25;
-    $('setting-pomo-short').value=userSettings.pomoShort||5;
-    $('setting-pomo-long').value=userSettings.pomoLong||15;
-    $('setting-pomo-rounds').value=userSettings.pomoRounds||4;
-    $('setting-pomo-sound').value=userSettings.pomoSound||'zen_bowl';
-    $('setting-pomo-repeats').value=userSettings.pomoSoundRepeats||3;
+    if($('setting-pomo-sound'))$('setting-pomo-sound').value=userSettings.pomoSound||'zen_bowl';
+    if($('setting-pomo-repeats'))$('setting-pomo-repeats').value=userSettings.pomoSoundRepeats||3;
     $('setting-user-theme').value=userSettings.userTheme||'gold';
     updateThemeTriggerButtonUI(userSettings.userTheme||'gold');
     $('setting-user-cursor').value=userSettings.userCursor||'default';
@@ -336,16 +332,13 @@ async function saveAllForgeSettings(e){
         const cleanedName=dispInput.value.trim().substring(0,24);
         userSettings.displayName=cleanedName||loggedInUser;
     }
+    userSettings.role=loggedInUser==='Cream'?'author':'illustrator';
     userSettings.monthlyCash=parseFloat($('setting-monthly-cash').value)||userSettings.monthlyCash||8000;
     userSettings.weeklyHours=parseFloat($('setting-weekly-hrs').value)||userSettings.weeklyHours||10;
     userSettings.dailySoftCap=parseFloat($('setting-daily-soft-cap').value)||userSettings.dailySoftCap||4;
     userSettings.maxBonusCapPct=parseFloat($('setting-bonus-cap').value)||userSettings.maxBonusCapPct||125;
-    userSettings.pomoFocus=parseInt($('setting-pomo-focus').value)||25;
-    userSettings.pomoShort=parseInt($('setting-pomo-short').value)||5;
-    userSettings.pomoLong=parseInt($('setting-pomo-long').value)||15;
-    userSettings.pomoRounds=parseInt($('setting-pomo-rounds').value)||4;
-    userSettings.pomoSound=$('setting-pomo-sound').value||'zen_bowl';
-    userSettings.pomoSoundRepeats=parseInt($('setting-pomo-repeats').value)||3;
+    if($('setting-pomo-sound'))userSettings.pomoSound=$('setting-pomo-sound').value||'zen_bowl';
+    if($('setting-pomo-repeats'))userSettings.pomoSoundRepeats=parseInt($('setting-pomo-repeats').value)||3;
     userSettings.userTheme=$('setting-user-theme').value;
     userSettings.userCursor=$('setting-user-cursor').value;
     userSettings.bgPattern=$('setting-bg-pattern').value||'dots';
@@ -356,18 +349,12 @@ async function saveAllForgeSettings(e){
     goalsTargetsLocked=true;
     goalsUnlockConfirmPending=false;
 
-    try{
-        localStorage.setItem('aureum_pomo_focus',userSettings.pomoFocus);
-        localStorage.setItem('aureum_pomo_short',userSettings.pomoShort);
-        localStorage.setItem('aureum_pomo_long',userSettings.pomoLong);
-    }catch(e){}
-
     if(duoPresenceData[loggedInUser]){
         duoPresenceData[loggedInUser].settings={...(duoPresenceData[loggedInUser].settings||{}),...userSettings};
     }
 
     await db.collection('settings').doc(loggedInUser).set(userSettings,{merge:true});
     showToast({title:'⚙️ Settings Saved',subtitle:'Options saved & Goals locked safely.',icon:'🔧',tier:'gold',duration:3000,originEvt:e});
-    updateSettingsUI();renderDuoHUDCards();updateUserSwitcherUI();loadUserData();setMyPomoMode('focus');
+    updateSettingsUI();renderDuoHUDCards();updateUserSwitcherUI();loadUserData();
 }
 

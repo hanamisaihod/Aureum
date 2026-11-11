@@ -25,8 +25,17 @@ try {
     if (_sl) _cachedLong = parseInt(_sl) || 15;
 } catch (e) {}
 
+const USER_ROLE_BINDINGS = {
+    North: { role: 'illustrator', domain: 'Artisan', label: 'Illustrator' },
+    Hanamisaihod: { role: 'illustrator', domain: 'Artisan', label: 'Illustrator' },
+    Cream: { role: 'author', domain: 'Chronicler', label: 'Author' }
+};
+
+let activeChronicleFilter = 'all';
+
 let userSettings = {
     displayName: '',
+    role: 'illustrator',
     monthlyCash: 8000,
     weeklyHours: 10,
     dailySoftCap: 4,
@@ -55,8 +64,8 @@ let goalsTargetsLocked = true;
 let goalsUnlockConfirmPending = false;
 
 let duoPresenceData = {
-    North: { settings: {}, hoursToday: 0, powerScore: 0, logs: [], workStyle: 'Tactician' },
-    Cream: { settings: {}, hoursToday: 0, powerScore: 0, logs: [], workStyle: 'Tactician' }
+    North: { role: 'illustrator', domain: 'Artisan', settings: {}, hoursToday: 0, powerScore: 0, logs: [], workStyle: 'Grand Virtuoso' },
+    Cream: { role: 'author', domain: 'Chronicler', settings: {}, hoursToday: 0, powerScore: 0, logs: [], workStyle: 'Arch-Chronicler' }
 };
 
 let currentTodayHoursLogged = 0;

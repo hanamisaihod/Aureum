@@ -186,3 +186,46 @@ aside.app-sidebar > * {
     display: none !important;
 }
 
+/* Chronicle Deck 3D Interactive Flip Cards & SVG Class Crest */
+.chronicle-flip-card {
+    perspective: 1100px;
+    min-height: 162px;
+}
+.chronicle-flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 162px;
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    transform-style: preserve-3d;
+}
+@media (hover: hover) and (pointer: fine) {
+    .chronicle-flip-card:hover .chronicle-flip-card-inner {
+        transform: rotateY(180deg);
+    }
+}
+.chronicle-flip-card.is-flipped .chronicle-flip-card-inner {
+    transform: rotateY(180deg);
+}
+.chronicle-flip-card-front,
+.chronicle-flip-card-back {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    box-shadow: 0 10px 26px -6px rgba(0, 0, 0, 0.65);
+}
+.chronicle-flip-card-back {
+    transform: rotateY(180deg);
+}
+.aureum-class-crest {
+    transition: transform 0.25s ease, filter 0.25s ease;
+}
+.hud-card:hover .aureum-class-crest,
+.chronicle-flip-card:hover .aureum-class-crest {
+    transform: scale(1.06);
+}
+
+

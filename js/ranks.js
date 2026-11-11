@@ -17,49 +17,176 @@ const RANK_TIER_BANDS = [
 
 const RANK_THRESHOLDS = [0, 80, 340, 770, 1400, 2200, 3200, 4400, 5750, 7350, 9100, 11100, 13200, 15600, 18100, 20900, 23800, 27000, 30400, 33900, 37700, 41600, 45800, 50200, 54700, 59500, 64500, 69700, 75100, 80700, 86500, 92500, 98700, 105000, 112000, 118500, 125500, 133000, 140500, 148000, 156000, 164000, 172500, 181000, 189500, 198500, 208000, 217000, 226500, 236500, 246500, 256500, 267000, 278000, 288500, 299500, 311000, 322500, 334000, 346000, 358000, 370500, 383000, 396000, 409000, 422000, 435500, 449000, 463000, 477000, 491500, 506000, 520500, 535500, 550500, 566000, 581500, 597500, 613500, 629500, 646000, 662500, 679500, 696500, 714000, 731500, 749500, 767500, 785500, 804000, 822500, 841500, 860500, 879500, 899000, 919000, 939000, 959000, 979500, 1000000];
 
+function getUserRole(userOrRole) {
+    const raw = String(userOrRole || (typeof viewedUser !== 'undefined' ? viewedUser : 'North')).trim().toLowerCase();
+    return (raw === 'cream' || raw === 'author') ? 'author' : 'illustrator';
+}
+
+function getUserDomainInfo(userOrRole) {
+    const role = getUserRole(userOrRole);
+    return role === 'author'
+        ? { role: 'author', roleLabel: 'Author', domain: 'Chronicler', icon: '✒️' }
+        : { role: 'illustrator', roleLabel: 'Illustrator', domain: 'Artisan', icon: '🎨' };
+}
+
+const CREST_STAT_PALETTES = {
+    INT: { primary: '#38bdf8', secondary: '#06b6d4', glow: 'rgba(56,189,248,0.45)', deep: '#082f49' },
+    WIS: { primary: '#f59e0b', secondary: '#fbbf24', glow: 'rgba(245,158,11,0.45)', deep: '#451a03' },
+    STR: { primary: '#ef4444', secondary: '#f43f5e', glow: 'rgba(239,68,68,0.45)', deep: '#450a0a' },
+    DEX: { primary: '#10b981', secondary: '#34d399', glow: 'rgba(16,185,129,0.45)', deep: '#064e3b' },
+    WIL: { primary: '#f59e0b', secondary: '#f97316', glow: 'rgba(245,158,11,0.45)', deep: '#431407' },
+    VIT: { primary: '#10b981', secondary: '#f59e0b', glow: 'rgba(16,185,129,0.40)', deep: '#064e3b' }
+};
+
+let _crestUidCounter = 0;
+
+function _buildCrestSigilSvg(normRole, uid, pal, secPal) {
+    if (normRole === 'author') {
+        return `<g class="crest-sigil-author"><path d="M16 25 C21 23, 27 24, 32 27 C37 24, 43 23, 48 25 L48 43 C43 41, 37 42, 32 45 C27 42, 21 41, 16 43 Z" fill="rgba(15,23,42,0.9)" stroke="url(#${uid}_g)" stroke-width="1.8" /><line x1="32" y1="27" x2="32" y2="45" stroke="${pal.primary}" stroke-width="1.5" /><line x1="20" y1="30" x2="28" y2="31.5" stroke="${pal.secondary}" stroke-width="1.2" /><line x1="36" y1="31.5" x2="44" y2="30" stroke="${secPal.primary}" stroke-width="1.2" /><path d="M43 15 C37 16, 31 22, 29 31 L32 39 L36 30 C41 26, 45 20, 43 15 Z" fill="url(#${uid}_g)" stroke="#f8fafc" stroke-width="0.9" /><line x1="41.5" y1="16.5" x2="29.5" y2="40.5" stroke="#f8fafc" stroke-width="1.2" /></g>`;
+    }
+    return `<g class="crest-sigil-illustrator"><polygon points="32,14 47,36 32,47 17,36" fill="rgba(15,23,42,0.88)" stroke="url(#${uid}_g)" stroke-width="1.8" /><polygon points="32,14 40,35 32,47 24,35" fill="url(#${uid}_g)" fill-opacity="0.28" stroke="${pal.secondary}" stroke-width="1.1" /><line x1="17" y1="36" x2="47" y2="36" stroke="${secPal.primary}" stroke-width="1.1" /><path d="M32 11 L36.5 26 L32 49 L27.5 26 Z" fill="url(#${uid}_g)" stroke="#f8fafc" stroke-width="0.95" /><circle cx="32" cy="27" r="2.2" fill="#0f172a" stroke="#f8fafc" stroke-width="1.1" /></g>`;
+}
+
+function renderClassCrest(role, topStats, level = 1, size = 44) {
+    const normRole = getUserRole(role);
+    const lvl = Math.max(1, Math.min(100, parseInt(level) || 1));
+    const uid = `c_${++_crestUidCounter}_${lvl}`;
+    let statKeys = [];
+    if (Array.isArray(topStats)) {
+        statKeys = topStats.map(s => (typeof s === 'string' ? s.toUpperCase() : (s?.key || '').toUpperCase())).filter(Boolean);
+    } else if (typeof topStats === 'string' && topStats.trim()) {
+        statKeys = [topStats.trim().toUpperCase()];
+    }
+    const corePriority = statKeys.find(k => ['INT', 'WIS', 'STR', 'DEX'].includes(k));
+    const primaryKey = corePriority || statKeys[0] || (normRole === 'author' ? 'WIS' : 'DEX');
+    const secondaryKey = statKeys.find(k => k !== primaryKey && CREST_STAT_PALETTES[k]) || (normRole === 'author' ? 'INT' : 'WIS');
+
+    const pal = CREST_STAT_PALETTES[primaryKey] || CREST_STAT_PALETTES.DEX;
+    const secPal = CREST_STAT_PALETTES[secondaryKey] || CREST_STAT_PALETTES.WIS;
+    const ringScale = (0.86 + Math.min(1, lvl / 100) * 0.14).toFixed(3);
+    const outerStroke = (1.35 + (lvl / 100) * 1.15).toFixed(2);
+    const tierBand = Math.min(10, Math.max(1, Math.ceil(lvl / 10)));
+
+    let levelFrame = '';
+    if (lvl >= 15) levelFrame += `<polygon points="32,4 52,12 60,32 52,52 32,60 12,52 4,32 12,12" fill="none" stroke="url(#${uid}_g)" stroke-width="1.1" stroke-opacity="0.55" />`;
+    if (lvl >= 30) levelFrame += `<circle cx="32" cy="32" r="28.5" fill="none" stroke="${pal.secondary}" stroke-width="0.9" stroke-dasharray="3,3" stroke-opacity="0.65" /><path d="M32 1.5 L34.2 6.5 L32 5.2 L29.8 6.5 Z M32 62.5 L34.2 57.5 L32 58.8 L29.8 57.5 Z M1.5 32 L6.5 29.8 L5.2 32 L6.5 34.2 Z M62.5 32 L57.5 29.8 L58.8 32 L57.5 34.2 Z" fill="${pal.primary}" />`;
+    if (lvl >= 55) levelFrame += `<polygon points="32,2 39,10 50,7 48,18 59,22 53,32 59,42 48,46 50,57 39,54 32,62 25,54 14,57 16,46 5,42 11,32 5,22 16,18 14,7 25,10" fill="none" stroke="${secPal.primary}" stroke-width="0.95" stroke-opacity="0.5" />`;
+    if (lvl >= 80) levelFrame += `<circle cx="32" cy="32" r="30.2" fill="none" stroke="${pal.primary}" stroke-width="1.3" stroke-opacity="0.8" />`;
+
+    const rDot = lvl >= 25 ? '2.1' : '1.4';
+    const runes = `<g class="crest-runes" opacity="0.92"><polygon points="32,5.5 34,8.5 32,11.5 30,8.5" fill="${pal.primary}" /><polygon points="32,52.5 34,55.5 32,58.5 30,55.5" fill="${pal.primary}" /><polygon points="5.5,32 8.5,30 11.5,32 8.5,34" fill="${secPal.primary}" /><polygon points="52.5,32 55.5,30 58.5,32 55.5,34" fill="${secPal.primary}" /><circle cx="14" cy="14" r="${rDot}" fill="${pal.secondary}" /><circle cx="50" cy="14" r="${rDot}" fill="${secPal.primary}" /><circle cx="14" cy="50" r="${rDot}" fill="${secPal.primary}" /><circle cx="50" cy="50" r="${rDot}" fill="${pal.secondary}" /></g>`;
+    const sigil = _buildCrestSigilSvg(normRole, uid, pal, secPal);
+    const sizeAttr = size ? `width="${size}" height="${size}"` : '';
+    return `<svg ${sizeAttr} viewBox="0 0 64 64" class="aureum-class-crest shrink-0 select-none overflow-visible" data-role="${normRole}" data-stat="${primaryKey}" data-level="${lvl}" style="filter: drop-shadow(0 0 8px ${pal.glow});"><defs><linearGradient id="${uid}_g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${pal.primary}" /><stop offset="60%" stop-color="${pal.secondary}" /><stop offset="100%" stop-color="${secPal.primary}" /></linearGradient><radialGradient id="${uid}_bg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="${pal.primary}" stop-opacity="0.28" /><stop offset="70%" stop-color="${pal.deep}" stop-opacity="0.88" /><stop offset="100%" stop-color="#090d16" stop-opacity="0.96" /></radialGradient></defs><g transform="translate(32 32) scale(${ringScale}) translate(-32 -32)"><circle cx="32" cy="32" r="26" fill="url(#${uid}_bg)" stroke="url(#${uid}_g)" stroke-width="${outerStroke}" /><circle cx="32" cy="32" r="21.5" fill="none" stroke="${pal.primary}" stroke-width="0.85" stroke-opacity="0.45" stroke-dasharray="${2 + tierBand},2" />${levelFrame}${runes}</g>${sigil}</svg>`;
+}
+
 function getRankTierName(level) {
     const lvl = Math.max(1, Math.min(100, parseInt(level) || 1));
     const idx = Math.min(9, Math.floor((lvl - 1) / 10));
     return RANK_TIER_BANDS[idx].tier;
 }
 
-function calculateRolling30DayQE(logs) {
+function computeStatScoresFromLogs(logs, settings, windowDays = 30, referenceTimeMs = null) {
+    const safeLogs = Array.isArray(logs) ? logs : [];
+    const safeSettings = settings || {};
+    const refNow = referenceTimeMs || Date.now();
+    const cutoff = windowDays ? (refNow - (windowDays * 86400000)) : 0;
+    const filtered = safeLogs.filter(l => {
+        const t = getLogDate(l).getTime();
+        return t <= refNow && (!cutoff || t >= cutoff);
+    });
+    const pool = filtered.length > 0 ? filtered : safeLogs.filter(l => getLogDate(l).getTime() <= refNow);
+    const workLogs = pool.filter(l => l.type === 'work');
+    const workoutLogs = pool.filter(l => l.type === 'workout');
+    const choreLogs = pool.filter(l => l.type === 'chore');
+    const diaryLogs = pool.filter(l => l.type === 'diary' || (l.reflectionText && String(l.reflectionText).trim().length > 0));
+    const pomoList = Array.isArray(safeSettings.completedPomoHistory) ? safeSettings.completedPomoHistory : [];
+    const unlockedBadges = Array.isArray(safeSettings.unlockedBadges) ? safeSettings.unlockedBadges : [];
+
+    const workoutHours = workoutLogs.reduce((a, l) => a + (parseFloat(l.hours) || 0), 0);
+    const avgStrain = workoutLogs.length > 0 ? workoutLogs.reduce((a, l) => a + (parseFloat(l.strain) || 3), 0) / workoutLogs.length : 3.0;
+    const heavyWorkHours = workLogs.filter(l => (parseFloat(l.effort) || 3) >= 4).reduce((a, l) => a + (parseFloat(l.hours) || 0), 0);
+    const strScore = (workoutHours * 5.0 * (avgStrain / 3)) + (workoutLogs.length * 2.5) + (heavyWorkHours * 2.4);
+
+    const avgQ = workLogs.length > 0 ? workLogs.reduce((a, l) => a + (parseFloat(l.results) || 3), 0) / workLogs.length : 3.2;
+    const highCraftHours = workLogs.filter(l => (parseFloat(l.results) || 3) >= 4).reduce((a, l) => a + (parseFloat(l.hours) || 0), 0);
+    const dexScore = ((avgQ - 1) * 9.5) + (highCraftHours * 2.6) + (workLogs.length * 1.4);
+
+    const totalWorkHours = workLogs.reduce((a, l) => a + (parseFloat(l.hours) || 0), 0);
+    const focusHours = pomoList.reduce((a, p) => a + ((parseFloat(p.durationSecs) || 0) / 3600), 0);
+    const intScore = (totalWorkHours * 2.4) + (focusHours * 3.5) + (workLogs.filter(l => (parseFloat(l.hours) || 0) >= 2).length * 2.2);
+
+    const wisScore = (diaryLogs.length * 4.8) + (unlockedBadges.length * 2.2) + (workLogs.filter(l => (parseFloat(l.results) || 3) >= 4 && (parseFloat(l.effort) || 3) <= 3).length * 3.0);
+
+    const activeDays = new Set();
+    pool.forEach(l => { const d = getLogDate(l); activeDays.add(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`); });
+    const choreHours = choreLogs.reduce((a, l) => a + (parseFloat(l.hours) || 0), 0);
+    const wilScore = (activeDays.size * 3.2) + (choreHours * 2.2) + (unlockedBadges.length * 2.5);
+    const vitScore = (choreHours * 3.8) + (activeDays.size * 1.8);
+
+    return {
+        STR: Math.round(15 + 84 * (1 - Math.exp(-strScore / 28))),
+        DEX: Math.round(15 + 84 * (1 - Math.exp(-dexScore / 32))),
+        INT: Math.round(15 + 84 * (1 - Math.exp(-intScore / 30))),
+        WIS: Math.round(15 + 84 * (1 - Math.exp(-wisScore / 26))),
+        WIL: Math.round(15 + 84 * (1 - Math.exp(-wilScore / 28))),
+        VIT: Math.round(15 + 84 * (1 - Math.exp(-vitScore / 28)))
+    };
+}
+
+function getHybridClassTitle(role, statScores) {
+    const normRole = getUserRole(role);
+    const s = statScores || { DEX: 20, WIS: 20, INT: 20, STR: 20, WIL: 20, VIT: 20 };
+    if (normRole === 'author') {
+        const intPair = (s.WIS || 0) + (s.INT || 0) * 1.15;
+        const wilPair = (s.WIS || 0) + (s.WIL || 0) * 1.15;
+        const strPair = (s.WIS || 0) + (s.STR || 0) * 1.15;
+        if (strPair > intPair && strPair >= wilPair) return 'Iron Scribe';
+        if (wilPair > intPair && wilPair > strPair) return 'Relic Keeper';
+        return 'Arch-Chronicler';
+    }
+    const wisPair = (s.DEX || 0) + (s.WIS || 0) * 1.15;
+    const intPair = (s.DEX || 0) + (s.INT || 0) * 1.15;
+    const strPair = (s.DEX || 0) + (s.STR || 0) * 1.15;
+    if (strPair > wisPair && strPair >= intPair) return 'Stalwart Illustris';
+    if (intPair > wisPair && intPair > strPair) return 'Artisan Draftsman';
+    return 'Grand Virtuoso';
+}
+
+function getTopStatKeysFromMap(statScores, role) {
+    const normRole = getUserRole(role);
+    const s = statScores || {};
+    const cands = ['INT', 'WIS', 'STR', 'DEX'];
+    const sorted = [...cands].sort((a, b) => (s[b] || 0) - (s[a] || 0));
+    if ((s[sorted[0]] || 0) === (s[sorted[sorted.length - 1]] || 0)) {
+        return normRole === 'author' ? ['WIS', 'INT', 'WIL'] : ['DEX', 'WIS', 'INT'];
+    }
+    return sorted;
+}
+
+function calculateRolling30DayQE(logs, userOrRole, settings) {
+    const role = getUserRole(userOrRole);
+    const scores30 = computeStatScoresFromLogs(logs, settings, 30);
+    const hybridTitle = getHybridClassTitle(role, scores30);
+    const topStats = getTopStatKeysFromMap(scores30, role);
     if (!logs || !Array.isArray(logs)) {
-        return { avgQuality: 0, avgEffort: 0, count: 0, stalwartCount: 0, archetype: 'Tactician' };
+        return { avgQuality: 0, avgEffort: 0, count: 0, stalwartCount: 0, archetype: hybridTitle, hybridTitle, topStats, statScores: scores30 };
     }
     const cutoff = Date.now() - (30 * 86400000);
     const recentWork = logs.filter(l => l.type === 'work' && getLogDate(l).getTime() >= cutoff);
     if (recentWork.length === 0) {
-        return { avgQuality: 0, avgEffort: 0, count: 0, stalwartCount: 0, archetype: 'Tactician' };
+        return { avgQuality: 0, avgEffort: 0, count: 0, stalwartCount: 0, archetype: hybridTitle, hybridTitle, topStats, statScores: scores30 };
     }
     let sumQ = 0, sumE = 0, stalwartCount = 0;
     for (let i = 0; i < recentWork.length; i++) {
-        const q = parseFloat(recentWork[i].results) || 3;
-        const e = parseFloat(recentWork[i].effort) || 3;
-        sumQ += q;
-        sumE += e;
-        if (q >= 4 && e >= 4) {
-            stalwartCount++;
-        }
+        const q = parseFloat(recentWork[i].results) || 3, e = parseFloat(recentWork[i].effort) || 3;
+        sumQ += q; sumE += e;
+        if (q >= 4 && e >= 4) stalwartCount++;
     }
-    const avgQuality = sumQ / recentWork.length;
-    const avgEffort = sumE / recentWork.length;
-
-    let archetype = 'Tactician';
-    if (avgQuality >= 4.0 && avgEffort >= 4.0) {
-        archetype = 'Stalwart';
-    } else if (avgQuality >= 4.0 && avgEffort <= 3.0) {
-        archetype = 'Virtuoso';
-    } else if (avgQuality <= 3.0 && avgEffort >= 4.0) {
-        archetype = 'Grinder';
-    } else {
-        archetype = 'Tactician';
-    }
-
-    return { avgQuality, avgEffort, count: recentWork.length, stalwartCount, archetype };
+    return { avgQuality: sumQ / recentWork.length, avgEffort: sumE / recentWork.length, count: recentWork.length, stalwartCount, archetype: hybridTitle, hybridTitle, topStats, statScores: scores30 };
 }
 
-function getRankDetails(pwr, logs) {
+function getRankDetails(pwr, logs, userOrRole, settings) {
     const score = Math.max(0, pwr || 0);
     let rank = 1;
     for (let i = 99; i >= 0; i--) {
@@ -68,10 +195,12 @@ function getRankDetails(pwr, logs) {
             break;
         }
     }
+    const role = getUserRole(userOrRole);
+    const domainInfo = getUserDomainInfo(role);
     const tierName = getRankTierName(rank);
-    const qeStats = calculateRolling30DayQE(logs);
-    const workStyle = qeStats.archetype;
-    const title = `${tierName} ${workStyle}`;
+    const qeStats = calculateRolling30DayQE(logs, role, settings);
+    const workStyle = qeStats.hybridTitle;
+    const title = workStyle;
 
     const currentThreshold = RANK_THRESHOLDS[rank - 1];
     const nextThreshold = rank < 100 ? RANK_THRESHOLDS[rank] : null;
@@ -85,9 +214,16 @@ function getRankDetails(pwr, logs) {
     return {
         rank,
         level: rank,
+        role,
+        domain: domainInfo.domain,
+        roleLabel: domainInfo.roleLabel,
         tierName,
         workStyle,
+        hybridTitle: workStyle,
         title,
+        fullRankTitle: `${tierName} • ${workStyle}`,
+        topStats: qeStats.topStats,
+        statScores30d: qeStats.statScores,
         currentThreshold,
         nextThreshold,
         progressPct,
@@ -113,32 +249,22 @@ const calculatePowerScore = calculateLifetimePWR;
 
 function calculateAndRenderPowerMeter(logs) {
     const pwrScore = calculateLifetimePWR(logs);
-    const rankDetails = getRankDetails(pwrScore, logs);
+    const rankDetails = getRankDetails(pwrScore, logs, viewedUser, userSettings);
     if ($('power-score-val')) $('power-score-val').innerText = pwrScore.toLocaleString();
     if ($('power-level-bar')) $('power-level-bar').style.width = `${Math.min(100, Math.round(rankDetails.progressPct))}%`;
 }
 
 const WORK_STYLE_INFO = {
-    Virtuoso: {
-        icon: '✨',
-        tagline: 'High Quality (≥ 4.0) + Low Effort (≤ 3.0)',
-        desc: 'Efficient, high craft — delivering peak output with minimal strain and effortless flow.'
-    },
-    Stalwart: {
-        icon: '🛡️',
-        tagline: 'High Quality (≥ 4.0) + High Effort (≥ 4.0)',
-        desc: 'High craft, maximum dedication — forging top-tier results through relentless grit and focus.'
-    },
-    Grinder: {
-        icon: '⛏️',
-        tagline: 'Low Quality (≤ 3.0) + High Effort (≥ 4.0)',
-        desc: 'High volume, brute force — pushing through heavy resistance and foundational groundwork.'
-    },
-    Tactician: {
-        icon: '⚖️',
-        tagline: 'Balanced Quality & Effort Distribution',
-        desc: 'Steady, measured cadence — maintaining a sustainable equilibrium across output and energy.'
-    }
+    'Grand Virtuoso': { icon: '🎨', combo: 'High DEX + WIS', tagline: 'High DEX + WIS • Master of Inspired Visual Craft', desc: 'Merges razor-sharp execution with deep reflective insight — turning every canvas session into timeless artistry.' },
+    'Artisan Draftsman': { icon: '📐', combo: 'High DEX + INT', tagline: 'High DEX + INT • Architect of Precision & Deep Focus', desc: 'Combines technical draughtsmanship with sustained cognitive immersion and unbroken flow states.' },
+    'Stalwart Illustris': { icon: '⚔️', combo: 'High DEX + STR', tagline: 'High DEX + STR • Relentless Vanguard of the Stylus', desc: 'Forges high-craft illustration through sheer physical stamina, heavy-effort shifts, and unyielding grit.' },
+    'Arch-Chronicler': { icon: '📜', combo: 'High WIS + INT', tagline: 'High WIS + INT • Sovereign Scholar of the Living Codex', desc: 'Synthesizes deep reflective wisdom with sustained intellectual focus to weave intricate narratives.' },
+    'Relic Keeper': { icon: '🏺', combo: 'High WIS + WIL', tagline: 'High WIS + WIL • Custodian of Lore & Unbroken Streaks', desc: 'Guards the sacred archives through daily discipline, streak resilience, and milestone mastery.' },
+    'Iron Scribe': { icon: '✒️', combo: 'High WIS + STR', tagline: 'High WIS + STR • Indomitable Forge-Writer', desc: 'Channels high-strain conditioning and intense effort into powerful, unshakeable written output.' },
+    Virtuoso: { icon: '✨', combo: 'High DEX + WIS', tagline: 'High Quality (≥ 4.0) + Low Effort (≤ 3.0)', desc: 'Efficient, high craft — delivering peak output with minimal strain and effortless flow.' },
+    Stalwart: { icon: '🛡️', combo: 'High DEX + STR', tagline: 'High Quality (≥ 4.0) + High Effort (≥ 4.0)', desc: 'High craft, maximum dedication — forging top-tier results through relentless grit and focus.' },
+    Grinder: { icon: '⛏️', combo: 'High DEX + STR', tagline: 'Low Quality (≤ 3.0) + High Effort (≥ 4.0)', desc: 'High volume, brute force — pushing through heavy resistance and foundational groundwork.' },
+    Tactician: { icon: '⚖️', combo: 'High DEX + INT', tagline: 'Balanced Quality & Effort Distribution', desc: 'Steady, measured cadence — maintaining a sustainable equilibrium across output and energy.' }
 };
 
 function getStatGrade(val) {
@@ -361,17 +487,21 @@ function renderRPGAbilitiesCard(abilities) {
     }).join('');
 
     const og = abilities.overallGrade;
+    const matrixCrest = renderClassCrest(abilities.role || viewedUser, abilities.topStats || [abilities.topStat?.key || 'DEX'], abilities.level || 1, 42);
     return `
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-800/90">
-            <div>
-                <div class="flex items-center gap-2 flex-wrap">
-                    <span class="text-sm sm:text-base font-black uppercase tracking-wider text-slate-100">⚡ Power Matrix</span>
-                    <span class="text-[10px] font-black font-mono px-2 py-0.5 rounded" style="background:${og.bg};color:${og.color};border:1px solid ${og.border}">CLASS ${og.grade} • AVG ${abilities.avgStat}</span>
-                </div>
-                <div class="text-[11px] text-slate-300 font-semibold mt-0.5 flex items-center gap-1.5 flex-wrap">
-                    <span class="text-amber-300 font-bold">Lvl ${abilities.level} • ${escapeHtml(abilities.rankTitle)}</span>
-                    <span class="text-slate-600">•</span>
-                    <span class="text-amber-300/90">Specialty: ${abilities.dominantSpecialty}</span>
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="shrink-0 p-1 rounded-xl bg-slate-950/90 border border-slate-800 flex items-center justify-center">${matrixCrest}</div>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-sm sm:text-base font-black uppercase tracking-wider text-slate-100">⚡ Power Matrix</span>
+                        <span class="text-[10px] font-black font-mono px-2 py-0.5 rounded" style="background:${og.bg};color:${og.color};border:1px solid ${og.border}">CLASS ${og.grade} • AVG ${abilities.avgStat}</span>
+                    </div>
+                    <div class="text-[11px] text-slate-300 font-semibold mt-0.5 flex items-center gap-1.5 flex-wrap">
+                        <span class="text-amber-300 font-bold">Lvl ${abilities.level} • ${escapeHtml(abilities.rankTitle)}</span>
+                        <span class="text-slate-600">•</span>
+                        <span class="text-amber-300/90">Specialty: ${abilities.dominantSpecialty}</span>
+                    </div>
                 </div>
             </div>
             <div class="bg-slate-950/90 border border-amber-500/40 rounded-xl px-3.5 py-1.5 text-left sm:text-right shrink-0">
@@ -559,8 +689,12 @@ function openRankRoadmapModal(targetUser, evt) {
     const dispName = escapeHtml(getUserDisplayName(u));
     const pwr = duoPresenceData[u]?.powerScore || 0;
     const uLogs = duoPresenceData[u]?.logs || (u === viewedUser ? currentRawLogsCache : []);
-    const rankInfo = getRankDetails(pwr, uLogs);
     const s = (u === loggedInUser) ? userSettings : (spectatorSettings || duoPresenceData[u]?.settings || {});
+    const rankInfo = getRankDetails(pwr, uLogs, u, s);
+    const abilities = calculateRPGAbilities(uLogs, s, pwr, rankInfo);
+    const sortedKeys = [...abilities.stats].sort((a, b) => b.val - a.val).map(x => x.key);
+    const crestStats = rankInfo.topStats && rankInfo.topStats.length > 0 ? rankInfo.topStats : sortedKeys;
+    const crestSvg = renderClassCrest(rankInfo.role, crestStats, rankInfo.level, 52);
 
     const sumEl = $('rank-modal-summary');
     if (sumEl) {
@@ -571,12 +705,14 @@ function openRankRoadmapModal(targetUser, evt) {
             <div class="flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3 min-w-0">
                     <img src="${s.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${u}`}" alt="${dispName}" class="w-12 h-12 rounded-xl border border-slate-700 shrink-0">
+                    <div class="shrink-0 flex items-center justify-center p-1 rounded-xl bg-slate-950/90 border border-slate-800" title="${rankInfo.roleLabel} (${rankInfo.domain} Domain)">${crestSvg}</div>
                     <div class="min-w-0">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
                             <span class="font-black text-sm text-slate-100">${dispName}</span>
                             <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">Lvl ${rankInfo.level}</span>
+                            <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 uppercase">${rankInfo.roleLabel} • ${rankInfo.domain}</span>
                         </div>
-                        <div class="text-xs font-bold theme-accent-text truncate">${rankInfo.title}</div>
+                        <div class="text-xs font-bold theme-accent-text truncate">${rankInfo.tierName} • ${rankInfo.hybridTitle}</div>
                     </div>
                 </div>
                 <div class="text-right shrink-0">
@@ -598,23 +734,25 @@ function openRankRoadmapModal(targetUser, evt) {
 
     const abilitiesEl = $('rank-modal-abilities-card');
     if (abilitiesEl) {
-        const abilities = calculateRPGAbilities(uLogs, s, pwr, rankInfo);
+        abilities.role = rankInfo.role;
+        abilities.topStats = crestStats;
         abilitiesEl.innerHTML = renderRPGAbilitiesCard(abilities);
     }
 
     const styleEl = $('rank-modal-style-card');
     if (styleEl) {
-        const ws = WORK_STYLE_INFO[rankInfo.workStyle] || WORK_STYLE_INFO.Tactician;
+        const ws = WORK_STYLE_INFO[rankInfo.workStyle] || WORK_STYLE_INFO['Grand Virtuoso'];
         const avgQStr = rankInfo.avgQuality30d > 0 ? rankInfo.avgQuality30d.toFixed(1) : '3.0';
         const avgEStr = rankInfo.avgEffort30d > 0 ? rankInfo.avgEffort30d.toFixed(1) : '3.0';
+        const miniCrest = renderClassCrest(rankInfo.role, crestStats, rankInfo.level, 40);
         styleEl.innerHTML = `
             <div class="flex items-start justify-between gap-3">
                 <div class="flex items-start gap-2.5 min-w-0">
-                    <div class="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-lg shrink-0">${ws.icon}</div>
+                    <div class="p-1 rounded-xl bg-slate-950/90 border border-amber-500/30 flex items-center justify-center shrink-0">${miniCrest}</div>
                     <div class="min-w-0">
                         <div class="flex items-center gap-2 flex-wrap">
-                            <span class="text-xs font-black text-slate-100 uppercase tracking-wider">Current Style: <span class="theme-accent-text">${rankInfo.workStyle}</span></span>
-                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-700">30d Avg: ${avgQStr} Q / ${avgEStr} E</span>
+                            <span class="text-xs font-black text-slate-100 uppercase tracking-wider">Hybrid Class: <span class="theme-accent-text">${rankInfo.workStyle}</span></span>
+                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-700">${ws.combo || 'Hybrid'} • ${avgQStr} Q / ${avgEStr} E</span>
                         </div>
                         <div class="text-[11px] font-semibold text-amber-400/90 mt-0.5">${ws.tagline}</div>
                         <p class="text-[11px] text-slate-400 leading-snug mt-0.5">${ws.desc}</p>

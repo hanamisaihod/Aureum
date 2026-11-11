@@ -10,6 +10,7 @@ async function saveDailyDiary(e) {
         type: 'diary',
         user: loggedInUser,
         text: text,
+        reflectionText: text,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
     showToast({

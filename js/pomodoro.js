@@ -76,14 +76,16 @@ function startMyPomoBackgroundTimer(){
 
 function updateUnloggedFocusDisplay(){
     const secs=(loggedInUser===viewedUser?userSettings:spectatorSettings)?.unloggedFocusSecs||0;
-    $('pomo-unlogged-hours').innerText=`${(secs/3600).toFixed(2)} hrs`;
-}
-
-function togglePomoExportDrawer(){
-    const panel=$('pomo-export-panel');if(panel)panel.classList.toggle('hidden');
+    const hrs=(secs/3600).toFixed(2);
+    if($('pomo-unlogged-hours'))$('pomo-unlogged-hours').innerText=`${hrs} hrs`;
+    const logBtn=$('pomo-log-accumulated-btn');
+    if(logBtn){
+        logBtn.disabled=(loggedInUser!==viewedUser);
+    }
 }
 
 async function resetUnloggedFocusTime(e){
+    if(e&&e.stopPropagation)e.stopPropagation();
     if(loggedInUser!==viewedUser)return;
     userSettings.unloggedFocusSecs=0;updateUnloggedFocusDisplay();
     await db.collection('settings').doc(loggedInUser).set({unloggedFocusSecs:0},{merge:true});
@@ -91,42 +93,89 @@ async function resetUnloggedFocusTime(e){
     showToast({title:'⏱️ Focus Cleared',subtitle:'Counter reset to 0.00 hrs.',icon:'⏱️',tier:'bronze',originEvt:e});
 }
 
-async function confirmLogUnloggedFocusToCrucible(e){
+function openLogWorkModal(prefillHours, e){
+    if(e&&e.stopPropagation)e.stopPropagation();
+    if(loggedInUser!==viewedUser)return;
+    const timeInput=$('work-time');
+    if(timeInput&&prefillHours!==undefined&&prefillHours!==null){
+        timeInput.value=Number(prefillHours).toFixed(2);
+    }
+    const modal=$('log-work-modal'),modalBody=$('log-work-modal-body'),card=$('work-form-card'),closeBtn=$('work-modal-close-btn');
+    if(modal&&modalBody&&card){
+        modalBody.appendChild(card);
+        modal.classList.remove('hidden');
+        if(closeBtn)closeBtn.classList.remove('hidden');
+    }
+    playTone('save');
+    setTimeout(()=>{
+        const refl=$('work-reflection');
+        if(refl)refl.focus();
+        else if(timeInput)timeInput.focus();
+    },60);
+}
+
+function closeLogWorkModal(e){
+    if(e&&e.stopPropagation)e.stopPropagation();
+    const modal=$('log-work-modal'),slot=$('work-form-slot'),card=$('work-form-card'),closeBtn=$('work-modal-close-btn');
+    if(slot&&card&&card.parentElement!==slot){
+        slot.appendChild(card);
+    }
+    if(closeBtn)closeBtn.classList.add('hidden');
+    if(modal)modal.classList.add('hidden');
+}
+
+function openLogAccumulatedHours(e){
+    if(e&&e.stopPropagation)e.stopPropagation();
     if(loggedInUser!==viewedUser)return;
     const secs=userSettings.unloggedFocusSecs||0;
-    if(secs<=0){
-        showToast({title:'⏱️ Focus Tracker Empty',subtitle:'No unlogged hours to export.',icon:'⏳',tier:'bronze'});
-        return;
+    const prefill=secs>0?Math.max(0.25,Math.round((secs/3600)*100)/100):1.00;
+    openLogWorkModal(prefill,e);
+}
+
+async function adjustPomoTimerDuration(deltaMins,e){
+    if(e&&e.stopPropagation)e.stopPropagation();
+    if(loggedInUser!==viewedUser||myPomoIsRunning)return;
+    const step=parseInt(deltaMins)||0;
+    if(!step)return;
+
+    let settingKey='pomoFocus',storageKey='aureum_pomo_focus',minMins=15,maxMins=180;
+    if(myPomoMode==='short'){
+        settingKey='pomoShort';storageKey='aureum_pomo_short';minMins=5;maxMins=60;
+    }else if(myPomoMode==='long'){
+        settingKey='pomoLong';storageKey='aureum_pomo_long';minMins=15;maxMins=120;
     }
-    const hours=Math.max(0.25,Math.round((secs/3600)*4)/4);
-    const R=parseInt($('pomo-export-quality').value)||3,E=parseInt($('pomo-export-effort').value)||3;
-    const baseRate=(R+E)/2,softCap=userSettings.dailySoftCap||4;
-    const normH=Math.min(hours,Math.max(0,softCap-currentTodayHoursLogged)),overH=hours-normH;
-    const pts=(normH*baseRate)+(overH*baseRate*0.25);
-    const targetPts=(userSettings.weeklyHours||10)*12,pointRate=targetPts>0?(userSettings.monthlyCash/targetPts):0;
-    const maxCash=userSettings.monthlyCash*((userSettings.maxBonusCapPct||125)/100);
 
-    const now=new Date();let currentMonthlyPts=0;
-    currentRawLogsCache.forEach(l=>{
-        if(l.type==='work'){
-            const d=getLogDate(l);
-            if(d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth())currentMonthlyPts+=(l.points||0);
-        }
-    });
-    const cashBefore=Math.min(currentMonthlyPts*pointRate,maxCash),cashAfter=Math.min((currentMonthlyPts+pts)*pointRate,maxCash);
-    const netCashEarned=Math.max(0,cashAfter-cashBefore);
+    const curMins=parseInt(userSettings[settingKey])||(myPomoMode==='focus'?25:(myPomoMode==='short'?5:15));
+    let nextMins;
+    if(curMins%15!==0&&Math.abs(step)===15){
+        nextMins=step>0?(Math.ceil(curMins/15)*15):(Math.floor(curMins/15)*15);
+        if(nextMins===curMins)nextMins=curMins+step;
+    }else{
+        nextMins=curMins+step;
+    }
+    nextMins=Math.max(minMins,Math.min(maxMins,nextMins));
 
-    await db.collection('logs').add({type:'work',user:loggedInUser,hours:hours,normalHours:normH,overCapHours:overH,results:R,effort:E,points:pts,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
-    userSettings.unloggedFocusSecs=0;
-    updateUnloggedFocusDisplay();
-    await db.collection('settings').doc(loggedInUser).set({unloggedFocusSecs:0},{merge:true});
-    if($('work-time'))$('work-time').value="1.00";
-    if($('pomo-export-quality'))$('pomo-export-quality').value="3";
-    if($('pomo-export-effort'))$('pomo-export-effort').value="3";
-    
-    $('pomo-export-panel').classList.add('hidden');
-    showToast({title:'🚀 Exported to Crucible',subtitle:`<strong>+฿${Math.round(netCashEarned).toLocaleString()} Earned</strong> (${hours}h @ Lvl ${R}/${E})`,icon:'🎯',tier:'gold',originEvt:e});
-    loadUserData();
+    userSettings[settingKey]=nextMins;
+    myPomoInitialTime=nextMins*60;
+    myPomoTime=myPomoInitialTime;
+    myPomoEndTime=null;
+    currentSessionWasPaused=false;
+
+    try{localStorage.setItem(storageKey,nextMins)}catch(err){}
+    if(duoPresenceData[loggedInUser]){
+        duoPresenceData[loggedInUser].settings={...(duoPresenceData[loggedInUser].settings||{}),[settingKey]:nextMins};
+    }
+
+    if($('pomo-timer-display'))$('pomo-timer-display').innerText=`${nextMins.toString().padStart(2,'0')}:00`;
+    if(myPomoMode==='focus'&&$('pomo-mode-focus'))$('pomo-mode-focus').innerText=`Focus (${nextMins}m)`;
+    if(myPomoMode==='short'&&$('pomo-mode-short'))$('pomo-mode-short').innerText=`Short (${nextMins}m)`;
+    if(myPomoMode==='long'&&$('pomo-mode-long'))$('pomo-mode-long').innerText=`Long (${nextMins}m)`;
+
+    playTone('save');
+    syncMyPomoToCloud();
+    try{
+        await db.collection('settings').doc(loggedInUser).set({[settingKey]:nextMins},{merge:true});
+    }catch(err){}
 }
 
 function setMyPomoMode(mode){
@@ -149,20 +198,6 @@ function toggleMyPomoTimer(){
 }
 function resetMyPomoTimer(){if(loggedInUser===viewedUser){clearInterval(myPomoInterval);myPomoIsRunning=false;myPomoEndTime=null;myPomoRound=1;setMyPomoMode('focus')}}
 function handleClockClick(){if(loggedInUser===viewedUser)toggleMyPomoTimer()}
-
-async function applyPomoPreset(f,s,l){
-    if(loggedInUser!==viewedUser)return;
-    userSettings.pomoFocus=f;userSettings.pomoShort=s;userSettings.pomoLong=l;
-    try{
-        localStorage.setItem('aureum_pomo_focus',f);
-        localStorage.setItem('aureum_pomo_short',s);
-        localStorage.setItem('aureum_pomo_long',l);
-    }catch(e){}
-    $('setting-pomo-focus').value=f;$('setting-pomo-short').value=s;$('setting-pomo-long').value=l;
-    await db.collection('settings').doc(loggedInUser).set({pomoFocus:f,pomoShort:s,pomoLong:l},{merge:true});
-    playTone('save');setMyPomoMode('focus');
-    showToast({title:'⏳ Preset Applied',subtitle:`${f}m Focus (${(f/60).toFixed(2)}h) / ${s}m Break`,icon:'⌛',tier:'gold'});
-}
 
 async function initAndRecoverMyPomoState(){
     try{
@@ -227,6 +262,10 @@ function startGlobalUIRenderer(){
             statusEl.innerText=isR?(mode==='focus'?"Focus Active":"Resting..."):(secs===initT?"Click Timer or Press Spacebar":"Paused");
             toggleBtn.innerText=isR?"Pause":(secs===initT?(mode==='focus'?"Start Focus":"Start Break"):"Resume");
         }else{statusEl.innerText=isR?`LIVE: ${mode.toUpperCase()}`:"PAUSED / IDLE"}
+
+        const minusBtn=$('pomo-step-minus'),plusBtn=$('pomo-step-plus');
+        if(minusBtn)minusBtn.disabled=(isR||!isSelf);
+        if(plusBtn)plusBtn.disabled=(isR||!isSelf);
 
         ['focus','short','long'].forEach(m=>{$(`pomo-mode-${m}`).className=m===mode?"px-4 py-1.5 rounded-lg font-extrabold transition-all theme-accent-btn":"px-4 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition-all"});
         $('pomo-round-badge').innerText=`Round ${round} of ${totR}`;

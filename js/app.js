@@ -8,6 +8,9 @@ auth.onAuthStateChanged(async u=>{
         currentUserUid=u.uid;if(modal)modal.classList.add('hidden');if(app)app.classList.remove('hidden');
         loggedInUser=(u.uid==="ioxjbBLDH0NDLDWVoYCjq8p3PYU2"||u.email?.toLowerCase().includes("cream"))?'Cream':'North';
         viewedUser=loggedInUser;
+        userSettings.role=loggedInUser==='Cream'?'author':'illustrator';
+        duoPresenceData.North.role='illustrator';
+        duoPresenceData.Cream.role='author';
         initDuoHUDListeners();
         initRealtimeSettingsListener();initGlobalHeaderGlowListener();
         await initAndRecoverMyPomoState();
@@ -89,15 +92,20 @@ function renderDuoHUDCards(){
             statusEl.innerText=note;
         }
 
-        // ZONE 2: Dynamic Title & Level Zone ([Rank Tier] [Work Style] + Lvl X badge)
+        // ZONE 2: Dynamic Title, SVG Class Crest & Level Zone
         const pwr = duoPresenceData[u].powerScore || 0;
         const uLogs = duoPresenceData[u].logs || (u === viewedUser ? currentRawLogsCache : []);
-        const rankDetails = getRankDetails(pwr, uLogs);
+        const rankDetails = getRankDetails(pwr, uLogs, u, s);
+
+        const crestEl = $(`hud-crest-${u.toLowerCase()}`);
+        if(crestEl && typeof renderClassCrest === 'function') {
+            crestEl.innerHTML = renderClassCrest(rankDetails.role, rankDetails.topStats, rankDetails.level, 30);
+        }
 
         const titleEl = $(`hud-title-${u.toLowerCase()}`);
         if(titleEl) {
-            titleEl.innerText = rankDetails.title;
-            titleEl.title = `${rankDetails.title} (30d: ${rankDetails.avgQuality30d ? rankDetails.avgQuality30d.toFixed(1) : '3.0'} Q / ${rankDetails.avgEffort30d ? rankDetails.avgEffort30d.toFixed(1) : '3.0'} E)`;
+            titleEl.innerText = rankDetails.hybridTitle;
+            titleEl.title = `${rankDetails.tierName} • ${rankDetails.hybridTitle} (${rankDetails.roleLabel} — ${rankDetails.domain} Domain)`;
         }
 
         const rankEl = $(`hud-rank-${u.toLowerCase()}`);
@@ -170,8 +178,8 @@ function initGlobalHeaderGlowListener(){
         duoPresenceData.North.logs=nLogs;duoPresenceData.Cream.logs=cLogs;
         duoPresenceData.North.powerScore=calculateLifetimePWR(nLogs);
         duoPresenceData.Cream.powerScore=calculateLifetimePWR(cLogs);
-        duoPresenceData.North.workStyle=calculateRolling30DayQE(nLogs).archetype;
-        duoPresenceData.Cream.workStyle=calculateRolling30DayQE(cLogs).archetype;
+        duoPresenceData.North.workStyle=calculateRolling30DayQE(nLogs,'North',duoPresenceData.North.settings).archetype;
+        duoPresenceData.Cream.workStyle=calculateRolling30DayQE(cLogs,'Cream',duoPresenceData.Cream.settings).archetype;
         renderDuoHUDCards();
     });
 }
@@ -187,7 +195,7 @@ function switchActiveUser(target){viewedUser=target;initRealtimeSettingsListener
 
 function updateUserSwitcherUI(){
     const isSelf=loggedInUser===viewedUser;
-    ['work-form-card','diary-form-card','health-form-card','chore-form-card','workout-form-card','todo-form','pomo-export-toggle-btn'].forEach(id=>{const el=$(id);if(el)el.style.display=isSelf?'block':'none'});
+    ['work-form-card','diary-form-card','health-form-card','chore-form-card','workout-form-card','todo-form','pomo-log-accumulated-btn'].forEach(id=>{const el=$(id);if(el)el.style.display=isSelf?'block':'none'});
     const clearBtn=$('todo-clear-btn');if(clearBtn)clearBtn.style.display=isSelf?'inline-block':'none';
     document.querySelectorAll('#tab-forge input, #tab-forge select').forEach(i=>{i.disabled=!isSelf;i.classList.toggle('opacity-50',!isSelf)});
     document.querySelectorAll('#tab-forge button').forEach(b=>b.style.display=isSelf?'inline-block':'none');
@@ -261,7 +269,7 @@ function loadUserData(){
         if(duoPresenceData[viewedUser]){
             duoPresenceData[viewedUser].powerScore=lifetimePWR;
             duoPresenceData[viewedUser].logs=rawLogs;
-            duoPresenceData[viewedUser].workStyle=calculateRolling30DayQE(rawLogs).archetype;
+            duoPresenceData[viewedUser].workStyle=calculateRolling30DayQE(rawLogs,viewedUser,userSettings).archetype;
         }
         renderDuoHUDCards();
         calculateAndRenderPowerMeter(rawLogs);
