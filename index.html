@@ -398,10 +398,61 @@
                     </div>
                 </div>
 
-                <!-- MAIN WORK & FOCUS HUB (LEFT: STACKED LOG WORK + TASKS | RIGHT: POMODORO TIMER) -->
+                <!-- MAIN WORK & FOCUS HUB (LEFT: POMODORO TIMER | RIGHT: STACKED LOG WORK + TASKS) -->
                 <div id="crucible-hub-grid" class="crucible-hub-grid grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-                    <!-- LEFT COLUMN: STACKED LOG WORK CARD (TOP) + TASKS / TODO CARD (BOTTOM) -->
-                    <div id="crucible-left-col" class="crucible-left-stack lg:col-span-6 flex flex-col gap-6 h-full">
+                    <!-- LEFT COLUMN: POMODORO FOCUS TIMER CARD (MATCHES STACKED RIGHT HEIGHT) -->
+                    <div id="crucible-left-col" class="crucible-left-timer lg:col-span-6 flex flex-col h-full">
+                        <div id="pomo-timer-card" class="card pomo-timer-card p-6 sm:p-7 rounded-2xl text-center flex flex-col justify-between h-full shadow-xl relative overflow-hidden">
+                            <div class="space-y-3.5 shrink-0">
+                                <div id="pomo-spectator-banner" class="hidden p-2 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 font-medium">
+                                    👁️ Viewing <strong><span id="pomo-spectator-target"></span>'s</strong> Timer
+                                </div>
+                                <div id="pomo-mode-box" class="flex justify-center gap-1.5 bg-slate-900/80 p-1.5 rounded-xl border border-slate-700 text-xs w-fit mx-auto">
+                                    <button onclick="handleUserSelectPomoMode('focus')" id="pomo-mode-focus" class="px-4 py-1.5 rounded-lg font-extrabold transition-all theme-accent-btn">Focus</button>
+                                    <button onclick="handleUserSelectPomoMode('short')" id="pomo-mode-short" class="px-4 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition-all">Short Break</button>
+                                    <button onclick="handleUserSelectPomoMode('long')" id="pomo-mode-long" class="px-4 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition-all">Long Break</button>
+                                </div>
+
+                                <div class="flex items-center justify-center gap-2">
+                                    <span class="text-xs uppercase tracking-widest theme-accent-text font-black" id="pomo-round-badge">Round 1 of 4</span>
+                                    <div id="pomo-round-dots" class="flex gap-1.5 ml-2"></div>
+                                </div>
+                            </div>
+
+                            <!-- CENTER CLOCK FACE, INLINE ±15M STEPPERS, STATUS BADGE & PROGRESS BAR -->
+                            <div id="pomo-clock-container" class="pomo-clock-center-zone select-none py-3 my-auto rounded-2xl transition-all flex-1 flex flex-col items-center justify-center gap-3.5">
+                                <div class="flex items-center justify-center gap-3 sm:gap-5 w-full">
+                                    <button type="button" id="pomo-step-minus" onclick="adjustPomoTimerDuration(-15, event)" class="px-3.5 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-amber-400 border border-slate-700 font-mono font-black text-xs sm:text-sm transition-all shadow disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none shrink-0" title="Decrease timer by 15 minutes (persistent)">-15m</button>
+                                    <div onclick="handleClockClick()" class="cursor-pointer group px-3 py-1.5 rounded-2xl hover:bg-slate-800/40 transition-all">
+                                        <div id="pomo-timer-display" class="text-5xl sm:text-6xl xl:text-7xl font-mono font-black theme-accent-text tracking-wider group-hover:scale-105 transition-transform leading-none">25:00</div>
+                                    </div>
+                                    <button type="button" id="pomo-step-plus" onclick="adjustPomoTimerDuration(15, event)" class="px-3.5 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-amber-400 border border-slate-700 font-mono font-black text-xs sm:text-sm transition-all shadow disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none shrink-0" title="Increase timer by 15 minutes (persistent)">+15m</button>
+                                </div>
+                                <div id="pomo-status-label" onclick="handleClockClick()" class="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-900/80 border border-slate-800 text-xs text-slate-300 uppercase tracking-widest font-bold hover:text-amber-300 hover:border-amber-500/40 transition-all">Click Timer or Press Spacebar</div>
+                                <div class="w-full max-w-md mx-auto bg-slate-900/80 h-2.5 rounded-full overflow-hidden border border-slate-700/60 p-0.5 mt-1">
+                                    <div id="pomo-progress-bar" class="theme-accent-bg h-full rounded-full transition-all duration-1000 w-full"></div>
+                                </div>
+                            </div>
+
+                            <!-- BOTTOM CONTROLS & STORED POMODORO FOCUS HOURS -->
+                            <div class="space-y-3.5 shrink-0 pt-2">
+                                <div id="pomo-controls-box" class="flex justify-center gap-3">
+                                    <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="px-8 py-2.5 rounded-xl theme-accent-btn font-extrabold text-xs transition-all shadow-md">Start Focus</button>
+                                    <button onclick="resetMyPomoTimer()" class="px-5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-xs transition-all">Reset</button>
+                                </div>
+
+                                <div class="pt-3 border-t border-slate-800/80 flex items-center justify-center gap-2.5 text-xs text-slate-400">
+                                    <span class="font-medium">Accumulated: <strong id="pomo-unlogged-hours" class="font-mono font-extrabold text-emerald-400">0.0 h</strong></span>
+                                    <button type="button" id="pomo-reset-accumulated-btn" onclick="resetUnloggedFocusTime(event)" title="Reset accumulated focus time" class="px-2 py-0.5 rounded-lg bg-slate-900/90 hover:bg-red-950/50 text-slate-400 hover:text-red-300 border border-slate-800 hover:border-red-500/40 text-[11px] font-bold transition-all inline-flex items-center gap-1">
+                                        <span>🗑️</span> <span>Reset</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: STACKED LOG WORK CARD (TOP) + TASKS / TODO CARD (BOTTOM) -->
+                    <div id="crucible-right-col" class="crucible-right-stack lg:col-span-6 flex flex-col gap-6 h-full">
                         <div id="work-form-card" class="card p-5 sm:p-6 rounded-2xl flex items-center justify-between gap-4 flex-wrap shrink-0">
                             <div class="min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap">
@@ -447,56 +498,6 @@
                         </div>
                     </div>
 
-                    <!-- RIGHT COLUMN: POMODORO FOCUS TIMER CARD (MATCHES STACKED LEFT HEIGHT) -->
-                    <div id="crucible-right-col" class="crucible-right-timer lg:col-span-6 flex flex-col h-full">
-                        <div id="pomo-timer-card" class="card pomo-timer-card p-6 sm:p-7 rounded-2xl text-center flex flex-col justify-between h-full shadow-xl relative overflow-hidden">
-                            <div class="space-y-3.5 shrink-0">
-                                <div id="pomo-spectator-banner" class="hidden p-2 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 font-medium">
-                                    👁️ Viewing <strong><span id="pomo-spectator-target"></span>'s</strong> Timer
-                                </div>
-                                <div id="pomo-mode-box" class="flex justify-center gap-1.5 bg-slate-900/80 p-1.5 rounded-xl border border-slate-700 text-xs w-fit mx-auto">
-                                    <button onclick="handleUserSelectPomoMode('focus')" id="pomo-mode-focus" class="px-4 py-1.5 rounded-lg font-extrabold transition-all theme-accent-btn">Focus</button>
-                                    <button onclick="handleUserSelectPomoMode('short')" id="pomo-mode-short" class="px-4 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition-all">Short Break</button>
-                                    <button onclick="handleUserSelectPomoMode('long')" id="pomo-mode-long" class="px-4 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition-all">Long Break</button>
-                                </div>
-                                
-                                <div class="flex items-center justify-center gap-2">
-                                    <span class="text-xs uppercase tracking-widest theme-accent-text font-black" id="pomo-round-badge">Round 1 of 4</span>
-                                    <div id="pomo-round-dots" class="flex gap-1.5 ml-2"></div>
-                                </div>
-                            </div>
-
-                            <!-- CENTER CLOCK FACE, INLINE ±15M STEPPERS, STATUS BADGE & PROGRESS BAR -->
-                            <div id="pomo-clock-container" class="pomo-clock-center-zone select-none py-3 my-auto rounded-2xl transition-all flex-1 flex flex-col items-center justify-center gap-3.5">
-                                <div class="flex items-center justify-center gap-3 sm:gap-5 w-full">
-                                    <button type="button" id="pomo-step-minus" onclick="adjustPomoTimerDuration(-15, event)" class="px-3.5 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-amber-400 border border-slate-700 font-mono font-black text-xs sm:text-sm transition-all shadow disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none shrink-0" title="Decrease timer by 15 minutes (persistent)">-15m</button>
-                                    <div onclick="handleClockClick()" class="cursor-pointer group px-3 py-1.5 rounded-2xl hover:bg-slate-800/40 transition-all">
-                                        <div id="pomo-timer-display" class="text-5xl sm:text-6xl xl:text-7xl font-mono font-black theme-accent-text tracking-wider group-hover:scale-105 transition-transform leading-none">25:00</div>
-                                    </div>
-                                    <button type="button" id="pomo-step-plus" onclick="adjustPomoTimerDuration(15, event)" class="px-3.5 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-amber-400 border border-slate-700 font-mono font-black text-xs sm:text-sm transition-all shadow disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none shrink-0" title="Increase timer by 15 minutes (persistent)">+15m</button>
-                                </div>
-                                <div id="pomo-status-label" onclick="handleClockClick()" class="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-900/80 border border-slate-800 text-xs text-slate-300 uppercase tracking-widest font-bold hover:text-amber-300 hover:border-amber-500/40 transition-all">Click Timer or Press Spacebar</div>
-                                <div class="w-full max-w-md mx-auto bg-slate-900/80 h-2.5 rounded-full overflow-hidden border border-slate-700/60 p-0.5 mt-1">
-                                    <div id="pomo-progress-bar" class="theme-accent-bg h-full rounded-full transition-all duration-1000 w-full"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- BOTTOM CONTROLS & STORED POMODORO FOCUS HOURS -->
-                            <div class="space-y-3.5 shrink-0 pt-2">
-                                <div id="pomo-controls-box" class="flex justify-center gap-3">
-                                    <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="px-8 py-2.5 rounded-xl theme-accent-btn font-extrabold text-xs transition-all shadow-md">Start Focus</button>
-                                    <button onclick="resetMyPomoTimer()" class="px-5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-xs transition-all">Reset</button>
-                                </div>
-
-                                <div class="pt-3 border-t border-slate-800/80 flex items-center justify-center gap-2.5 text-xs text-slate-400">
-                                    <span class="font-medium">Accumulated: <strong id="pomo-unlogged-hours" class="font-mono font-extrabold text-emerald-400">0.0 h</strong></span>
-                                    <button type="button" id="pomo-reset-accumulated-btn" onclick="resetUnloggedFocusTime(event)" title="Reset accumulated focus time" class="px-2 py-0.5 rounded-lg bg-slate-900/90 hover:bg-red-950/50 text-slate-400 hover:text-red-300 border border-slate-800 hover:border-red-500/40 text-[11px] font-bold transition-all inline-flex items-center gap-1">
-                                        <span>🗑️</span> <span>Reset</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                         <!-- PRIMARY LOG WORK MODAL OVERLAY -->
@@ -1071,7 +1072,6 @@
     <script src="js/pomodoro.js"></script>
     <script src="js/charts.js"></script>
     <script src="js/journal.js"></script>
-    <script src="js/announcerQuotes.js"></script>
     <script src="js/ledger.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/app.js"></script>

@@ -161,6 +161,59 @@ function _buildChronicleStatBadges(l){
     }
     return `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold bg-amber-500/15 text-amber-300 border border-amber-500/30">📖 WIS Chronicle</span><span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold bg-purple-500/15 text-purple-300 border border-purple-500/30">✨ Lore Entry</span>`;
 }
+function formatActivityCategoryTag(l) {
+    const role = typeof getUserRole === 'function'
+        ? getUserRole(l?.role || l?.user || viewedUser)
+        : ((l?.user || viewedUser) === 'Cream' ? 'author' : 'illustrator');
+
+    if (l.type === 'work') {
+        const dur = formatActivityDuration(l.hours || 0);
+        const q = parseFloat(l.results) || 3;
+        const e = parseFloat(l.effort) || 3;
+        const categoryLabel = role === 'author' ? '✒️ Writing' : '🎨 Illustration';
+        return {
+            title: role === 'author' ? '✒️ Writing Session' : '🎨 Illustration Session',
+            tagText: `${categoryLabel} • ${dur} (Quality ${q} • Effort ${e})`,
+            shortTagText: `${categoryLabel} • ${dur} (Quality ${q})`,
+            durationLabel: dur
+        };
+    }
+    if (l.type === 'workout') {
+        const dur = formatActivityDuration(l.hours || 0);
+        const strain = parseInt(l.strain) || 3;
+        return {
+            title: '🏃 Sanctuary Fitness',
+            tagText: `🏃 Fitness • ${dur} (Intensity ${strain})`,
+            shortTagText: `🏃 Fitness • ${dur}`,
+            durationLabel: dur
+        };
+    }
+    if (l.type === 'chore') {
+        const dur = formatActivityDuration(l.hours || 0);
+        return {
+            title: '🧹 Sanctuary Chore',
+            tagText: `🧹 Chores • ${dur}`,
+            shortTagText: `🧹 Chores • ${dur}`,
+            durationLabel: dur
+        };
+    }
+    if (l.type === 'health') {
+        const lvl = parseInt(l.level) || 1;
+        return {
+            title: '🍨 Sanctuary Treat',
+            tagText: `🍨 Recovery • Level ${lvl}`,
+            shortTagText: `🍨 Recovery • Level ${lvl}`,
+            durationLabel: `Level ${lvl}`
+        };
+    }
+    return {
+        title: '📖 Chronicle Reflection',
+        tagText: '📖 Reflection • Journal Entry',
+        shortTagText: '📖 Reflection • Journal Entry',
+        durationLabel: 'Journal Entry'
+    };
+}
+
 function _renderChronicleCardHtml(l,idx,isSelf,pointRate,diaryByDay){
     const d=getLogDate(l);
     const dayKey=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
@@ -170,30 +223,31 @@ function _renderChronicleCardHtml(l,idx,isSelf,pointRate,diaryByDay){
     const scoresOnDay=typeof computeStatScoresFromLogs==='function'?computeStatScoresFromLogs(logsUpToDay,userSettings,30,endOfDayMs):{};
     const roleOnDay=typeof getUserRole==='function'?getUserRole(l.role||l.user||viewedUser):'illustrator';
     const classTitleOnDay=typeof getHybridClassTitle==='function'?getHybridClassTitle(roleOnDay,scoresOnDay):'Grand Virtuoso';
-    const topStatsOnDay=typeof getTopStatKeysFromMap==='function'?getTopStatKeysFromMap(scoresOnDay,roleOnDay):['DEX','WIS'];
     const rankOnDay=getRankDetails(pwrOnDay,logsUpToDay,roleOnDay,userSettings);
-    const crestSvg=typeof renderClassCrest==='function'?renderClassCrest(roleOnDay,topStatsOnDay,rankOnDay.level,38):'';
 
     const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     const timeStr=d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
 
-    let typeLabel='⚗️ Work Session',durationLabel=`${formatHours(l.hours||0)} hrs`,accentBadge='';
-    if(l.type==='work'){
-        const earned=Math.round((l.points||0)*pointRate);
-        accentBadge=`<span class="text-xs font-mono font-black text-emerald-400">+฿${earned.toLocaleString()}</span>`;
-    }else if(l.type==='workout'){typeLabel='🏃 Sanctuary Fitness';durationLabel=`${formatHours(l.hours||0)} hrs`}
-    else if(l.type==='chore'){typeLabel='🧹 Sanctuary Chore';durationLabel=`${formatHours(l.hours||0)} hrs`}
-    else if(l.type==='health'){typeLabel='🍨 Sanctuary Treat';durationLabel=`Level ${l.level||1}`}
-    else if(l.type==='diary'){typeLabel='📖 Historical Reflection';durationLabel='Journal Entry'}
-
+    const activityMeta = formatActivityCategoryTag(l);
     const directReflection=(l.reflectionText||l.text||l.note||'').trim();
     const linkedDiary=directReflection?'':(diaryByDay[dayKey]||'').trim();
     const backText=directReflection||linkedDiary;
     const hasNote=Boolean(backText);
-    const cardDomId=`chronicle-card-${l.id||idx}`;
-    const delBtn=(isSelf&&l.id)?`<button type="button" onclick="deleteLogEntry('${l.id}', event)" class="text-[10px] text-red-400 font-bold px-2 py-0.5 rounded bg-red-500/10 hover:bg-red-500/25">Delete</button>`:'';
 
-    return `<div id="${cardDomId}" onclick="toggleChronicleCardFlip('${cardDomId}', event)" class="chronicle-flip-card cursor-pointer select-none"><div class="chronicle-flip-card-inner"><div class="chronicle-flip-card-front p-4 rounded-2xl bg-slate-900/90 border border-slate-800/90 flex flex-col justify-between gap-3"><div class="flex items-center justify-between gap-2 border-b border-slate-800/80 pb-2"><div class="flex items-center gap-2 min-w-0"><span class="text-[11px] font-black text-slate-200 truncate">${typeLabel}</span><span class="text-[10px] font-mono text-slate-400">• ${dateStr}</span></div><div class="flex items-center gap-2 shrink-0">${accentBadge}${delBtn}</div></div><div class="flex items-center justify-between gap-3 py-0.5"><div class="flex items-center gap-2.5 min-w-0"><div class="p-1 rounded-xl bg-slate-950/90 border border-slate-800 shrink-0">${crestSvg}</div><div class="min-w-0"><div class="text-xs font-black theme-accent-text truncate">${escapeHtml(classTitleOnDay)}</div><div class="text-[10px] font-mono text-slate-400">Lvl ${rankOnDay.level} • ${rankOnDay.tierName}</div></div></div><div class="text-right shrink-0"><div class="text-sm font-black font-mono text-white">${durationLabel}</div><div class="text-[9px] font-mono text-slate-500">${timeStr}</div></div></div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/60 flex-wrap"><div class="flex items-center gap-1.5 flex-wrap">${_buildChronicleStatBadges(l)}</div><span class="text-[9px] font-bold ${hasNote?'text-amber-300':'text-slate-500'} font-mono shrink-0">${hasNote?'✍️ Flip for Reflection ↻':'↻ Flip Card'}</span></div></div><div class="chronicle-flip-card-back p-4 rounded-2xl bg-slate-950/95 border border-amber-500/35 flex flex-col justify-between gap-2.5"><div class="flex items-center justify-between gap-2 border-b border-slate-800 pb-2"><span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-1.5"><span>📜</span> <span>${l.type==='diary'?'Diary Reflection':(directReflection?'Session Reflection':'Daily Reflection')} • ${dateStr}</span></span><div class="flex items-center gap-2"><span class="text-[10px] font-mono text-slate-400">${escapeHtml(classTitleOnDay)}</span>${delBtn}</div></div><div class="flex-1 flex items-center overflow-y-auto custom-scroll py-1">${hasNote?`<p class="text-xs text-slate-200 italic leading-relaxed break-words">"${escapeHtml(backText)}"</p>`:`<p class="text-xs text-slate-500 italic">No reflection text recorded for this entry.</p>`}</div><div class="flex items-center justify-between text-[9px] font-mono text-slate-500 border-t border-slate-900 pt-1.5"><span>${typeLabel} (${durationLabel})</span><span>Tap to flip back ↺</span></div></div></div></div>`;
+    const primaryTitle = (l.type === 'health' && l.note && l.note.trim())
+        ? `🍨 ${escapeHtml(l.note.trim())}`
+        : activityMeta.title;
+
+    let accentBadge='';
+    if(l.type==='work'){
+        const earned=Math.round((l.points||0)*pointRate);
+        accentBadge=`<span class="px-2 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-[11px] font-mono font-black text-emerald-400 whitespace-nowrap">+฿${earned.toLocaleString()}</span>`;
+    }
+
+    const cardDomId=`chronicle-card-${l.id||idx}`;
+    const delBtn=(isSelf&&l.id)?`<button type="button" onclick="deleteLogEntry('${l.id}', event)" title="Delete entry" aria-label="Delete entry" class="chronicle-delete-btn w-6 h-6 rounded-lg flex items-center justify-center text-sm font-black leading-none text-slate-400 hover:text-red-300 bg-slate-800/70 hover:bg-red-500/20 border border-slate-700/70 hover:border-red-500/40 shrink-0">&times;</button>`:'';
+
+    return `<div id="${cardDomId}" onclick="toggleChronicleCardFlip('${cardDomId}', event)" class="chronicle-flip-card cursor-pointer select-none"><div class="chronicle-flip-card-inner"><div class="chronicle-flip-card-front p-4 sm:p-5 rounded-2xl bg-slate-900/95 border border-slate-800/90 flex flex-col justify-between gap-3.5"><div class="space-y-2 border-b border-slate-800/80 pb-3"><div class="text-sm font-black text-slate-100 leading-snug break-words">${primaryTitle}</div><div class="flex items-center justify-between gap-2 flex-wrap"><div class="flex items-center gap-1.5 text-[11px] font-mono text-slate-400 whitespace-nowrap"><span>${dateStr}</span><span class="text-slate-600">•</span><span>${timeStr}</span></div><div class="flex items-center gap-2 shrink-0">${accentBadge}${delBtn}</div></div></div><div class="space-y-2.5"><div class="guild-activity-type-tag w-full justify-between flex-wrap"><span class="text-xs font-extrabold text-amber-200 leading-snug">${escapeHtml(activityMeta.tagText)}</span><span class="text-[10px] font-mono font-bold text-slate-400 whitespace-nowrap">Lvl ${rankOnDay.level} • ${escapeHtml(classTitleOnDay)}</span></div>${directReflection ? `<p class="text-xs text-slate-300 leading-relaxed break-words">${escapeHtml(directReflection)}</p>` : ''}</div><div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-800/60 flex-wrap"><div class="flex items-center gap-1.5 flex-wrap">${_buildChronicleStatBadges(l)}</div></div></div><div class="chronicle-flip-card-back p-4 sm:p-5 rounded-2xl bg-slate-950/95 border border-amber-500/35 flex flex-col justify-between gap-3"><div class="space-y-1.5 border-b border-slate-800 pb-2.5"><div class="flex items-center justify-between gap-2"><span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-1.5"><span>📜</span> <span>${l.type==='diary'?'Diary Reflection':(directReflection?'Session Reflection':'Daily Reflection')}</span></span><div class="flex items-center gap-2 shrink-0"><span class="text-[11px] font-mono text-slate-400 whitespace-nowrap">${dateStr}</span>${delBtn}</div></div><div class="text-[11px] font-mono text-slate-400">${escapeHtml(classTitleOnDay)} • Lvl ${rankOnDay.level} ${escapeHtml(rankOnDay.tierName)}</div></div><div class="flex-1 flex items-center overflow-y-auto custom-scroll py-1">${hasNote?`<p class="text-xs text-slate-200 italic leading-relaxed break-words">"${escapeHtml(backText)}"</p>`:`<p class="text-xs text-slate-500 italic">No reflection text recorded for this entry.</p>`}</div><div class="flex items-center justify-between gap-2 text-[10px] font-mono text-slate-400 border-t border-slate-900 pt-2 flex-wrap"><span>${escapeHtml(activityMeta.shortTagText)}</span></div></div></div></div>`;
 }
 
 
@@ -231,7 +285,7 @@ function renderLedgerLists(logs){
 }
 
 // ============================================================================
-// PART 1: SANCTUARY GUILD ACTIVITY FEED SHOWCASE, ANNOUNCER ENGINE & SPAMMABLE REACTIONS
+// PART 1: SANCTUARY GUILD ACTIVITY FEED SHOWCASE & SPAMMABLE REACTIONS
 // ============================================================================
 
 const GUILD_REACTION_EMOJIS = ['☕', '👏', '🔥'];
@@ -452,12 +506,7 @@ function _renderGuildActivityCardHtml(log, idx) {
     const safeCardDomId = cardId.replace(/[^a-zA-Z0-9_-]/g, '_');
     const { userName, avatarUrl, actionSummary, timeAgo } = formatGuildActivityHeaderInfo(log);
     const statPill = getActivityCardStatGainPill(log);
-
-    const q = parseFloat(log.results) || (log.type === 'workout' ? (parseFloat(log.strain) || 3) : 3);
-    const e = parseFloat(log.effort) || (log.type === 'workout' ? (parseFloat(log.strain) || 3) : 3);
-    const announcerQuote = typeof getAnnouncerComment === 'function'
-        ? getAnnouncerComment(log.type, q, e, cardId)
-        : 'Another solid session logged for the craft.';
+    const activityMeta = formatActivityCategoryTag(log);
 
     const counts = getEffectiveReactionsForTarget(log);
     const reactionButtonsHtml = GUILD_REACTION_EMOJIS.map(emoji => {
@@ -479,7 +528,7 @@ function _renderGuildActivityCardHtml(log, idx) {
     }).join('');
 
     return `
-        <article class="guild-activity-card space-y-2" data-activity-card-id="${escapeHtml(cardId)}">
+        <article class="guild-activity-card space-y-2.5" data-activity-card-id="${escapeHtml(cardId)}">
             <div class="flex items-start justify-between gap-2">
                 <div class="flex items-center gap-2.5 min-w-0">
                     <img src="${avatarUrl}" alt="${userName}" class="guild-card-avatar" loading="lazy">
@@ -495,14 +544,11 @@ function _renderGuildActivityCardHtml(log, idx) {
                     ${escapeHtml(statPill.label)}
                 </span>
             </div>
-            <div class="guild-announcer-box">
-                <p class="text-[11px] text-amber-100/90 italic leading-snug font-medium">
-                    “${escapeHtml(announcerQuote)}”
-                </p>
-            </div>
-            <div class="flex items-center justify-between gap-1.5 pt-0.5">
-                <span class="text-[9px] font-mono uppercase tracking-wider text-slate-500 font-bold">🎙️ Announcer</span>
-                <div class="flex items-center gap-1.5 shrink-0">
+            <div class="flex items-center justify-between gap-2 pt-0.5 flex-wrap">
+                <div class="guild-activity-type-tag">
+                    <span class="text-[11px] font-extrabold text-amber-200 leading-snug">${escapeHtml(activityMeta.shortTagText)}</span>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0 ml-auto">
                     ${reactionButtonsHtml}
                 </div>
             </div>
