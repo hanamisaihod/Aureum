@@ -225,12 +225,66 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
     const wilVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-wilRaw / 42)))));
 
     const stats = [
-        { key: 'STR', name: 'Strength', icon: '⚔️', val: strVal, color: '#ef4444', detail: `${formatHours(workoutHours)}h Fitness • ${formatHours(heavyWorkHours)}h High-Strain` },
-        { key: 'DEX', name: 'Dexterity', icon: '🎯', val: dexVal, color: '#10b981', detail: `${avgQ.toFixed(1)}/5 Craft • ${masteryMultStr} Mastery` },
-        { key: 'INT', name: 'Intelligence', icon: '🧠', val: intVal, color: '#38bdf8', detail: `${formatHours(totalWorkHours)}h Work • ${pomoList.length} Focus Rnds` },
-        { key: 'VIT', name: 'Vitality', icon: '🛡️', val: vitVal, color: '#f59e0b', detail: `${formatHours(totalChoreHours)}h Chores • ${balancedDays}d Paced` },
-        { key: 'WIS', name: 'Wisdom', icon: '📖', val: wisVal, color: '#a855f7', detail: `${diaryLogs.length} Chronicles • ${unlockedBadges.length} Relics` },
-        { key: 'WIL', name: 'Willpower', icon: '🔥', val: wilVal, color: '#f97316', detail: `${sortedDays.length}d Active • ${bestStreak}d Best Streak` }
+        {
+            key: 'STR',
+            name: 'Strength',
+            icon: '⚔️',
+            val: strVal,
+            color: '#ef4444',
+            detail: `${formatHours(workoutHours)}h Fitness | ${formatHours(heavyWorkHours)}h High-Strain`,
+            description: 'Measures physical conditioning, athletic exertion, and capacity for high-strain output.',
+            actionGuide: '⚡ Log Fitness workouts with higher strain or complete high-effort Work Shifts (Effort >= 4.0) to build raw strength.'
+        },
+        {
+            key: 'DEX',
+            name: 'Dexterity',
+            icon: '🎯',
+            val: dexVal,
+            color: '#10b981',
+            detail: `${avgQ.toFixed(1)} / 5 Craft | ${masteryMultStr} Mastery`,
+            description: 'Measures precision, fine craft, and high-quality execution standards.',
+            actionGuide: '⚡ Log Focus Shifts with Quality >= 4.0 and Effort >= 3.5 to earn maximum 1.25x Mastery EXP.'
+        },
+        {
+            key: 'INT',
+            name: 'Intelligence',
+            icon: '🧠',
+            val: intVal,
+            color: '#38bdf8',
+            detail: `${formatHours(totalWorkHours)}h Work | ${pomoList.length} Focus Rnds`,
+            description: 'Measures cognitive depth, sustained concentration, and uninterrupted deep-work mastery.',
+            actionGuide: '⚡ Complete unbroken Hourglass Focus rounds without pausing and accumulate Deep Work hours.'
+        },
+        {
+            key: 'VIT',
+            name: 'Vitality',
+            icon: '🛡️',
+            val: vitVal,
+            color: '#f59e0b',
+            detail: `${formatHours(totalChoreHours)}h Chores | ${balancedDays}d Paced`,
+            description: 'Measures life maintenance, environmental order, and sustainable daily work pacing.',
+            actionGuide: '⚡ Log Sanctuary Chores, track Health metrics, and maintain balanced work days within your daily soft cap.'
+        },
+        {
+            key: 'WIS',
+            name: 'Wisdom',
+            icon: '📖',
+            val: wisVal,
+            color: '#a855f7',
+            detail: `${diaryLogs.length} Chronicles | ${unlockedBadges.length} Relics`,
+            description: 'Measures self-reflection, synthesis of lived experience, and milestone mastery.',
+            actionGuide: '⚡ Write Journal Chronicles to reflect on your days and unlock Relics across all disciplines.'
+        },
+        {
+            key: 'WIL',
+            name: 'Willpower',
+            icon: '🔥',
+            val: wilVal,
+            color: '#f97316',
+            detail: `${sortedDays.length}d Active | ${bestStreak}d Best Streak`,
+            description: 'Measures relentless consistency, daily discipline, and long-term streak resilience.',
+            actionGuide: '⚡ Show up daily to extend your active streak and hit your daily focus soft cap consistently.'
+        }
     ];
 
     const avgStat = Math.round(stats.reduce((s, x) => s + x.val, 0) / stats.length);
@@ -246,47 +300,254 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
         WIL: 'Unyielding Sovereign (Endurance)'
     };
 
-    return { stats, avgStat, powerLevel, overallGrade, dominantSpecialty: `${topStat.icon} ${specialtyMap[topStat.key] || topStat.name}` };
+    return {
+        stats,
+        avgStat,
+        powerLevel,
+        overallGrade,
+        dominantSpecialty: `${topStat.icon} ${specialtyMap[topStat.key] || topStat.name}`,
+        level: rankInfo?.level || 1,
+        tierName: rankInfo?.tierName || 'Initiate',
+        workStyle: rankInfo?.workStyle || 'Tactician',
+        rankTitle: rankInfo?.title || 'Initiate Tactician'
+    };
 }
 
+let activePowerMatrixData = null;
+let activePowerMatrixPinnedKey = null;
+
 function renderRPGAbilitiesCard(abilities) {
+    activePowerMatrixData = abilities;
+    activePowerMatrixPinnedKey = null;
+
     const stats = abilities.stats;
-    const cx = 115, cy = 105, maxR = 68;
+    const vbW = 440, vbH = 360;
+    const cx = 220, cy = 180, maxR = 116;
     const angles = [-90, -30, 30, 90, 150, 210].map(deg => (deg * Math.PI) / 180);
 
     const rings = [0.25, 0.5, 0.75, 1.0].map(scale => {
         const pts = angles.map(a => `${(cx + Math.cos(a) * maxR * scale).toFixed(1)},${(cy + Math.sin(a) * maxR * scale).toFixed(1)}`).join(' ');
-        return `<polygon points="${pts}" fill="none" stroke="rgba(148,163,184,0.18)" stroke-width="1" ${scale === 1 ? 'stroke-dasharray="none"' : 'stroke-dasharray="2,2"'} />`;
+        return `<polygon points="${pts}" fill="${scale === 1 ? 'rgba(15,23,42,0.35)' : 'none'}" stroke="${scale === 1 ? 'rgba(251,191,36,0.32)' : 'rgba(148,163,184,0.18)'}" stroke-width="${scale === 1 ? '1.4' : '1'}" ${scale === 1 ? 'stroke-dasharray="none"' : 'stroke-dasharray="3,3"'} />`;
     }).join('');
 
-    const axes = angles.map(a =>
-        `<line x1="${cx}" y1="${cy}" x2="${(cx + Math.cos(a) * maxR).toFixed(1)}" y2="${(cy + Math.sin(a) * maxR).toFixed(1)}" stroke="rgba(148,163,184,0.22)" stroke-width="1" />`
-    ).join('');
+    const axes = stats.map((st, i) => {
+        const a = angles[i];
+        const x2 = (cx + Math.cos(a) * maxR).toFixed(1);
+        const y2 = (cy + Math.sin(a) * maxR).toFixed(1);
+        return `<line id="power-matrix-axis-${st.key}" data-stat="${st.key}" class="power-matrix-axis" style="--active-stat-color:${st.color}" x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="rgba(148,163,184,0.28)" stroke-width="1.25" stroke-linecap="round" />`;
+    }).join('');
 
     const dataCoords = stats.map((st, i) => {
-        const ratio = Math.max(0.12, Math.min(1, st.val / 99));
-        return { x: cx + Math.cos(angles[i]) * maxR * ratio, y: cy + Math.sin(angles[i]) * maxR * ratio, st };
+        const ratio = Math.max(0.14, Math.min(1, st.val / 99));
+        const x = cx + Math.cos(angles[i]) * maxR * ratio;
+        const y = cy + Math.sin(angles[i]) * maxR * ratio;
+        const labelR = maxR + 40;
+        const lx = cx + Math.cos(angles[i]) * labelR;
+        const ly = cy + Math.sin(angles[i]) * labelR;
+        return { x, y, lx, ly, st, i, g: getStatGrade(st.val) };
     });
 
     const dataPolygonPts = dataCoords.map(c => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
-    const vertexDots = dataCoords.map(c =>
-        `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="3.5" fill="${c.st.color}" stroke="#0f172a" stroke-width="1.5" />`
-    ).join('');
 
-    const labelNodes = stats.map((st, i) => {
-        const labelR = maxR + 22;
-        const lx = (cx + Math.cos(angles[i]) * labelR).toFixed(1);
-        const ly = cy + Math.sin(angles[i]) * labelR;
-        return `<text x="${lx}" y="${(ly - 3).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" fill="#e2e8f0" font-size="9.5" font-weight="900" font-family="monospace">${st.key}</text><text x="${lx}" y="${(ly + 8).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" fill="${st.color}" font-size="9" font-weight="800" font-family="monospace">${st.val}</text>`;
-    }).join('');
-
-    const statBarsHtml = stats.map(st => {
-        const g = getStatGrade(st.val);
-        return `<div class="p-2 rounded-lg bg-slate-950/70 border border-slate-800/90 space-y-1"><div class="flex items-center justify-between text-xs"><div class="flex items-center gap-1.5 min-w-0"><span class="text-sm shrink-0">${st.icon}</span><span class="font-black text-slate-100 text-[11px] font-mono">${st.key}</span><span class="text-[10px] text-slate-400 font-semibold truncate">${st.name}</span></div><div class="flex items-center gap-1.5 shrink-0 font-mono"><span class="text-[9px] font-black px-1.5 py-0.2 rounded" style="background:${g.bg};color:${g.color};border:1px solid ${g.border}">${g.grade}</span><span class="text-xs font-black text-white">${st.val}<span class="text-[9px] text-slate-500">/99</span></span></div></div><div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800"><div class="h-full rounded-full transition-all duration-500" style="width:${Math.min(100, Math.round((st.val / 99) * 100))}%;background:${st.color}"></div></div><div class="text-[9px] text-slate-400 font-mono truncate">${st.detail}</div></div>`;
+    const interactiveNodes = dataCoords.map(c => {
+        const vx = c.x.toFixed(1), vy = c.y.toFixed(1);
+        const lx = c.lx.toFixed(1), ly = c.ly.toFixed(1);
+        const pillX = (c.lx - 34).toFixed(1), pillY = (c.ly - 17).toFixed(1);
+        const key = c.st.key;
+        return `<g class="power-matrix-node-group" data-stat="${key}" style="--stat-color:${c.st.color}" tabindex="0" role="button" aria-label="${c.st.name} (${key}) ${c.g.grade}${c.st.val} out of 99" onmouseenter="handlePowerMatrixNodeHover('${key}', event)" onmouseleave="handlePowerMatrixNodeLeave('${key}', event)" onclick="handlePowerMatrixNodeTap('${key}', event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handlePowerMatrixNodeTap('${key}', event);}"><circle class="power-matrix-dot-halo" cx="${vx}" cy="${vy}" r="12" fill="${c.st.color}" fill-opacity="0.28" stroke="${c.st.color}" stroke-width="1.5" /><circle class="power-matrix-dot" cx="${vx}" cy="${vy}" r="6" fill="${c.st.color}" stroke="#0f172a" stroke-width="2" /><circle cx="${vx}" cy="${vy}" r="20" fill="transparent" /><rect class="power-matrix-label-pill" x="${pillX}" y="${pillY}" width="68" height="34" rx="8" fill="rgba(15,23,42,0.92)" stroke="rgba(148,163,184,0.28)" stroke-width="1.2" /><text x="${lx}" y="${(c.ly - 6).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" fill="#f8fafc" font-size="11" font-weight="900" font-family="monospace">${c.st.icon} ${key}</text><text x="${lx}" y="${(c.ly + 8.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" fill="${c.st.color}" font-size="10.5" font-weight="800" font-family="monospace">${c.g.grade}${c.st.val}<tspan fill="#64748b" font-size="8.5">/99</tspan></text></g>`;
     }).join('');
 
     const og = abilities.overallGrade;
-    return `<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-800"><div><div class="flex items-center gap-2"><span class="text-xs font-black uppercase tracking-wider text-slate-100">⚡ Aureate Ability Matrix &amp; Stats</span><span class="text-[10px] font-black font-mono px-2 py-0.5 rounded" style="background:${og.bg};color:${og.color};border:1px solid ${og.border}">CLASS ${og.grade} • AVG ${abilities.avgStat}</span></div><div class="text-[11px] text-amber-300/90 font-semibold mt-0.5">Specialty: ${abilities.dominantSpecialty}</div></div><div class="bg-slate-950/90 border border-amber-500/40 rounded-xl px-3 py-1.5 text-right shrink-0"><div class="text-[9px] uppercase tracking-widest font-extrabold text-slate-400">Combat Power Level</div><div class="text-base font-black font-mono text-amber-400">⚡ ${abilities.powerLevel.toLocaleString()} <span class="text-[10px] text-amber-200/80">PWR</span></div></div></div><div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center pt-1"><div class="sm:col-span-5 flex flex-col items-center justify-center bg-slate-950/60 rounded-xl border border-slate-800/80 p-2"><svg viewBox="0 0 230 210" class="w-full max-w-[220px] h-auto select-none overflow-visible"><defs><radialGradient id="abilityRadarGrad" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f59e0b" stop-opacity="0.48" /><stop offset="100%" stop-color="#38bdf8" stop-opacity="0.20" /></radialGradient></defs>${rings}${axes}<polygon points="${dataPolygonPts}" fill="url(#abilityRadarGrad)" stroke="#fbbf24" stroke-width="2" stroke-linejoin="round" />${vertexDots}${labelNodes}</svg><div class="text-[9px] font-mono text-slate-400 text-center -mt-1">6-Axis Attribute Radar (1–99 Scale)</div></div><div class="sm:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-2">${statBarsHtml}</div></div>`;
+    return `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-800/90">
+            <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-sm sm:text-base font-black uppercase tracking-wider text-slate-100">⚡ Power Matrix</span>
+                    <span class="text-[10px] font-black font-mono px-2 py-0.5 rounded" style="background:${og.bg};color:${og.color};border:1px solid ${og.border}">CLASS ${og.grade} • AVG ${abilities.avgStat}</span>
+                </div>
+                <div class="text-[11px] text-slate-300 font-semibold mt-0.5 flex items-center gap-1.5 flex-wrap">
+                    <span class="text-amber-300 font-bold">Lvl ${abilities.level} • ${escapeHtml(abilities.rankTitle)}</span>
+                    <span class="text-slate-600">•</span>
+                    <span class="text-amber-300/90">Specialty: ${abilities.dominantSpecialty}</span>
+                </div>
+            </div>
+            <div class="bg-slate-950/90 border border-amber-500/40 rounded-xl px-3.5 py-1.5 text-left sm:text-right shrink-0">
+                <div class="text-[9px] uppercase tracking-widest font-extrabold text-slate-400">Combat Power Level</div>
+                <div class="text-base sm:text-lg font-black font-mono text-amber-400">⚡ ${abilities.powerLevel.toLocaleString()} <span class="text-[10px] text-amber-200/80">PWR</span></div>
+            </div>
+        </div>
+        <div id="power-matrix-stage" class="power-matrix-stage bg-slate-950/70 rounded-2xl border border-slate-800/90 p-2 sm:p-4 flex flex-col items-center justify-center" onclick="handlePowerMatrixStageClick(event)">
+            <svg id="power-matrix-svg" viewBox="0 0 ${vbW} ${vbH}" class="w-full max-w-[560px] h-auto select-none overflow-visible">
+                <defs>
+                    <radialGradient id="abilityRadarGrad" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.50" />
+                        <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.22" />
+                    </radialGradient>
+                </defs>
+                ${rings}
+                ${axes}
+                <circle cx="${cx}" cy="${cy}" r="2.5" fill="rgba(251,191,36,0.55)" />
+                <polygon points="${dataPolygonPts}" fill="url(#abilityRadarGrad)" stroke="#fbbf24" stroke-width="2.4" stroke-linejoin="round" />
+                ${interactiveNodes}
+            </svg>
+            <div class="text-[10px] font-mono text-slate-400 text-center mt-1 flex items-center justify-center gap-1.5">
+                <span>✨ Hover or tap any stat node for live breakdown &amp; leveling guide</span>
+            </div>
+            <div id="power-matrix-tooltip" class="power-matrix-tooltip hidden p-3.5 text-left" role="tooltip" onclick="event.stopPropagation()"></div>
+        </div>
+    `;
+}
+
+function getPowerMatrixStatCoords(statKey) {
+    if (!activePowerMatrixData || !Array.isArray(activePowerMatrixData.stats)) return null;
+    const idx = activePowerMatrixData.stats.findIndex(s => s.key === statKey);
+    if (idx === -1) return null;
+    const st = activePowerMatrixData.stats[idx];
+    const vbW = 440, vbH = 360;
+    const cx = 220, cy = 180, maxR = 116;
+    const angle = ([-90, -30, 30, 90, 150, 210][idx] * Math.PI) / 180;
+    const ratio = Math.max(0.14, Math.min(1, st.val / 99));
+    const vx = cx + Math.cos(angle) * maxR * ratio;
+    const vy = cy + Math.sin(angle) * maxR * ratio;
+    return { st, idx, vx, vy, vbW, vbH, g: getStatGrade(st.val) };
+}
+
+function renderPowerMatrixTooltip(statKey) {
+    const stage = $('power-matrix-stage');
+    const tooltip = $('power-matrix-tooltip');
+    if (!stage || !tooltip) return;
+
+    const info = getPowerMatrixStatCoords(statKey);
+    if (!info) {
+        hidePowerMatrixTooltip();
+        return;
+    }
+
+    const { st, vx, vy, vbW, vbH, g } = info;
+
+    stage.classList.add('has-active-stat');
+    stage.querySelectorAll('.power-matrix-node-group').forEach(el => {
+        el.classList.toggle('is-active', el.getAttribute('data-stat') === statKey);
+    });
+    stage.querySelectorAll('.power-matrix-axis').forEach(el => {
+        const isMatch = el.getAttribute('data-stat') === statKey;
+        el.classList.toggle('is-active', isMatch);
+        el.setAttribute('stroke', isMatch ? st.color : 'rgba(148,163,184,0.28)');
+    });
+
+    tooltip.style.setProperty('--tooltip-accent', st.color);
+    tooltip.style.border = `1.5px solid ${st.color}`;
+    tooltip.innerHTML = `
+        <div class="space-y-2">
+            <div class="flex items-center justify-between gap-2 border-b border-slate-800 pb-1.5">
+                <div class="text-xs font-black text-slate-100 leading-tight">
+                    <span>${st.icon} ${st.key} (${st.name})</span>
+                    <span class="text-slate-400"> — </span>
+                    <span class="font-mono" style="color:${g.color}">${g.grade}${st.val} / 99</span>
+                </div>
+                <button type="button" onclick="hidePowerMatrixTooltip(event)" class="text-slate-500 hover:text-slate-200 text-xs font-bold px-1 leading-none sm:hidden" aria-label="Close tooltip">✕</button>
+            </div>
+            <div class="text-[11px] font-mono font-bold px-2 py-1 rounded-lg bg-slate-900/95 border border-slate-800 text-amber-300">
+                ${st.detail}
+            </div>
+            <p class="text-[11px] text-slate-300 leading-snug">
+                ${st.description}
+            </p>
+            <div class="text-[11px] font-semibold leading-snug p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-200">
+                ${st.actionGuide}
+            </div>
+        </div>
+    `;
+    tooltip.classList.remove('hidden');
+
+    const stageRect = stage.getBoundingClientRect();
+    const svgEl = $('power-matrix-svg');
+    const svgRect = svgEl ? svgEl.getBoundingClientRect() : stageRect;
+
+    const nodeX = (svgRect.left - stageRect.left) + (vx / vbW) * svgRect.width;
+    const nodeY = (svgRect.top - stageRect.top) + (vy / vbH) * svgRect.height;
+
+    const ttW = tooltip.offsetWidth || 280;
+    const ttH = tooltip.offsetHeight || 165;
+    const pad = 10;
+
+    let left = nodeX - (ttW / 2);
+    if (vx < vbW * 0.45) {
+        left = nodeX + 18;
+    } else if (vx > vbW * 0.55) {
+        left = nodeX - ttW - 18;
+    }
+    left = Math.max(pad, Math.min(stageRect.width - ttW - pad, left));
+
+    let top = vy <= vbH * 0.52 ? (nodeY + 18) : (nodeY - ttH - 18);
+    if (top + ttH > stageRect.height - pad) {
+        top = Math.max(pad, nodeY - ttH - 16);
+    }
+    if (top < pad) {
+        top = Math.min(stageRect.height - ttH - pad, nodeY + 16);
+    }
+    top = Math.max(pad, Math.min(stageRect.height - ttH - pad, top));
+
+    tooltip.style.left = `${Math.round(left)}px`;
+    tooltip.style.top = `${Math.round(top)}px`;
+}
+
+function hidePowerMatrixTooltip(evt) {
+    if (evt && evt.stopPropagation) evt.stopPropagation();
+    activePowerMatrixPinnedKey = null;
+    const stage = $('power-matrix-stage');
+    const tooltip = $('power-matrix-tooltip');
+    if (tooltip) tooltip.classList.add('hidden');
+    if (stage) {
+        stage.classList.remove('has-active-stat');
+        stage.querySelectorAll('.power-matrix-node-group').forEach(el => el.classList.remove('is-active'));
+        stage.querySelectorAll('.power-matrix-axis').forEach(el => {
+            el.classList.remove('is-active');
+            el.setAttribute('stroke', 'rgba(148,163,184,0.28)');
+        });
+    }
+}
+
+function handlePowerMatrixNodeHover(statKey, evt) {
+    if (evt && evt.sourceCapabilities && evt.sourceCapabilities.firesTouchEvents) return;
+    if (activePowerMatrixPinnedKey && activePowerMatrixPinnedKey !== statKey) return;
+    renderPowerMatrixTooltip(statKey);
+}
+
+function handlePowerMatrixNodeLeave(statKey, evt) {
+    if (activePowerMatrixPinnedKey) return;
+    hidePowerMatrixTooltip(evt);
+}
+
+function handlePowerMatrixNodeTap(statKey, evt) {
+    if (evt && evt.stopPropagation) evt.stopPropagation();
+    if (activePowerMatrixPinnedKey === statKey) {
+        hidePowerMatrixTooltip();
+    } else {
+        activePowerMatrixPinnedKey = statKey;
+        renderPowerMatrixTooltip(statKey);
+    }
+}
+
+function handlePowerMatrixStageClick(evt) {
+    if (!evt.target.closest('.power-matrix-node-group') && !evt.target.closest('#power-matrix-tooltip')) {
+        hidePowerMatrixTooltip();
+    }
+}
+
+if (typeof document !== 'undefined') {
+    document.addEventListener('click', (evt) => {
+        if (!activePowerMatrixPinnedKey) return;
+        if (!evt.target.closest('.power-matrix-node-group') && !evt.target.closest('#power-matrix-tooltip')) {
+            hidePowerMatrixTooltip();
+        }
+    });
+    document.addEventListener('touchstart', (evt) => {
+        if (!activePowerMatrixPinnedKey) return;
+        if (!evt.target.closest('.power-matrix-node-group') && !evt.target.closest('#power-matrix-tooltip')) {
+            hidePowerMatrixTooltip();
+        }
+    }, { passive: true });
 }
 
 function openRankRoadmapModal(targetUser, evt) {
@@ -415,6 +676,7 @@ function openRankRoadmapModal(targetUser, evt) {
 }
 
 function closeRankRoadmapModal() {
+    hidePowerMatrixTooltip();
     $('rank-roadmap-modal').classList.add('hidden');
 }
 

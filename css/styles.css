@@ -100,3 +100,89 @@ aside.app-sidebar > * {
 .custom-scroll::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.4); border-radius: 9999px; }
 .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(245, 158, 11, 0.5); }
 .insight-fade { transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1), transform 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
+
+/* Power Matrix Hero Card & Interactive Radar Nodes */
+.power-matrix-hero-card {
+    max-width: 680px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.power-matrix-stage {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+.power-matrix-axis {
+    transition: stroke 0.22s ease, stroke-width 0.22s ease, filter 0.22s ease, opacity 0.22s ease;
+}
+.power-matrix-axis.is-active {
+    stroke-width: 2.8px !important;
+    filter: drop-shadow(0 0 8px var(--active-stat-color, #fbbf24));
+    animation: matrixAxisPulse 1.4s ease-in-out infinite;
+}
+.power-matrix-stage.has-active-stat .power-matrix-axis:not(.is-active) {
+    opacity: 0.35;
+}
+.power-matrix-node-group {
+    cursor: pointer;
+    outline: none;
+}
+.power-matrix-dot {
+    transition: r 0.2s cubic-bezier(0.16, 1, 0.3, 1), stroke-width 0.2s ease, filter 0.2s ease;
+    transform-origin: center;
+}
+.power-matrix-dot-halo {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: opacity 0.22s ease;
+    pointer-events: none;
+}
+.power-matrix-label-pill {
+    transition: stroke 0.2s ease, stroke-width 0.2s ease, filter 0.2s ease, transform 0.2s ease;
+}
+.power-matrix-node-group:hover .power-matrix-dot,
+.power-matrix-node-group.is-active .power-matrix-dot {
+    r: 8.5px;
+    stroke-width: 2.5px;
+    filter: drop-shadow(0 0 10px var(--stat-color, #fbbf24));
+}
+.power-matrix-node-group:hover .power-matrix-dot-halo,
+.power-matrix-node-group.is-active .power-matrix-dot-halo {
+    opacity: 0.9;
+    animation: matrixNodePulse 1.35s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+}
+.power-matrix-node-group:hover .power-matrix-label-pill,
+.power-matrix-node-group.is-active .power-matrix-label-pill {
+    stroke: var(--stat-color, #fbbf24);
+    stroke-width: 1.8px;
+    filter: drop-shadow(0 0 10px var(--stat-color, #fbbf24));
+}
+@keyframes matrixNodePulse {
+    0%, 100% { transform: scale(0.95); opacity: 0.75; }
+    50% { transform: scale(1.45); opacity: 0.2; }
+}
+@keyframes matrixAxisPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.65; }
+}
+.power-matrix-tooltip {
+    position: absolute;
+    z-index: 30;
+    width: min(310px, calc(100% - 16px));
+    background: rgba(9, 13, 22, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 0.875rem;
+    box-shadow: 0 18px 40px -8px rgba(0, 0, 0, 0.85), 0 0 20px -4px var(--tooltip-accent, rgba(251, 191, 36, 0.35));
+    transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.power-matrix-tooltip.hidden {
+    display: none !important;
+}
+
