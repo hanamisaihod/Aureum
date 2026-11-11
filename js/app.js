@@ -257,7 +257,8 @@ function switchTab(t){
 }
 
 function loadUserData(){
-    db.collection('logs').where('user','==',viewedUser).onSnapshot(snapshot=>{
+    if(userLogsUnsubscribe)userLogsUnsubscribe();
+    userLogsUnsubscribe=db.collection('logs').where('user','==',viewedUser).onSnapshot(snapshot=>{
         let rawLogs=[],monthlyPoints=0,todayHours=0,todayLogs=[];
         const now=new Date(),startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate());
 

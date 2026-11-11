@@ -294,24 +294,60 @@ const GUILD_REACTION_STORAGE_KEY = 'aureum_guild_reactions_v1';
 const GUILD_QUIET_FALLBACK_ID = 'guild_quiet_shift';
 const MAX_GUILD_ACTIVITY_CARDS = 10;
 
-let _localReactionsMap = {};
 let _activityFeedLatestReactions = {};
-let _pendingReactionDeltas = {};
-let _reactionDebounceTimers = {};
-let _reactionFirstTapTimestamps = {};
+let _optimisticReactionCounts = {};
+let _baselineBridgedTargets = { doc: {}, log: {}, settings: {} };
+let _deferredFeedRenderTimer = null;
 
+// Clean up any legacy local-only reaction cache so Firestore onSnapshot is always authoritative
 try {
-    const rawSaved = localStorage.getItem(GUILD_REACTION_STORAGE_KEY);
-    if (rawSaved) {
-        const parsed = JSON.parse(rawSaved);
-        if (parsed && typeof parsed === 'object') _localReactionsMap = parsed;
-    }
+    localStorage.removeItem(GUILD_REACTION_STORAGE_KEY);
 } catch (e) {}
 
-function _saveLocalReactionsToStorage() {
-    try {
-        localStorage.setItem(GUILD_REACTION_STORAGE_KEY, JSON.stringify(_localReactionsMap));
-    } catch (e) {}
+function _extractReactionsMapFromDocData(data) {
+    const extracted = {};
+    if (!data || typeof data !== 'object') return extracted;
+
+    const mergeCardCounts = (cardId, emojiMap) => {
+        if (!cardId || !emojiMap || typeof emojiMap !== 'object') return;
+        extracted[cardId] = extracted[cardId] || {};
+        GUILD_REACTION_EMOJIS.forEach(em => {
+            const val = parseInt(emojiMap[em]);
+            if (!isNaN(val) && val >= 0) {
+                extracted[cardId][em] = Math.max(extracted[cardId][em] || 0, val);
+            }
+        });
+    };
+
+    if (data.reactions && typeof data.reactions === 'object') {
+        Object.keys(data.reactions).forEach(cardId => {
+            mergeCardCounts(cardId, data.reactions[cardId]);
+        });
+    }
+
+    Object.keys(data).forEach(key => {
+        if (key === 'reactions' || key === 'updatedAt') return;
+        if (key.startsWith('reactions.')) {
+            const parts = key.split('.');
+            if (parts.length >= 3) {
+                const emoji = parts[parts.length - 1];
+                const cardId = parts.slice(1, parts.length - 1).join('.');
+                if (cardId && GUILD_REACTION_EMOJIS.includes(emoji)) {
+                    const val = parseInt(data[key]);
+                    if (!isNaN(val) && val >= 0) {
+                        extracted[cardId] = extracted[cardId] || {};
+                        extracted[cardId][emoji] = Math.max(extracted[cardId][emoji] || 0, val);
+                    }
+                }
+            }
+            return;
+        }
+        if (data[key] && typeof data[key] === 'object') {
+            mergeCardCounts(key, data[key]);
+        }
+    });
+
+    return extracted;
 }
 
 function initGuildActivityFeedListener() {
@@ -322,18 +358,15 @@ function initGuildActivityFeedListener() {
         activityFeedUnsubscribe = db.collection('activity_feed').doc('latest').onSnapshot(doc => {
             if (doc.exists) {
                 const data = doc.data() || {};
-                const mapFromDoc = (data.reactions && typeof data.reactions === 'object') ? data.reactions : {};
-                _activityFeedLatestReactions = { ...mapFromDoc };
-                Object.keys(data).forEach(k => {
-                    if (k !== 'reactions' && k !== 'updatedAt' && data[k] && typeof data[k] === 'object') {
-                        _activityFeedLatestReactions[k] = {
-                            ...(_activityFeedLatestReactions[k] || {}),
-                            ...data[k]
-                        };
-                    }
-                });
-                _syncLiveReactionBadgesInDOM();
+                _activityFeedLatestReactions = _extractReactionsMapFromDocData(data);
+            } else {
+                _activityFeedLatestReactions = {};
             }
+            _syncLiveReactionBadgesInDOM();
+            renderGuildActivityFeed();
+        }, () => {
+            _syncLiveReactionBadgesInDOM();
+            renderGuildActivityFeed();
         });
     } catch (e) {}
 }
@@ -398,11 +431,14 @@ function getActiveTickerTargetLog() {
     return recent.length > 0 ? recent[0] : null;
 }
 
-function getEffectiveReactionsForTarget(logOrId) {
+function _getServerReactionBreakdownForTarget(logOrId) {
     const targetId = typeof logOrId === 'string'
         ? logOrId
         : (logOrId?.id || GUILD_QUIET_FALLBACK_ID);
-    const logObj = typeof logOrId === 'object' ? logOrId : null;
+    const recent = getRecentGuildActivityLogs(MAX_GUILD_ACTIVITY_CARDS);
+    const logObj = (typeof logOrId === 'object' && logOrId !== null)
+        ? logOrId
+        : (recent.find(l => String(l.id) === targetId) || null);
 
     const latestDocReactions = (_activityFeedLatestReactions && _activityFeedLatestReactions[targetId] && typeof _activityFeedLatestReactions[targetId] === 'object')
         ? _activityFeedLatestReactions[targetId]
@@ -410,29 +446,46 @@ function getEffectiveReactionsForTarget(logOrId) {
     const legacyLogReactions = (logObj && logObj.reactions && typeof logObj.reactions === 'object')
         ? logObj.reactions
         : {};
-    const localSaved = _localReactionsMap[targetId] || {};
-    const pending = _pendingReactionDeltas[targetId] || {};
+    const northSettingsReactions = duoPresenceData?.North?.settings?.guildReactions?.[targetId] || {};
+    const creamSettingsReactions = duoPresenceData?.Cream?.settings?.guildReactions?.[targetId] || {};
 
-    const result = {};
-    let changedLocal = false;
-
+    const breakdown = {};
     GUILD_REACTION_EMOJIS.forEach(emoji => {
         const docCount = Math.max(0, parseInt(latestDocReactions[emoji]) || 0);
-        const legCount = Math.max(0, parseInt(legacyLogReactions[emoji]) || 0);
-        const srvCount = Math.max(docCount, legCount);
-        const locCount = Math.max(0, parseInt(localSaved[emoji]) || 0);
-        const pendDelta = Math.max(0, parseInt(pending[emoji]) || 0);
-        const effective = Math.max(srvCount + pendDelta, locCount);
-        result[emoji] = effective;
-
-        if (pendDelta === 0 && srvCount > locCount) {
-            _localReactionsMap[targetId] = _localReactionsMap[targetId] || {};
-            _localReactionsMap[targetId][emoji] = srvCount;
-            changedLocal = true;
-        }
+        const logCount = Math.max(0, parseInt(legacyLogReactions[emoji]) || 0);
+        const northCount = Math.max(0, parseInt(northSettingsReactions[emoji]) || 0);
+        const creamCount = Math.max(0, parseInt(creamSettingsReactions[emoji]) || 0);
+        const settingsSum = northCount + creamCount;
+        const srvCount = Math.max(docCount, logCount, settingsSum);
+        breakdown[emoji] = { docCount, logCount, settingsSum, srvCount };
     });
 
-    if (changedLocal) _saveLocalReactionsToStorage();
+    return breakdown;
+}
+
+function getEffectiveReactionsForTarget(logOrId) {
+    const targetId = typeof logOrId === 'string'
+        ? logOrId
+        : (logOrId?.id || GUILD_QUIET_FALLBACK_ID);
+    const breakdown = _getServerReactionBreakdownForTarget(logOrId);
+    const optimisticForCard = _optimisticReactionCounts[targetId] || {};
+    const now = Date.now();
+
+    const result = {};
+    GUILD_REACTION_EMOJIS.forEach(emoji => {
+        const { srvCount } = breakdown[emoji];
+        const optEntry = optimisticForCard[emoji];
+        let optVal = 0;
+        if (optEntry && typeof optEntry === 'object') {
+            if (srvCount >= optEntry.count || now > optEntry.expiresAt) {
+                delete optimisticForCard[emoji];
+            } else {
+                optVal = optEntry.count;
+            }
+        }
+        result[emoji] = Math.max(srvCount, optVal);
+    });
+
     return result;
 }
 
@@ -594,6 +647,23 @@ function renderGuildActivityFeed() {
         return;
     }
 
+    const existingCards = Array.from(listEl.querySelectorAll('.guild-activity-card'));
+    const sameCardOrder = existingCards.length === recentLogs.length && existingCards.every((el, i) => {
+        const expectedId = String(recentLogs[i].id || `guild_card_${i}`);
+        return el.getAttribute('data-activity-card-id') === expectedId;
+    });
+    const hasActiveReactionAnim = Boolean(listEl.querySelector('.ticker-floating-plus, .ticker-react-btn.is-popping'));
+
+    if (sameCardOrder && hasActiveReactionAnim) {
+        _syncLiveReactionBadgesInDOM();
+        if (_deferredFeedRenderTimer) clearTimeout(_deferredFeedRenderTimer);
+        _deferredFeedRenderTimer = setTimeout(() => {
+            _deferredFeedRenderTimer = null;
+            renderGuildActivityFeed();
+        }, 760);
+        return;
+    }
+
     listEl.innerHTML = recentLogs.map((log, idx) => _renderGuildActivityCardHtml(log, idx)).join('');
 }
 
@@ -634,64 +704,85 @@ function _spawnFloatingReactionText(emoji, btnEl) {
     }, 740);
 }
 
-async function flushReactionBatchToFirestore(targetId) {
-    if (_reactionDebounceTimers[targetId]) {
-        clearTimeout(_reactionDebounceTimers[targetId]);
-        delete _reactionDebounceTimers[targetId];
+async function _atomicIncrementReactionInFirestore(targetId, emoji, breakdownForEmoji) {
+    const { docCount = 0, logCount = 0, settingsSum = 0, srvCount = 0 } = breakdownForEmoji || {};
+    const bridgeKey = `${targetId}::${emoji}`;
+
+    let docIncrement = 1;
+    if (!_baselineBridgedTargets.doc[bridgeKey] && docCount < srvCount) {
+        docIncrement = (srvCount - docCount) + 1;
+        _baselineBridgedTargets.doc[bridgeKey] = true;
+    } else {
+        _baselineBridgedTargets.doc[bridgeKey] = true;
     }
-    delete _reactionFirstTapTimestamps[targetId];
 
-    const deltas = _pendingReactionDeltas[targetId];
-    if (!deltas || Object.keys(deltas).length === 0) return;
-    const snapshotDeltas = { ...deltas };
-    delete _pendingReactionDeltas[targetId];
+    let logIncrement = 1;
+    if (!_baselineBridgedTargets.log[bridgeKey] && logCount < srvCount) {
+        logIncrement = (srvCount - logCount) + 1;
+        _baselineBridgedTargets.log[bridgeKey] = true;
+    } else {
+        _baselineBridgedTargets.log[bridgeKey] = true;
+    }
 
-    const incrementMap = {};
-    let hasPositive = false;
-    Object.entries(snapshotDeltas).forEach(([em, d]) => {
-        const count = parseInt(d) || 0;
-        if (count > 0) {
-            incrementMap[em] = firebase.firestore.FieldValue.increment(count);
-            hasPositive = true;
-        }
-    });
-    if (!hasPositive) return;
+    let settingsIncrement = 1;
+    if (!_baselineBridgedTargets.settings[bridgeKey] && settingsSum < srvCount) {
+        settingsIncrement = (srvCount - settingsSum) + 1;
+        _baselineBridgedTargets.settings[bridgeKey] = true;
+    } else {
+        _baselineBridgedTargets.settings[bridgeKey] = true;
+    }
 
-    try {
-        await db.collection('activity_feed').doc('latest').set({
-            reactions: {
-                [targetId]: incrementMap
-            },
+    const feedDocRef = db.collection('activity_feed').doc('latest');
+    const ops = [];
+
+    // 1. Primary atomic update on activity_feed/latest (updateDoc with dot-notation, fallback to set merge)
+    ops.push(
+        feedDocRef.update({
+            [`reactions.${targetId}.${emoji}`]: firebase.firestore.FieldValue.increment(docIncrement),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-    } catch (err) {
-        try {
-            const fullCounts = _localReactionsMap[targetId] || {};
-            await db.collection('activity_feed').doc('latest').set({
+        }).catch(() => {
+            return feedDocRef.set({
                 reactions: {
-                    [targetId]: fullCounts
-                }
+                    [targetId]: {
+                        [emoji]: firebase.firestore.FieldValue.increment(docIncrement)
+                    }
+                },
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
-        } catch (e2) {}
-    }
-}
+        })
+    );
 
-function _scheduleDebouncedReactionFlush(targetId) {
-    const now = Date.now();
-    if (!_reactionFirstTapTimestamps[targetId]) {
-        _reactionFirstTapTimestamps[targetId] = now;
+    // 2. Atomic update on the source log document in logs/{targetId}
+    if (targetId && targetId !== GUILD_QUIET_FALLBACK_ID) {
+        const logDocRef = db.collection('logs').doc(targetId);
+        ops.push(
+            logDocRef.update({
+                [`reactions.${emoji}`]: firebase.firestore.FieldValue.increment(logIncrement)
+            }).catch(() => {
+                return logDocRef.set({
+                    reactions: {
+                        [emoji]: firebase.firestore.FieldValue.increment(logIncrement)
+                    }
+                }, { merge: true });
+            })
+        );
     }
-    if (_reactionDebounceTimers[targetId]) {
-        clearTimeout(_reactionDebounceTimers[targetId]);
+
+    // 3. Atomic update on settings/{loggedInUser} (streamed live via initDuoHUDListeners onSnapshot)
+    if (loggedInUser) {
+        const settingsDocRef = db.collection('settings').doc(loggedInUser);
+        ops.push(
+            settingsDocRef.set({
+                guildReactions: {
+                    [targetId]: {
+                        [emoji]: firebase.firestore.FieldValue.increment(settingsIncrement)
+                    }
+                }
+            }, { merge: true })
+        );
     }
-    const elapsedSinceFirstTap = now - _reactionFirstTapTimestamps[targetId];
-    if (elapsedSinceFirstTap >= 1600) {
-        flushReactionBatchToFirestore(targetId);
-        return;
-    }
-    _reactionDebounceTimers[targetId] = setTimeout(() => {
-        flushReactionBatchToFirestore(targetId);
-    }, 420);
+
+    await Promise.allSettled(ops);
 }
 
 function spamGuildReaction(cardIdOrEmoji, emojiOrEvt, maybeEvt) {
@@ -716,20 +807,15 @@ function spamGuildReaction(cardIdOrEmoji, emojiOrEvt, maybeEvt) {
     const recent = getRecentGuildActivityLogs(MAX_GUILD_ACTIVITY_CARDS);
     const targetLog = recent.find(l => String(l.id) === targetId) || targetId;
 
+    const breakdown = _getServerReactionBreakdownForTarget(targetLog);
     const currentEffective = getEffectiveReactionsForTarget(targetLog);
     const nextVal = (currentEffective[emoji] || 0) + 1;
 
-    _pendingReactionDeltas[targetId] = _pendingReactionDeltas[targetId] || {};
-    _pendingReactionDeltas[targetId][emoji] = (_pendingReactionDeltas[targetId][emoji] || 0) + 1;
-
-    _localReactionsMap[targetId] = _localReactionsMap[targetId] || {};
-    GUILD_REACTION_EMOJIS.forEach(em => {
-        if (_localReactionsMap[targetId][em] === undefined) {
-            _localReactionsMap[targetId][em] = currentEffective[em] || 0;
-        }
-    });
-    _localReactionsMap[targetId][emoji] = nextVal;
-    _saveLocalReactionsToStorage();
+    _optimisticReactionCounts[targetId] = _optimisticReactionCounts[targetId] || {};
+    _optimisticReactionCounts[targetId][emoji] = {
+        count: nextVal,
+        expiresAt: Date.now() + 4000
+    };
 
     const safeCardDomId = targetId.replace(/[^a-zA-Z0-9_-]/g, '_');
     const domKey = GUILD_REACTION_DOM_KEYS[emoji];
@@ -744,14 +830,8 @@ function spamGuildReaction(cardIdOrEmoji, emojiOrEvt, maybeEvt) {
     }
 
     _playReactionSpamMicroTone();
-    _scheduleDebouncedReactionFlush(targetId);
+    _atomicIncrementReactionInFirestore(targetId, emoji, breakdown[emoji]);
 }
-
-window.addEventListener('beforeunload', () => {
-    Object.keys(_pendingReactionDeltas).forEach(tid => {
-        flushReactionBatchToFirestore(tid);
-    });
-});
 
 // ============================================================================
 // PART 2: CONFIGURABLE & AESTHETIC MONTHLY PERFORMANCE CODEX

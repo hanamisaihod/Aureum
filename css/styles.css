@@ -250,6 +250,20 @@ aside.app-sidebar > * {
 .crucible-hub-grid {
     align-items: stretch;
 }
+@media (min-width: 1024px) {
+    .crucible-hub-grid {
+        grid-template-columns: minmax(0, 65fr) minmax(0, 35fr);
+        align-items: stretch;
+    }
+    .crucible-left-timer {
+        flex: 1.65 1 0%;
+        min-width: 0;
+    }
+    .crucible-right-stack {
+        flex: 1 1 0%;
+        min-width: 0;
+    }
+}
 .crucible-left-timer,
 .crucible-right-stack,
 .crucible-left-stack,
@@ -257,6 +271,7 @@ aside.app-sidebar > * {
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-width: 0;
 }
 .pomo-timer-card {
     height: 100%;
