@@ -38,7 +38,7 @@ function calculateRolling30DayQE(logs) {
         const e = parseFloat(recentWork[i].effort) || 3;
         sumQ += q;
         sumE += e;
-        if (q >= 4.0 && e >= 3.5) {
+        if (q >= 4 && e >= 4) {
             stalwartCount++;
         }
     }
@@ -46,11 +46,11 @@ function calculateRolling30DayQE(logs) {
     const avgEffort = sumE / recentWork.length;
 
     let archetype = 'Tactician';
-    if (avgQuality >= 4.0 && avgEffort <= 2.8) {
-        archetype = 'Virtuoso';
-    } else if (avgQuality >= 4.0 && avgEffort >= 3.5) {
+    if (avgQuality >= 4.0 && avgEffort >= 4.0) {
         archetype = 'Stalwart';
-    } else if (avgQuality <= 2.8 && avgEffort >= 3.5) {
+    } else if (avgQuality >= 4.0 && avgEffort <= 3.0) {
+        archetype = 'Virtuoso';
+    } else if (avgQuality <= 3.0 && avgEffort >= 4.0) {
         archetype = 'Grinder';
     } else {
         archetype = 'Tactician';
@@ -121,17 +121,17 @@ function calculateAndRenderPowerMeter(logs) {
 const WORK_STYLE_INFO = {
     Virtuoso: {
         icon: '✨',
-        tagline: 'High Quality (≥ 4.0) + Low Effort (≤ 2.8)',
+        tagline: 'High Quality (≥ 4.0) + Low Effort (≤ 3.0)',
         desc: 'Efficient, high craft — delivering peak output with minimal strain and effortless flow.'
     },
     Stalwart: {
         icon: '🛡️',
-        tagline: 'High Quality (≥ 4.0) + High Effort (≥ 3.5)',
+        tagline: 'High Quality (≥ 4.0) + High Effort (≥ 4.0)',
         desc: 'High craft, maximum dedication — forging top-tier results through relentless grit and focus.'
     },
     Grinder: {
         icon: '⛏️',
-        tagline: 'Low Quality (≤ 2.8) + High Effort (≥ 3.5)',
+        tagline: 'Low Quality (≤ 3.0) + High Effort (≥ 4.0)',
         desc: 'High volume, brute force — pushing through heavy resistance and foundational groundwork.'
     },
     Tactician: {
@@ -177,9 +177,11 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
         ? qe30.avgEffort
         : (workLogs.length > 0 ? workLogs.reduce((acc, l) => acc + (parseFloat(l.effort) || 3), 0) / workLogs.length : 3.0);
     let masteryMult = 0.75;
-    if (avgQ >= 4.0 && avgE >= 3.5) {
+    if (avgQ >= 4 && avgE >= 4) {
         masteryMult = 1.25;
-    } else if (avgQ >= 4.0) {
+    } else if (avgQ >= 4 && avgE <= 3) {
+        masteryMult = 1.0;
+    } else if (avgQ >= 4) {
         masteryMult = 1.0;
     }
     const masteryMultStr = Number.isInteger(masteryMult) ? `${masteryMult.toFixed(1)}x` : `${masteryMult}x`;
@@ -243,7 +245,7 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
             color: '#10b981',
             detail: `${avgQ.toFixed(1)} / 5 Craft | ${masteryMultStr} Mastery`,
             description: 'Measures precision, fine craft, and high-quality execution standards.',
-            actionGuide: '⚡ Log Focus Shifts with Quality >= 4.0 and Effort >= 3.5 to earn maximum 1.25x Mastery EXP.'
+            actionGuide: '⚡ Log sessions with Quality 4–5 and Effort 4–5 to earn maximum 1.25x Mastery EXP.'
         },
         {
             key: 'INT',

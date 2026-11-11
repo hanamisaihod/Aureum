@@ -17,9 +17,11 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
     const maxBonus = (settings.monthlyCash || 8000) * ((settings.maxBonusCapPct || 125) / 100);
 
     // 1. The Catalyst Hour
-    // Identifies the 2-hour window during the day with the highest average Quality (>= 4.0) achieved at lower Effort (<= 3.0).
-    let bestCatalystStart = -1, bestCatalystQ = 0, bestCatalystE = 0, bestCatalystScore = -1;
-    let fallbackStart = -1, fallbackQ = 0, fallbackE = 0, fallbackRatio = -1;
+    // Identifies the 2-hour daily window with the highest average Quality (>= 4) achieved during high-effort work (Effort >= 4).
+    const catalystDesc = 'Your peak output window — where your highest quality work (Quality 4–5) and deepest focus occur.';
+    let bestCatalystStart = -1, bestCatalystQ = 0, bestCatalystE = 0;
+    let fallbackQ4Start = -1, fallbackQ4_Q = 0, fallbackQ4_E = 0;
+    let fallbackAnyStart = -1, fallbackAnyQ = 0, fallbackAnyE = 0;
 
     for (let h = 0; h < 24; h++) {
         const hNext = (h + 1) % 24;
@@ -29,55 +31,68 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
         });
         if (winLogs.length > 0) {
             let sumQ = 0, sumE = 0;
+            let heSumQ = 0, heSumE = 0, heCount = 0;
             winLogs.forEach(l => {
-                sumQ += (parseFloat(l.results) || 3);
-                sumE += (parseFloat(l.effort) || 3);
+                const q = parseFloat(l.results) || 3;
+                const e = parseFloat(l.effort) || 3;
+                sumQ += q;
+                sumE += e;
+                if (e >= 4) {
+                    heSumQ += q;
+                    heSumE += e;
+                    heCount++;
+                }
             });
             const avgQ = sumQ / winLogs.length;
             const avgE = sumE / winLogs.length;
-            const ratio = avgQ / Math.max(1, avgE);
 
-            if (avgQ >= 4.0 && avgE <= 3.0) {
-                if (avgQ > bestCatalystQ || (avgQ === bestCatalystQ && ratio > bestCatalystScore)) {
-                    bestCatalystStart = h;
-                    bestCatalystQ = avgQ;
-                    bestCatalystE = avgE;
-                    bestCatalystScore = ratio;
+            if (heCount > 0) {
+                const heAvgQ = heSumQ / heCount;
+                const heAvgE = heSumE / heCount;
+                if (heAvgQ >= 4) {
+                    if (heAvgQ > bestCatalystQ || (heAvgQ === bestCatalystQ && heAvgE > bestCatalystE)) {
+                        bestCatalystStart = h;
+                        bestCatalystQ = heAvgQ;
+                        bestCatalystE = heAvgE;
+                    }
                 }
             }
-            if (ratio > fallbackRatio) {
-                fallbackRatio = ratio;
-                fallbackStart = h;
-                fallbackQ = avgQ;
-                fallbackE = avgE;
+
+            if (avgQ >= 4) {
+                if (avgQ > fallbackQ4_Q || (avgQ === fallbackQ4_Q && avgE > fallbackQ4_E)) {
+                    fallbackQ4Start = h;
+                    fallbackQ4_Q = avgQ;
+                    fallbackQ4_E = avgE;
+                }
+            }
+
+            if (avgQ > fallbackAnyQ || (avgQ === fallbackAnyQ && avgE > fallbackAnyE)) {
+                fallbackAnyStart = h;
+                fallbackAnyQ = avgQ;
+                fallbackAnyE = avgE;
             }
         }
     }
 
-    if (bestCatalystStart >= 0) {
-        const startStr = formatHourAmPm(bestCatalystStart);
-        const endStr = formatHourAmPm((bestCatalystStart + 2) % 24);
+    const chosenCatalystStart = bestCatalystStart >= 0
+        ? bestCatalystStart
+        : (fallbackQ4Start >= 0 ? fallbackQ4Start : fallbackAnyStart);
+
+    if (chosenCatalystStart >= 0) {
+        const startStr = formatHourAmPm(chosenCatalystStart);
+        const endStr = formatHourAmPm((chosenCatalystStart + 2) % 24);
         insights.push({
             icon: '⚡',
             category: 'The Catalyst Hour',
             value: `${startStr} – ${endStr}`,
-            detail: `${bestCatalystQ.toFixed(1)} Avg Q • ${bestCatalystE.toFixed(1)} Avg E (${(bestCatalystQ / Math.max(1, bestCatalystE)).toFixed(2)}x Eff.)`
-        });
-    } else if (fallbackStart >= 0) {
-        const startStr = formatHourAmPm(fallbackStart);
-        const endStr = formatHourAmPm((fallbackStart + 2) % 24);
-        insights.push({
-            icon: '⚡',
-            category: 'The Catalyst Hour',
-            value: `${startStr} – ${endStr}`,
-            detail: `${fallbackQ.toFixed(1)} Avg Q • ${fallbackE.toFixed(1)} Avg E (Target: Q≥4.0, E≤3.0)`
+            detail: catalystDesc
         });
     } else {
         insights.push({
             icon: '⚡',
             category: 'The Catalyst Hour',
             value: '9:00 AM – 11:00 AM',
-            detail: 'Awaiting Q≥4.0 & E≤3.0 sessions'
+            detail: catalystDesc
         });
     }
 
@@ -90,14 +105,14 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
             icon: '⚖️',
             category: 'The Grindset Ratio',
             value: `${qe30.avgQuality.toFixed(1)} Avg Quality | ${qe30.avgEffort.toFixed(1)} Avg Effort`,
-            detail: `${peakFocusPct}% Stalwart Focus Shifts`
+            detail: `${peakFocusPct}% Peak Focus Shifts (Quality 4+, Effort 4+)`
         });
     } else {
         insights.push({
             icon: '⚖️',
             category: 'The Grindset Ratio',
             value: '3.0 Avg Quality | 3.0 Avg Effort',
-            detail: '0% Stalwart Focus Shifts'
+            detail: '0% Peak Focus Shifts (Quality 4+, Effort 4+)'
         });
     }
 
