@@ -75,36 +75,60 @@ function startMyPomoBackgroundTimer(){
 }
 
 function updateUnloggedFocusDisplay(){
-    const secs=(loggedInUser===viewedUser?userSettings:spectatorSettings)?.unloggedFocusSecs||0;
-    const hrs=(secs/3600).toFixed(2);
-    if($('pomo-unlogged-hours'))$('pomo-unlogged-hours').innerText=`${hrs} hrs`;
-    const logBtn=$('pomo-log-accumulated-btn');
-    if(logBtn){
-        logBtn.disabled=(loggedInUser!==viewedUser);
+    const isSelf=(loggedInUser===viewedUser);
+    const secs=(isSelf?userSettings:spectatorSettings)?.unloggedFocusSecs||0;
+    const hrs=(secs/3600).toFixed(1);
+    if($('pomo-unlogged-hours'))$('pomo-unlogged-hours').innerText=`${hrs} h`;
+    if($('work-accumulated-pill-text'))$('work-accumulated-pill-text').innerText=`+${hrs} h accumulated`;
+    const pill=$('work-accumulated-pill');
+    if(pill){
+        pill.disabled=(!isSelf||secs<=0);
+        pill.classList.toggle('opacity-50', secs<=0);
+    }
+    const resetBtn=$('pomo-reset-accumulated-btn');
+    if(resetBtn){
+        resetBtn.style.display=isSelf?'inline-flex':'none';
+        resetBtn.disabled=(secs<=0);
+        resetBtn.classList.toggle('opacity-40', secs<=0);
     }
 }
 
 async function resetUnloggedFocusTime(e){
     if(e&&e.stopPropagation)e.stopPropagation();
     if(loggedInUser!==viewedUser)return;
+    const secs=userSettings.unloggedFocusSecs||0;
+    if(secs<=0)return;
+    if(!confirm('Reset accumulated Pomodoro focus time to 0.0 h?'))return;
     userSettings.unloggedFocusSecs=0;updateUnloggedFocusDisplay();
     await db.collection('settings').doc(loggedInUser).set({unloggedFocusSecs:0},{merge:true});
     playTone('delete');
-    showToast({title:'⏱️ Focus Cleared',subtitle:'Counter reset to 0.00 hrs.',icon:'⏱️',tier:'bronze',originEvt:e});
+    showToast({title:'⏱️ Focus Cleared',subtitle:'Accumulated time reset to 0.0 h.',icon:'⏱️',tier:'bronze',originEvt:e});
+}
+
+function applyAccumulatedHoursToWorkInput(e){
+    if(e&&e.stopPropagation)e.stopPropagation();
+    if(loggedInUser!==viewedUser)return;
+    const secs=userSettings.unloggedFocusSecs||0;
+    if(secs<=0)return;
+    const accumHrs=Math.max(0.1, parseFloat((secs/3600).toFixed(1)));
+    const timeInput=$('work-time');
+    if(timeInput){
+        timeInput.value=accumHrs.toFixed(1);
+        playTone('step');
+    }
 }
 
 function openLogWorkModal(prefillHours, e){
     if(e&&e.stopPropagation)e.stopPropagation();
     if(loggedInUser!==viewedUser)return;
+    updateUnloggedFocusDisplay();
     const timeInput=$('work-time');
     if(timeInput&&prefillHours!==undefined&&prefillHours!==null){
         timeInput.value=Number(prefillHours).toFixed(2);
     }
-    const modal=$('log-work-modal'),modalBody=$('log-work-modal-body'),card=$('work-form-card'),closeBtn=$('work-modal-close-btn');
-    if(modal&&modalBody&&card){
-        modalBody.appendChild(card);
+    const modal=$('log-work-modal');
+    if(modal){
         modal.classList.remove('hidden');
-        if(closeBtn)closeBtn.classList.remove('hidden');
     }
     playTone('save');
     setTimeout(()=>{
@@ -116,11 +140,7 @@ function openLogWorkModal(prefillHours, e){
 
 function closeLogWorkModal(e){
     if(e&&e.stopPropagation)e.stopPropagation();
-    const modal=$('log-work-modal'),slot=$('work-form-slot'),card=$('work-form-card'),closeBtn=$('work-modal-close-btn');
-    if(slot&&card&&card.parentElement!==slot){
-        slot.appendChild(card);
-    }
-    if(closeBtn)closeBtn.classList.add('hidden');
+    const modal=$('log-work-modal');
     if(modal)modal.classList.add('hidden');
 }
 
@@ -128,7 +148,7 @@ function openLogAccumulatedHours(e){
     if(e&&e.stopPropagation)e.stopPropagation();
     if(loggedInUser!==viewedUser)return;
     const secs=userSettings.unloggedFocusSecs||0;
-    const prefill=secs>0?Math.max(0.25,Math.round((secs/3600)*100)/100):1.00;
+    const prefill=secs>0?Math.max(0.1,parseFloat((secs/3600).toFixed(1))):1.00;
     openLogWorkModal(prefill,e);
 }
 

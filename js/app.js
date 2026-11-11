@@ -195,7 +195,8 @@ function switchActiveUser(target){viewedUser=target;initRealtimeSettingsListener
 
 function updateUserSwitcherUI(){
     const isSelf=loggedInUser===viewedUser;
-    ['work-form-card','diary-form-card','health-form-card','chore-form-card','workout-form-card','todo-form','pomo-log-accumulated-btn'].forEach(id=>{const el=$(id);if(el)el.style.display=isSelf?'block':'none'});
+    ['work-form-card','diary-form-card','health-form-card','chore-form-card','workout-form-card','todo-form'].forEach(id=>{const el=$(id);if(el)el.style.display=isSelf?'':'none'});
+    if(!isSelf&&typeof closeLogWorkModal==='function')closeLogWorkModal();
     const clearBtn=$('todo-clear-btn');if(clearBtn)clearBtn.style.display=isSelf?'inline-block':'none';
     document.querySelectorAll('#tab-forge input, #tab-forge select').forEach(i=>{i.disabled=!isSelf;i.classList.toggle('opacity-50',!isSelf)});
     document.querySelectorAll('#tab-forge button').forEach(b=>b.style.display=isSelf?'inline-block':'none');
