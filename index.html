@@ -174,7 +174,44 @@
     </div>
 
     <!-- MAIN APP WRAPPER -->
-    <div id="app-content" class="hidden flex flex-col md:flex-row items-start gap-6 max-w-7xl mx-auto">
+    <div id="app-content" class="hidden flex flex-col gap-4 max-w-7xl mx-auto">
+
+        <!-- PERSISTENT TOP ACTIVITY TICKER ("GUILD FEED") -->
+        <header id="guild-activity-ticker" class="guild-ticker-bar rounded-2xl px-3.5 py-2 sm:px-5 sm:py-2.5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 w-full">
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-950/90 border border-amber-500/35 shrink-0 shadow-inner">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 presence-pulse shrink-0"></span>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-amber-300 whitespace-nowrap">Guild Feed</span>
+                </div>
+                <div id="guild-ticker-message" class="text-xs sm:text-[13px] font-semibold text-slate-200 truncate min-w-0 flex-1" title="The studio is quiet. Awaiting the next shift...">
+                    <span class="text-slate-400 italic">The studio is quiet. Awaiting the next shift...</span>
+                </div>
+                <div id="guild-ticker-nav" class="hidden items-center gap-1 shrink-0">
+                    <button type="button" onclick="cycleGuildTickerLog(-1)" class="w-5 h-5 rounded-md bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-slate-400 hover:text-white text-[10px] font-bold flex items-center justify-center transition-all" title="Newer recent activity">‹</button>
+                    <span id="guild-ticker-index-label" class="text-[10px] font-mono text-slate-400 px-1">1/1</span>
+                    <button type="button" onclick="cycleGuildTickerLog(1)" class="w-5 h-5 rounded-md bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-slate-400 hover:text-white text-[10px] font-bold flex items-center justify-center transition-all" title="Older recent activity">›</button>
+                </div>
+            </div>
+
+            <!-- SPAMMABLE QUICK-REACTION EMOJI ENGINE -->
+            <div id="guild-ticker-reactions" class="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto relative">
+                <button type="button" id="ticker-react-btn-coffee" onclick="spamGuildReaction('☕', event)" class="ticker-react-btn" title="Send Coffee Fuel (Spammable!)">
+                    <span class="text-sm leading-none">☕</span>
+                    <span id="ticker-react-count-coffee" class="font-mono text-[11px] font-black text-amber-300">0</span>
+                </button>
+                <button type="button" id="ticker-react-btn-clap" onclick="spamGuildReaction('👏', event)" class="ticker-react-btn" title="Applaud Craft (Spammable!)">
+                    <span class="text-sm leading-none">👏</span>
+                    <span id="ticker-react-count-clap" class="font-mono text-[11px] font-black text-amber-300">0</span>
+                </button>
+                <button type="button" id="ticker-react-btn-fire" onclick="spamGuildReaction('🔥', event)" class="ticker-react-btn" title="Ignite Hype (Spammable!)">
+                    <span class="text-sm leading-none">🔥</span>
+                    <span id="ticker-react-count-fire" class="font-mono text-[11px] font-black text-amber-300">0</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- WORKSPACE SHELL (SIDEBAR + MAIN PANEL) -->
+        <div class="flex flex-col md:flex-row items-start gap-6 w-full">
         
         <!-- VERTICAL SIDEBAR PANEL -->
         <aside class="app-sidebar p-3.5 sm:p-4 rounded-2xl w-full md:w-72 lg:w-80 shrink-0 space-y-4 flex flex-col">
@@ -700,6 +737,9 @@
 
             <!-- TAB 3: CHRONICLES -->
             <div id="tab-chronicles" class="space-y-6 hidden">
+                <!-- SECTION 0: CONFIGURABLE MONTHLY PERFORMANCE CODEX (DARK-MODE FANTASY FOLIO) -->
+                <div id="monthly-performance-codex-section" class="transition-all duration-300"></div>
+
                 <!-- SECTION 1: ANALYTICS SUMMARY HEADER (COMPACT WORK & SANCTUARY TREND CHARTS) -->
                 <div id="chronicles-analytics-header" class="grid grid-cols-1 xl:grid-cols-2 gap-5">
                     <div class="card p-4 sm:p-5 rounded-2xl">
@@ -886,6 +926,20 @@
                                     </button>
                                 </div>
                             </div>
+
+                            <!-- MONTHLY PERFORMANCE CODEX TOGGLE -->
+                            <div class="pt-4 border-t border-slate-800 flex items-center justify-between gap-4">
+                                <div class="space-y-0.5">
+                                    <label for="setting-show-monthly-codex" class="block text-xs font-black uppercase tracking-wider text-amber-300 cursor-pointer">Show Monthly Performance Codex</label>
+                                    <p class="text-[11px] text-slate-400 leading-snug">Display the ornate Monthly Performance Codex folio card (allowance payout, craft scores, 30-day Stat Radar &amp; reflection highlight) at the top of the Chronicles tab.</p>
+                                </div>
+                                <label class="inline-flex items-center cursor-pointer select-none shrink-0" for="setting-show-monthly-codex">
+                                    <input type="checkbox" id="setting-show-monthly-codex" checked onchange="handleToggleMonthlyCodex(this.checked)" class="sr-only">
+                                    <span class="forge-toggle-track">
+                                        <span class="forge-toggle-thumb"></span>
+                                    </span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -998,6 +1052,7 @@
                 </form>
             </div>
         </main>
+        </div>
 
         <div id="badge-toast-container"></div>
     </div>

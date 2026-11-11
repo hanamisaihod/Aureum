@@ -228,4 +228,174 @@ aside.app-sidebar > * {
     transform: scale(1.06);
 }
 
+/* ============================================================================
+   PERSISTENT TOP ACTIVITY TICKER ("GUILD FEED") & SPAMMABLE EMOJI REACTIONS
+   ============================================================================ */
+.guild-ticker-bar {
+    position: relative;
+    background: linear-gradient(90deg, rgba(9, 13, 22, 0.96) 0%, rgba(18, 23, 36, 0.96) 50%, rgba(9, 13, 22, 0.96) 100%);
+    border: 1.5px solid var(--card-border);
+    box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow: visible;
+    z-index: 35;
+}
+.guild-ticker-bar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(90deg, var(--accent-glow) 0%, transparent 18%, transparent 82%, var(--accent-glow) 100%);
+    opacity: 0.22;
+}
+.ticker-react-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+    background: rgba(15, 23, 42, 0.92);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    color: #e2e8f0;
+    font-size: 0.75rem;
+    font-weight: 800;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: pointer;
+    transition: transform 0.12s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    overflow: visible;
+}
+.ticker-react-btn:hover {
+    border-color: var(--accent-primary);
+    background: rgba(30, 41, 59, 0.95);
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+.ticker-react-btn:active,
+.ticker-react-btn.is-popping {
+    transform: scale(1.16) translateY(-1px);
+    border-color: var(--accent-secondary);
+    background: rgba(245, 158, 11, 0.18);
+    box-shadow: 0 0 16px var(--accent-glow);
+}
+.ticker-react-btn.has-reactions {
+    border-color: rgba(245, 158, 11, 0.45);
+    background: rgba(245, 158, 11, 0.1);
+}
+.ticker-floating-plus {
+    position: absolute;
+    pointer-events: none;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 900;
+    font-size: 0.78rem;
+    line-height: 1;
+    white-space: nowrap;
+    color: #fef08a;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95), 0 0 10px rgba(245, 158, 11, 0.85);
+    z-index: 90;
+    animation: tickerFloatUpFade 0.72s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes tickerFloatUpFade {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(0.75);
+    }
+    30% {
+        opacity: 1;
+        transform: translate(calc(-50% + var(--drift-x, 0px)), -14px) scale(1.15);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--drift-x, 0px)), -36px) scale(0.92);
+    }
+}
+
+/* ============================================================================
+   MONTHLY PERFORMANCE CODEX — DARK-MODE FANTASY FOLIO & 3D FLIP CARD
+   ============================================================================ */
+.codex-folio-shell {
+    position: relative;
+    background: radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.11) 0%, rgba(15, 20, 32, 0.98) 55%, rgba(9, 12, 20, 0.99) 100%);
+    border: 1.5px solid rgba(245, 158, 11, 0.48);
+    box-shadow: 0 18px 45px -10px rgba(0, 0, 0, 0.85), 0 0 28px -6px rgba(245, 158, 11, 0.25), inset 0 0 32px rgba(245, 158, 11, 0.05);
+    overflow: hidden;
+}
+.codex-foil-title {
+    background: linear-gradient(135deg, #fef08a 0%, #f59e0b 45%, #d97706 75%, #fde68a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 22px rgba(245, 158, 11, 0.28);
+}
+.codex-foil-badge {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(180, 83, 9, 0.28) 100%);
+    border: 1px solid rgba(251, 191, 36, 0.45);
+    color: #fef08a;
+}
+.codex-flip-card {
+    perspective: 1500px;
+}
+.codex-flip-card-inner {
+    display: grid;
+    grid-template-columns: 100%;
+    position: relative;
+    width: 100%;
+    transition: transform 0.68s cubic-bezier(0.22, 1, 0.36, 1);
+    transform-style: preserve-3d;
+}
+.codex-flip-card.is-flipped .codex-flip-card-inner {
+    transform: rotateY(180deg);
+}
+.codex-flip-card-front,
+.codex-flip-card-back {
+    grid-area: 1 / 1;
+    width: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+.codex-flip-card-back {
+    transform: rotateY(180deg);
+}
+.codex-flip-card:not(.is-flipped) .codex-flip-card-back {
+    pointer-events: none;
+}
+.codex-flip-card.is-flipped .codex-flip-card-front {
+    pointer-events: none;
+}
+
+/* FORGE TOGGLE SWITCH */
+.forge-toggle-track {
+    width: 44px;
+    height: 24px;
+    background-color: rgba(15, 23, 42, 0.95);
+    border: 1.5px solid rgba(100, 116, 139, 0.5);
+    border-radius: 9999px;
+    position: relative;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.forge-toggle-thumb {
+    width: 18px;
+    height: 18px;
+    background-color: #94a3b8;
+    border-radius: 9999px;
+    position: absolute;
+    top: 1.5px;
+    left: 2px;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.25s ease, box-shadow 0.25s ease;
+}
+input:checked + .forge-toggle-track {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(217, 119, 6, 0.45) 100%);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 14px var(--accent-glow);
+}
+input:checked + .forge-toggle-track .forge-toggle-thumb {
+    transform: translateX(19px);
+    background-color: #fef08a;
+    box-shadow: 0 0 8px rgba(254, 240, 138, 0.8);
+}
+
+
 

@@ -297,6 +297,34 @@ async function randomizeAvatar(){
     showToast({title:'🎲 Surprise!',subtitle:'New avatar generated!',icon:'✨',tier:'gold'});
 }
 
+async function handleToggleMonthlyCodex(isChecked){
+    const enabled = Boolean(isChecked);
+    userSettings.showMonthlyCodex = enabled;
+    try {
+        localStorage.setItem('aureum_show_monthly_codex', String(enabled));
+    } catch (e) {}
+    if (duoPresenceData[loggedInUser]) {
+        duoPresenceData[loggedInUser].settings = duoPresenceData[loggedInUser].settings || {};
+        duoPresenceData[loggedInUser].settings.showMonthlyCodex = enabled;
+    }
+    if (typeof renderMonthlyPerformanceCodex === 'function') {
+        renderMonthlyPerformanceCodex();
+    }
+    playTone('save');
+    showToast({
+        title: enabled ? '📜 Monthly Codex Enabled' : '📜 Monthly Codex Hidden',
+        subtitle: enabled ? 'Monthly Performance Codex is now visible in Chronicles.' : 'Monthly Performance Codex hidden from Chronicles.',
+        icon: enabled ? '👑' : '🌙',
+        tier: enabled ? 'gold' : 'silver',
+        duration: 2400
+    });
+    if (loggedInUser === viewedUser) {
+        try {
+            await db.collection('settings').doc(loggedInUser).set({ showMonthlyCodex: enabled }, { merge: true });
+        } catch (e) {}
+    }
+}
+
 function updateSettingsUI(){
     $('label-weekly-hrs').innerText=userSettings.weeklyHours;
     $('label-monthly-cash').innerText=userSettings.monthlyCash.toLocaleString();
@@ -321,6 +349,9 @@ function updateSettingsUI(){
     $('setting-avatar-url').value=userSettings.avatarUrl||'';
     const particle=userSettings.particleIntensity??15;
     $('setting-particle-intensity').value=particle;$('label-particle-val').innerText=`${particle}%`;
+    const codexCheckbox=$('setting-show-monthly-codex');
+    if(codexCheckbox)codexCheckbox.checked=(userSettings.showMonthlyCodex!==false);
+    if(typeof renderMonthlyPerformanceCodex==='function')renderMonthlyPerformanceCodex();
     applyGoalsTargetsLockUI();
     updateUnloggedFocusDisplay();
 }
@@ -345,6 +376,11 @@ async function saveAllForgeSettings(e){
     userSettings.bgOpacity=parseInt($('setting-bg-opacity').value)||20;
     userSettings.avatarUrl=$('setting-avatar-url').value.trim();
     userSettings.particleIntensity=parseInt($('setting-particle-intensity').value)||0;
+    const codexCheckbox=$('setting-show-monthly-codex');
+    if(codexCheckbox){
+        userSettings.showMonthlyCodex=Boolean(codexCheckbox.checked);
+        try{localStorage.setItem('aureum_show_monthly_codex',String(userSettings.showMonthlyCodex))}catch(err){}
+    }
 
     goalsTargetsLocked=true;
     goalsUnlockConfirmPending=false;

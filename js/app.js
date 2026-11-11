@@ -141,7 +141,13 @@ function initRealtimeSettingsListener(){
         if(doc.exists){
             const data=doc.data();
             if(loggedInUser===viewedUser){
+                const prevShowCodex=userSettings.showMonthlyCodex;
                 userSettings={...userSettings,...data};
+                if(data.showMonthlyCodex===undefined){
+                    userSettings.showMonthlyCodex=prevShowCodex!==false;
+                }else{
+                    try{localStorage.setItem('aureum_show_monthly_codex',String(Boolean(data.showMonthlyCodex)))}catch(e){}
+                }
                 applyThemeToBody(userSettings.userTheme);
                 applyCursorToBody(userSettings.userCursor);
                 applyBackgroundPattern(userSettings.bgPattern,userSettings.bgOpacity);
@@ -153,6 +159,8 @@ function initRealtimeSettingsListener(){
             }
         }
         updateSettingsUI();renderTodoList();renderDuoHUDCards();
+        if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
+        if(typeof renderMonthlyPerformanceCodex==='function')renderMonthlyPerformanceCodex();
         if(currentRawLogsCache.length>0)loadUserData();
     });
 }
@@ -161,10 +169,11 @@ function initGlobalHeaderGlowListener(){
     if(globalLogsUnsubscribe)globalLogsUnsubscribe();
     const now=new Date(),startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate());
     globalLogsUnsubscribe=db.collection('logs').onSnapshot(snapshot=>{
-        let nH=0,cH=0,nLogs=[],cLogs=[];
+        let nH=0,cH=0,nLogs=[],cLogs=[],allLogs=[];
         snapshot.forEach(doc=>{
             const d=doc.data();
             d.id=doc.id;
+            allLogs.push(d);
             const logDate=getLogDate(d);
             if(d.user==='North'){
                 nLogs.push(d);
@@ -174,6 +183,7 @@ function initGlobalHeaderGlowListener(){
                 if(logDate>=startToday&&d.type==='work')cH+=(d.hours||0);
             }
         });
+        globalAllLogsCache=allLogs;
         duoPresenceData.North.hoursToday=nH;duoPresenceData.Cream.hoursToday=cH;
         duoPresenceData.North.logs=nLogs;duoPresenceData.Cream.logs=cLogs;
         duoPresenceData.North.powerScore=calculateLifetimePWR(nLogs);
@@ -181,6 +191,7 @@ function initGlobalHeaderGlowListener(){
         duoPresenceData.North.workStyle=calculateRolling30DayQE(nLogs,'North',duoPresenceData.North.settings).archetype;
         duoPresenceData.Cream.workStyle=calculateRolling30DayQE(cLogs,'Cream',duoPresenceData.Cream.settings).archetype;
         renderDuoHUDCards();
+        if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
     });
 }
 
@@ -219,6 +230,7 @@ function switchTab(t){
     });
     $(`tab-${t}`)?.classList.remove('hidden');
     if(t==='forge'&&typeof applyGoalsTargetsLockUI==='function')applyGoalsTargetsLockUI();
+    if(t==='chronicles'&&typeof renderMonthlyPerformanceCodex==='function')renderMonthlyPerformanceCodex();
     if(t==='crucible')attachPomoSpectatorListener();
 }
 
@@ -291,6 +303,16 @@ function loadUserData(){
         renderJournalBookView(diaryLogs);
 
         populateAndFilterLedger();
+        if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
+        if(typeof renderMonthlyPerformanceCodex==='function')renderMonthlyPerformanceCodex();
         evaluateBadges(rawLogs,userSettings.completedPomoHistory||[],viewedUser);
     });
 }
+
+try {
+    if (typeof renderGuildActivityTicker === 'function') renderGuildActivityTicker();
+    if (typeof renderMonthlyPerformanceCodex === 'function') renderMonthlyPerformanceCodex();
+    setInterval(() => {
+        if (typeof renderGuildActivityTicker === 'function') renderGuildActivityTicker();
+    }, 30000);
+} catch (e) {}
