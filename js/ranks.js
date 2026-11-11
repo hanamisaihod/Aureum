@@ -88,17 +88,17 @@ function getRankTierName(level) {
 const ALL_STAT_KEYS = ['STR', 'DEX', 'INT', 'VIT', 'WIS', 'WIL'];
 
 const STAT_CATEGORY_BASELINES = {
-    DEX: 45,
-    INT: 45,
-    WIS: 45,
-    STR: 46,
-    WIL: 54,
-    VIT: 60
+    STR: 50,
+    DEX: 50,
+    INT: 50,
+    VIT: 50,
+    WIS: 50,
+    WIL: 50
 };
 
 const ROLE_STAT_AFFINITY = {
-    illustrator: { DEX: 7, INT: 3, STR: 2, WIS: 0, WIL: 0, VIT: -6 },
-    author: { WIS: 8, INT: 4, WIL: 2, DEX: 0, STR: 0, VIT: -6 }
+    illustrator: { DEX: 5, INT: 3, STR: 2, WIS: 0, WIL: 0, VIT: 0 },
+    author: { WIS: 5, INT: 3, WIL: 2, DEX: 0, STR: 0, VIT: 0 }
 };
 
 function _getInferredMilestoneCount(logs, pomoList = []) {
@@ -121,80 +121,162 @@ function _getInferredMilestoneCount(logs, pomoList = []) {
     return count;
 }
 
+/**
+ * Calibrates Wisdom (WIS) against a strict rolling 30-day target:
+ * - 30-Day Target: 1 reflection per day = 30 reflections in 30 days for 100% WIS baseline.
+ * - Linear/Proportional Scaling: 2 reflections in 30 days = (2/30)*100 ≈ 6.67% base WIS contribution (~15-20 WIS).
+ * - Same-Day Diminishing Returns: 1st reflection on Day X = 100% (1.0), subsequent reflections on Day X = 15% (0.15).
+ * - Relic Removal: Unlocked Relics contribute 0 points to WIS.
+ */
+function calculateWisdom(userLogs = [], userReflections = [], windowDays = 30, referenceTimeMs = null) {
+    const safeWindowDays = Math.max(1, parseFloat(windowDays) || 30);
+    const refNow = referenceTimeMs || Date.now();
+    const cutoffMs = refNow - (safeWindowDays * 86400000);
+
+    const combinedEntries = [];
+    const seenIds = new Set();
+
+    const pushIfReflection = (item, isExplicitReflection = false) => {
+        if (!item) return;
+        if (typeof item === 'string') {
+            if (item.trim().length > 0) {
+                combinedEntries.push({ timestamp: refNow, text: item.trim() });
+            }
+            return;
+        }
+        if (typeof item !== 'object') return;
+        if (item.id && seenIds.has(item.id)) return;
+
+        const d = getLogDate(item);
+        const tMs = d.getTime();
+        if (tMs < cutoffMs || tMs > (refNow + 300000)) return;
+
+        const hasDiaryText = item.type === 'diary' && String(item.text || item.reflectionText || '').trim().length > 0;
+        const hasLogReflection = item.type !== 'diary' && (
+            String(item.reflectionText || '').trim().length > 0 ||
+            String(item.note || '').trim().length > 0
+        );
+        const hasExplicitText = isExplicitReflection && String(item.text || item.reflectionText || item.note || '').trim().length > 0;
+
+        if (hasDiaryText || hasLogReflection || hasExplicitText) {
+            if (item.id) seenIds.add(item.id);
+            combinedEntries.push(item);
+        }
+    };
+
+    if (Array.isArray(userLogs)) {
+        userLogs.forEach(l => pushIfReflection(l, false));
+    }
+    if (Array.isArray(userReflections)) {
+        userReflections.forEach(r => pushIfReflection(r, true));
+    }
+
+    const reflectionsByDay = {};
+    combinedEntries.forEach(entry => {
+        const d = getLogDate(entry);
+        const dayKey = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        reflectionsByDay[dayKey] = (reflectionsByDay[dayKey] || 0) + 1;
+    });
+
+    let effectiveReflections = 0;
+    Object.values(reflectionsByDay).forEach(countOnDay => {
+        if (countOnDay >= 1) {
+            effectiveReflections += 1.0 + Math.max(0, countOnDay - 1) * 0.15;
+        }
+    });
+
+    if (effectiveReflections <= 0) {
+        return 12;
+    }
+
+    const normalizedRatio = effectiveReflections / safeWindowDays;
+    const rawWis = 13 + (normalizedRatio * 82);
+
+    return Math.min(99, Math.max(12, Math.round(rawWis)));
+}
+
+function _scale30DayStat(units, target30dUnits, floorScore = 12, maxScore = 96) {
+    if (!units || units <= 0) return floorScore;
+    const safeTarget = Math.max(1, target30dUnits);
+    const ratio = Math.max(0, units / safeTarget);
+    const curvedRatio = Math.pow(Math.min(1.25, ratio), 0.92);
+    const score = floorScore + curvedRatio * 74;
+    return Math.min(maxScore, Math.max(floorScore, Math.round(score)));
+}
+
 function computeStatScoresFromLogs(logs, settings, windowDays = 30, referenceTimeMs = null) {
     const safeLogs = Array.isArray(logs) ? logs : [];
     const safeSettings = settings || {};
+    const safeWindowDays = Math.max(1, parseFloat(windowDays) || 30);
     const refNow = referenceTimeMs || Date.now();
-    const cutoff30 = refNow - ((windowDays || 30) * 86400000);
+    const cutoff30 = refNow - (safeWindowDays * 86400000);
     const pool = referenceTimeMs
         ? safeLogs.filter(l => getLogDate(l).getTime() <= refNow)
         : safeLogs;
     const recentPool = pool.filter(l => getLogDate(l).getTime() >= cutoff30);
 
-    const workLogs = pool.filter(l => l.type === 'work');
     const recentWork = recentPool.filter(l => l.type === 'work');
-    const activeWork = recentWork.length > 0 ? recentWork : workLogs;
-
     const workoutLogs = recentPool.filter(l => l.type === 'workout');
     const choreLogs = recentPool.filter(l => l.type === 'chore');
     const healthLogs = recentPool.filter(l => l.type === 'health');
-    const diaryLogs = pool.filter(l => l.type === 'diary');
-    const reflectionLogs = pool.filter(l => l.type !== 'diary' && ((l.reflectionText && String(l.reflectionText).trim().length > 0) || (l.note && String(l.note).trim().length > 0)));
-    const pomoList = Array.isArray(safeSettings.completedPomoHistory) ? safeSettings.completedPomoHistory : [];
-    const unlockedBadges = Array.isArray(safeSettings.unlockedBadges) && safeSettings.unlockedBadges.length > 0
-        ? safeSettings.unlockedBadges
-        : new Array(_getInferredMilestoneCount(pool, pomoList));
+
+    const allPomoList = Array.isArray(safeSettings.completedPomoHistory) ? safeSettings.completedPomoHistory : [];
+    const recentPomoList = allPomoList.filter(p => {
+        if (!p || !p.timestamp) return false;
+        const ts = typeof p.timestamp === 'number' ? p.timestamp : new Date(p.timestamp).getTime();
+        return ts >= cutoff30 && ts <= (refNow + 300000);
+    });
     const todos = Array.isArray(safeSettings.scratchpadTodos) ? safeSettings.scratchpadTodos : [];
 
-    // 1. STR — High-effort endurance and raw work capacity
-    const workoutHours = workoutLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
-    const avgStrain = workoutLogs.length > 0
-        ? workoutLogs.reduce((acc, l) => acc + (parseFloat(l.strain) || 3), 0) / workoutLogs.length : 3.0;
-    const workEffortUnits = activeWork.reduce((acc, l) => {
+    const weeklyTargetHrs = Math.max(4, parseFloat(safeSettings.weeklyHours) || 10);
+    const target30dWorkHours = Math.max(20, (weeklyTargetHrs / 7) * safeWindowDays);
+    const softCap = parseFloat(safeSettings.dailySoftCap) || 4;
+
+    // 1. STR — High-effort endurance and raw work capacity (Rolling 30-day baseline)
+    const workoutEffortUnits = workoutLogs.reduce((acc, l) => {
+        const h = Math.max(0.15, parseFloat(l.hours) || 0.5);
+        const strain = Math.max(1, Math.min(5, parseFloat(l.strain) || 3));
+        return acc + h * (0.9 + (strain / 3) * 1.1);
+    }, 0);
+    const workEffortUnits = recentWork.reduce((acc, l) => {
         const h = Math.max(0.1, parseFloat(l.hours) || 0);
         const e = Math.max(1, Math.min(5, parseFloat(l.effort) || 3));
-        return acc + h * (e >= 5 ? 1.85 : (e >= 4 ? 1.45 : (e >= 3 ? 0.95 : 0.65)));
+        const effortWeight = e >= 5 ? 1.5 : (e >= 4 ? 1.2 : (e >= 3 ? 0.85 : (e >= 2 ? 0.6 : 0.45)));
+        return acc + (h * effortWeight);
     }, 0);
-    const strUnits = workEffortUnits + (workoutHours * 1.35 * (avgStrain / 3));
-    const strVal = Math.min(99, Math.max(15, Math.round(strUnits > 0 ? 18 + 14.5 * Math.log(1 + strUnits / 2.6) : 15)));
+    const strUnits = workEffortUnits + (workoutEffortUnits * 1.35);
+    const strTarget30d = Math.max(24, target30dWorkHours * 0.85);
+    const strVal = _scale30DayStat(strUnits, strTarget30d, 12, 96);
 
-    // 2. DEX — Precision and fine craft execution (Re-anchored: Q=3 gives ~55-65, Q=4-5 gives 70-90+, no average-craft penalty)
-    const avgQ = activeWork.length > 0
-        ? activeWork.reduce((acc, l) => acc + (parseFloat(l.results) || 3), 0) / activeWork.length
-        : 3.0;
-    const craftEquivHours = activeWork.reduce((acc, l) => {
+    // 2. DEX — Precision and fine craft execution (Rolling 30-day baseline)
+    const avgQ = recentWork.length > 0
+        ? recentWork.reduce((acc, l) => acc + (parseFloat(l.results) || 3), 0) / recentWork.length
+        : 0;
+    const craftEquivHours = recentWork.reduce((acc, l) => {
         const q = Math.max(1, Math.min(5, parseFloat(l.results) || 3));
         const h = Math.max(0.1, parseFloat(l.hours) || 0);
-        return acc + h * (q >= 5 ? 1.45 : (q >= 4 ? 1.2 : (q >= 3 ? 1.0 : (q >= 2 ? 0.85 : 0.75))));
-    }, 0);
-    const highCraftHours = activeWork.reduce((acc, l) => {
-        const q = parseFloat(l.results) || 3;
-        const h = Math.max(0, parseFloat(l.hours) || 0);
-        return acc + (q >= 4 ? h * (q >= 5 ? 1.5 : 1.0) : 0);
+        const qMult = q >= 5 ? 1.45 : (q >= 4 ? 1.22 : (q >= 3 ? 1.0 : (q >= 2 ? 0.78 : 0.6)));
+        return acc + (h * qMult);
     }, 0);
     const doneTodos = todos.filter(t => t.done).length;
-    let dexRaw = 15;
-    if (activeWork.length > 0) {
-        const steadyQualityScore = avgQ >= 3 ? 20 + ((avgQ - 3) / 2) * 12 : 15 + ((avgQ - 1) / 2) * 5;
-        const volumeCurve = Math.min(22, 7.8 * Math.log(1 + craftEquivHours / 2.2));
-        const highCraftBoost = Math.min(18, 6.2 * Math.log(1 + highCraftHours / 2.2));
-        dexRaw = 22 + steadyQualityScore + volumeCurve + highCraftBoost + Math.min(3, doneTodos * 0.4);
-    } else if (doneTodos > 0) {
-        dexRaw = 15 + Math.min(10, doneTodos * 1.2);
+    const dexUnits = craftEquivHours + Math.min(3.5, doneTodos * 0.35);
+    const dexTarget30d = Math.max(24, target30dWorkHours * 0.9);
+    let dexVal = _scale30DayStat(dexUnits, dexTarget30d, 12, 96);
+    if (recentWork.length >= 3 && avgQ >= 3.8) {
+        dexVal = Math.min(97, Math.round(dexVal + (avgQ - 3.5) * 4));
     }
-    const dexVal = Math.min(99, Math.max(15, Math.round(dexRaw)));
 
-    // 3. INT — Deep focus immersion and cognitive flow
-    const recentWorkHours = activeWork.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
-    const totalFocusHours = pomoList.reduce((acc, p) => acc + ((parseFloat(p.durationSecs) || 0) / 3600), 0);
-    const unbrokenFocusHours = pomoList.filter(p => !p.wasPaused).reduce((acc, p) => acc + ((parseFloat(p.durationSecs) || 0) / 3600), 0);
-    const intUnits = (recentWorkHours * 1.35) + (totalFocusHours * 2.2) + (unbrokenFocusHours * 1.4);
-    const intVal = Math.min(99, Math.max(15, Math.round(intUnits > 0 ? 18 + 15.0 * Math.log(1 + intUnits / 2.5) : 15)));
+    // 3. INT — Deep focus immersion and cognitive flow (Rolling 30-day baseline)
+    const recentWorkHours = recentWork.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
+    const recentFocusHours = recentPomoList.reduce((acc, p) => acc + ((parseFloat(p.durationSecs) || 0) / 3600), 0);
+    const unbrokenFocusHours = recentPomoList.filter(p => !p.wasPaused).reduce((acc, p) => acc + ((parseFloat(p.durationSecs) || 0) / 3600), 0);
+    const intUnits = (recentWorkHours * 1.0) + (recentFocusHours * 1.25) + (unbrokenFocusHours * 0.65);
+    const intTarget30d = Math.max(25, target30dWorkHours * 0.95);
+    const intVal = _scale30DayStat(intUnits, intTarget30d, 12, 96);
 
-    // 4. VIT — Physical endurance, chores, and daily recovery (Diminishing daily returns: 100%, 70%, 40% + log soft-cap for 55-70 routine range)
-    const softCap = parseFloat(safeSettings.dailySoftCap) || 4;
+    // 4. VIT — Physical endurance, chores, and daily recovery (Rolling 30-day baseline)
     const workByDay = {};
-    activeWork.forEach(l => {
+    recentWork.forEach(l => {
         const d = getLogDate(l);
         const k = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
         workByDay[k] = (workByDay[k] || 0) + (parseFloat(l.hours) || 0);
@@ -209,15 +291,15 @@ function computeStatScoresFromLogs(logs, settings, windowDays = 30, referenceTim
     workoutLogs.forEach(w => {
         const hrs = Math.min(3.0, Math.max(0.25, parseFloat(w.hours) || 0.5));
         const strain = Math.max(1, Math.min(5, parseInt(w.strain) || 3));
-        addSanctuaryEntry(w, 1.2 + hrs * (0.9 + strain * 0.4), false);
+        addSanctuaryEntry(w, 1.0 + hrs * (0.85 + strain * 0.35), false);
     });
     choreLogs.forEach(c => {
         const hrs = Math.min(2.5, Math.max(0.25, parseFloat(c.hours) || 0.5));
-        addSanctuaryEntry(c, 1.1 + hrs * 1.2, false);
+        addSanctuaryEntry(c, 0.9 + hrs * 1.15, false);
     });
     healthLogs.forEach(s => {
         const lvl = Math.max(1, Math.min(5, parseInt(s.level) || 1));
-        addSanctuaryEntry(s, 0.35 + lvl * 0.15, true);
+        addSanctuaryEntry(s, 0.3 + lvl * 0.12, true);
     });
 
     let vitCoreExp = 0, vitSnackExp = 0;
@@ -229,40 +311,30 @@ function computeStatScoresFromLogs(logs, settings, windowDays = 30, referenceTim
             else vitCoreExp += entry.baseExp * dimMult;
         });
     });
-    const totalVitExp = vitCoreExp + Math.min(8, vitSnackExp);
-    const vitVal = Math.min(99, Math.max(15, Math.round(totalVitExp > 0 ? 18 + 13.4 * Math.log(1 + totalVitExp / 2.8) : 15)));
+    const totalVitExp = vitCoreExp + Math.min(4.5, vitSnackExp);
+    const vitTarget30d = 28;
+    const vitVal = _scale30DayStat(totalVitExp, vitTarget30d, 12, 96);
 
-    // 5. WIS — Self-reflection, synthesis, and milestone mastery
-    const activeDaySet = new Set();
+    // 5. WIS — Rolling 30-day self-reflection (1/day = 30/30d target, 15% same-day diminishing returns, 0 relic points)
+    const wisVal = calculateWisdom(recentPool, [], safeWindowDays, refNow);
+
+    // 6. WIL — Daily discipline and unbroken streak momentum (Rolling 30-day baseline)
+    const recentDaySet = new Set();
     recentPool.forEach(l => {
         const d = getLogDate(l);
-        activeDaySet.add(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime());
+        recentDaySet.add(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime());
     });
-    const sustainableSessions = activeWork.filter(l => (parseFloat(l.results) || 3) >= 3 && (parseFloat(l.hours) || 0) <= softCap + 0.5).length;
-    const pacingWisdom = activeWork.length > 0
-        ? 18 + Math.min(22, 7.5 * Math.log(1 + sustainableSessions / 2.2)) + Math.min(8, activeDaySet.size * 0.35)
-        : 0;
-    const reflectionUnits = diaryLogs.length * 1.8 + reflectionLogs.length * 1.0;
-    const reflectionBonus = reflectionUnits > 0 ? Math.min(24, 7.8 * Math.log(1 + reflectionUnits / 1.4)) : 0;
-    const relicBonus = Math.min(16, unlockedBadges.length * 1.5);
-    const wisVal = Math.min(99, Math.max(15, Math.round(15 + pacingWisdom + reflectionBonus + relicBonus)));
-
-    // 6. WIL — Daily discipline and unbroken streak momentum
-    const allDaySet = new Set();
-    pool.forEach(l => {
-        const d = getLogDate(l);
-        allDaySet.add(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime());
-    });
-    const sortedDays = Array.from(allDaySet).sort((a, b) => a - b);
-    let bestStreak = sortedDays.length > 0 ? 1 : 0, curRun = sortedDays.length > 0 ? 1 : 0;
-    for (let i = 1; i < sortedDays.length; i++) {
-        const diff = Math.round((sortedDays[i] - sortedDays[i - 1]) / 86400000);
-        if (diff === 1) { curRun++; if (curRun > bestStreak) bestStreak = curRun; }
+    const sortedRecentDays = Array.from(recentDaySet).sort((a, b) => a - b);
+    let bestRecentStreak = sortedRecentDays.length > 0 ? 1 : 0, curRun = sortedRecentDays.length > 0 ? 1 : 0;
+    for (let i = 1; i < sortedRecentDays.length; i++) {
+        const diff = Math.round((sortedRecentDays[i] - sortedRecentDays[i - 1]) / 86400000);
+        if (diff === 1) { curRun++; if (curRun > bestRecentStreak) bestRecentStreak = curRun; }
         else if (diff > 1) curRun = 1;
     }
     const softCapHits = Object.values(workByDay).filter(h => h >= softCap).length;
-    const wilUnits = (activeDaySet.size * 1.4) + (Math.min(30, bestStreak) * 1.1) + (softCapHits * 0.9);
-    const wilVal = Math.min(99, Math.max(15, Math.round(wilUnits > 0 ? 18 + 13.8 * Math.log(1 + wilUnits / 2.8) : 15)));
+    const wilUnits = (recentDaySet.size * 1.0) + (Math.min(safeWindowDays, bestRecentStreak) * 0.65) + (softCapHits * 0.5);
+    const wilTarget30d = 38;
+    const wilVal = _scale30DayStat(wilUnits, wilTarget30d, 12, 96);
 
     return {
         STR: strVal,
@@ -538,6 +610,13 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
         else if (diff > 1) curRun = 1;
     }
 
+    const cutoff30 = Date.now() - (30 * 86400000);
+    const recent30Logs = safeLogs.filter(l => getLogDate(l).getTime() >= cutoff30);
+    const recentReflectionsCount = recent30Logs.filter(l => {
+        if (l.type === 'diary') return String(l.text || l.reflectionText || '').trim().length > 0;
+        return String(l.reflectionText || l.note || '').trim().length > 0;
+    }).length;
+
     const stats = [
         {
             key: 'STR',
@@ -546,7 +625,7 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
             val: strVal,
             color: '#ef4444',
             detail: `${formatHours(workoutHours)}h Fitness | ${formatHours(heavyWorkHours)}h High-Strain`,
-            description: 'High-effort endurance and raw work capacity.'
+            description: 'High-effort endurance and raw work capacity (30d baseline).'
         },
         {
             key: 'DEX',
@@ -555,7 +634,7 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
             val: dexVal,
             color: '#10b981',
             detail: `${avgQ.toFixed(1)} Avg Quality | ${workLogs.length} Shifts`,
-            description: 'Precision and fine craft execution.'
+            description: 'Precision and fine craft execution (30d baseline).'
         },
         {
             key: 'INT',
@@ -564,7 +643,7 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
             val: intVal,
             color: '#38bdf8',
             detail: `${formatHours(totalWorkHours)}h Work | ${formatHours(totalFocusHours)}h Focus`,
-            description: 'Deep focus immersion and cognitive flow.'
+            description: 'Deep focus immersion and cognitive flow (30d baseline).'
         },
         {
             key: 'VIT',
@@ -573,7 +652,7 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
             val: vitVal,
             color: '#f59e0b',
             detail: `${formatHours(totalChoreHours)}h Chores | ${workoutLogs.length} Workouts`,
-            description: 'Physical endurance, chores, and daily recovery.'
+            description: 'Physical endurance, chores, and daily recovery (30d baseline).'
         },
         {
             key: 'WIS',
@@ -581,8 +660,8 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
             icon: '📖',
             val: wisVal,
             color: '#a855f7',
-            detail: `${diaryLogs.length} Chronicles | ${unlockedBadges.length} Relics`,
-            description: 'Self-reflection, synthesis, and milestone mastery.'
+            detail: `${recentReflectionsCount}/30d Reflections | ${diaryLogs.length} Chronicles`,
+            description: 'Daily reflection synthesis calibrated against a 30-day rolling target.'
         },
         {
             key: 'WIL',
@@ -591,7 +670,7 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
             val: wilVal,
             color: '#f97316',
             detail: `${sortedDays.length}d Active | ${bestStreak}d Best Streak`,
-            description: 'Daily discipline and unbroken streak momentum.'
+            description: 'Daily discipline and unbroken streak momentum (30d baseline).'
         }
     ];
 

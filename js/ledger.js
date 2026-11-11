@@ -231,15 +231,17 @@ function renderLedgerLists(logs){
 }
 
 // ============================================================================
-// PART 1: PERSISTENT TOP ACTIVITY TICKER ("GUILD FEED") & SPAMMABLE REACTIONS
+// PART 1: LEFT SIDEBAR GUILD ACTIVITY FEED, ANNOUNCER ENGINE & SPAMMABLE REACTIONS
 // ============================================================================
 
 const GUILD_REACTION_EMOJIS = ['☕', '👏', '🔥'];
 const GUILD_REACTION_DOM_KEYS = { '☕': 'coffee', '👏': 'clap', '🔥': 'fire' };
 const GUILD_REACTION_STORAGE_KEY = 'aureum_guild_reactions_v1';
 const GUILD_QUIET_FALLBACK_ID = 'guild_quiet_shift';
+const MAX_GUILD_ACTIVITY_CARDS = 10;
 
 let _localReactionsMap = {};
+let _activityFeedLatestReactions = {};
 let _pendingReactionDeltas = {};
 let _reactionDebounceTimers = {};
 let _reactionFirstTapTimestamps = {};
@@ -255,6 +257,30 @@ try {
 function _saveLocalReactionsToStorage() {
     try {
         localStorage.setItem(GUILD_REACTION_STORAGE_KEY, JSON.stringify(_localReactionsMap));
+    } catch (e) {}
+}
+
+function initGuildActivityFeedListener() {
+    if (typeof activityFeedUnsubscribe === 'function' && activityFeedUnsubscribe) {
+        activityFeedUnsubscribe();
+    }
+    try {
+        activityFeedUnsubscribe = db.collection('activity_feed').doc('latest').onSnapshot(doc => {
+            if (doc.exists) {
+                const data = doc.data() || {};
+                const mapFromDoc = (data.reactions && typeof data.reactions === 'object') ? data.reactions : {};
+                _activityFeedLatestReactions = { ...mapFromDoc };
+                Object.keys(data).forEach(k => {
+                    if (k !== 'reactions' && k !== 'updatedAt' && data[k] && typeof data[k] === 'object') {
+                        _activityFeedLatestReactions[k] = {
+                            ...(_activityFeedLatestReactions[k] || {}),
+                            ...data[k]
+                        };
+                    }
+                });
+                _syncLiveReactionBadgesInDOM();
+            }
+        });
     } catch (e) {}
 }
 
@@ -274,41 +300,62 @@ function formatTickerTimeAgo(dateObj) {
     return `${diffDays}d ago`;
 }
 
-function getRecentGuildLogs48h() {
+function formatActivityDuration(hoursVal) {
+    const num = Math.max(0, parseFloat(hoursVal) || 0);
+    if (num > 0 && num < 1) {
+        const mins = Math.max(1, Math.round(num * 60));
+        return `${mins}m`;
+    }
+    return `${formatHours(num)}h`;
+}
+
+function getUserAvatarUrl(userKey) {
+    const raw = String(userKey || 'North').trim();
+    const normUser = raw.toLowerCase() === 'cream' ? 'Cream' : 'North';
+
+    if (normUser === loggedInUser && userSettings && typeof userSettings.avatarUrl === 'string' && userSettings.avatarUrl.trim()) {
+        return userSettings.avatarUrl.trim();
+    }
+    if (typeof spectatorSettings !== 'undefined' && spectatorSettings && normUser === viewedUser && typeof spectatorSettings.avatarUrl === 'string' && spectatorSettings.avatarUrl.trim()) {
+        return spectatorSettings.avatarUrl.trim();
+    }
+    const s = duoPresenceData[normUser]?.settings;
+    if (s && typeof s.avatarUrl === 'string' && s.avatarUrl.trim()) {
+        return s.avatarUrl.trim();
+    }
+    return `https://api.dicebear.com/7.x/bottts/svg?seed=${normUser}`;
+}
+
+function getRecentGuildActivityLogs(limit = MAX_GUILD_ACTIVITY_CARDS) {
     const sourceLogs = (Array.isArray(globalAllLogsCache) && globalAllLogsCache.length > 0)
         ? globalAllLogsCache
         : (Array.isArray(currentRawLogsCache) ? currentRawLogsCache : []);
-    const nowMs = Date.now();
-    const cutoff48h = nowMs - (48 * 60 * 60 * 1000);
-    return sourceLogs
-        .filter(l => {
-            const t = getLogDate(l).getTime();
-            return t >= cutoff48h && t <= (nowMs + 300000);
-        })
-        .sort((a, b) => getLogDate(b).getTime() - getLogDate(a).getTime());
+    return [...sourceLogs]
+        .sort((a, b) => getLogDate(b).getTime() - getLogDate(a).getTime())
+        .slice(0, limit);
+}
+
+function getRecentGuildLogs48h() {
+    return getRecentGuildActivityLogs(MAX_GUILD_ACTIVITY_CARDS);
 }
 
 function getActiveTickerTargetLog() {
-    const recent48h = getRecentGuildLogs48h();
-    if (recent48h.length > 0) {
-        const safeIdx = Math.max(0, Math.min(recent48h.length - 1, activeTickerLogIndex));
-        return recent48h[safeIdx];
-    }
-    const allPool = (Array.isArray(globalAllLogsCache) && globalAllLogsCache.length > 0)
-        ? globalAllLogsCache
-        : (Array.isArray(currentRawLogsCache) ? currentRawLogsCache : []);
-    if (allPool.length > 0) {
-        const sortedAll = [...allPool].sort((a, b) => getLogDate(b).getTime() - getLogDate(a).getTime());
-        return sortedAll[0];
-    }
-    return null;
+    const recent = getRecentGuildActivityLogs(MAX_GUILD_ACTIVITY_CARDS);
+    return recent.length > 0 ? recent[0] : null;
 }
 
-function getEffectiveReactionsForTarget(logObj) {
-    const targetId = logObj?.id || GUILD_QUIET_FALLBACK_ID;
-    const serverReactions = (logObj && logObj.reactions && typeof logObj.reactions === 'object')
+function getEffectiveReactionsForTarget(logOrId) {
+    const targetId = typeof logOrId === 'string'
+        ? logOrId
+        : (logOrId?.id || GUILD_QUIET_FALLBACK_ID);
+    const logObj = typeof logOrId === 'object' ? logOrId : null;
+
+    const latestDocReactions = (_activityFeedLatestReactions && _activityFeedLatestReactions[targetId] && typeof _activityFeedLatestReactions[targetId] === 'object')
+        ? _activityFeedLatestReactions[targetId]
+        : {};
+    const legacyLogReactions = (logObj && logObj.reactions && typeof logObj.reactions === 'object')
         ? logObj.reactions
-        : (targetId === GUILD_QUIET_FALLBACK_ID && userSettings?.quietShiftReactions ? userSettings.quietShiftReactions : {});
+        : {};
     const localSaved = _localReactionsMap[targetId] || {};
     const pending = _pendingReactionDeltas[targetId] || {};
 
@@ -316,7 +363,9 @@ function getEffectiveReactionsForTarget(logObj) {
     let changedLocal = false;
 
     GUILD_REACTION_EMOJIS.forEach(emoji => {
-        const srvCount = Math.max(0, parseInt(serverReactions[emoji]) || 0);
+        const docCount = Math.max(0, parseInt(latestDocReactions[emoji]) || 0);
+        const legCount = Math.max(0, parseInt(legacyLogReactions[emoji]) || 0);
+        const srvCount = Math.max(docCount, legCount);
         const locCount = Math.max(0, parseInt(localSaved[emoji]) || 0);
         const pendDelta = Math.max(0, parseInt(pending[emoji]) || 0);
         const effective = Math.max(srvCount + pendDelta, locCount);
@@ -333,105 +382,176 @@ function getEffectiveReactionsForTarget(logObj) {
     return result;
 }
 
-function formatGuildTickerEntryHtml(log) {
-    const d = getLogDate(log);
-    const timeAgo = formatTickerTimeAgo(d);
-    const userName = escapeHtml(getUserDisplayName(log.user || 'North'));
+function getActivityCardStatGainPill(log) {
+    const type = log?.type || 'work';
+    const role = typeof getUserRole === 'function' ? getUserRole(log?.role || log?.user) : 'illustrator';
 
-    let emoji = '⚗️';
-    let duration = `${formatHours(log.hours || 0)}h`;
-    let category = 'Work';
-
-    if (log.type === 'work') {
-        emoji = '⚗️';
-        duration = `${formatHours(log.hours || 0)}h`;
-        category = 'Work';
-    } else if (log.type === 'workout') {
-        emoji = '🏃';
-        duration = `${formatHours(log.hours || 0)}h`;
-        category = 'Fitness';
-    } else if (log.type === 'chore') {
-        emoji = '🧹';
-        duration = `${formatHours(log.hours || 0)}h`;
-        category = 'Chores';
-    } else if (log.type === 'health') {
-        emoji = '🍨';
-        duration = `Lvl ${log.level || 1}`;
-        category = 'Snack';
-    } else if (log.type === 'diary') {
-        emoji = '📖';
-        duration = 'Daily';
-        category = 'Reflection';
+    if (type === 'work') {
+        const h = Math.max(0.25, parseFloat(log.hours) || 1);
+        const q = Math.max(1, Math.min(5, parseFloat(log.results) || 3));
+        const e = Math.max(1, Math.min(5, parseFloat(log.effort) || 3));
+        if (e >= 4 && e > q) {
+            const strGain = Math.max(2, Math.round(h * (1.8 + e * 0.7)));
+            return { label: `+${strGain} STR`, classes: 'bg-rose-500/15 text-rose-300 border-rose-500/35' };
+        }
+        if (role === 'author' && q <= 3) {
+            const intGain = Math.max(2, Math.round(h * (1.8 + q * 0.65)));
+            return { label: `+${intGain} INT`, classes: 'bg-sky-500/15 text-sky-300 border-sky-500/35' };
+        }
+        const dexGain = Math.max(2, Math.round(h * (1.8 + q * 0.75)));
+        return { label: `+${dexGain} DEX`, classes: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/35' };
     }
-
-    const plainSummary = `${emoji} ${getUserDisplayName(log.user || 'North')} logged ${duration} ${category} — ${timeAgo}`;
-    const html = `
-        <span class="inline-flex items-center gap-1.5 min-w-0 truncate">
-            <span class="text-sm shrink-0">${emoji}</span>
-            <span class="font-black text-amber-300">${userName}</span>
-            <span class="text-slate-400">logged</span>
-            <span class="font-mono font-extrabold text-slate-100">${escapeHtml(duration)}</span>
-            <span class="font-bold text-emerald-400">${escapeHtml(category)}</span>
-            <span class="text-slate-500 font-normal">—</span>
-            <span class="font-mono text-[11px] text-slate-400">${escapeHtml(timeAgo)}</span>
-        </span>
-    `;
-    return { html, plainSummary };
+    if (type === 'workout') {
+        const h = Math.max(0.25, parseFloat(log.hours) || 0.75);
+        const strain = Math.max(1, Math.min(5, parseInt(log.strain) || 3));
+        const vitGain = Math.max(3, Math.round(h * (4.2 + strain * 1.6)));
+        return { label: `+${vitGain} VIT`, classes: 'bg-amber-500/15 text-amber-300 border-amber-500/35' };
+    }
+    if (type === 'chore') {
+        const h = Math.max(0.25, parseFloat(log.hours) || 0.5);
+        const vitGain = Math.max(3, Math.round(h * 7));
+        return { label: `+${vitGain} VIT`, classes: 'bg-amber-500/15 text-amber-300 border-amber-500/35' };
+    }
+    if (type === 'health') {
+        const lvl = Math.max(1, Math.min(5, parseInt(log.level) || 1));
+        const vitGain = Math.max(2, lvl * 2);
+        return { label: `+${vitGain} VIT`, classes: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/35' };
+    }
+    return { label: '+3 WIS', classes: 'bg-purple-500/15 text-purple-300 border-purple-500/35' };
 }
 
-function renderGuildActivityTicker() {
-    const msgEl = $('guild-ticker-message');
-    const navEl = $('guild-ticker-nav');
-    const idxLabel = $('guild-ticker-index-label');
-    if (!msgEl) return;
+function formatGuildActivityHeaderInfo(log) {
+    const rawUser = log?.user || 'North';
+    const userName = escapeHtml(getUserDisplayName(rawUser));
+    const role = typeof getUserRole === 'function' ? getUserRole(log?.role || rawUser) : (rawUser === 'Cream' ? 'author' : 'illustrator');
+    const avatarUrl = escapeHtml(getUserAvatarUrl(rawUser));
+    const timeAgo = escapeHtml(formatTickerTimeAgo(getLogDate(log)));
 
-    const recent48h = getRecentGuildLogs48h();
-    if (recent48h.length === 0) {
-        activeTickerLogIndex = 0;
-        const emptyText = 'The studio is quiet. Awaiting the next shift...';
-        msgEl.innerHTML = `<span class="text-slate-400 italic">${emptyText}</span>`;
-        msgEl.title = emptyText;
-        if (navEl) {
-            navEl.classList.add('hidden');
-            navEl.classList.remove('flex');
-        }
+    let actionSummary = '';
+    if (log.type === 'work') {
+        const dur = formatActivityDuration(log.hours || 0);
+        const craftDomain = role === 'author' ? 'Writing' : 'Illustration';
+        actionSummary = `logged <span class="font-mono font-extrabold text-slate-100">${escapeHtml(dur)}</span> <span class="font-bold text-amber-300">${craftDomain}</span>`;
+    } else if (log.type === 'workout') {
+        const dur = formatActivityDuration(log.hours || 0);
+        actionSummary = `logged <span class="font-mono font-extrabold text-slate-100">${escapeHtml(dur)}</span> <span class="font-bold text-emerald-400">Fitness</span>`;
+    } else if (log.type === 'chore') {
+        const dur = formatActivityDuration(log.hours || 0);
+        actionSummary = `logged <span class="font-mono font-extrabold text-slate-100">${escapeHtml(dur)}</span> <span class="font-bold text-sky-300">Chores</span>`;
+    } else if (log.type === 'health') {
+        actionSummary = `logged <span class="font-mono font-extrabold text-slate-100">Lvl ${parseInt(log.level) || 1}</span> <span class="font-bold text-emerald-300">Recovery</span>`;
     } else {
-        if (activeTickerLogIndex >= recent48h.length) activeTickerLogIndex = 0;
-        const currentLog = recent48h[activeTickerLogIndex];
-        const { html, plainSummary } = formatGuildTickerEntryHtml(currentLog);
-        msgEl.innerHTML = html;
-        msgEl.title = plainSummary;
-
-        if (navEl && idxLabel) {
-            if (recent48h.length > 1) {
-                navEl.classList.remove('hidden');
-                navEl.classList.add('flex');
-                idxLabel.innerText = `${activeTickerLogIndex + 1}/${recent48h.length}`;
-            } else {
-                navEl.classList.add('hidden');
-                navEl.classList.remove('flex');
-            }
-        }
+        actionSummary = `inscribed a <span class="font-bold text-purple-300">Reflection</span>`;
     }
 
-    const reactionTarget = getActiveTickerTargetLog();
-    const counts = getEffectiveReactionsForTarget(reactionTarget);
-    GUILD_REACTION_EMOJIS.forEach(emoji => {
-        const key = GUILD_REACTION_DOM_KEYS[emoji];
-        const countEl = $(`ticker-react-count-${key}`);
-        const btnEl = $(`ticker-react-btn-${key}`);
+    return { userName, avatarUrl, actionSummary, timeAgo };
+}
+
+function _renderGuildActivityCardHtml(log, idx) {
+    const cardId = String(log.id || `guild_card_${idx}`);
+    const safeCardDomId = cardId.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const { userName, avatarUrl, actionSummary, timeAgo } = formatGuildActivityHeaderInfo(log);
+    const statPill = getActivityCardStatGainPill(log);
+
+    const q = parseFloat(log.results) || (log.type === 'workout' ? (parseFloat(log.strain) || 3) : 3);
+    const e = parseFloat(log.effort) || (log.type === 'workout' ? (parseFloat(log.strain) || 3) : 3);
+    const announcerQuote = typeof getAnnouncerComment === 'function'
+        ? getAnnouncerComment(log.type, q, e, cardId)
+        : 'Another solid session logged for the craft.';
+
+    const counts = getEffectiveReactionsForTarget(log);
+    const reactionButtonsHtml = GUILD_REACTION_EMOJIS.map(emoji => {
+        const domKey = GUILD_REACTION_DOM_KEYS[emoji];
         const c = counts[emoji] || 0;
-        if (countEl) countEl.innerText = c.toLocaleString();
-        if (btnEl) btnEl.classList.toggle('has-reactions', c > 0);
+        const activeCls = c > 0 ? 'has-reactions' : '';
+        return `
+            <button type="button"
+                id="card-react-btn-${safeCardDomId}-${domKey}"
+                data-card-id="${escapeHtml(cardId)}"
+                data-emoji="${emoji}"
+                onclick="spamGuildReaction('${escapeHtml(cardId)}', '${emoji}', event)"
+                class="ticker-react-btn ${activeCls}"
+                title="React with ${emoji} (Spammable!)">
+                <span class="text-xs leading-none">${emoji}</span>
+                <span id="card-react-count-${safeCardDomId}-${domKey}" class="ticker-react-count font-mono text-[10px] font-black text-amber-300">${c.toLocaleString()}</span>
+            </button>
+        `;
+    }).join('');
+
+    return `
+        <article class="guild-activity-card space-y-2" data-activity-card-id="${escapeHtml(cardId)}">
+            <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <img src="${avatarUrl}" alt="${userName}" class="guild-card-avatar" loading="lazy">
+                    <div class="min-w-0 leading-snug">
+                        <div class="text-[11px] text-slate-200 break-words">
+                            <span class="font-black text-white">${userName}</span>
+                            <span class="text-slate-300"> ${actionSummary}</span>
+                        </div>
+                        <div class="text-[9px] font-mono text-slate-400 mt-0.5">${timeAgo}</div>
+                    </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold border shrink-0 ${statPill.classes}">
+                    ${escapeHtml(statPill.label)}
+                </span>
+            </div>
+            <div class="guild-announcer-box">
+                <p class="text-[11px] text-amber-100/90 italic leading-snug font-medium">
+                    “${escapeHtml(announcerQuote)}”
+                </p>
+            </div>
+            <div class="flex items-center justify-between gap-1.5 pt-0.5">
+                <span class="text-[9px] font-mono uppercase tracking-wider text-slate-500 font-bold">🎙️ Announcer</span>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    ${reactionButtonsHtml}
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+function _syncLiveReactionBadgesInDOM() {
+    const listEl = $('guild-activity-feed-list');
+    if (!listEl) return;
+    const recent = getRecentGuildActivityLogs(MAX_GUILD_ACTIVITY_CARDS);
+    recent.forEach((log, idx) => {
+        const cardId = String(log.id || `guild_card_${idx}`);
+        const safeCardDomId = cardId.replace(/[^a-zA-Z0-9_-]/g, '_');
+        const counts = getEffectiveReactionsForTarget(log);
+        GUILD_REACTION_EMOJIS.forEach(emoji => {
+            const domKey = GUILD_REACTION_DOM_KEYS[emoji];
+            const countEl = $(`card-react-count-${safeCardDomId}-${domKey}`);
+            const btnEl = $(`card-react-btn-${safeCardDomId}-${domKey}`);
+            const c = counts[emoji] || 0;
+            if (countEl) countEl.innerText = c.toLocaleString();
+            if (btnEl) btnEl.classList.toggle('has-reactions', c > 0);
+        });
     });
 }
 
-function cycleGuildTickerLog(delta) {
-    const recent48h = getRecentGuildLogs48h();
-    if (recent48h.length <= 1) return;
-    activeTickerLogIndex = (activeTickerLogIndex + delta + recent48h.length) % recent48h.length;
-    renderGuildActivityTicker();
+function renderGuildActivityFeed() {
+    const listEl = $('guild-activity-feed-list');
+    const countBadge = $('guild-feed-count-badge');
+    if (!listEl) return;
+
+    const recentLogs = getRecentGuildActivityLogs(MAX_GUILD_ACTIVITY_CARDS);
+    if (countBadge) {
+        countBadge.innerText = `${recentLogs.length} ${recentLogs.length === 1 ? 'Card' : 'Cards'}`;
+    }
+
+    if (recentLogs.length === 0) {
+        listEl.innerHTML = `
+            <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 text-center text-xs text-slate-400 italic">
+                The studio is quiet. Awaiting the next shift...
+            </div>
+        `;
+        return;
+    }
+
+    listEl.innerHTML = recentLogs.map((log, idx) => _renderGuildActivityCardHtml(log, idx)).join('');
 }
+
+const renderGuildActivityTicker = renderGuildActivityFeed;
 
 function _playReactionSpamMicroTone() {
     if (typeof audioMuted !== 'undefined' && audioMuted) return;
@@ -492,23 +612,20 @@ async function flushReactionBatchToFirestore(targetId) {
     if (!hasPositive) return;
 
     try {
-        if (targetId && targetId !== GUILD_QUIET_FALLBACK_ID) {
-            await db.collection('logs').doc(targetId).set({
-                reactions: incrementMap
-            }, { merge: true });
-        } else if (loggedInUser) {
-            await db.collection('settings').doc(loggedInUser).set({
-                quietShiftReactions: incrementMap
-            }, { merge: true });
-        }
+        await db.collection('activity_feed').doc('latest').set({
+            reactions: {
+                [targetId]: incrementMap
+            },
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
     } catch (err) {
         try {
             const fullCounts = _localReactionsMap[targetId] || {};
-            if (targetId && targetId !== GUILD_QUIET_FALLBACK_ID) {
-                await db.collection('logs').doc(targetId).set({
-                    reactions: fullCounts
-                }, { merge: true });
-            }
+            await db.collection('activity_feed').doc('latest').set({
+                reactions: {
+                    [targetId]: fullCounts
+                }
+            }, { merge: true });
         } catch (e2) {}
     }
 }
@@ -531,12 +648,27 @@ function _scheduleDebouncedReactionFlush(targetId) {
     }, 420);
 }
 
-function spamGuildReaction(emoji, evt) {
+function spamGuildReaction(cardIdOrEmoji, emojiOrEvt, maybeEvt) {
+    let targetId = GUILD_QUIET_FALLBACK_ID;
+    let emoji = '🔥';
+    let evt = maybeEvt;
+
+    if (GUILD_REACTION_EMOJIS.includes(cardIdOrEmoji)) {
+        emoji = cardIdOrEmoji;
+        evt = emojiOrEvt;
+        const firstLog = getActiveTickerTargetLog();
+        targetId = firstLog?.id || GUILD_QUIET_FALLBACK_ID;
+    } else {
+        targetId = String(cardIdOrEmoji || GUILD_QUIET_FALLBACK_ID);
+        emoji = emojiOrEvt;
+        evt = maybeEvt;
+    }
+
     if (evt && evt.stopPropagation) evt.stopPropagation();
     if (!GUILD_REACTION_EMOJIS.includes(emoji)) return;
 
-    const targetLog = getActiveTickerTargetLog();
-    const targetId = targetLog?.id || GUILD_QUIET_FALLBACK_ID;
+    const recent = getRecentGuildActivityLogs(MAX_GUILD_ACTIVITY_CARDS);
+    const targetLog = recent.find(l => String(l.id) === targetId) || targetId;
 
     const currentEffective = getEffectiveReactionsForTarget(targetLog);
     const nextVal = (currentEffective[emoji] || 0) + 1;
@@ -553,9 +685,10 @@ function spamGuildReaction(emoji, evt) {
     _localReactionsMap[targetId][emoji] = nextVal;
     _saveLocalReactionsToStorage();
 
+    const safeCardDomId = targetId.replace(/[^a-zA-Z0-9_-]/g, '_');
     const domKey = GUILD_REACTION_DOM_KEYS[emoji];
-    const countEl = $(`ticker-react-count-${domKey}`);
-    const btnEl = $(`ticker-react-btn-${domKey}`);
+    const countEl = $(`card-react-count-${safeCardDomId}-${domKey}`);
+    const btnEl = $(`card-react-btn-${safeCardDomId}-${domKey}`);
     if (countEl) countEl.innerText = nextVal.toLocaleString();
     if (btnEl) {
         btnEl.classList.add('has-reactions', 'is-popping');

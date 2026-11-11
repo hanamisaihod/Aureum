@@ -13,6 +13,7 @@ auth.onAuthStateChanged(async u=>{
         duoPresenceData.Cream.role='author';
         initDuoHUDListeners();
         initRealtimeSettingsListener();initGlobalHeaderGlowListener();
+        if(typeof initGuildActivityFeedListener==='function')initGuildActivityFeedListener();
         await initAndRecoverMyPomoState();
         updateUserSwitcherUI();initCharts();loadUserData();
         updateRatingUI('results');updateRatingUI('effort');updateWorkoutStrainUI();
@@ -31,10 +32,12 @@ function initDuoHUDListeners(){
     unsubscribeNorthSettings=db.collection('settings').doc('North').onSnapshot(doc=>{
         if(doc.exists)duoPresenceData.North.settings=doc.data();
         renderDuoHUDCards();
+        if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
     });
     unsubscribeCreamSettings=db.collection('settings').doc('Cream').onSnapshot(doc=>{
         if(doc.exists)duoPresenceData.Cream.settings=doc.data();
         renderDuoHUDCards();
+        if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
     });
 }
 

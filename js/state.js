@@ -79,5 +79,6 @@ let activeTickerLogIndex = 0;
 let monthlyCodexFlipped = false;
 let settingsUnsubscribe = null;
 let globalLogsUnsubscribe = null;
+let activityFeedUnsubscribe = null;
 let unsubscribeNorthSettings = null;
 let unsubscribeCreamSettings = null;

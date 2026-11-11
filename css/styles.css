@@ -229,38 +229,59 @@ aside.app-sidebar > * {
 }
 
 /* ============================================================================
-   PERSISTENT TOP ACTIVITY TICKER ("GUILD FEED") & SPAMMABLE EMOJI REACTIONS
+   LEFT SIDEBAR GUILD ACTIVITY FEED, ANNOUNCER QUOTE BOX & SPAMMABLE REACTIONS
    ============================================================================ */
-.guild-ticker-bar {
+.guild-feed-sidebar-shell {
     position: relative;
-    background: linear-gradient(90deg, rgba(9, 13, 22, 0.96) 0%, rgba(18, 23, 36, 0.96) 50%, rgba(9, 13, 22, 0.96) 100%);
+    background: linear-gradient(180deg, rgba(12, 16, 28, 0.96) 0%, rgba(9, 13, 22, 0.98) 100%);
     border: 1.5px solid var(--card-border);
-    box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    overflow: visible;
-    z-index: 35;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 22px -6px rgba(0, 0, 0, 0.7);
 }
-.guild-ticker-bar::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background: linear-gradient(90deg, var(--accent-glow) 0%, transparent 18%, transparent 82%, var(--accent-glow) 100%);
-    opacity: 0.22;
+.guild-activity-card {
+    position: relative;
+    background: rgba(15, 23, 42, 0.88);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 0.875rem;
+    padding: 0.7rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.guild-activity-card:hover {
+    border-color: rgba(245, 158, 11, 0.42);
+    background: rgba(18, 27, 46, 0.95);
+    box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.65);
+}
+.guild-card-avatar {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 10px !important;
+    object-fit: cover !important;
+    border: 1.5px solid rgba(251, 191, 36, 0.45) !important;
+    background-color: #090d16;
+    flex-shrink: 0;
+}
+.guild-announcer-box {
+    position: relative;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.09) 0%, rgba(15, 23, 42, 0.92) 100%);
+    border-left: 2.5px solid var(--accent-primary);
+    border-top: 1px solid rgba(245, 158, 11, 0.18);
+    border-right: 1px solid rgba(148, 163, 184, 0.14);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: 0.5rem;
+    padding: 0.42rem 0.55rem;
 }
 .ticker-react-btn {
     position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.25rem 0.6rem;
+    justify-content: center;
+    gap: 0.28rem;
+    min-width: 2.85rem;
+    padding: 0.2rem 0.48rem;
     border-radius: 9999px;
-    background: rgba(15, 23, 42, 0.92);
+    background: rgba(9, 13, 22, 0.92);
     border: 1px solid rgba(148, 163, 184, 0.25);
     color: #e2e8f0;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 800;
     user-select: none;
     -webkit-user-select: none;
@@ -271,25 +292,31 @@ aside.app-sidebar > * {
 .ticker-react-btn:hover {
     border-color: var(--accent-primary);
     background: rgba(30, 41, 59, 0.95);
-    box-shadow: 0 0 12px var(--accent-glow);
+    box-shadow: 0 0 10px var(--accent-glow);
 }
 .ticker-react-btn:active,
 .ticker-react-btn.is-popping {
-    transform: scale(1.16) translateY(-1px);
+    transform: scale(1.12);
     border-color: var(--accent-secondary);
     background: rgba(245, 158, 11, 0.18);
-    box-shadow: 0 0 16px var(--accent-glow);
+    box-shadow: 0 0 14px var(--accent-glow);
 }
 .ticker-react-btn.has-reactions {
     border-color: rgba(245, 158, 11, 0.45);
     background: rgba(245, 158, 11, 0.1);
+}
+.ticker-react-count {
+    display: inline-block;
+    min-width: 1.15ch;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
 }
 .ticker-floating-plus {
     position: absolute;
     pointer-events: none;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-weight: 900;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     line-height: 1;
     white-space: nowrap;
     color: #fef08a;
