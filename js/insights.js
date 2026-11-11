@@ -82,22 +82,22 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
     }
 
     // 2. The Grindset Ratio
-    // Calculates the exact rolling 30-day numerical averages for Quality vs. Effort.
+    // Calculates the rolling 30-day numerical averages for Quality vs. Effort and Peak Focus Ratio.
     const qe30 = calculateRolling30DayQE(rawLogs);
     if (qe30.count > 0) {
-        const effIdx = (qe30.avgQuality / Math.max(1, qe30.avgEffort)).toFixed(2);
+        const peakFocusPct = Math.round((qe30.stalwartCount / qe30.count) * 100);
         insights.push({
             icon: '⚖️',
             category: 'The Grindset Ratio',
-            value: `${qe30.avgQuality.toFixed(1)} Avg Quality / ${qe30.avgEffort.toFixed(1)} Avg Effort`,
-            detail: `${effIdx}x Efficiency Index (30d rolling)`
+            value: `${qe30.avgQuality.toFixed(1)} Avg Quality | ${qe30.avgEffort.toFixed(1)} Avg Effort`,
+            detail: `${peakFocusPct}% Stalwart Focus Shifts`
         });
     } else {
         insights.push({
             icon: '⚖️',
             category: 'The Grindset Ratio',
-            value: '3.0 Avg Quality / 3.0 Avg Effort',
-            detail: '1.00x Efficiency Index (Baseline)'
+            value: '3.0 Avg Quality | 3.0 Avg Effort',
+            detail: '0% Stalwart Focus Shifts'
         });
     }
 

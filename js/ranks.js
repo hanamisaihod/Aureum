@@ -25,17 +25,22 @@ function getRankTierName(level) {
 
 function calculateRolling30DayQE(logs) {
     if (!logs || !Array.isArray(logs)) {
-        return { avgQuality: 0, avgEffort: 0, count: 0, archetype: 'Tactician' };
+        return { avgQuality: 0, avgEffort: 0, count: 0, stalwartCount: 0, archetype: 'Tactician' };
     }
     const cutoff = Date.now() - (30 * 86400000);
     const recentWork = logs.filter(l => l.type === 'work' && getLogDate(l).getTime() >= cutoff);
     if (recentWork.length === 0) {
-        return { avgQuality: 0, avgEffort: 0, count: 0, archetype: 'Tactician' };
+        return { avgQuality: 0, avgEffort: 0, count: 0, stalwartCount: 0, archetype: 'Tactician' };
     }
-    let sumQ = 0, sumE = 0;
+    let sumQ = 0, sumE = 0, stalwartCount = 0;
     for (let i = 0; i < recentWork.length; i++) {
-        sumQ += (parseFloat(recentWork[i].results) || 3);
-        sumE += (parseFloat(recentWork[i].effort) || 3);
+        const q = parseFloat(recentWork[i].results) || 3;
+        const e = parseFloat(recentWork[i].effort) || 3;
+        sumQ += q;
+        sumE += e;
+        if (q >= 4.0 && e >= 3.5) {
+            stalwartCount++;
+        }
     }
     const avgQuality = sumQ / recentWork.length;
     const avgEffort = sumE / recentWork.length;
@@ -51,7 +56,7 @@ function calculateRolling30DayQE(logs) {
         archetype = 'Tactician';
     }
 
-    return { avgQuality, avgEffort, count: recentWork.length, archetype };
+    return { avgQuality, avgEffort, count: recentWork.length, stalwartCount, archetype };
 }
 
 function getRankDetails(pwr, logs) {
@@ -164,14 +169,24 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
     const strRaw = (workoutHours * 4.2 * (avgStrain / 3)) + (workoutLogs.length * 1.8) + (heavyWorkHours * 1.4);
     const strVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-strRaw / 38)))));
 
-    const avgQ = workLogs.length > 0 ? workLogs.reduce((acc, l) => acc + (parseFloat(l.results) || 3), 0) / workLogs.length : 3.0;
-    const avgE = workLogs.length > 0 ? workLogs.reduce((acc, l) => acc + (parseFloat(l.effort) || 3), 0) / workLogs.length : 3.0;
-    const effRatio = avgQ / Math.max(1, avgE);
+    const qe30 = calculateRolling30DayQE(safeLogs);
+    const avgQ = qe30.count > 0
+        ? qe30.avgQuality
+        : (workLogs.length > 0 ? workLogs.reduce((acc, l) => acc + (parseFloat(l.results) || 3), 0) / workLogs.length : 3.0);
+    const avgE = qe30.count > 0
+        ? qe30.avgEffort
+        : (workLogs.length > 0 ? workLogs.reduce((acc, l) => acc + (parseFloat(l.effort) || 3), 0) / workLogs.length : 3.0);
+    let masteryMult = 0.75;
+    if (avgQ >= 4.0 && avgE >= 3.5) {
+        masteryMult = 1.25;
+    } else if (avgQ >= 4.0) {
+        masteryMult = 1.0;
+    }
+    const masteryMultStr = Number.isInteger(masteryMult) ? `${masteryMult.toFixed(1)}x` : `${masteryMult}x`;
     const doneTodos = todos.filter(t => t.done).length;
-    const dexQualityPart = workLogs.length > 0 ? ((avgQ - 1) / 4) * 48 : 14;
-    const dexEffPart = workLogs.length > 0 ? Math.min(26, effRatio * 15) : 8;
+    const dexQualityPart = workLogs.length > 0 ? ((avgQ - 1) / 4) * 54 : 18;
     const dexMasteryPart = Math.min(25, Math.sqrt(workLogs.length) * 3.2 + doneTodos * 0.8);
-    const dexVal = Math.min(99, Math.max(12, Math.round(dexQualityPart + dexEffPart + dexMasteryPart)));
+    const dexVal = Math.min(99, Math.max(12, Math.round((dexQualityPart + dexMasteryPart) * masteryMult)));
 
     const totalWorkHours = workLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
     const unbrokenPomos = pomoList.filter(p => !p.wasPaused).length;
@@ -211,7 +226,7 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
 
     const stats = [
         { key: 'STR', name: 'Strength', icon: '⚔️', val: strVal, color: '#ef4444', detail: `${formatHours(workoutHours)}h Fitness • ${formatHours(heavyWorkHours)}h High-Strain` },
-        { key: 'DEX', name: 'Dexterity', icon: '🎯', val: dexVal, color: '#10b981', detail: `${avgQ.toFixed(1)}/5 Craft • ${effRatio.toFixed(2)}x Eff.` },
+        { key: 'DEX', name: 'Dexterity', icon: '🎯', val: dexVal, color: '#10b981', detail: `${avgQ.toFixed(1)}/5 Craft • ${masteryMultStr} Mastery` },
         { key: 'INT', name: 'Intelligence', icon: '🧠', val: intVal, color: '#38bdf8', detail: `${formatHours(totalWorkHours)}h Work • ${pomoList.length} Focus Rnds` },
         { key: 'VIT', name: 'Vitality', icon: '🛡️', val: vitVal, color: '#f59e0b', detail: `${formatHours(totalChoreHours)}h Chores • ${balancedDays}d Paced` },
         { key: 'WIS', name: 'Wisdom', icon: '📖', val: wisVal, color: '#a855f7', detail: `${diaryLogs.length} Chronicles • ${unlockedBadges.length} Relics` },
