@@ -190,8 +190,12 @@ function playTone(type){
 
 function requestNotificationPermission(){if("Notification"in window&&Notification.permission==="default")Notification.requestPermission()}
 function triggerDesktopNotification(t,b){if("Notification"in window&&Notification.permission==="granted")new Notification(t,{body:b,icon:"https://fav.farm/✨"})}
-function toggleAudioMute(){
+async function toggleAudioMute(){
     audioMuted=!audioMuted;
-    $('audio-toggle-btn').innerText=audioMuted?"🔇":"🔊";
+    userSettings.audioMuted=audioMuted;
+    if($('audio-toggle-btn'))$('audio-toggle-btn').innerText=audioMuted?"🔇":"🔊";
+    if(loggedInUser){
+        try{await db.collection('settings').doc(loggedInUser).set({audioMuted},{merge:true})}catch(e){}
+    }
 }
 

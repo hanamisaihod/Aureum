@@ -293,22 +293,6 @@
                 <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span class="text-lg">⚙️</span> <span>Forge</span></button>
             </nav>
 
-            <!-- PERSISTENT LEFT SIDEBAR GUILD ACTIVITY FEED (8–10 RECENT CARDS + ANNOUNCER ENGINE) -->
-            <section id="guild-activity-sidebar" class="guild-feed-sidebar-shell rounded-2xl p-3 border border-amber-500/25 bg-slate-950/85 space-y-2.5 shrink-0">
-                <div class="flex items-center justify-between gap-2 pb-2 border-b border-slate-800/90">
-                    <div class="flex items-center gap-1.5 min-w-0">
-                        <span class="w-2 h-2 rounded-full bg-amber-400 presence-pulse shrink-0"></span>
-                        <h3 class="text-[11px] font-black uppercase tracking-widest text-amber-300 truncate">Guild Activity Feed</h3>
-                    </div>
-                    <span id="guild-feed-count-badge" class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded-full bg-slate-900 text-slate-300 border border-slate-700/80 shrink-0">0 Logs</span>
-                </div>
-                <div id="guild-activity-feed-list" class="guild-activity-feed-scroll space-y-2.5 max-h-[390px] overflow-y-auto pr-1 custom-scroll">
-                    <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 text-center text-xs text-slate-400 italic">
-                        The studio is quiet. Awaiting the next shift...
-                    </div>
-                </div>
-            </section>
-
             <!-- AUREATE INSIGHTS BANNER IN SIDEBAR (COMPACT & FITTING) -->
             <div id="aureate-insights-banner" class="card relative shrink-0 rounded-xl p-3 border border-amber-500/25 bg-gradient-to-r from-amber-950/25 via-slate-900/85 to-slate-900/40 shadow-md space-y-2">
                 <div class="flex items-center justify-between gap-1 pb-1.5 border-b border-slate-800/80">
@@ -414,58 +398,11 @@
                     </div>
                 </div>
 
-                <!-- MAIN WORK & FOCUS HUB -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    <!-- LEFT COLUMN: FOCUS TIMER & HOURGLASS PRESETS -->
-                    <div class="lg:col-span-7 space-y-5">
-                        <div class="card p-6 sm:p-7 rounded-2xl text-center space-y-4 shadow-xl relative overflow-hidden">
-                            <div id="pomo-spectator-banner" class="hidden p-2 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 font-medium">
-                                👁️ Viewing <strong><span id="pomo-spectator-target"></span>'s</strong> Timer
-                            </div>
-                            <div id="pomo-mode-box" class="flex justify-center gap-1.5 bg-slate-900/80 p-1.5 rounded-xl border border-slate-700 text-xs w-fit mx-auto">
-                                <button onclick="handleUserSelectPomoMode('focus')" id="pomo-mode-focus" class="px-4 py-1.5 rounded-lg font-extrabold transition-all theme-accent-btn">Focus</button>
-                                <button onclick="handleUserSelectPomoMode('short')" id="pomo-mode-short" class="px-4 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition-all">Short Break</button>
-                                <button onclick="handleUserSelectPomoMode('long')" id="pomo-mode-long" class="px-4 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition-all">Long Break</button>
-                            </div>
-                            
-                            <div class="flex items-center justify-center gap-2">
-                                <span class="text-xs uppercase tracking-widest theme-accent-text font-black" id="pomo-round-badge">Round 1 of 4</span>
-                                <div id="pomo-round-dots" class="flex gap-1.5 ml-2"></div>
-                            </div>
-
-                            <div id="pomo-clock-container" class="select-none py-1 my-1 rounded-2xl transition-all">
-                                <div class="flex items-center justify-center gap-3 sm:gap-5">
-                                    <button type="button" id="pomo-step-minus" onclick="adjustPomoTimerDuration(-15, event)" class="px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-amber-400 border border-slate-700 font-mono font-black text-xs sm:text-sm transition-all shadow disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none" title="Decrease timer by 15 minutes (persistent)">-15m</button>
-                                    <div onclick="handleClockClick()" class="cursor-pointer group px-2 py-1 rounded-xl hover:bg-slate-800/40 transition-all">
-                                        <div id="pomo-timer-display" class="text-6xl sm:text-7xl font-mono font-black theme-accent-text tracking-wider group-hover:scale-105 transition-transform">25:00</div>
-                                    </div>
-                                    <button type="button" id="pomo-step-plus" onclick="adjustPomoTimerDuration(15, event)" class="px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-amber-400 border border-slate-700 font-mono font-black text-xs sm:text-sm transition-all shadow disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none" title="Increase timer by 15 minutes (persistent)">+15m</button>
-                                </div>
-                                <div id="pomo-status-label" onclick="handleClockClick()" class="cursor-pointer text-xs text-slate-300 mt-2 uppercase tracking-widest font-bold hover:text-amber-300">Click Timer or Press Spacebar</div>
-                            </div>
-                            
-                            <div class="w-full bg-slate-900/80 h-2.5 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
-                                <div id="pomo-progress-bar" class="theme-accent-bg h-full rounded-full transition-all duration-1000 w-full"></div>
-                            </div>
-                            
-                            <div id="pomo-controls-box" class="flex justify-center gap-3 pt-1">
-                                <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="px-8 py-2.5 rounded-xl theme-accent-btn font-extrabold text-xs transition-all shadow-md">Start Focus</button>
-                                <button onclick="resetMyPomoTimer()" class="px-5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-xs transition-all">Reset</button>
-                            </div>
-
-                            <!-- STORED POMODORO FOCUS HOURS & RESET -->
-                            <div class="pt-3 border-t border-slate-800/80 flex items-center justify-center gap-2.5 text-xs text-slate-400">
-                                <span class="font-medium">Accumulated: <strong id="pomo-unlogged-hours" class="font-mono font-extrabold text-emerald-400">0.0 h</strong></span>
-                                <button type="button" id="pomo-reset-accumulated-btn" onclick="resetUnloggedFocusTime(event)" title="Reset accumulated focus time" class="px-2 py-0.5 rounded-lg bg-slate-900/90 hover:bg-red-950/50 text-slate-400 hover:text-red-300 border border-slate-800 hover:border-red-500/40 text-[11px] font-bold transition-all inline-flex items-center gap-1">
-                                    <span>🗑️</span> <span>Reset</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- RIGHT COLUMN: LOG WORK & TASKS -->
-                    <div class="lg:col-span-5 space-y-5">
-                        <div id="work-form-card" class="card p-5 sm:p-6 rounded-2xl flex items-center justify-between gap-4 flex-wrap">
+                <!-- MAIN WORK & FOCUS HUB (LEFT: STACKED LOG WORK + TASKS | RIGHT: POMODORO TIMER) -->
+                <div id="crucible-hub-grid" class="crucible-hub-grid grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                    <!-- LEFT COLUMN: STACKED LOG WORK CARD (TOP) + TASKS / TODO CARD (BOTTOM) -->
+                    <div id="crucible-left-col" class="crucible-left-stack lg:col-span-6 flex flex-col gap-6 h-full">
+                        <div id="work-form-card" class="card p-5 sm:p-6 rounded-2xl flex items-center justify-between gap-4 flex-wrap shrink-0">
                             <div class="min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap">
                                     <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>⚗️</span> <span>Log Work</span></h2>
@@ -479,6 +416,88 @@
                                 <span>⚗️</span> <span>Log Work</span>
                             </button>
                         </div>
+                        <div id="todo-card" class="card p-5 sm:p-6 rounded-2xl flex flex-col justify-between gap-4 flex-1">
+                            <div class="space-y-4">
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>📝</span> <span>Tasks</span></h2>
+                                        <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" title="Precision and fine craft execution.">+DEX</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span id="todo-count-active" class="text-xs font-bold px-2.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">0 Active</span>
+                                        <span id="todo-count-done" class="text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">0 Done</span>
+                                        <button id="todo-clear-btn" onclick="clearCompletedTodos()" class="text-xs text-slate-400 hover:text-red-400 px-2.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all font-semibold">Clear</button>
+                                    </div>
+                                </div>
+                                <form id="todo-form" onsubmit="addTodoItem(event)" class="flex gap-2">
+                                    <input type="text" id="todo-input" placeholder="Add task..." class="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                                    <button type="submit" class="theme-accent-btn font-black px-5 py-2 rounded-xl text-xs transition-all shadow-md">+ Add</button>
+                                </form>
+                            </div>
+                            <div class="flex flex-col gap-3 pt-1 flex-1 justify-between">
+                                <div class="bg-slate-900/50 p-3.5 rounded-xl border border-slate-800 flex-1 flex flex-col">
+                                    <div class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-2 shrink-0">Pending</div>
+                                    <div id="todo-active-list" class="space-y-2 pr-1 max-h-[240px] overflow-y-auto flex-1"></div>
+                                </div>
+                                <div class="bg-slate-900/50 p-3.5 rounded-xl border border-slate-800 flex-1 flex flex-col">
+                                    <div class="text-xs font-extrabold text-slate-500 uppercase tracking-wider mb-2 shrink-0">Completed</div>
+                                    <div id="todo-completed-list" class="space-y-2 pr-1 max-h-[240px] overflow-y-auto flex-1"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: POMODORO FOCUS TIMER CARD (MATCHES STACKED LEFT HEIGHT) -->
+                    <div id="crucible-right-col" class="crucible-right-timer lg:col-span-6 flex flex-col h-full">
+                        <div id="pomo-timer-card" class="card pomo-timer-card p-6 sm:p-7 rounded-2xl text-center flex flex-col justify-between h-full shadow-xl relative overflow-hidden">
+                            <div class="space-y-3.5 shrink-0">
+                                <div id="pomo-spectator-banner" class="hidden p-2 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 font-medium">
+                                    👁️ Viewing <strong><span id="pomo-spectator-target"></span>'s</strong> Timer
+                                </div>
+                                <div id="pomo-mode-box" class="flex justify-center gap-1.5 bg-slate-900/80 p-1.5 rounded-xl border border-slate-700 text-xs w-fit mx-auto">
+                                    <button onclick="handleUserSelectPomoMode('focus')" id="pomo-mode-focus" class="px-4 py-1.5 rounded-lg font-extrabold transition-all theme-accent-btn">Focus</button>
+                                    <button onclick="handleUserSelectPomoMode('short')" id="pomo-mode-short" class="px-4 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition-all">Short Break</button>
+                                    <button onclick="handleUserSelectPomoMode('long')" id="pomo-mode-long" class="px-4 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition-all">Long Break</button>
+                                </div>
+                                
+                                <div class="flex items-center justify-center gap-2">
+                                    <span class="text-xs uppercase tracking-widest theme-accent-text font-black" id="pomo-round-badge">Round 1 of 4</span>
+                                    <div id="pomo-round-dots" class="flex gap-1.5 ml-2"></div>
+                                </div>
+                            </div>
+
+                            <!-- CENTER CLOCK FACE, INLINE ±15M STEPPERS, STATUS BADGE & PROGRESS BAR -->
+                            <div id="pomo-clock-container" class="pomo-clock-center-zone select-none py-3 my-auto rounded-2xl transition-all flex-1 flex flex-col items-center justify-center gap-3.5">
+                                <div class="flex items-center justify-center gap-3 sm:gap-5 w-full">
+                                    <button type="button" id="pomo-step-minus" onclick="adjustPomoTimerDuration(-15, event)" class="px-3.5 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-amber-400 border border-slate-700 font-mono font-black text-xs sm:text-sm transition-all shadow disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none shrink-0" title="Decrease timer by 15 minutes (persistent)">-15m</button>
+                                    <div onclick="handleClockClick()" class="cursor-pointer group px-3 py-1.5 rounded-2xl hover:bg-slate-800/40 transition-all">
+                                        <div id="pomo-timer-display" class="text-5xl sm:text-6xl xl:text-7xl font-mono font-black theme-accent-text tracking-wider group-hover:scale-105 transition-transform leading-none">25:00</div>
+                                    </div>
+                                    <button type="button" id="pomo-step-plus" onclick="adjustPomoTimerDuration(15, event)" class="px-3.5 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-amber-400 border border-slate-700 font-mono font-black text-xs sm:text-sm transition-all shadow disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none shrink-0" title="Increase timer by 15 minutes (persistent)">+15m</button>
+                                </div>
+                                <div id="pomo-status-label" onclick="handleClockClick()" class="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-900/80 border border-slate-800 text-xs text-slate-300 uppercase tracking-widest font-bold hover:text-amber-300 hover:border-amber-500/40 transition-all">Click Timer or Press Spacebar</div>
+                                <div class="w-full max-w-md mx-auto bg-slate-900/80 h-2.5 rounded-full overflow-hidden border border-slate-700/60 p-0.5 mt-1">
+                                    <div id="pomo-progress-bar" class="theme-accent-bg h-full rounded-full transition-all duration-1000 w-full"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- BOTTOM CONTROLS & STORED POMODORO FOCUS HOURS -->
+                            <div class="space-y-3.5 shrink-0 pt-2">
+                                <div id="pomo-controls-box" class="flex justify-center gap-3">
+                                    <button id="pomo-toggle-btn" onclick="toggleMyPomoTimer()" class="px-8 py-2.5 rounded-xl theme-accent-btn font-extrabold text-xs transition-all shadow-md">Start Focus</button>
+                                    <button onclick="resetMyPomoTimer()" class="px-5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-xs transition-all">Reset</button>
+                                </div>
+
+                                <div class="pt-3 border-t border-slate-800/80 flex items-center justify-center gap-2.5 text-xs text-slate-400">
+                                    <span class="font-medium">Accumulated: <strong id="pomo-unlogged-hours" class="font-mono font-extrabold text-emerald-400">0.0 h</strong></span>
+                                    <button type="button" id="pomo-reset-accumulated-btn" onclick="resetUnloggedFocusTime(event)" title="Reset accumulated focus time" class="px-2 py-0.5 rounded-lg bg-slate-900/90 hover:bg-red-950/50 text-slate-400 hover:text-red-300 border border-slate-800 hover:border-red-500/40 text-[11px] font-bold transition-all inline-flex items-center gap-1">
+                                        <span>🗑️</span> <span>Reset</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                         <!-- PRIMARY LOG WORK MODAL OVERLAY -->
                         <div id="log-work-modal" onclick="if(event.target===this) closeLogWorkModal(event)" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md flex items-center justify-center z-50 hidden p-4">
@@ -545,37 +564,6 @@
                                     <button type="submit" id="work-submit-btn" class="w-full sm:w-auto px-6 py-2.5 theme-accent-btn font-extrabold rounded-xl text-xs transition-all shadow-md shrink-0">Save Work Log</button>
                                 </div>
                             </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="todo-card" class="card p-5 sm:p-6 rounded-2xl space-y-4">
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                                <div class="flex items-center gap-2">
-                                    <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>📝</span> <span>Tasks</span></h2>
-                                    <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" title="Precision and fine craft execution.">+DEX</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span id="todo-count-active" class="text-xs font-bold px-2.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">0 Active</span>
-                                    <span id="todo-count-done" class="text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">0 Done</span>
-                                    <button id="todo-clear-btn" onclick="clearCompletedTodos()" class="text-xs text-slate-400 hover:text-red-400 px-2.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all font-semibold">Clear</button>
-                                </div>
-                            </div>
-                            <form id="todo-form" onsubmit="addTodoItem(event)" class="flex gap-2">
-                                <input type="text" id="todo-input" placeholder="Add task..." class="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                                <button type="submit" class="theme-accent-btn font-black px-5 py-2 rounded-xl text-xs transition-all shadow-md">+ Add</button>
-                            </form>
-                            <!-- RESTRUCTURED: VERTICAL STACK CARDS -->
-                            <div class="flex flex-col gap-3 pt-1">
-                                <div class="bg-slate-900/50 p-3.5 rounded-xl border border-slate-800">
-                                    <div class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-2">Pending</div>
-                                    <div id="todo-active-list" class="space-y-2 pr-1 max-h-[240px] overflow-y-auto"></div>
-                                </div>
-                                <div class="bg-slate-900/50 p-3.5 rounded-xl border border-slate-800">
-                                    <div class="text-xs font-extrabold text-slate-500 uppercase tracking-wider mb-2">Completed</div>
-                                    <div id="todo-completed-list" class="space-y-2 pr-1 max-h-[240px] overflow-y-auto"></div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -583,88 +571,119 @@
 
             <!-- TAB 2: SANCTUARY -->
             <div id="tab-sanctuary" class="hidden space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-                    <div id="workout-form-card" class="card p-6 rounded-2xl flex flex-col justify-between relative min-h-[280px]">
-                        <div class="mb-4 flex items-center justify-between gap-2">
-                            <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>🏃</span> <span>Fitness</span></h2>
-                            <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30" title="Physical endurance, chores, and daily recovery.">+VIT</span>
-                        </div>
-                        <form onsubmit="logWorkout(event)" class="space-y-4">
-                            <input type="hidden" id="workout-strain" value="3">
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Hours Spent</label>
-                                <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden h-11">
-                                    <button type="button" onmousedown="startHold('value', 'workout-time', -1, 0.25, 0.25, undefined, event)" ontouchstart="startHold('value', 'workout-time', -1, 0.25, 0.25, undefined, event)" class="px-4 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-base font-bold select-none">-</button>
-                                    <input type="number" id="workout-time" step="0.25" min="0.25" value="0.75" required class="w-full text-center bg-transparent text-sm text-white font-mono font-black focus:outline-none [appearance:textfield]">
-                                    <button type="button" onmousedown="startHold('value', 'workout-time', 1, 0.25, 0.25, undefined, event)" ontouchstart="startHold('value', 'workout-time', 1, 0.25, 0.25, undefined, event)" class="px-4 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-base font-bold select-none">+</button>
-                                </div>
+                <!-- SANCTUARY HUB: LEFT LOGGERS + RIGHT GUILD ACTIVITY FEED SHOWCASE -->
+                <div id="sanctuary-hub-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                    <!-- LEFT COLUMN: FITNESS, CHORES & SNACKS LOGGERS -->
+                    <div id="sanctuary-loggers-col" class="lg:col-span-7 flex flex-col gap-6">
+                        <div id="workout-form-card" class="card p-6 rounded-2xl flex flex-col justify-between relative">
+                            <div class="mb-4 flex items-center justify-between gap-2">
+                                <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>🏃</span> <span>Fitness</span></h2>
+                                <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30" title="Physical endurance, chores, and daily recovery.">+VIT</span>
                             </div>
-                            <div>
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">Intensity Level</label>
-                                    <div id="workout-strain-bars" class="flex items-center"></div>
-                                </div>
-                                <div class="flex items-center bg-slate-900/90 rounded-xl border border-slate-700 p-1 h-11">
-                                    <button type="button" onmousedown="startHold('strain', 'workout-strain', -1, null, null, null, event)" ontouchstart="startHold('strain', 'workout-strain', -1, null, null, null, event)" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none flex items-center justify-center">◀</button>
-                                    <div id="selector-box-workout" class="flex-1 text-center">
-                                        <span class="text-xs font-bold text-slate-100 flex items-center justify-center gap-1.5">
-                                            <span id="w-icon">🔥</span><span id="w-badge" class="theme-accent-text font-black">LVL 3</span><span class="text-slate-500">·</span><span id="w-title">Moderate Effort</span>
-                                        </span>
+                            <form onsubmit="logWorkout(event)" class="space-y-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <input type="hidden" id="workout-strain" value="3">
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Hours Spent</label>
+                                        <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden h-11">
+                                            <button type="button" onmousedown="startHold('value', 'workout-time', -1, 0.25, 0.25, undefined, event)" ontouchstart="startHold('value', 'workout-time', -1, 0.25, 0.25, undefined, event)" class="px-4 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-base font-bold select-none">-</button>
+                                            <input type="number" id="workout-time" step="0.25" min="0.25" value="0.75" required class="w-full text-center bg-transparent text-sm text-white font-mono font-black focus:outline-none [appearance:textfield]">
+                                            <button type="button" onmousedown="startHold('value', 'workout-time', 1, 0.25, 0.25, undefined, event)" ontouchstart="startHold('value', 'workout-time', 1, 0.25, 0.25, undefined, event)" class="px-4 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-base font-bold select-none">+</button>
+                                        </div>
                                     </div>
-                                    <button type="button" onmousedown="startHold('strain', 'workout-strain', 1, null, null, null, event)" ontouchstart="startHold('strain', 'workout-strain', 1, null, null, null, event)" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none flex items-center justify-center">▶</button>
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">Intensity Level</label>
+                                            <div id="workout-strain-bars" class="flex items-center"></div>
+                                        </div>
+                                        <div class="flex items-center bg-slate-900/90 rounded-xl border border-slate-700 p-1 h-11">
+                                            <button type="button" onmousedown="startHold('strain', 'workout-strain', -1, null, null, null, event)" ontouchstart="startHold('strain', 'workout-strain', -1, null, null, null, event)" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none flex items-center justify-center">◀</button>
+                                            <div id="selector-box-workout" class="flex-1 text-center min-w-0 px-1">
+                                                <span class="text-xs font-bold text-slate-100 flex items-center justify-center gap-1 truncate">
+                                                    <span id="w-icon">🔥</span><span id="w-badge" class="theme-accent-text font-black">LVL 3</span><span class="text-slate-500">·</span><span id="w-title" class="truncate">Moderate Effort</span>
+                                                </span>
+                                            </div>
+                                            <button type="button" onmousedown="startHold('strain', 'workout-strain', 1, null, null, null, event)" ontouchstart="startHold('strain', 'workout-strain', 1, null, null, null, event)" class="px-3 h-full bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold select-none flex items-center justify-center">▶</button>
+                                        </div>
+                                    </div>
                                 </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Reflection <span class="text-slate-500 font-normal">(Optional)</span></label>
+                                    <input type="text" id="workout-reflection" placeholder="e.g. Morning run, PR set..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3.5 h-11 text-xs text-white focus:outline-none focus:border-amber-500">
+                                </div>
+                                <button type="submit" class="w-full theme-accent-btn font-extrabold rounded-xl text-xs py-3 transition-all shadow-md mt-2">Save Fitness Log</button>
+                            </form>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-1 items-stretch">
+                            <div id="chore-form-card" class="card p-6 rounded-2xl flex flex-col justify-between relative h-full">
+                                <div class="mb-4 flex items-center justify-between gap-2">
+                                    <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>🧹</span> <span>Chores</span></h2>
+                                    <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30" title="Physical endurance, chores, and daily recovery.">+VIT</span>
+                                </div>
+                                <form onsubmit="logChore(event)" class="space-y-4 flex-1 flex flex-col justify-between">
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Hours Spent</label>
+                                            <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden h-11">
+                                                <button type="button" onmousedown="startHold('value', 'chore-time', -1, 0.25, 0.25, undefined, event)" ontouchstart="startHold('value', 'chore-time', -1, 0.25, 0.25, undefined, event)" class="px-4 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-base font-bold select-none">-</button>
+                                                <input type="number" id="chore-time" step="0.25" min="0.25" value="0.50" required class="w-full text-center bg-transparent text-sm text-white font-mono font-black focus:outline-none [appearance:textfield]">
+                                                <button type="button" onmousedown="startHold('value', 'chore-time', 1, 0.25, 0.25, undefined, event)" ontouchstart="startHold('value', 'chore-time', 1, 0.25, 0.25, undefined, event)" class="px-4 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-base font-bold select-none">+</button>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Description</label>
+                                            <input type="text" id="chore-note" placeholder="e.g. Laundry, kitchen reset..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3.5 h-11 text-xs text-white focus:outline-none focus:border-amber-500">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="w-full theme-accent-btn font-extrabold rounded-xl text-xs py-3 transition-all shadow-md mt-2">Save Chore Log</button>
+                                </form>
                             </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Reflection <span class="text-slate-500 font-normal">(Optional)</span></label>
-                                <input type="text" id="workout-reflection" placeholder="e.g. Morning run, PR set..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3.5 h-11 text-xs text-white focus:outline-none focus:border-amber-500">
+
+                            <div id="health-form-card" class="card p-6 rounded-2xl flex flex-col justify-between relative h-full">
+                                <div class="mb-4 flex items-center justify-between gap-2">
+                                    <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>🍨</span> <span>Snacks</span></h2>
+                                    <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30" title="Physical endurance, chores, and daily recovery.">+VIT</span>
+                                </div>
+                                <form onsubmit="logHealth(event)" class="space-y-4 flex-1 flex flex-col justify-between">
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Portion Level</label>
+                                            <select id="health-level" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3.5 h-11 text-xs text-white focus:outline-none focus:border-amber-500">
+                                                <option value="1">Level 1 (Small / Light)</option>
+                                                <option value="2">Level 2 (Medium / Standard)</option>
+                                                <option value="3">Level 3 (Large / Heavy)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Item</label>
+                                            <input type="text" id="health-note" placeholder="e.g. Ice cream, matcha..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3.5 h-11 text-xs text-white focus:outline-none focus:border-amber-500">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="w-full theme-accent-btn font-extrabold rounded-xl text-xs py-3 transition-all shadow-md mt-2">Save Snack Log</button>
+                                </form>
                             </div>
-                            <button type="submit" class="w-full theme-accent-btn font-extrabold rounded-xl text-xs py-3 transition-all shadow-md mt-2">Save Fitness Log</button>
-                        </form>
+                        </div>
                     </div>
 
-                    <div id="chore-form-card" class="card p-6 rounded-2xl flex flex-col justify-between relative min-h-[280px]">
-                        <div class="mb-4 flex items-center justify-between gap-2">
-                            <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>🧹</span> <span>Chores</span></h2>
-                            <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30" title="Physical endurance, chores, and daily recovery.">+VIT</span>
-                        </div>
-                        <form onsubmit="logChore(event)" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Hours Spent</label>
-                                <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden h-11">
-                                    <button type="button" onmousedown="startHold('value', 'chore-time', -1, 0.25, 0.25, undefined, event)" ontouchstart="startHold('value', 'chore-time', -1, 0.25, 0.25, undefined, event)" class="px-4 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-base font-bold select-none">-</button>
-                                    <input type="number" id="chore-time" step="0.25" min="0.25" value="0.50" required class="w-full text-center bg-transparent text-sm text-white font-mono font-black focus:outline-none [appearance:textfield]">
-                                    <button type="button" onmousedown="startHold('value', 'chore-time', 1, 0.25, 0.25, undefined, event)" ontouchstart="startHold('value', 'chore-time', 1, 0.25, 0.25, undefined, event)" class="px-4 h-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-base font-bold select-none">+</button>
+                    <!-- RIGHT COLUMN: DEDICATED SANCTUARY GUILD ACTIVITY FEED SHOWCASE -->
+                    <section id="guild-activity-sanctuary" class="lg:col-span-5 card guild-feed-sanctuary-shell rounded-2xl p-5 sm:p-6 flex flex-col justify-between h-full">
+                        <div class="flex items-center justify-between gap-2 pb-3.5 mb-3.5 border-b border-slate-800/90 shrink-0">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400 presence-pulse shrink-0"></span>
+                                    <h2 class="text-base sm:text-lg font-black text-slate-100 truncate">Guild Activity Feed</h2>
                                 </div>
+                                <p class="text-[11px] text-slate-400 font-medium mt-0.5 truncate">Live Studio &amp; Sanctuary Showcase • Spammable Cheers</p>
                             </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Description</label>
-                                <input type="text" id="chore-note" placeholder="e.g. Laundry, kitchen reset..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3.5 h-11 text-xs text-white focus:outline-none focus:border-amber-500">
-                            </div>
-                            <button type="submit" class="w-full theme-accent-btn font-extrabold rounded-xl text-xs py-3 transition-all shadow-md mt-2">Save Chore Log</button>
-                        </form>
-                    </div>
-
-                    <div id="health-form-card" class="card p-6 rounded-2xl flex flex-col justify-between relative min-h-[280px]">
-                        <div class="mb-4 flex items-center justify-between gap-2">
-                            <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>🍨</span> <span>Snacks</span></h2>
-                            <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30" title="Physical endurance, chores, and daily recovery.">+VIT</span>
+                            <span id="guild-feed-count-badge" class="text-[10px] font-mono font-extrabold px-2.5 py-1 rounded-full bg-slate-900 text-amber-300 border border-amber-500/30 shrink-0">0 Cards</span>
                         </div>
-                        <form onsubmit="logHealth(event)" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Portion Level</label>
-                                <select id="health-level" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3.5 h-11 text-xs text-white focus:outline-none focus:border-amber-500">
-                                    <option value="1">Level 1 (Small / Light)</option>
-                                    <option value="2">Level 2 (Medium / Standard)</option>
-                                    <option value="3">Level 3 (Large / Heavy)</option>
-                                </select>
+                        <div id="guild-activity-feed-list" class="guild-activity-feed-scroll space-y-3 overflow-y-auto pr-1.5 custom-scroll flex-1">
+                            <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 text-center text-xs text-slate-400 italic">
+                                The studio is quiet. Awaiting the next shift...
                             </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Item</label>
-                                <input type="text" id="health-note" placeholder="e.g. Ice cream, matcha..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3.5 h-11 text-xs text-white focus:outline-none focus:border-amber-500">
-                            </div>
-                            <button type="submit" class="w-full theme-accent-btn font-extrabold rounded-xl text-xs py-3 transition-all shadow-md mt-2">Save Snack Log</button>
-                        </form>
-                    </div>
+                        </div>
+                    </section>
                 </div>
 
                 <!-- INTERACTIVE IMMERSIVE TWO-PAGE REFLECTION BOOK -->
@@ -720,7 +739,7 @@
             <!-- TAB 3: CHRONICLES -->
             <div id="tab-chronicles" class="space-y-6 hidden">
                 <!-- SECTION 0: CONFIGURABLE MONTHLY PERFORMANCE CODEX (DARK-MODE FANTASY FOLIO) -->
-                <div id="monthly-performance-codex-section" class="transition-all duration-300"></div>
+                <div id="monthly-performance-codex-section" class="hidden transition-all duration-300"></div>
 
                 <!-- SECTION 1: ANALYTICS SUMMARY HEADER (COMPACT WORK & SANCTUARY TREND CHARTS) -->
                 <div id="chronicles-analytics-header" class="grid grid-cols-1 xl:grid-cols-2 gap-5">
@@ -820,7 +839,7 @@
                             <div class="pb-4 border-b border-slate-800">
                                 <label for="setting-display-name" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Display Name</label>
                                 <div class="flex gap-2">
-                                    <input type="text" id="setting-display-name" maxlength="24" placeholder="Enter your display name..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-xs text-white font-bold focus:outline-none focus:border-amber-500">
+                                    <input type="text" id="setting-display-name" maxlength="24" onchange="applyCustomDisplayName()" placeholder="Enter your display name..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-xs text-white font-bold focus:outline-none focus:border-amber-500">
                                     <button type="button" onclick="applyCustomDisplayName()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-amber-300 font-bold rounded-xl whitespace-nowrap transition-all">Update Name</button>
                                 </div>
                             </div>
@@ -882,7 +901,7 @@
                                 <div>
                                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Avatar URL</label>
                                     <div class="flex gap-2">
-                                        <input type="text" id="setting-avatar-url" placeholder="https://..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                                        <input type="text" id="setting-avatar-url" onchange="applyCustomAvatarUrl()" placeholder="https://..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
                                         <button type="button" onclick="applyCustomAvatarUrl()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-200 font-bold rounded-xl whitespace-nowrap">Apply</button>
                                     </div>
                                 </div>
@@ -916,7 +935,7 @@
                                     <p class="text-[11px] text-slate-400 leading-snug">Display the ornate Monthly Performance Codex folio card (allowance payout, craft scores, 30-day Stat Radar &amp; reflection highlight) at the top of the Chronicles tab.</p>
                                 </div>
                                 <label class="inline-flex items-center cursor-pointer select-none shrink-0" for="setting-show-monthly-codex">
-                                    <input type="checkbox" id="setting-show-monthly-codex" checked onchange="handleToggleMonthlyCodex(this.checked)" class="sr-only">
+                                    <input type="checkbox" id="setting-show-monthly-codex" onchange="handleToggleMonthlyCodex(this.checked)" class="sr-only">
                                     <span class="forge-toggle-track">
                                         <span class="forge-toggle-thumb"></span>
                                     </span>

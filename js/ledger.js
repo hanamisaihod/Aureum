@@ -231,7 +231,7 @@ function renderLedgerLists(logs){
 }
 
 // ============================================================================
-// PART 1: LEFT SIDEBAR GUILD ACTIVITY FEED, ANNOUNCER ENGINE & SPAMMABLE REACTIONS
+// PART 1: SANCTUARY GUILD ACTIVITY FEED SHOWCASE, ANNOUNCER ENGINE & SPAMMABLE REACTIONS
 // ============================================================================
 
 const GUILD_REACTION_EMOJIS = ['☕', '👏', '🔥'];
@@ -885,7 +885,7 @@ function renderMonthlyPerformanceCodex() {
     const container = $('monthly-performance-codex-section');
     if (!container) return;
 
-    if (userSettings.showMonthlyCodex === false) {
+    if (userSettings.showMonthlyCodex !== true) {
         container.classList.add('hidden');
         container.innerHTML = '';
         return;

@@ -144,22 +144,34 @@ function initRealtimeSettingsListener(){
         if(doc.exists){
             const data=doc.data();
             if(loggedInUser===viewedUser){
-                const prevShowCodex=userSettings.showMonthlyCodex;
                 userSettings={...userSettings,...data};
-                if(data.showMonthlyCodex===undefined){
-                    userSettings.showMonthlyCodex=prevShowCodex!==false;
+                if(typeof data.showMonthlyCodex==='boolean'){
+                    userSettings.showMonthlyCodex=data.showMonthlyCodex;
+                    try{localStorage.setItem('aureum_show_monthly_codex_v2',String(data.showMonthlyCodex))}catch(e){}
                 }else{
-                    try{localStorage.setItem('aureum_show_monthly_codex',String(Boolean(data.showMonthlyCodex)))}catch(e){}
+                    userSettings.showMonthlyCodex=false;
+                    try{localStorage.setItem('aureum_show_monthly_codex_v2','false')}catch(e){}
+                    db.collection('settings').doc(loggedInUser).set({showMonthlyCodex:false},{merge:true}).catch(()=>{});
+                }
+                if(typeof data.audioMuted==='boolean'){
+                    audioMuted=data.audioMuted;
+                    if($('audio-toggle-btn'))$('audio-toggle-btn').innerText=audioMuted?"🔇":"🔊";
+                }
+                if(duoPresenceData[loggedInUser]){
+                    duoPresenceData[loggedInUser].settings={...(duoPresenceData[loggedInUser].settings||{}),...userSettings};
                 }
                 applyThemeToBody(userSettings.userTheme);
                 applyCursorToBody(userSettings.userCursor);
                 applyBackgroundPattern(userSettings.bgPattern,userSettings.bgOpacity);
             }else{
-                spectatorSettings=data;
+                spectatorSettings={...data,showMonthlyCodex:Boolean(data.showMonthlyCodex===true)};
                 applyThemeToBody(userSettings.userTheme);
                 applyCursorToBody(userSettings.userCursor);
                 applyBackgroundPattern(userSettings.bgPattern,userSettings.bgOpacity);
             }
+        }else if(loggedInUser===viewedUser&&loggedInUser){
+            userSettings.showMonthlyCodex=false;
+            db.collection('settings').doc(loggedInUser).set(userSettings,{merge:true}).catch(()=>{});
         }
         updateSettingsUI();renderTodoList();renderDuoHUDCards();
         if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
@@ -210,6 +222,12 @@ function switchActiveUser(target){viewedUser=target;initRealtimeSettingsListener
 function updateUserSwitcherUI(){
     const isSelf=loggedInUser===viewedUser;
     ['work-form-card','diary-form-card','health-form-card','chore-form-card','workout-form-card','todo-form'].forEach(id=>{const el=$(id);if(el)el.style.display=isSelf?'':'none'});
+    const sanctuaryLoggersCol=$('sanctuary-loggers-col'),guildFeedSanctuary=$('guild-activity-sanctuary');
+    if(sanctuaryLoggersCol)sanctuaryLoggersCol.style.display=isSelf?'':'none';
+    if(guildFeedSanctuary){
+        guildFeedSanctuary.classList.toggle('lg:col-span-5',isSelf);
+        guildFeedSanctuary.classList.toggle('lg:col-span-12',!isSelf);
+    }
     if(!isSelf&&typeof closeLogWorkModal==='function')closeLogWorkModal();
     const clearBtn=$('todo-clear-btn');if(clearBtn)clearBtn.style.display=isSelf?'inline-block':'none';
     document.querySelectorAll('#tab-forge input, #tab-forge select').forEach(i=>{i.disabled=!isSelf;i.classList.toggle('opacity-50',!isSelf)});
@@ -233,6 +251,7 @@ function switchTab(t){
     });
     $(`tab-${t}`)?.classList.remove('hidden');
     if(t==='forge'&&typeof applyGoalsTargetsLockUI==='function')applyGoalsTargetsLockUI();
+    if(t==='sanctuary'&&typeof renderGuildActivityFeed==='function')renderGuildActivityFeed();
     if(t==='chronicles'&&typeof renderMonthlyPerformanceCodex==='function')renderMonthlyPerformanceCodex();
     if(t==='crucible')attachPomoSpectatorListener();
 }

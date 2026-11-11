@@ -70,12 +70,35 @@ function confirmUnlockGoalsTargets(){
     showToast({title:'🔓 Targets Unlocked',subtitle:'You may now carefully edit Goals & Targets.',icon:'⚠️',tier:'gold',duration:3000});
 }
 
-function lockGoalsTargets(){
+async function lockGoalsTargets(){
+    if(loggedInUser===viewedUser){
+        const mc=parseFloat($('setting-monthly-cash')?.value);
+        const wh=parseFloat($('setting-weekly-hrs')?.value);
+        const sc=parseFloat($('setting-daily-soft-cap')?.value);
+        const bc=parseFloat($('setting-bonus-cap')?.value);
+        if(!isNaN(mc)&&mc>0)userSettings.monthlyCash=mc;
+        if(!isNaN(wh)&&wh>0)userSettings.weeklyHours=wh;
+        if(!isNaN(sc)&&sc>0)userSettings.dailySoftCap=sc;
+        if(!isNaN(bc)&&bc>=100)userSettings.maxBonusCapPct=bc;
+        if(duoPresenceData[loggedInUser]){
+            duoPresenceData[loggedInUser].settings={...(duoPresenceData[loggedInUser].settings||{}),monthlyCash:userSettings.monthlyCash,weeklyHours:userSettings.weeklyHours,dailySoftCap:userSettings.dailySoftCap,maxBonusCapPct:userSettings.maxBonusCapPct};
+        }
+        try{
+            await db.collection('settings').doc(loggedInUser).set({
+                monthlyCash:userSettings.monthlyCash,
+                weeklyHours:userSettings.weeklyHours,
+                dailySoftCap:userSettings.dailySoftCap,
+                maxBonusCapPct:userSettings.maxBonusCapPct
+            },{merge:true});
+        }catch(e){}
+    }
     goalsUnlockConfirmPending=false;
     goalsTargetsLocked=true;
     playTone('save');
     applyGoalsTargetsLockUI();
-    showToast({title:'🔒 Targets Locked',subtitle:'Goals & Targets are now protected from accidental changes.',icon:'🛡️',tier:'emerald',duration:2500});
+    updateSettingsUI();
+    loadUserData();
+    showToast({title:'🔒 Targets Locked & Saved',subtitle:'Goals & Targets saved to database and locked.',icon:'🛡️',tier:'emerald',duration:2500});
 }
 
 function resetGoalsTargetsToSaved(){
@@ -166,21 +189,34 @@ function applyGoalsTargetsLockUI(){
     }
 }
 
+async function persistUserSettingsPatch(patch){
+    if(!patch||typeof patch!=='object')return;
+    Object.assign(userSettings,patch);
+    if(loggedInUser&&duoPresenceData[loggedInUser]){
+        duoPresenceData[loggedInUser].settings={...(duoPresenceData[loggedInUser].settings||{}),...patch};
+    }
+    if(loggedInUser){
+        try{
+            await db.collection('settings').doc(loggedInUser).set(patch,{merge:true});
+        }catch(e){}
+    }
+}
+
 async function handleInstantBgPatternChange(){
-    const pattern=$('setting-bg-pattern').value;
-    const opacity=parseInt($('setting-bg-opacity').value)||0;
-    userSettings.bgPattern=pattern;userSettings.bgOpacity=opacity;
+    const pattern=$('setting-bg-pattern').value||'dots';
+    const parsedOp=parseInt($('setting-bg-opacity').value);
+    const opacity=isNaN(parsedOp)?20:parsedOp;
     applyBackgroundPattern(pattern,opacity);
-    if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({bgPattern:pattern,bgOpacity:opacity},{merge:true});
+    await persistUserSettingsPatch({bgPattern:pattern,bgOpacity:opacity});
 }
 
 async function handleInstantSoundChange(){
-    const val=$('setting-pomo-sound').value;userSettings.pomoSound=val;
-    if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({pomoSound:val},{merge:true});
+    const val=$('setting-pomo-sound').value||'zen_bowl';
+    await persistUserSettingsPatch({pomoSound:val});
 }
 async function handleInstantSoundRepeatChange(){
-    const val=parseInt($('setting-pomo-repeats').value)||3;userSettings.pomoSoundRepeats=val;
-    if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({pomoSoundRepeats:val},{merge:true});
+    const val=parseInt($('setting-pomo-repeats').value)||3;
+    await persistUserSettingsPatch({pomoSoundRepeats:val});
 }
 const THEME_CATALOG = [
     { id: 'gold', name: 'Aureum Gold', subtitle: 'Amber + Champagne Gold', bgMain: '#0e1117', cardBg: '#161a24', primary: '#f59e0b', secondary: '#fef08a' },
@@ -251,57 +287,62 @@ function renderThemePickerCards() {
 
 async function selectThemeFromModal(themeId) {
     if (loggedInUser !== viewedUser) return;
-    userSettings.userTheme = themeId;
     updateThemeTriggerButtonUI(themeId);
     applyThemeToBody(themeId);
+    userSettings.userTheme = themeId;
     renderThemePickerCards();
     playTone('save');
     closeThemePickerModal();
-    if (loggedInUser === viewedUser) {
-        await db.collection('settings').doc(loggedInUser).set({ userTheme: themeId }, { merge: true });
-    }
+    await persistUserSettingsPatch({ userTheme: themeId });
 }
 
 async function handleInstantThemeChange(){
-    const val=$('setting-user-theme').value;userSettings.userTheme=val;
+    const val=$('setting-user-theme').value||'gold';
     updateThemeTriggerButtonUI(val);
     applyThemeToBody(val);
-    if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({userTheme:val},{merge:true});
+    await persistUserSettingsPatch({userTheme:val});
 }
 async function handleInstantCursorChange(){
-    const val=$('setting-user-cursor').value;userSettings.userCursor=val;applyCursorToBody(val);
-    if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({userCursor:val},{merge:true});
+    const val=$('setting-user-cursor').value||'default';
+    applyCursorToBody(val);
+    await persistUserSettingsPatch({userCursor:val});
 }
 async function handleInstantEffectChange(){
-    userSettings.particleIntensity=parseInt($('setting-particle-intensity').value)||0;
-    if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({particleIntensity:userSettings.particleIntensity},{merge:true});
+    const parsed=parseInt($('setting-particle-intensity').value);
+    const val=isNaN(parsed)?0:parsed;
+    await persistUserSettingsPatch({particleIntensity:val});
 }
 
 async function applyCustomAvatarUrl(){
     const url=$('setting-avatar-url').value.trim();if(!url)return;
-    userSettings.avatarUrl=url;renderDuoHUDCards();
-    if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({avatarUrl:url},{merge:true});
-    showToast({title:'🖼️ Avatar Updated',subtitle:'Custom avatar applied!',icon:'✨',tier:'gold'});
+    await persistUserSettingsPatch({avatarUrl:url});
+    renderDuoHUDCards();
+    if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
+    showToast({title:'🖼️ Avatar Updated',subtitle:'Custom avatar applied & saved!',icon:'✨',tier:'gold'});
 }
 async function setAvatarPreset(style,seed){
     const url=`https://api.dicebear.com/7.x/${style}/svg?seed=${seed}`;
-    $('setting-avatar-url').value=url;userSettings.avatarUrl=url;renderDuoHUDCards();
-    if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({avatarUrl:url},{merge:true});
-    showToast({title:'🤖 Preset Applied',subtitle:'Avatar updated!',icon:'🤖',tier:'gold'});
+    $('setting-avatar-url').value=url;
+    await persistUserSettingsPatch({avatarUrl:url});
+    renderDuoHUDCards();
+    if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
+    showToast({title:'🤖 Preset Applied',subtitle:'Avatar updated & saved!',icon:'🤖',tier:'gold'});
 }
 async function randomizeAvatar(){
     const styles=['bottts','adventurer','lorelei','avataaars','personas','micah'];
     const url=`https://api.dicebear.com/7.x/${styles[(Math.random()*styles.length)|0]}/svg?seed=${Math.random().toString(36).substring(7)}`;
-    $('setting-avatar-url').value=url;userSettings.avatarUrl=url;renderDuoHUDCards();
-    if(loggedInUser===viewedUser)await db.collection('settings').doc(loggedInUser).set({avatarUrl:url},{merge:true});
-    showToast({title:'🎲 Surprise!',subtitle:'New avatar generated!',icon:'✨',tier:'gold'});
+    $('setting-avatar-url').value=url;
+    await persistUserSettingsPatch({avatarUrl:url});
+    renderDuoHUDCards();
+    if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
+    showToast({title:'🎲 Surprise!',subtitle:'New avatar generated & saved!',icon:'✨',tier:'gold'});
 }
 
 async function handleToggleMonthlyCodex(isChecked){
     const enabled = Boolean(isChecked);
     userSettings.showMonthlyCodex = enabled;
     try {
-        localStorage.setItem('aureum_show_monthly_codex', String(enabled));
+        localStorage.setItem('aureum_show_monthly_codex_v2', String(enabled));
     } catch (e) {}
     if (duoPresenceData[loggedInUser]) {
         duoPresenceData[loggedInUser].settings = duoPresenceData[loggedInUser].settings || {};
@@ -318,7 +359,7 @@ async function handleToggleMonthlyCodex(isChecked){
         tier: enabled ? 'gold' : 'silver',
         duration: 2400
     });
-    if (loggedInUser === viewedUser) {
+    if (loggedInUser) {
         try {
             await db.collection('settings').doc(loggedInUser).set({ showMonthlyCodex: enabled }, { merge: true });
         } catch (e) {}
@@ -346,11 +387,14 @@ function updateSettingsUI(){
     $('setting-bg-pattern').value=userSettings.bgPattern||'dots';
     const bgOp=userSettings.bgOpacity??20;
     $('setting-bg-opacity').value=bgOp;$('label-bg-opacity-val').innerText=`${bgOp}%`;
-    $('setting-avatar-url').value=userSettings.avatarUrl||'';
+    const avatarInput=$('setting-avatar-url');
+    if(avatarInput&&document.activeElement!==avatarInput){
+        avatarInput.value=userSettings.avatarUrl||'';
+    }
     const particle=userSettings.particleIntensity??15;
     $('setting-particle-intensity').value=particle;$('label-particle-val').innerText=`${particle}%`;
     const codexCheckbox=$('setting-show-monthly-codex');
-    if(codexCheckbox)codexCheckbox.checked=(userSettings.showMonthlyCodex!==false);
+    if(codexCheckbox)codexCheckbox.checked=Boolean(userSettings.showMonthlyCodex===true);
     if(typeof renderMonthlyPerformanceCodex==='function')renderMonthlyPerformanceCodex();
     applyGoalsTargetsLockUI();
     updateUnloggedFocusDisplay();
@@ -358,6 +402,7 @@ function updateSettingsUI(){
 
 async function saveAllForgeSettings(e){
     if(e)e.preventDefault();
+    if(!loggedInUser)return;
     const dispInput=$('setting-display-name');
     if(dispInput){
         const cleanedName=dispInput.value.trim().substring(0,24);
@@ -370,27 +415,34 @@ async function saveAllForgeSettings(e){
     userSettings.maxBonusCapPct=parseFloat($('setting-bonus-cap').value)||userSettings.maxBonusCapPct||125;
     if($('setting-pomo-sound'))userSettings.pomoSound=$('setting-pomo-sound').value||'zen_bowl';
     if($('setting-pomo-repeats'))userSettings.pomoSoundRepeats=parseInt($('setting-pomo-repeats').value)||3;
-    userSettings.userTheme=$('setting-user-theme').value;
-    userSettings.userCursor=$('setting-user-cursor').value;
+    userSettings.userTheme=$('setting-user-theme').value||'gold';
+    userSettings.userCursor=$('setting-user-cursor').value||'default';
     userSettings.bgPattern=$('setting-bg-pattern').value||'dots';
-    userSettings.bgOpacity=parseInt($('setting-bg-opacity').value)||20;
+    const parsedBgOp=parseInt($('setting-bg-opacity').value);
+    userSettings.bgOpacity=isNaN(parsedBgOp)?20:parsedBgOp;
     userSettings.avatarUrl=$('setting-avatar-url').value.trim();
-    userSettings.particleIntensity=parseInt($('setting-particle-intensity').value)||0;
+    const parsedParticle=parseInt($('setting-particle-intensity').value);
+    userSettings.particleIntensity=isNaN(parsedParticle)?15:parsedParticle;
     const codexCheckbox=$('setting-show-monthly-codex');
     if(codexCheckbox){
         userSettings.showMonthlyCodex=Boolean(codexCheckbox.checked);
-        try{localStorage.setItem('aureum_show_monthly_codex',String(userSettings.showMonthlyCodex))}catch(err){}
+        try{localStorage.setItem('aureum_show_monthly_codex_v2',String(userSettings.showMonthlyCodex))}catch(err){}
     }
+    userSettings.audioMuted=Boolean(audioMuted);
 
     goalsTargetsLocked=true;
     goalsUnlockConfirmPending=false;
+
+    applyThemeToBody(userSettings.userTheme);
+    applyCursorToBody(userSettings.userCursor);
+    applyBackgroundPattern(userSettings.bgPattern,userSettings.bgOpacity);
 
     if(duoPresenceData[loggedInUser]){
         duoPresenceData[loggedInUser].settings={...(duoPresenceData[loggedInUser].settings||{}),...userSettings};
     }
 
     await db.collection('settings').doc(loggedInUser).set(userSettings,{merge:true});
-    showToast({title:'⚙️ Settings Saved',subtitle:'Options saved & Goals locked safely.',icon:'🔧',tier:'gold',duration:3000,originEvt:e});
+    showToast({title:'⚙️ Settings Saved',subtitle:'All settings saved to database & Goals locked safely.',icon:'🔧',tier:'gold',duration:3000,originEvt:e});
     updateSettingsUI();renderDuoHUDCards();updateUserSwitcherUI();loadUserData();
 }
 

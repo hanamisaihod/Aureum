@@ -15,7 +15,7 @@ let currentJournalPageIndex = 0;
 let _cachedFocus = 25;
 let _cachedShort = 5;
 let _cachedLong = 15;
-let _cachedShowMonthlyCodex = true;
+let _cachedShowMonthlyCodex = false;
 
 try {
     const _sf = localStorage.getItem('aureum_pomo_focus');
@@ -24,8 +24,8 @@ try {
     if (_ss) _cachedShort = parseInt(_ss) || 5;
     const _sl = localStorage.getItem('aureum_pomo_long');
     if (_sl) _cachedLong = parseInt(_sl) || 15;
-    const _scodex = localStorage.getItem('aureum_show_monthly_codex');
-    if (_scodex !== null) _cachedShowMonthlyCodex = _scodex !== 'false';
+    const _scodex = localStorage.getItem('aureum_show_monthly_codex_v2');
+    if (_scodex !== null) _cachedShowMonthlyCodex = _scodex === 'true';
 } catch (e) {}
 
 const USER_ROLE_BINDINGS = {
@@ -57,6 +57,7 @@ let userSettings = {
     avatarUrl: '',
     particleIntensity: 15,
     statusNote: '',
+    audioMuted: false,
     showMonthlyCodex: _cachedShowMonthlyCodex,
     vaultedMonths: {},
     unlockedBadges: [],

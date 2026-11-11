@@ -229,13 +229,46 @@ aside.app-sidebar > * {
 }
 
 /* ============================================================================
-   LEFT SIDEBAR GUILD ACTIVITY FEED, ANNOUNCER QUOTE BOX & SPAMMABLE REACTIONS
+   CRUCIBLE GRID ALIGNMENT & SANCTUARY GUILD ACTIVITY SHOWCASE
    ============================================================================ */
+.crucible-hub-grid {
+    align-items: stretch;
+}
+.crucible-left-stack,
+.crucible-right-timer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.pomo-timer-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.pomo-clock-center-zone {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.guild-feed-sanctuary-shell,
 .guild-feed-sidebar-shell {
     position: relative;
     background: linear-gradient(180deg, rgba(12, 16, 28, 0.96) 0%, rgba(9, 13, 22, 0.98) 100%);
     border: 1.5px solid var(--card-border);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 22px -6px rgba(0, 0, 0, 0.7);
+}
+#guild-activity-sanctuary .guild-activity-feed-scroll {
+    max-height: 460px;
+}
+@media (min-width: 1024px) {
+    #guild-activity-sanctuary:not(.lg\:col-span-12) .guild-activity-feed-scroll {
+        flex: 1 1 0px;
+        min-height: 360px;
+        max-height: none;
+    }
 }
 .guild-activity-card {
     position: relative;
