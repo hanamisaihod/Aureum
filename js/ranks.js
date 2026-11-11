@@ -191,8 +191,9 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
     const dexVal = Math.min(99, Math.max(12, Math.round((dexQualityPart + dexMasteryPart) * masteryMult)));
 
     const totalWorkHours = workLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
-    const unbrokenPomos = pomoList.filter(p => !p.wasPaused).length;
-    const intRaw = (totalWorkHours * 1.6) + (pomoList.length * 2.2) + (unbrokenPomos * 1.4);
+    const totalFocusHours = pomoList.reduce((acc, p) => acc + ((parseFloat(p.durationSecs) || 0) / 3600), 0);
+    const unbrokenFocusHours = pomoList.filter(p => !p.wasPaused).reduce((acc, p) => acc + ((parseFloat(p.durationSecs) || 0) / 3600), 0);
+    const intRaw = (totalWorkHours * 1.6) + (totalFocusHours * 4.4) + (unbrokenFocusHours * 2.8);
     const intVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-intRaw / 55)))));
 
     const totalChoreHours = choreLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
@@ -253,9 +254,9 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
             icon: '🧠',
             val: intVal,
             color: '#38bdf8',
-            detail: `${formatHours(totalWorkHours)}h Work | ${pomoList.length} Focus Rnds`,
+            detail: `${formatHours(totalWorkHours)}h Work | ${formatHours(totalFocusHours)}h Focus`,
             description: 'Measures cognitive depth, sustained concentration, and uninterrupted deep-work mastery.',
-            actionGuide: '⚡ Complete unbroken Hourglass Focus rounds without pausing and accumulate Deep Work hours.'
+            actionGuide: '⚡ Accumulate unbroken Hourglass Focus time without pausing and log Deep Work hours.'
         },
         {
             key: 'VIT',

@@ -18,7 +18,7 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
 
     // 1. The Catalyst Hour
     // Identifies the 2-hour daily window with the highest average Quality (>= 4) achieved during high-effort work (Effort >= 4).
-    const catalystDesc = 'Your peak output window — where your highest quality work (Quality 4–5) and deepest focus occur.';
+    const catalystDesc = 'Peak window for Quality 4+ deep focus';
     let bestCatalystStart = -1, bestCatalystQ = 0, bestCatalystE = 0;
     let fallbackQ4Start = -1, fallbackQ4_Q = 0, fallbackQ4_E = 0;
     let fallbackAnyStart = -1, fallbackAnyQ = 0, fallbackAnyE = 0;
