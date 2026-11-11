@@ -18,7 +18,7 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
 
     // 1. The Catalyst Hour
     // Identifies the 2-hour daily window with the highest average Quality (>= 4) achieved during high-effort work (Effort >= 4).
-    const catalystDesc = 'Peak window for Quality 4+ deep focus';
+    const catalystDesc = 'Peak two-hour deep focus window.';
     let bestCatalystStart = -1, bestCatalystQ = 0, bestCatalystE = 0;
     let fallbackQ4Start = -1, fallbackQ4_Q = 0, fallbackQ4_E = 0;
     let fallbackAnyStart = -1, fallbackAnyQ = 0, fallbackAnyE = 0;
@@ -105,14 +105,14 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
             icon: '⚖️',
             category: 'The Grindset Ratio',
             value: `${qe30.avgQuality.toFixed(1)} Avg Quality | ${qe30.avgEffort.toFixed(1)} Avg Effort`,
-            detail: `${peakFocusPct}% Peak Focus Shifts (Quality 4+, Effort 4+)`
+            detail: `${peakFocusPct}% Peak Focus Shifts`
         });
     } else {
         insights.push({
             icon: '⚖️',
             category: 'The Grindset Ratio',
             value: '3.0 Avg Quality | 3.0 Avg Effort',
-            detail: '0% Peak Focus Shifts (Quality 4+, Effort 4+)'
+            detail: '0% Peak Focus Shifts'
         });
     }
 

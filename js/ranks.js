@@ -87,76 +87,173 @@ function getRankTierName(level) {
 
 const ALL_STAT_KEYS = ['STR', 'DEX', 'INT', 'VIT', 'WIS', 'WIL'];
 
+const STAT_CATEGORY_BASELINES = {
+    DEX: 45,
+    INT: 45,
+    WIS: 45,
+    STR: 46,
+    WIL: 54,
+    VIT: 60
+};
+
+const ROLE_STAT_AFFINITY = {
+    illustrator: { DEX: 7, INT: 3, STR: 2, WIS: 0, WIL: 0, VIT: -6 },
+    author: { WIS: 8, INT: 4, WIL: 2, DEX: 0, STR: 0, VIT: -6 }
+};
+
+function _getInferredMilestoneCount(logs, pomoList = []) {
+    if (!Array.isArray(logs) || logs.length === 0) return 0;
+    let count = 0;
+    const workLogs = logs.filter(l => l.type === 'work');
+    const totalWorkHrs = workLogs.reduce((a, l) => a + (parseFloat(l.hours) || 0), 0);
+    if (workLogs.length >= 1) count++;
+    if (totalWorkHrs >= 4) count++;
+    if (totalWorkHrs >= 100) count++;
+    if (logs.some(l => l.type === 'workout')) count++;
+    const choreLogs = logs.filter(l => l.type === 'chore');
+    const totalChoreHrs = choreLogs.reduce((a, l) => a + (parseFloat(l.hours) || 0), 0);
+    if (choreLogs.length >= 1) count++;
+    if (totalChoreHrs >= 25) count++;
+    const diaryCount = logs.filter(l => l.type === 'diary').length;
+    if (diaryCount >= 1) count++;
+    if (diaryCount >= 30) count++;
+    if (Array.isArray(pomoList) && pomoList.length >= 1) count++;
+    return count;
+}
+
 function computeStatScoresFromLogs(logs, settings, windowDays = 30, referenceTimeMs = null) {
     const safeLogs = Array.isArray(logs) ? logs : [];
     const safeSettings = settings || {};
     const refNow = referenceTimeMs || Date.now();
+    const cutoff30 = refNow - ((windowDays || 30) * 86400000);
     const pool = referenceTimeMs
         ? safeLogs.filter(l => getLogDate(l).getTime() <= refNow)
         : safeLogs;
+    const recentPool = pool.filter(l => getLogDate(l).getTime() >= cutoff30);
 
     const workLogs = pool.filter(l => l.type === 'work');
-    const workoutLogs = pool.filter(l => l.type === 'workout');
-    const choreLogs = pool.filter(l => l.type === 'chore');
+    const recentWork = recentPool.filter(l => l.type === 'work');
+    const activeWork = recentWork.length > 0 ? recentWork : workLogs;
+
+    const workoutLogs = recentPool.filter(l => l.type === 'workout');
+    const choreLogs = recentPool.filter(l => l.type === 'chore');
+    const healthLogs = recentPool.filter(l => l.type === 'health');
     const diaryLogs = pool.filter(l => l.type === 'diary');
-    const healthLogs = pool.filter(l => l.type === 'health');
+    const reflectionLogs = pool.filter(l => l.type !== 'diary' && ((l.reflectionText && String(l.reflectionText).trim().length > 0) || (l.note && String(l.note).trim().length > 0)));
     const pomoList = Array.isArray(safeSettings.completedPomoHistory) ? safeSettings.completedPomoHistory : [];
-    const unlockedBadges = Array.isArray(safeSettings.unlockedBadges) ? safeSettings.unlockedBadges : [];
+    const unlockedBadges = Array.isArray(safeSettings.unlockedBadges) && safeSettings.unlockedBadges.length > 0
+        ? safeSettings.unlockedBadges
+        : new Array(_getInferredMilestoneCount(pool, pomoList));
     const todos = Array.isArray(safeSettings.scratchpadTodos) ? safeSettings.scratchpadTodos : [];
 
+    // 1. STR — High-effort endurance and raw work capacity
     const workoutHours = workoutLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
     const avgStrain = workoutLogs.length > 0
         ? workoutLogs.reduce((acc, l) => acc + (parseFloat(l.strain) || 3), 0) / workoutLogs.length : 3.0;
-    const heavyWorkHours = workLogs.filter(l => (parseFloat(l.effort) || 3) >= 4).reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
-    const strRaw = (workoutHours * 4.2 * (avgStrain / 3)) + (workoutLogs.length * 1.8) + (heavyWorkHours * 1.4);
-    const strVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-strRaw / 38)))));
+    const workEffortUnits = activeWork.reduce((acc, l) => {
+        const h = Math.max(0.1, parseFloat(l.hours) || 0);
+        const e = Math.max(1, Math.min(5, parseFloat(l.effort) || 3));
+        return acc + h * (e >= 5 ? 1.85 : (e >= 4 ? 1.45 : (e >= 3 ? 0.95 : 0.65)));
+    }, 0);
+    const strUnits = workEffortUnits + (workoutHours * 1.35 * (avgStrain / 3));
+    const strVal = Math.min(99, Math.max(15, Math.round(strUnits > 0 ? 18 + 14.5 * Math.log(1 + strUnits / 2.6) : 15)));
 
-    const cutoff30 = refNow - ((windowDays || 30) * 86400000);
-    const recentWork = workLogs.filter(l => getLogDate(l).getTime() >= cutoff30);
-    const avgQ = recentWork.length > 0
-        ? recentWork.reduce((acc, l) => acc + (parseFloat(l.results) || 3), 0) / recentWork.length
-        : (workLogs.length > 0 ? workLogs.reduce((acc, l) => acc + (parseFloat(l.results) || 3), 0) / workLogs.length : 3.0);
-    const avgE = recentWork.length > 0
-        ? recentWork.reduce((acc, l) => acc + (parseFloat(l.effort) || 3), 0) / recentWork.length
-        : (workLogs.length > 0 ? workLogs.reduce((acc, l) => acc + (parseFloat(l.effort) || 3), 0) / workLogs.length : 3.0);
-    let masteryMult = 0.75;
-    if (avgQ >= 4 && avgE >= 4) {
-        masteryMult = 1.25;
-    } else if (avgQ >= 4) {
-        masteryMult = 1.0;
-    }
+    // 2. DEX — Precision and fine craft execution (Re-anchored: Q=3 gives ~55-65, Q=4-5 gives 70-90+, no average-craft penalty)
+    const avgQ = activeWork.length > 0
+        ? activeWork.reduce((acc, l) => acc + (parseFloat(l.results) || 3), 0) / activeWork.length
+        : 3.0;
+    const craftEquivHours = activeWork.reduce((acc, l) => {
+        const q = Math.max(1, Math.min(5, parseFloat(l.results) || 3));
+        const h = Math.max(0.1, parseFloat(l.hours) || 0);
+        return acc + h * (q >= 5 ? 1.45 : (q >= 4 ? 1.2 : (q >= 3 ? 1.0 : (q >= 2 ? 0.85 : 0.75))));
+    }, 0);
+    const highCraftHours = activeWork.reduce((acc, l) => {
+        const q = parseFloat(l.results) || 3;
+        const h = Math.max(0, parseFloat(l.hours) || 0);
+        return acc + (q >= 4 ? h * (q >= 5 ? 1.5 : 1.0) : 0);
+    }, 0);
     const doneTodos = todos.filter(t => t.done).length;
-    const dexQualityPart = workLogs.length > 0 ? ((avgQ - 1) / 4) * 54 : 18;
-    const dexMasteryPart = Math.min(25, Math.sqrt(workLogs.length) * 3.2 + doneTodos * 0.8);
-    const dexVal = Math.min(99, Math.max(12, Math.round((dexQualityPart + dexMasteryPart) * masteryMult)));
+    let dexRaw = 15;
+    if (activeWork.length > 0) {
+        const steadyQualityScore = avgQ >= 3 ? 20 + ((avgQ - 3) / 2) * 12 : 15 + ((avgQ - 1) / 2) * 5;
+        const volumeCurve = Math.min(22, 7.8 * Math.log(1 + craftEquivHours / 2.2));
+        const highCraftBoost = Math.min(18, 6.2 * Math.log(1 + highCraftHours / 2.2));
+        dexRaw = 22 + steadyQualityScore + volumeCurve + highCraftBoost + Math.min(3, doneTodos * 0.4);
+    } else if (doneTodos > 0) {
+        dexRaw = 15 + Math.min(10, doneTodos * 1.2);
+    }
+    const dexVal = Math.min(99, Math.max(15, Math.round(dexRaw)));
 
-    const totalWorkHours = workLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
+    // 3. INT — Deep focus immersion and cognitive flow
+    const recentWorkHours = activeWork.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
     const totalFocusHours = pomoList.reduce((acc, p) => acc + ((parseFloat(p.durationSecs) || 0) / 3600), 0);
     const unbrokenFocusHours = pomoList.filter(p => !p.wasPaused).reduce((acc, p) => acc + ((parseFloat(p.durationSecs) || 0) / 3600), 0);
-    const intRaw = (totalWorkHours * 1.6) + (totalFocusHours * 4.4) + (unbrokenFocusHours * 2.8);
-    const intVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-intRaw / 55)))));
+    const intUnits = (recentWorkHours * 1.35) + (totalFocusHours * 2.2) + (unbrokenFocusHours * 1.4);
+    const intVal = Math.min(99, Math.max(15, Math.round(intUnits > 0 ? 18 + 15.0 * Math.log(1 + intUnits / 2.5) : 15)));
 
-    const totalChoreHours = choreLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
+    // 4. VIT — Physical endurance, chores, and daily recovery (Diminishing daily returns: 100%, 70%, 40% + log soft-cap for 55-70 routine range)
     const softCap = parseFloat(safeSettings.dailySoftCap) || 4;
     const workByDay = {};
-    workLogs.forEach(l => {
+    activeWork.forEach(l => {
         const d = getLogDate(l);
         const k = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
         workByDay[k] = (workByDay[k] || 0) + (parseFloat(l.hours) || 0);
     });
-    const balancedDays = Object.values(workByDay).filter(h => h >= 1.5 && h <= softCap + 1).length;
-    const vitRaw = (totalChoreHours * 3.6) + (choreLogs.length * 1.5) + (balancedDays * 2.2) + (healthLogs.length * 0.8);
-    const vitVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-vitRaw / 38)))));
+    const sanctuaryByDay = {};
+    const addSanctuaryEntry = (l, baseExp, isSnack) => {
+        const d = getLogDate(l);
+        const dayKey = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        if (!sanctuaryByDay[dayKey]) sanctuaryByDay[dayKey] = [];
+        sanctuaryByDay[dayKey].push({ baseExp, isSnack });
+    };
+    workoutLogs.forEach(w => {
+        const hrs = Math.min(3.0, Math.max(0.25, parseFloat(w.hours) || 0.5));
+        const strain = Math.max(1, Math.min(5, parseInt(w.strain) || 3));
+        addSanctuaryEntry(w, 1.2 + hrs * (0.9 + strain * 0.4), false);
+    });
+    choreLogs.forEach(c => {
+        const hrs = Math.min(2.5, Math.max(0.25, parseFloat(c.hours) || 0.5));
+        addSanctuaryEntry(c, 1.1 + hrs * 1.2, false);
+    });
+    healthLogs.forEach(s => {
+        const lvl = Math.max(1, Math.min(5, parseInt(s.level) || 1));
+        addSanctuaryEntry(s, 0.35 + lvl * 0.15, true);
+    });
 
-    const wisRaw = (diaryLogs.length * 3.5) + (unlockedBadges.length * 4.2);
-    const wisVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-wisRaw / 42)))));
+    let vitCoreExp = 0, vitSnackExp = 0;
+    Object.values(sanctuaryByDay).forEach(dayEntries => {
+        dayEntries.sort((a, b) => b.baseExp - a.baseExp);
+        dayEntries.forEach((entry, idx) => {
+            const dimMult = idx === 0 ? 1.0 : (idx === 1 ? 0.7 : 0.4);
+            if (entry.isSnack) vitSnackExp += entry.baseExp * dimMult;
+            else vitCoreExp += entry.baseExp * dimMult;
+        });
+    });
+    const totalVitExp = vitCoreExp + Math.min(8, vitSnackExp);
+    const vitVal = Math.min(99, Math.max(15, Math.round(totalVitExp > 0 ? 18 + 13.4 * Math.log(1 + totalVitExp / 2.8) : 15)));
 
+    // 5. WIS — Self-reflection, synthesis, and milestone mastery
     const activeDaySet = new Set();
-    pool.forEach(l => {
+    recentPool.forEach(l => {
         const d = getLogDate(l);
         activeDaySet.add(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime());
     });
-    const sortedDays = Array.from(activeDaySet).sort((a, b) => a - b);
+    const sustainableSessions = activeWork.filter(l => (parseFloat(l.results) || 3) >= 3 && (parseFloat(l.hours) || 0) <= softCap + 0.5).length;
+    const pacingWisdom = activeWork.length > 0
+        ? 18 + Math.min(22, 7.5 * Math.log(1 + sustainableSessions / 2.2)) + Math.min(8, activeDaySet.size * 0.35)
+        : 0;
+    const reflectionUnits = diaryLogs.length * 1.8 + reflectionLogs.length * 1.0;
+    const reflectionBonus = reflectionUnits > 0 ? Math.min(24, 7.8 * Math.log(1 + reflectionUnits / 1.4)) : 0;
+    const relicBonus = Math.min(16, unlockedBadges.length * 1.5);
+    const wisVal = Math.min(99, Math.max(15, Math.round(15 + pacingWisdom + reflectionBonus + relicBonus)));
+
+    // 6. WIL — Daily discipline and unbroken streak momentum
+    const allDaySet = new Set();
+    pool.forEach(l => {
+        const d = getLogDate(l);
+        allDaySet.add(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime());
+    });
+    const sortedDays = Array.from(allDaySet).sort((a, b) => a - b);
     let bestStreak = sortedDays.length > 0 ? 1 : 0, curRun = sortedDays.length > 0 ? 1 : 0;
     for (let i = 1; i < sortedDays.length; i++) {
         const diff = Math.round((sortedDays[i] - sortedDays[i - 1]) / 86400000);
@@ -164,8 +261,8 @@ function computeStatScoresFromLogs(logs, settings, windowDays = 30, referenceTim
         else if (diff > 1) curRun = 1;
     }
     const softCapHits = Object.values(workByDay).filter(h => h >= softCap).length;
-    const wilRaw = (sortedDays.length * 2.0) + (bestStreak * 3.8) + (softCapHits * 3.0);
-    const wilVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-wilRaw / 42)))));
+    const wilUnits = (activeDaySet.size * 1.4) + (Math.min(30, bestStreak) * 1.1) + (softCapHits * 0.9);
+    const wilVal = Math.min(99, Math.max(15, Math.round(wilUnits > 0 ? 18 + 13.8 * Math.log(1 + wilUnits / 2.8) : 15)));
 
     return {
         STR: strVal,
@@ -199,15 +296,25 @@ function _normalizeStatsMap(stats) {
     return map;
 }
 
+function getNormalizedStatScore(statKey, rawVal, role) {
+    const normRole = getUserRole(role);
+    const val = Number(rawVal) || 15;
+    const base = STAT_CATEGORY_BASELINES[statKey] || 46;
+    const affinity = ROLE_STAT_AFFINITY[normRole]?.[statKey] || 0;
+    return ((val - base) / base) * 100 + affinity;
+}
+
 function getTopStatKeysFromMap(statScores, role) {
     const normRole = getUserRole(role);
     const s = _normalizeStatsMap(statScores);
     const tieOrder = normRole === 'author'
-        ? ['WIS', 'INT', 'WIL', 'VIT', 'DEX', 'STR']
-        : ['DEX', 'WIS', 'INT', 'VIT', 'WIL', 'STR'];
+        ? ['WIS', 'INT', 'WIL', 'DEX', 'STR', 'VIT']
+        : ['DEX', 'INT', 'STR', 'WIS', 'WIL', 'VIT'];
     const sorted = [...ALL_STAT_KEYS].sort((a, b) => {
-        const diff = (s[b] || 0) - (s[a] || 0);
-        if (diff !== 0) return diff;
+        const normDiff = getNormalizedStatScore(b, s[b], normRole) - getNormalizedStatScore(a, s[a], normRole);
+        if (Math.abs(normDiff) > 0.01) return normDiff;
+        const rawDiff = (s[b] || 0) - (s[a] || 0);
+        if (rawDiff !== 0) return rawDiff;
         return tieOrder.indexOf(a) - tieOrder.indexOf(b);
     });
     return sorted;
@@ -251,7 +358,7 @@ function calculateHybridClass(stats, role) {
     if (hasPair('WIS', 'INT')) return 'Arch-Chronicler';
     if (hasPair('WIS', 'WIL')) return 'Relic Keeper';
     if (hasPair('WIS', 'STR')) return 'Iron Scribe';
-    if (hasPair('VIT', 'WIL')) return 'Stalwart Vanguard';
+    if (hasPair('VIT', 'WIL')) return 'Relic Keeper';
     if (hasPair('VIT', 'WIS')) return 'Relic Keeper';
     if (hasPair('VIT', 'STR')) return 'Iron Scribe';
     if (hasPair('INT', 'VIT')) return 'Arch-Chronicler';
@@ -362,21 +469,21 @@ function calculateAndRenderPowerMeter(logs) {
 }
 
 const WORK_STYLE_INFO = {
-    'Stalwart Vanguard': { icon: '🛡️', combo: 'High VIT + WIL', tagline: 'High VIT + WIL • Unwavering Pacing & Deep Endurance', desc: 'Harmonizes sustainable daily pacing with relentless streak discipline and deep endurance across every shift.' },
-    'Relic Artisan': { icon: '🏺', combo: 'High VIT + WIS', tagline: 'High VIT + WIS • Resilient Craft & Archival Focus', desc: 'Blends sanctuary balance and restorative pacing with reflective chronicle wisdom and milestone mastery.' },
-    'Iron Sculptor': { icon: '⚒️', combo: 'High VIT + STR', tagline: 'High VIT + STR • Heavy Project Volume & Physical Power', desc: 'Combines physical conditioning and high-strain output with grounded life maintenance to power heavy project volume.' },
-    'Master Chronicler': { icon: '📖', combo: 'High WIS + WIL', tagline: 'High WIS + WIL • Deep Worldbuilding & Focus', desc: 'Synthesizes archival reflection and lore mastery with unbroken daily willpower and long-term consistency.' },
-    'System Draftsman': { icon: '📐', combo: 'High INT + VIT', tagline: 'High INT + VIT • Structured Technical Execution', desc: 'Pairs sustained cognitive immersion and deep focus sessions with structured, well-paced daily execution.' },
-    'Grand Virtuoso': { icon: '🎨', combo: 'High DEX + WIS', tagline: 'High DEX + WIS • Master of Inspired Visual Craft', desc: 'Merges razor-sharp execution with deep reflective insight — turning every canvas session into timeless artistry.' },
-    'Artisan Draftsman': { icon: '📐', combo: 'High DEX + INT', tagline: 'High DEX + INT • Architect of Precision & Deep Focus', desc: 'Combines technical draughtsmanship with sustained cognitive immersion and unbroken flow states.' },
-    'Stalwart Illustris': { icon: '⚔️', combo: 'High DEX + STR', tagline: 'High DEX + STR • Relentless Vanguard of the Stylus', desc: 'Forges high-craft illustration through sheer physical stamina, heavy-effort shifts, and unyielding grit.' },
-    'Arch-Chronicler': { icon: '📜', combo: 'High WIS + INT', tagline: 'High WIS + INT • Sovereign Scholar of the Living Codex', desc: 'Synthesizes deep reflective wisdom with sustained intellectual focus to weave intricate narratives.' },
-    'Relic Keeper': { icon: '🏺', combo: 'High WIS + WIL', tagline: 'High WIS + WIL • Custodian of Lore & Unbroken Streaks', desc: 'Guards the sacred archives through daily discipline, streak resilience, and milestone mastery.' },
-    'Iron Scribe': { icon: '✒️', combo: 'High WIS + STR', tagline: 'High WIS + STR • Indomitable Forge-Writer', desc: 'Channels high-strain conditioning and intense effort into powerful, unshakeable written output.' },
-    Virtuoso: { icon: '✨', combo: 'High DEX + WIS', tagline: 'High Quality (≥ 4.0) + Low Effort (≤ 3.0)', desc: 'Efficient, high craft — delivering peak output with minimal strain and effortless flow.' },
-    Stalwart: { icon: '🛡️', combo: 'High DEX + STR', tagline: 'High Quality (≥ 4.0) + High Effort (≥ 4.0)', desc: 'High craft, maximum dedication — forging top-tier results through relentless grit and focus.' },
-    Grinder: { icon: '⛏️', combo: 'High DEX + STR', tagline: 'Low Quality (≤ 3.0) + High Effort (≥ 4.0)', desc: 'High volume, brute force — pushing through heavy resistance and foundational groundwork.' },
-    Tactician: { icon: '⚖️', combo: 'High DEX + INT', tagline: 'Balanced Quality & Effort Distribution', desc: 'Steady, measured cadence — maintaining a sustainable equilibrium across output and energy.' }
+    'Stalwart Vanguard': { icon: '🛡️', combo: 'VIT + WIL', tagline: 'Unwavering Pacing & Endurance', desc: 'Sustainable daily pacing and relentless streak discipline.' },
+    'Relic Artisan': { icon: '🏺', combo: 'VIT + WIS', tagline: 'Resilient Craft & Archival Focus', desc: 'Restorative sanctuary balance and reflective milestone mastery.' },
+    'Iron Sculptor': { icon: '⚒️', combo: 'VIT + STR', tagline: 'Heavy Volume & Physical Power', desc: 'Physical conditioning paired with high-strain project volume.' },
+    'Master Chronicler': { icon: '📖', combo: 'WIS + WIL', tagline: 'Deep Worldbuilding & Consistency', desc: 'Archival reflection and unbroken daily streak discipline.' },
+    'System Draftsman': { icon: '📐', combo: 'INT + VIT', tagline: 'Structured Technical Execution', desc: 'Sustained cognitive immersion and balanced daily execution.' },
+    'Grand Virtuoso': { icon: '🎨', combo: 'DEX + WIS', tagline: 'Master of Inspired Visual Craft', desc: 'Precision craft execution paired with reflective insight.' },
+    'Artisan Draftsman': { icon: '📐', combo: 'DEX + INT', tagline: 'Architect of Precision & Focus', desc: 'Technical draughtsmanship and uninterrupted deep flow.' },
+    'Stalwart Illustris': { icon: '⚔️', combo: 'DEX + STR', tagline: 'Relentless Vanguard of the Stylus', desc: 'High-craft illustration forged through heavy-effort shifts.' },
+    'Arch-Chronicler': { icon: '📜', combo: 'WIS + INT', tagline: 'Sovereign Scholar of the Codex', desc: 'Reflective wisdom combined with sustained intellectual focus.' },
+    'Relic Keeper': { icon: '🏺', combo: 'WIS + WIL', tagline: 'Custodian of Lore & Streaks', desc: 'Daily discipline, streak resilience, and milestone mastery.' },
+    'Iron Scribe': { icon: '✒️', combo: 'WIS + STR', tagline: 'Indomitable Forge-Writer', desc: 'Intense effort channeled into unshakeable written output.' },
+    Virtuoso: { icon: '✨', combo: 'DEX + WIS', tagline: 'Effortless High Craft', desc: 'Peak craft output with minimal strain.' },
+    Stalwart: { icon: '🛡️', combo: 'DEX + STR', tagline: 'Relentless High Craft', desc: 'Top-tier craft forged through maximum dedication.' },
+    Grinder: { icon: '⛏️', combo: 'DEX + STR', tagline: 'High-Volume Groundwork', desc: 'Pushing through heavy resistance and foundational volume.' },
+    Tactician: { icon: '⚖️', combo: 'DEX + INT', tagline: 'Balanced Cadence', desc: 'Steady equilibrium across craft output and energy.' }
 };
 
 function getStatGrade(val) {
@@ -395,59 +502,28 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
     const workoutLogs = safeLogs.filter(l => l.type === 'workout');
     const choreLogs = safeLogs.filter(l => l.type === 'chore');
     const diaryLogs = safeLogs.filter(l => l.type === 'diary');
-    const healthLogs = safeLogs.filter(l => l.type === 'health');
     const pomoList = Array.isArray(safeSettings.completedPomoHistory) ? safeSettings.completedPomoHistory : [];
-    const unlockedBadges = Array.isArray(safeSettings.unlockedBadges) ? safeSettings.unlockedBadges : [];
-    const todos = Array.isArray(safeSettings.scratchpadTodos) ? safeSettings.scratchpadTodos : [];
+    const unlockedBadges = Array.isArray(safeSettings.unlockedBadges) && safeSettings.unlockedBadges.length > 0
+        ? safeSettings.unlockedBadges
+        : new Array(_getInferredMilestoneCount(safeLogs, pomoList));
+
+    const scores30 = computeStatScoresFromLogs(safeLogs, safeSettings, 30);
+    const strVal = scores30.STR;
+    const dexVal = scores30.DEX;
+    const intVal = scores30.INT;
+    const vitVal = scores30.VIT;
+    const wisVal = scores30.WIS;
+    const wilVal = scores30.WIL;
 
     const workoutHours = workoutLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
-    const avgStrain = workoutLogs.length > 0
-        ? workoutLogs.reduce((acc, l) => acc + (parseFloat(l.strain) || 3), 0) / workoutLogs.length : 3.0;
     const heavyWorkHours = workLogs.filter(l => (parseFloat(l.effort) || 3) >= 4).reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
-    const strRaw = (workoutHours * 4.2 * (avgStrain / 3)) + (workoutLogs.length * 1.8) + (heavyWorkHours * 1.4);
-    const strVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-strRaw / 38)))));
-
-    const qe30 = calculateRolling30DayQE(safeLogs);
+    const qe30 = calculateRolling30DayQE(safeLogs, rankInfo?.role, safeSettings);
     const avgQ = qe30.count > 0
         ? qe30.avgQuality
         : (workLogs.length > 0 ? workLogs.reduce((acc, l) => acc + (parseFloat(l.results) || 3), 0) / workLogs.length : 3.0);
-    const avgE = qe30.count > 0
-        ? qe30.avgEffort
-        : (workLogs.length > 0 ? workLogs.reduce((acc, l) => acc + (parseFloat(l.effort) || 3), 0) / workLogs.length : 3.0);
-    let masteryMult = 0.75;
-    if (avgQ >= 4 && avgE >= 4) {
-        masteryMult = 1.25;
-    } else if (avgQ >= 4 && avgE <= 3) {
-        masteryMult = 1.0;
-    } else if (avgQ >= 4) {
-        masteryMult = 1.0;
-    }
-    const masteryMultStr = Number.isInteger(masteryMult) ? `${masteryMult.toFixed(1)}x` : `${masteryMult}x`;
-    const doneTodos = todos.filter(t => t.done).length;
-    const dexQualityPart = workLogs.length > 0 ? ((avgQ - 1) / 4) * 54 : 18;
-    const dexMasteryPart = Math.min(25, Math.sqrt(workLogs.length) * 3.2 + doneTodos * 0.8);
-    const dexVal = Math.min(99, Math.max(12, Math.round((dexQualityPart + dexMasteryPart) * masteryMult)));
-
     const totalWorkHours = workLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
     const totalFocusHours = pomoList.reduce((acc, p) => acc + ((parseFloat(p.durationSecs) || 0) / 3600), 0);
-    const unbrokenFocusHours = pomoList.filter(p => !p.wasPaused).reduce((acc, p) => acc + ((parseFloat(p.durationSecs) || 0) / 3600), 0);
-    const intRaw = (totalWorkHours * 1.6) + (totalFocusHours * 4.4) + (unbrokenFocusHours * 2.8);
-    const intVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-intRaw / 55)))));
-
     const totalChoreHours = choreLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
-    const softCap = parseFloat(safeSettings.dailySoftCap) || 4;
-    const workByDay = {};
-    workLogs.forEach(l => {
-        const d = getLogDate(l);
-        const k = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-        workByDay[k] = (workByDay[k] || 0) + (parseFloat(l.hours) || 0);
-    });
-    const balancedDays = Object.values(workByDay).filter(h => h >= 1.5 && h <= softCap + 1).length;
-    const vitRaw = (totalChoreHours * 3.6) + (choreLogs.length * 1.5) + (balancedDays * 2.2) + (healthLogs.length * 0.8);
-    const vitVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-vitRaw / 38)))));
-
-    const wisRaw = (diaryLogs.length * 3.5) + (unlockedBadges.length * 4.2);
-    const wisVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-wisRaw / 42)))));
 
     const activeDaySet = new Set();
     safeLogs.forEach(l => {
@@ -461,9 +537,6 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
         if (diff === 1) { curRun++; if (curRun > bestStreak) bestStreak = curRun; }
         else if (diff > 1) curRun = 1;
     }
-    const softCapHits = Object.values(workByDay).filter(h => h >= softCap).length;
-    const wilRaw = (sortedDays.length * 2.0) + (bestStreak * 3.8) + (softCapHits * 3.0);
-    const wilVal = Math.min(99, Math.max(12, Math.round(12 + 87 * (1 - Math.exp(-wilRaw / 42)))));
 
     const stats = [
         {
@@ -473,8 +546,7 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
             val: strVal,
             color: '#ef4444',
             detail: `${formatHours(workoutHours)}h Fitness | ${formatHours(heavyWorkHours)}h High-Strain`,
-            description: 'Measures physical conditioning, athletic exertion, and capacity for high-strain output.',
-            actionGuide: '⚡ Log Fitness workouts with higher strain or complete high-effort Work Shifts (Effort >= 4.0) to build raw strength.'
+            description: 'High-effort endurance and raw work capacity.'
         },
         {
             key: 'DEX',
@@ -482,9 +554,8 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
             icon: '🎯',
             val: dexVal,
             color: '#10b981',
-            detail: `${avgQ.toFixed(1)} / 5 Craft | ${masteryMultStr} Mastery`,
-            description: 'Measures precision, fine craft, and high-quality execution standards.',
-            actionGuide: '⚡ Log sessions with Quality 4–5 and Effort 4–5 to earn maximum 1.25x Mastery EXP.'
+            detail: `${avgQ.toFixed(1)} Avg Quality | ${workLogs.length} Shifts`,
+            description: 'Precision and fine craft execution.'
         },
         {
             key: 'INT',
@@ -493,8 +564,7 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
             val: intVal,
             color: '#38bdf8',
             detail: `${formatHours(totalWorkHours)}h Work | ${formatHours(totalFocusHours)}h Focus`,
-            description: 'Measures cognitive depth, sustained concentration, and uninterrupted deep-work mastery.',
-            actionGuide: '⚡ Accumulate unbroken Hourglass Focus time without pausing and log Deep Work hours.'
+            description: 'Deep focus immersion and cognitive flow.'
         },
         {
             key: 'VIT',
@@ -502,9 +572,8 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
             icon: '🛡️',
             val: vitVal,
             color: '#f59e0b',
-            detail: `${formatHours(totalChoreHours)}h Chores | ${balancedDays}d Paced`,
-            description: 'Measures life maintenance, environmental order, and sustainable daily work pacing.',
-            actionGuide: '⚡ Log Sanctuary Chores, track Health metrics, and maintain balanced work days within your daily soft cap.'
+            detail: `${formatHours(totalChoreHours)}h Chores | ${workoutLogs.length} Workouts`,
+            description: 'Physical endurance, chores, and daily recovery.'
         },
         {
             key: 'WIS',
@@ -513,8 +582,7 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
             val: wisVal,
             color: '#a855f7',
             detail: `${diaryLogs.length} Chronicles | ${unlockedBadges.length} Relics`,
-            description: 'Measures self-reflection, synthesis of lived experience, and milestone mastery.',
-            actionGuide: '⚡ Write Journal Chronicles to reflect on your days and unlock Relics across all disciplines.'
+            description: 'Self-reflection, synthesis, and milestone mastery.'
         },
         {
             key: 'WIL',
@@ -523,22 +591,22 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
             val: wilVal,
             color: '#f97316',
             detail: `${sortedDays.length}d Active | ${bestStreak}d Best Streak`,
-            description: 'Measures relentless consistency, daily discipline, and long-term streak resilience.',
-            actionGuide: '⚡ Show up daily to extend your active streak and hit your daily focus soft cap consistently.'
+            description: 'Daily discipline and unbroken streak momentum.'
         }
     ];
 
     const avgStat = Math.round(stats.reduce((s, x) => s + x.val, 0) / stats.length);
     const powerLevel = Math.round((pwr || 0) + (avgStat * 25) + ((rankInfo?.level || 1) * 120));
     const overallGrade = getStatGrade(avgStat);
-    const topStat = [...stats].sort((a, b) => b.val - a.val)[0];
+    const topKeys = getTopStatKeysFromMap(scores30, rankInfo?.role);
+    const topStat = stats.find(s => s.key === topKeys[0]) || stats[0];
     const specialtyMap = {
-        STR: 'Titan Vanguard (Physical & Grit)',
-        DEX: 'Grand Artisan (Craft & Precision)',
-        INT: 'Arcane Scholar (Deep Focus)',
-        VIT: 'Sanctuary Warden (Harmony & Keep)',
-        WIS: 'Chronicle Sage (Lore & Insight)',
-        WIL: 'Unyielding Sovereign (Endurance)'
+        STR: 'Titan Vanguard',
+        DEX: 'Grand Artisan',
+        INT: 'Arcane Scholar',
+        VIT: 'Sanctuary Warden',
+        WIS: 'Chronicle Sage',
+        WIL: 'Unyielding Sovereign'
     };
 
     return {
@@ -546,6 +614,8 @@ function calculateRPGAbilities(logs, settings, pwr, rankInfo) {
         avgStat,
         powerLevel,
         overallGrade,
+        topStat,
+        topStats: topKeys,
         dominantSpecialty: `${topStat.icon} ${specialtyMap[topStat.key] || topStat.name}`,
         level: rankInfo?.level || 1,
         tierName: rankInfo?.tierName || 'Initiate',
@@ -599,7 +669,9 @@ function renderRPGAbilitiesCard(abilities) {
     }).join('');
 
     const og = abilities.overallGrade;
-    const matrixCrest = renderClassCrest(abilities.role || viewedUser, abilities.topStats || [abilities.topStat?.key || 'DEX'], abilities.level || 1, 42);
+    const primaryKey = abilities.topStats?.[0] || abilities.topStat?.key || 'DEX';
+    const secondaryKey = abilities.topStats?.[1] || 'WIS';
+    const matrixCrest = renderClassCrest(abilities.role || viewedUser, abilities.topStats || [primaryKey], abilities.level || 1, 42);
     return `
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-800/90">
             <div class="flex items-center gap-3 min-w-0">
@@ -607,17 +679,15 @@ function renderRPGAbilitiesCard(abilities) {
                 <div class="min-w-0">
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-sm sm:text-base font-black uppercase tracking-wider text-slate-100">⚡ Power Matrix</span>
-                        <span class="text-[10px] font-black font-mono px-2 py-0.5 rounded" style="background:${og.bg};color:${og.color};border:1px solid ${og.border}">CLASS ${og.grade} • AVG ${abilities.avgStat}</span>
+                        <span class="text-[10px] font-black font-mono px-2 py-0.5 rounded" style="background:${og.bg};color:${og.color};border:1px solid ${og.border}">${primaryKey}/${secondaryKey} • CLASS ${og.grade} (${abilities.avgStat})</span>
                     </div>
-                    <div class="text-[11px] text-slate-300 font-semibold mt-0.5 flex items-center gap-1.5 flex-wrap">
-                        <span class="text-amber-300 font-bold">Lvl ${abilities.level} • ${escapeHtml(abilities.rankTitle)}</span>
-                        <span class="text-slate-600">•</span>
-                        <span class="text-amber-300/90">Specialty: ${abilities.dominantSpecialty}</span>
+                    <div class="text-[11px] text-amber-300 font-bold mt-0.5 truncate">
+                        Lvl ${abilities.level} • ${escapeHtml(abilities.rankTitle)}
                     </div>
                 </div>
             </div>
             <div class="bg-slate-950/90 border border-amber-500/40 rounded-xl px-3.5 py-1.5 text-left sm:text-right shrink-0">
-                <div class="text-[9px] uppercase tracking-widest font-extrabold text-slate-400">Combat Power Level</div>
+                <div class="text-[9px] uppercase tracking-widest font-extrabold text-slate-400">Combat Power</div>
                 <div class="text-base sm:text-lg font-black font-mono text-amber-400">⚡ ${abilities.powerLevel.toLocaleString()} <span class="text-[10px] text-amber-200/80">PWR</span></div>
             </div>
         </div>
@@ -635,9 +705,6 @@ function renderRPGAbilitiesCard(abilities) {
                 <polygon points="${dataPolygonPts}" fill="url(#abilityRadarGrad)" stroke="#fbbf24" stroke-width="2.4" stroke-linejoin="round" />
                 ${interactiveNodes}
             </svg>
-            <div class="text-[10px] font-mono text-slate-400 text-center mt-1 flex items-center justify-center gap-1.5">
-                <span>✨ Hover or tap any stat node for live breakdown &amp; leveling guide</span>
-            </div>
             <div id="power-matrix-tooltip" class="power-matrix-tooltip hidden p-3.5 text-left" role="tooltip" onclick="event.stopPropagation()"></div>
         </div>
     `;
@@ -683,7 +750,7 @@ function renderPowerMatrixTooltip(statKey) {
     tooltip.style.setProperty('--tooltip-accent', st.color);
     tooltip.style.border = `1.5px solid ${st.color}`;
     tooltip.innerHTML = `
-        <div class="space-y-2">
+        <div class="space-y-1.5">
             <div class="flex items-center justify-between gap-2 border-b border-slate-800 pb-1.5">
                 <div class="text-xs font-black text-slate-100 leading-tight">
                     <span>${st.icon} ${st.key} (${st.name})</span>
@@ -698,9 +765,6 @@ function renderPowerMatrixTooltip(statKey) {
             <p class="text-[11px] text-slate-300 leading-snug">
                 ${st.description}
             </p>
-            <div class="text-[11px] font-semibold leading-snug p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-200">
-                ${st.actionGuide}
-            </div>
         </div>
     `;
     tooltip.classList.remove('hidden');
@@ -864,9 +928,8 @@ function openRankRoadmapModal(targetUser, evt) {
                     <div class="min-w-0">
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-xs font-black text-slate-100 uppercase tracking-wider">Hybrid Class: <span class="theme-accent-text">${rankInfo.workStyle}</span></span>
-                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-700">${ws.combo || 'Hybrid'} • ${avgQStr} Q / ${avgEStr} E</span>
+                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-700" title="${avgQStr} Avg Q / ${avgEStr} Avg E">${ws.combo || 'Hybrid'}</span>
                         </div>
-                        <div class="text-[11px] font-semibold text-amber-400/90 mt-0.5">${ws.tagline}</div>
                         <p class="text-[11px] text-slate-400 leading-snug mt-0.5">${ws.desc}</p>
                     </div>
                 </div>

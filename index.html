@@ -49,10 +49,9 @@
                     <span class="text-2xl">👑</span>
                     <div>
                         <h3 class="text-base sm:text-lg font-black text-slate-100 flex items-center gap-2 flex-wrap">
-                            <span>Aureate Level, Stats &amp; Work Style</span>
+                            <span>Aureate Level &amp; Power Matrix</span>
                             <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">10 TIERS • 100 LVLS</span>
                         </h3>
-                        <p class="text-[11px] text-slate-400">RPG Ability Matrix, Power Level &amp; 10-Tier Progression (0 to 1,000,000 EXP)</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeRankRoadmapModal()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-1">✕</button>
@@ -101,7 +100,6 @@
                     <span class="text-2xl">🎨</span>
                     <div>
                         <h3 class="text-base sm:text-lg font-black text-slate-100">Dual-Tone Theme Palette</h3>
-                        <p class="text-[11px] text-slate-400">Select a card to preview &amp; apply its dual-tone color scheme</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeThemePickerModal()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-1">✕</button>
@@ -452,11 +450,11 @@
                             <div class="min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap">
                                     <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>⚗️</span> <span>Log Work</span></h2>
+                                    <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" title="Precision and fine craft execution.">+DEX / +STR</span>
                                     <div id="work-form-softcap-notice" class="hidden text-xs text-amber-300 font-bold flex items-center gap-1">
                                         <span>🍵 Soft Cap Active</span>
                                     </div>
                                 </div>
-                                <p class="text-xs text-slate-400 mt-0.5">Record your completed shift, craft quality, and effort.</p>
                             </div>
                             <button type="button" id="open-log-work-modal-btn" onclick="openLogWorkModal(null, event)" class="px-5 py-2.5 theme-accent-btn font-extrabold rounded-xl text-xs transition-all shadow-md shrink-0 flex items-center gap-1.5">
                                 <span>⚗️</span> <span>Log Work</span>
@@ -534,7 +532,10 @@
 
                         <div id="todo-card" class="card p-5 sm:p-6 rounded-2xl space-y-4">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                                <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>📝</span> <span>Tasks</span></h2>
+                                <div class="flex items-center gap-2">
+                                    <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>📝</span> <span>Tasks</span></h2>
+                                    <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" title="Precision and fine craft execution.">+DEX</span>
+                                </div>
                                 <div class="flex items-center gap-2">
                                     <span id="todo-count-active" class="text-xs font-bold px-2.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">0 Active</span>
                                     <span id="todo-count-done" class="text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">0 Done</span>
@@ -565,8 +566,9 @@
             <div id="tab-sanctuary" class="hidden space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                     <div id="workout-form-card" class="card p-6 rounded-2xl flex flex-col justify-between relative min-h-[280px]">
-                        <div class="mb-4">
+                        <div class="mb-4 flex items-center justify-between gap-2">
                             <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>🏃</span> <span>Fitness</span></h2>
+                            <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30" title="Physical endurance, chores, and daily recovery.">+VIT</span>
                         </div>
                         <form onsubmit="logWorkout(event)" class="space-y-4">
                             <input type="hidden" id="workout-strain" value="3">
@@ -602,8 +604,9 @@
                     </div>
 
                     <div id="chore-form-card" class="card p-6 rounded-2xl flex flex-col justify-between relative min-h-[280px]">
-                        <div class="mb-4">
+                        <div class="mb-4 flex items-center justify-between gap-2">
                             <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>🧹</span> <span>Chores</span></h2>
+                            <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30" title="Physical endurance, chores, and daily recovery.">+VIT</span>
                         </div>
                         <form onsubmit="logChore(event)" class="space-y-4">
                             <div>
@@ -623,8 +626,9 @@
                     </div>
 
                     <div id="health-form-card" class="card p-6 rounded-2xl flex flex-col justify-between relative min-h-[280px]">
-                        <div class="mb-4">
+                        <div class="mb-4 flex items-center justify-between gap-2">
                             <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>🍨</span> <span>Snacks</span></h2>
+                            <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30" title="Physical endurance, chores, and daily recovery.">+VIT</span>
                         </div>
                         <form onsubmit="logHealth(event)" class="space-y-4">
                             <div>
@@ -649,9 +653,10 @@
                     <div class="journal-spine hidden sm:block"></div>
                     
                     <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2.5">
                             <span class="text-2xl">📖</span>
                             <h2 class="text-xl font-black text-slate-100">Chronicle Journal</h2>
+                            <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-purple-500/15 text-purple-300 border border-purple-500/30" title="Self-reflection, synthesis, and milestone mastery.">+WIS</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <button onmousedown="startHoldJournalPage(-1, event)" ontouchstart="startHoldJournalPage(-1, event)" class="px-3.5 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-xl text-xs font-bold transition-all select-none">◀ Prev</button>
@@ -744,10 +749,10 @@
                 <!-- SECTION 2: UNIFIED CHRONICLE DECK TIMELINE -->
                 <div class="card p-5 sm:p-6 rounded-2xl space-y-5">
                     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-800 pb-4">
-                        <div class="flex items-center gap-3 flex-wrap">
+                        <div class="flex items-center gap-2.5 flex-wrap">
                             <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>📜</span> <span>Chronicle Deck</span></h2>
+                            <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-purple-500/15 text-purple-300 border border-purple-500/30" title="Self-reflection, synthesis, and milestone mastery.">+WIS</span>
                             <span id="chronicle-deck-count" class="text-[11px] font-mono font-extrabold px-2.5 py-0.5 rounded-lg bg-slate-900 text-amber-300 border border-amber-500/30">0 Cards</span>
-                            <span class="text-[11px] text-slate-400 hidden sm:inline">Hover or tap any card to flip for reflection notes</span>
                         </div>
                         <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-between lg:justify-end">
                             <div class="flex flex-wrap items-center gap-1.5">
@@ -771,8 +776,9 @@
             <div id="tab-relics" class="hidden space-y-6">
                 <div class="card p-6 rounded-2xl">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                        <div>
+                        <div class="flex items-center gap-2.5">
                             <h2 class="text-xl font-black text-slate-100">Relics</h2>
+                            <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-purple-500/15 text-purple-300 border border-purple-500/30" title="Self-reflection, synthesis, and milestone mastery.">+WIS</span>
                         </div>
                         <div class="flex items-center gap-3 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-700/80">
                             <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Unlocked:</span>
@@ -795,7 +801,6 @@
                                     <input type="text" id="setting-display-name" maxlength="24" placeholder="Enter your display name..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-xs text-white font-bold focus:outline-none focus:border-amber-500">
                                     <button type="button" onclick="applyCustomDisplayName()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-amber-300 font-bold rounded-xl whitespace-nowrap transition-all">Update Name</button>
                                 </div>
-                                <p class="text-[11px] text-slate-500 mt-1">Customizes how your name appears across the HUD, Chronicles, and Rank cards.</p>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -886,14 +891,11 @@
 
                     <div id="goals-targets-card" class="card p-6 rounded-2xl border transition-all">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-800">
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <h2 class="text-xl font-black text-slate-100">Goals &amp; Targets</h2>
-                                    <span id="goals-lock-status-badge" class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 uppercase tracking-wider flex items-center gap-1">
-                                        <span>🔒</span> <span>Locked</span>
-                                    </span>
-                                </div>
-                                <p id="goals-lock-helper-text" class="text-[11px] text-slate-400 mt-0.5">Protected against accidental changes. Unlock deliberately to modify sensitive targets.</p>
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-xl font-black text-slate-100">Goals &amp; Targets</h2>
+                                <span id="goals-lock-status-badge" class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 uppercase tracking-wider flex items-center gap-1">
+                                    <span>🔒</span> <span>Locked</span>
+                                </span>
                             </div>
 
                             <div id="goals-lock-action-area" class="flex items-center gap-2 shrink-0">
