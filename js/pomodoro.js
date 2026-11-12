@@ -152,23 +152,41 @@ function openLogAccumulatedHours(e){
     openLogWorkModal(prefill,e);
 }
 
+function updatePomoStepButtonsUI(mode, isDisabled){
+    const stepSize=mode==='focus'?15:5;
+    const minusBtn=$('pomo-step-minus'),plusBtn=$('pomo-step-plus');
+    if(minusBtn){
+        if(isDisabled!==undefined)minusBtn.disabled=isDisabled;
+        minusBtn.innerText=`-${stepSize}m`;
+        minusBtn.title=`Decrease timer by ${stepSize} minutes (persistent)`;
+    }
+    if(plusBtn){
+        if(isDisabled!==undefined)plusBtn.disabled=isDisabled;
+        plusBtn.innerText=`+${stepSize}m`;
+        plusBtn.title=`Increase timer by ${stepSize} minutes (persistent)`;
+    }
+}
+
 async function adjustPomoTimerDuration(deltaMins,e){
     if(e&&e.stopPropagation)e.stopPropagation();
     if(loggedInUser!==viewedUser||myPomoIsRunning)return;
-    const step=parseInt(deltaMins)||0;
-    if(!step)return;
+    const dir=Math.sign(parseInt(deltaMins)||0);
+    if(!dir)return;
+
+    const stepSize=myPomoMode==='focus'?15:5;
+    const step=dir*stepSize;
 
     let settingKey='pomoFocus',storageKey='aureum_pomo_focus',minMins=15,maxMins=180;
     if(myPomoMode==='short'){
         settingKey='pomoShort';storageKey='aureum_pomo_short';minMins=5;maxMins=60;
     }else if(myPomoMode==='long'){
-        settingKey='pomoLong';storageKey='aureum_pomo_long';minMins=15;maxMins=120;
+        settingKey='pomoLong';storageKey='aureum_pomo_long';minMins=5;maxMins=120;
     }
 
     const curMins=parseInt(userSettings[settingKey])||(myPomoMode==='focus'?25:(myPomoMode==='short'?5:15));
     let nextMins;
-    if(curMins%15!==0&&Math.abs(step)===15){
-        nextMins=step>0?(Math.ceil(curMins/15)*15):(Math.floor(curMins/15)*15);
+    if(curMins%stepSize!==0){
+        nextMins=step>0?(Math.ceil(curMins/stepSize)*stepSize):(Math.floor(curMins/stepSize)*stepSize);
         if(nextMins===curMins)nextMins=curMins+step;
     }else{
         nextMins=curMins+step;
@@ -202,7 +220,9 @@ function setMyPomoMode(mode){
     myPomoMode=mode;myPomoIsRunning=false;currentSessionWasPaused=false;myPomoEndTime=null;
     if(myPomoInterval)clearInterval(myPomoInterval);
     const f=parseInt(userSettings.pomoFocus)||25,s=parseInt(userSettings.pomoShort)||5,l=parseInt(userSettings.pomoLong)||15;
-    myPomoInitialTime=(mode==='focus'?f:(mode==='short'?s:l))*60;myPomoTime=myPomoInitialTime;syncMyPomoToCloud();
+    myPomoInitialTime=(mode==='focus'?f:(mode==='short'?s:l))*60;myPomoTime=myPomoInitialTime;
+    updatePomoStepButtonsUI(mode);
+    syncMyPomoToCloud();
 }
 
 function toggleMyPomoTimer(){
@@ -283,9 +303,7 @@ function startGlobalUIRenderer(){
             toggleBtn.innerText=isR?"Pause":(secs===initT?(mode==='focus'?"Start Focus":"Start Break"):"Resume");
         }else{statusEl.innerText=isR?`LIVE: ${mode.toUpperCase()}`:"PAUSED / IDLE"}
 
-        const minusBtn=$('pomo-step-minus'),plusBtn=$('pomo-step-plus');
-        if(minusBtn)minusBtn.disabled=(isR||!isSelf);
-        if(plusBtn)plusBtn.disabled=(isR||!isSelf);
+        updatePomoStepButtonsUI(mode, isR||!isSelf);
 
         ['focus','short','long'].forEach(m=>{$(`pomo-mode-${m}`).className=m===mode?"px-4 py-1.5 rounded-lg font-extrabold transition-all theme-accent-btn":"px-4 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition-all"});
         $('pomo-round-badge').innerText=`Round ${round} of ${totR}`;

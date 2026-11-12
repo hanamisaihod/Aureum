@@ -419,14 +419,14 @@
                                 </div>
                             </div>
 
-                            <!-- CENTER CLOCK FACE, INLINE ±15M STEPPERS, STATUS BADGE & PROGRESS BAR -->
+                            <!-- CENTER CLOCK FACE, INLINE STEPPERS, STATUS BADGE & PROGRESS BAR -->
                             <div id="pomo-clock-container" class="pomo-clock-center-zone select-none py-4 my-auto rounded-2xl transition-all flex-1 flex flex-col items-center justify-center gap-4">
                                 <div class="flex items-center justify-center gap-4 sm:gap-7 w-full max-w-xl mx-auto">
-                                    <button type="button" id="pomo-step-minus" onclick="adjustPomoTimerDuration(-15, event)" class="px-4 py-2.5 sm:px-5 sm:py-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-amber-400 border border-slate-700 font-mono font-black text-xs sm:text-sm transition-all shadow disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none shrink-0" title="Decrease timer by 15 minutes (persistent)">-15m</button>
+                                    <button type="button" id="pomo-step-minus" onclick="adjustPomoTimerDuration(-1, event)" class="px-4 py-2.5 sm:px-5 sm:py-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-amber-400 border border-slate-700 font-mono font-black text-xs sm:text-sm transition-all shadow disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none shrink-0" title="Decrease timer by 15 minutes (persistent)">-15m</button>
                                     <div onclick="handleClockClick()" class="cursor-pointer group px-4 py-2 rounded-2xl hover:bg-slate-800/40 transition-all">
                                         <div id="pomo-timer-display" class="text-6xl sm:text-7xl xl:text-8xl font-mono font-black theme-accent-text tracking-wider group-hover:scale-105 transition-transform leading-none">25:00</div>
                                     </div>
-                                    <button type="button" id="pomo-step-plus" onclick="adjustPomoTimerDuration(15, event)" class="px-4 py-2.5 sm:px-5 sm:py-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-amber-400 border border-slate-700 font-mono font-black text-xs sm:text-sm transition-all shadow disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none shrink-0" title="Increase timer by 15 minutes (persistent)">+15m</button>
+                                    <button type="button" id="pomo-step-plus" onclick="adjustPomoTimerDuration(1, event)" class="px-4 py-2.5 sm:px-5 sm:py-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-amber-400 border border-slate-700 font-mono font-black text-xs sm:text-sm transition-all shadow disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none shrink-0" title="Increase timer by 15 minutes (persistent)">+15m</button>
                                 </div>
                                 <div id="pomo-status-label" onclick="handleClockClick()" class="cursor-pointer inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-slate-900/80 border border-slate-800 text-xs text-slate-300 uppercase tracking-widest font-bold hover:text-amber-300 hover:border-amber-500/40 transition-all">Click Timer or Press Spacebar</div>
                                 <div class="w-full max-w-lg mx-auto bg-slate-900/80 h-3 rounded-full overflow-hidden border border-slate-700/60 p-0.5 mt-1">
