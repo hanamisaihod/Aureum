@@ -77,7 +77,7 @@ function startMyPomoBackgroundTimer(){
 function updateUnloggedFocusDisplay(){
     const isSelf=(loggedInUser===viewedUser);
     const secs=(isSelf?userSettings:spectatorSettings)?.unloggedFocusSecs||0;
-    const hrs=(secs/3600).toFixed(1);
+    const hrs=(secs/3600).toFixed(2);
     if($('pomo-unlogged-hours'))$('pomo-unlogged-hours').innerText=`${hrs} h`;
     if($('work-accumulated-pill-text'))$('work-accumulated-pill-text').innerText=`+${hrs} h accumulated`;
     const pill=$('work-accumulated-pill');
@@ -110,10 +110,10 @@ function applyAccumulatedHoursToWorkInput(e){
     if(loggedInUser!==viewedUser)return;
     const secs=userSettings.unloggedFocusSecs||0;
     if(secs<=0)return;
-    const accumHrs=Math.max(0.1, parseFloat((secs/3600).toFixed(1)));
+    const accumHrs=Math.max(0.1, parseFloat((secs/3600).toFixed(2)));
     const timeInput=$('work-time');
     if(timeInput){
-        timeInput.value=accumHrs.toFixed(1);
+        timeInput.value=accumHrs.toFixed(2);
         playTone('step');
     }
 }
