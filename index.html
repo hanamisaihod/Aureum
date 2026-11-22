@@ -377,55 +377,41 @@
                             <div class="flex items-center justify-between gap-2 flex-wrap">
                                 <div class="flex items-center gap-2 flex-wrap min-w-0">
                                     <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>⚡</span> <span>Quick Log</span></h2>
-                                    <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" title="Log any session in 2-3 taps, no popups.">2-3 taps</span>
                                     <div id="work-form-softcap-notice" class="hidden text-xs text-amber-300 font-bold flex items-center gap-1">
                                         <span>🍵 Soft Cap Active</span>
                                     </div>
                                 </div>
-                                <span id="quick-log-category-hint" class="text-[10px] font-mono font-bold text-slate-500 whitespace-nowrap">+DEX / +STR</span>
+                                <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 whitespace-nowrap" title="Focused studio work.">+DEX / +STR</span>
                             </div>
 
                             <form id="quick-log-form" onsubmit="submitQuickLog(event)" class="space-y-3" autocomplete="off">
-                                <!-- ROW 1 - CATEGORY SEGMENTED PILLS -->
-                                <div id="quick-log-category-row" class="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-slate-900/70 border border-slate-700">
-                                    <button type="button" data-quick-category="work" onclick="setQuickLogCategory('work')" aria-pressed="true" class="quick-log-segment is-active flex items-center justify-center gap-1 px-1.5 py-2 rounded-lg text-[11px] font-extrabold">🎨 Work</button>
-                                    <button type="button" data-quick-category="chore" onclick="setQuickLogCategory('chore')" aria-pressed="false" class="quick-log-segment flex items-center justify-center gap-1 px-1.5 py-2 rounded-lg text-[11px] font-extrabold">🧹 Chore</button>
-                                    <button type="button" data-quick-category="workout" onclick="setQuickLogCategory('workout')" aria-pressed="false" class="quick-log-segment flex items-center justify-center gap-1 px-1.5 py-2 rounded-lg text-[11px] font-extrabold">🏃 Workout</button>
+                                <!-- ROW 1 - 15-MINUTE STEPPER + EXPLICIT BANKED-FOCUS MOVE -->
+                                <div class="flex items-stretch gap-1.5">
+                                    <div class="flex-1 min-w-0 flex items-stretch bg-slate-900/90 border border-slate-700 rounded-xl overflow-hidden h-10">
+                                        <button type="button" id="quick-log-step-minus" aria-label="Subtract 15 minutes" onmousedown="holdQuickLogMinutes(-1, event)" ontouchstart="holdQuickLogMinutes(-1, event)" class="quick-log-step-btn">−</button>
+                                        <input type="text" id="quick-log-duration" value="0m" readonly aria-label="Session duration (15 minute steps)" class="w-full min-w-0 text-center bg-transparent px-1 text-sm text-white font-mono font-black focus:outline-none cursor-default select-none">
+                                        <button type="button" id="quick-log-step-plus" aria-label="Add 15 minutes" onmousedown="holdQuickLogMinutes(1, event)" ontouchstart="holdQuickLogMinutes(1, event)" class="quick-log-step-btn">+</button>
+                                    </div>
+                                    <button type="button" id="work-accumulated-pill" onclick="applyAccumulatedHoursToWorkInput(event)" title="Move banked Pomodoro focus into the duration box" class="h-10 px-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 text-white font-mono font-extrabold text-[10px] transition-all shrink-0 flex items-center gap-1 select-none">
+                                        <span aria-hidden="true">⚡</span><span class="hidden sm:inline">Move</span> <span id="work-accumulated-pill-text">0.00 h</span><span aria-hidden="true">→</span>
+                                    </button>
                                 </div>
 
-                                <!-- ROW 2 - 1-TAP DURATION CHIPS + COMPACT DIRECT INPUT -->
-                                <div class="space-y-2">
-                                    <div id="quick-log-duration-chips" class="flex flex-wrap gap-1.5"></div>
-                                    <div class="flex items-center gap-1.5">
-                                        <div class="flex-1 min-w-0 flex items-center bg-slate-900/90 border border-slate-700 rounded-xl overflow-hidden h-9">
-                                            <input type="number" id="quick-log-duration" min="1" max="600" step="any" value="25" inputmode="decimal" oninput="onQuickLogDurationInput(event)" aria-label="Session duration" class="w-full min-w-0 text-center bg-transparent px-2 text-sm text-white font-mono font-black focus:outline-none [appearance:textfield]">
-                                            <button type="button" id="quick-log-duration-unit" onclick="toggleQuickLogDurationUnit(event)" title="Toggle minutes / hours" class="h-full px-2.5 text-[10px] font-black uppercase tracking-wider bg-slate-800/90 hover:bg-slate-700 text-slate-300 border-l border-slate-700 shrink-0">min</button>
-                                        </div>
-                                        <button type="button" id="work-accumulated-pill" onclick="applyAccumulatedHoursToWorkInput(event)" title="Tap to apply accumulated Pomodoro hours" class="h-9 px-2.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 font-mono font-extrabold text-[10px] transition-all shrink-0 flex items-center gap-1 select-none">
-                                            <span>⚡</span> <span id="work-accumulated-pill-text">+0.0 h accumulated</span>
-                                        </button>
+                                <!-- ROW 2 - COUPLED 1-5 PANEL: QUALITY (PAYOUT) LEADS, EFFORT FOLLOWS -->
+                                <div id="quick-log-ratings" class="rounded-xl bg-slate-900/60 border border-slate-700 px-2 py-1.5 space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-14 shrink-0 text-[9px] uppercase tracking-wider font-black text-amber-300">Quality</span>
+                                        <div id="quick-log-quality-strip" class="flex-1 grid grid-cols-5 gap-1"></div>
+                                        <span id="quick-log-quality-label" class="w-5 shrink-0 text-center text-[11px] font-mono font-black text-amber-300">3</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-14 shrink-0 text-[9px] uppercase tracking-wider font-black text-slate-400">Effort</span>
+                                        <div id="quick-log-effort-strip" class="flex-1 grid grid-cols-5 gap-1"></div>
+                                        <span id="quick-log-effort-label" class="w-5 shrink-0 text-center text-[11px] font-mono font-black text-slate-300">3</span>
                                     </div>
                                 </div>
 
-                                <!-- ROW 3 - INLINE 1-5 EFFORT & QUALITY STRIPS (hidden for chores) -->
-                                <div id="quick-log-ratings" class="grid grid-cols-2 gap-2">
-                                    <div class="min-w-0">
-                                        <div class="flex items-center justify-between gap-1 mb-1">
-                                            <span class="text-[9px] uppercase tracking-wider font-black text-slate-400">Effort</span>
-                                            <span id="quick-log-effort-label" class="text-[9px] font-mono text-slate-500">3</span>
-                                        </div>
-                                        <div id="quick-log-effort-strip" class="grid grid-cols-5 gap-1"></div>
-                                    </div>
-                                    <div class="min-w-0">
-                                        <div class="flex items-center justify-between gap-1 mb-1">
-                                            <span class="text-[9px] uppercase tracking-wider font-black text-slate-400">Quality</span>
-                                            <span id="quick-log-quality-label" class="text-[9px] font-mono text-slate-500">3</span>
-                                        </div>
-                                        <div id="quick-log-quality-strip" class="grid grid-cols-5 gap-1"></div>
-                                    </div>
-                                </div>
-
-                                <!-- ROW 4 - NOTE + INSTANT SUBMIT -->
+                                <!-- ROW 3 - NOTE + INSTANT SUBMIT -->
                                 <div class="flex flex-col sm:flex-row gap-2">
                                     <input type="text" id="quick-log-note" placeholder="Quick note (optional)..." autocomplete="off" class="flex-1 min-w-0 bg-slate-900/90 border border-slate-700 rounded-xl px-3 h-9 text-xs text-white focus:outline-none focus:border-amber-500">
                                     <button type="submit" id="quick-log-submit-btn" class="h-9 px-4 theme-accent-btn font-extrabold rounded-xl text-xs transition-all shadow-md shrink-0 whitespace-nowrap">Log Session</button>

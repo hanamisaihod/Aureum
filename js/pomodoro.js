@@ -194,10 +194,11 @@ function updateUnloggedFocusDisplay(){
     const secs=(isSelf?userSettings:spectatorSettings)?.unloggedFocusSecs||0;
     const hrs=(secs/3600).toFixed(2);
     if($('pomo-unlogged-hours'))$('pomo-unlogged-hours').innerText=`${hrs} h`;
-    if($('work-accumulated-pill-text'))$('work-accumulated-pill-text').innerText=`+${hrs} h accumulated`;
+    if($('work-accumulated-pill-text'))$('work-accumulated-pill-text').innerText=`${hrs} h`;
     const pill=$('work-accumulated-pill');
     if(pill){
         pill.disabled=(!isSelf||secs<=0);
+        pill.title=secs>0?`Move ${hrs} h of banked focus into the duration box`:'No banked Pomodoro focus yet';
         pill.classList.toggle('opacity-50', secs<=0);
     }
     const resetBtn=$('pomo-reset-accumulated-btn');
@@ -233,7 +234,7 @@ function applyAccumulatedHoursToWorkInput(e){
     }
     const timeInput=$('quick-log-duration');
     if(timeInput){
-        timeInput.value=String(accumulatedMinutes);
+        timeInput.value=`${accumulatedMinutes}m`;
         playTone('step');
     }
 }

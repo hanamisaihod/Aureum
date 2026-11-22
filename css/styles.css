@@ -460,10 +460,35 @@ aside.app-sidebar > * {
 }
 
 /* ============================================================================
-   QUICK LOG CARD — FLAT INLINE SEGMENT / CHIP / RATING STRIPS
+   QUICK LOG CARD — 15-MINUTE STEPPER / COUPLED RATING STRIPS
    ============================================================================ */
-.quick-log-segment,
-.quick-log-chip,
+.quick-log-step-btn {
+    width: 2.25rem;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(30, 41, 59, 0.9);
+    color: #e2e8f0;
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background-color 0.16s ease, color 0.16s ease;
+}
+.quick-log-step-btn:hover:not(:disabled) {
+    background: rgba(51, 65, 85, 0.95);
+    color: var(--accent-primary);
+}
+.quick-log-step-btn:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: -2px;
+}
+.quick-log-step-btn:disabled {
+    color: #64748b;
+    cursor: not-allowed;
+}
 .quick-log-rating-btn {
     border: 1px solid rgba(51, 65, 85, 0.85);
     background: rgba(2, 6, 23, 0.65);
@@ -473,26 +498,14 @@ aside.app-sidebar > * {
     -webkit-user-select: none;
     transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease, transform 0.12s ease;
 }
-.quick-log-segment:hover,
-.quick-log-chip:hover,
 .quick-log-rating-btn:hover {
     border-color: var(--accent-primary);
     color: #f8fafc;
     transform: translateY(-1px);
 }
-.quick-log-segment:focus-visible,
-.quick-log-chip:focus-visible,
 .quick-log-rating-btn:focus-visible {
     outline: 2px solid var(--accent-primary);
     outline-offset: 2px;
-}
-.quick-log-segment.is-active,
-.quick-log-chip.is-active {
-    background: linear-gradient(135deg, var(--accent-glow) 0%, rgba(255, 255, 255, 0.06) 100%);
-    border-color: var(--accent-primary);
-    color: var(--accent-primary);
-    font-weight: 900;
-    box-shadow: 0 0 14px var(--accent-glow);
 }
 .quick-log-rating-btn.is-active {
     background: var(--accent-primary);

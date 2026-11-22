@@ -1,9 +1,9 @@
 // ============================================================================
 // AUREUM — Inline Quick-Log Runtime Tests (fake DOM + fake Firestore)
 // ============================================================================
-// Exercises the exact payloads produced by the three category pills without a
-// browser, so logging work/chore/workout can never silently drift from the
-// Sanctuary forms.
+// The Crucible Quick Log is work-only (chores and workouts live in Sanctuary),
+// always steps in 15 minutes, starts at 0, and only accepts banked Pomodoro
+// focus through the explicit green Move action.
 
 const test = require('node:test');
 const assert = require('node:assert');
@@ -12,6 +12,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const choreMultiplier = require('../js/choreMultiplier.js');
+const indexHtml = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 
 function createEl(extra) {
     const classes = new Set();
@@ -40,23 +41,18 @@ function createEl(extra) {
 function createQuickLogContext() {
     const elements = {
         'quick-log-form': createEl(),
-        'quick-log-duration': createEl({ value: '25' }),
-        'quick-log-duration-unit': createEl(),
-        'quick-log-duration-chips': createEl(),
-        'quick-log-effort-strip': createEl(),
+        'quick-log-duration': createEl({ value: '0m' }),
+        'quick-log-step-minus': createEl(),
+        'quick-log-step-plus': createEl(),
         'quick-log-quality-strip': createEl(),
+        'quick-log-effort-strip': createEl(),
         'quick-log-ratings': createEl(),
         'quick-log-effort-label': createEl(),
         'quick-log-quality-label': createEl(),
-        'quick-log-category-hint': createEl(),
         'quick-log-submit-btn': createEl({ innerText: 'Log Session' }),
         'quick-log-note': createEl(),
         'quick-log-error': createEl()
     };
-
-    const categoryButtons = ['work', 'chore', 'workout'].map(key => createEl({
-        getAttribute: name => (name === 'data-quick-category' ? key : null)
-    }));
 
     const added = [];
     const db = {
@@ -72,7 +68,7 @@ function createQuickLogContext() {
         console,
         document: {
             addEventListener() {},
-            querySelectorAll: selector => (selector === '[data-quick-category]' ? categoryButtons : []),
+            querySelectorAll: () => [],
             getElementById: id => elements[id] || null,
             readyState: 'complete'
         },
@@ -109,81 +105,153 @@ function createQuickLogContext() {
         vm.runInContext(source, sandbox, { filename: file });
     });
 
-    return { sandbox, elements, added, categoryButtons };
+    return { sandbox, elements, added };
 }
 
-test('quick-log initial render exposes work chips, ratings, and defaults', () => {
+test('quick-log starts at zero with a 15-minute stepper and visible ratings', () => {
     const { sandbox, elements } = createQuickLogContext();
 
-    assert.equal(vm.runInContext('[typeof applyAccumulatedFocusToQuickLog, typeof focusQuickLogCard, typeof submitQuickLog, typeof toggleQuickLogDurationUnit].join(",")', sandbox), 'function,function,function,function');
-    assert.ok(elements['quick-log-duration-chips'].innerHTML.includes('25m'));
-    assert.ok(elements['quick-log-duration-chips'].innerHTML.includes('120m'));
+    assert.equal(
+        vm.runInContext('[typeof applyAccumulatedFocusToQuickLog, typeof focusQuickLogCard, typeof submitQuickLog, typeof stepQuickLogMinutes, typeof holdQuickLogMinutes].join(",")', sandbox),
+        'function,function,function,function,function'
+    );
+    assert.equal(vm.runInContext('getQuickLogMinutes()', sandbox), 0);
+    assert.equal(elements['quick-log-duration'].value, '0m');
+    assert.equal(elements['quick-log-step-minus'].disabled, true);
+    assert.equal(elements['quick-log-step-plus'].disabled, false);
     assert.equal(elements['quick-log-ratings'].classList.contains('hidden'), false);
-    assert.equal(elements['quick-log-effort-label'].innerText, '3');
     assert.equal(elements['quick-log-quality-label'].innerText, '3');
-    assert.equal(elements['quick-log-category-hint'].innerText, '+DEX / +STR');
-    assert.equal(vm.runInContext('getQuickLogMinutesFromInput()', sandbox), 25);
+    assert.equal(elements['quick-log-effort-label'].innerText, '3');
+    assert.ok(elements['quick-log-quality-strip'].innerHTML.includes('Quality 5 of 5'));
+    assert.ok(elements['quick-log-effort-strip'].innerHTML.includes('Effort 1 of 5'));
 });
 
-test('chore category swaps chips, hides ratings, and keeps logging fast', () => {
-    const { sandbox, elements } = createQuickLogContext();
-
-    vm.runInContext('setQuickLogCategory("chore")', sandbox);
-
-    assert.ok(elements['quick-log-duration-chips'].innerHTML.includes('10m'));
-    assert.ok(!elements['quick-log-duration-chips'].innerHTML.includes('120m'));
-    assert.equal(elements['quick-log-ratings'].classList.contains('hidden'), true);
-    assert.equal(elements['quick-log-category-hint'].innerText, '+VIT');
-    assert.equal(elements['quick-log-duration'].value, '15'); // chore default
-});
-
-test('quick-log submits canonical work, chore, and workout payloads', async () => {
+test('duration only moves in 15-minute steps and never falls below zero', () => {
     const { sandbox, elements, added } = createQuickLogContext();
 
-    // --- Work ---
-    vm.runInContext('setQuickLogCategory("work")', sandbox);
-    elements['quick-log-duration'].value = '25';
-    vm.runInContext('onQuickLogDurationInput()', sandbox);
+    vm.runInContext('stepQuickLogMinutes(1)', sandbox);
+    assert.equal(vm.runInContext('getQuickLogMinutes()', sandbox), 15);
+    assert.equal(elements['quick-log-duration'].value, '15m');
+    assert.equal(elements['quick-log-step-minus'].disabled, false);
+
+    vm.runInContext('stepQuickLogMinutes(1); stepQuickLogMinutes(1); stepQuickLogMinutes(1)', sandbox);
+    assert.equal(vm.runInContext('getQuickLogMinutes()', sandbox), 60);
+    assert.equal(elements['quick-log-duration'].value, '1h');
+
+    vm.runInContext('stepQuickLogMinutes(-1)', sandbox);
+    assert.equal(elements['quick-log-duration'].value, '45m');
+
+    // Hold repeaters call the same stepper, so a single press stages one step.
+    vm.runInContext('holdQuickLogMinutes(1)', sandbox);
+    assert.equal(elements['quick-log-duration'].value, '1h');
+
+    vm.runInContext('setQuickLogMinutes(620)', sandbox);
+    assert.equal(vm.runInContext('getQuickLogMinutes()', sandbox), 600);
+    assert.equal(elements['quick-log-duration'].value, '10h');
+
+    // Off-grid values snap onto the grid instead of creating odd durations.
+    vm.runInContext('setQuickLogMinutes(16)', sandbox);
+    assert.equal(elements['quick-log-duration'].value, '15m');
+    vm.runInContext('setQuickLogMinutes(23)', sandbox);
+    assert.equal(elements['quick-log-duration'].value, '30m');
+
+    vm.runInContext('setQuickLogMinutes(15); stepQuickLogMinutes(-1)', sandbox);
+    assert.equal(vm.runInContext('getQuickLogMinutes()', sandbox), 0);
+    assert.equal(elements['quick-log-duration'].value, '0m');
+    assert.equal(elements['quick-log-step-minus'].disabled, true);
+
+    assert.equal(added.length, 0); // stepping never writes a log by itself
+});
+
+test('banked focus snaps onto the 15-minute grid only when moved in', () => {
+    const { sandbox, elements } = createQuickLogContext();
+
+    // Nothing auto-fills: the box stays empty until the green Move button runs.
+    assert.equal(elements['quick-log-duration'].value, '0m');
+
+    vm.runInContext('applyAccumulatedFocusToQuickLog(90)', sandbox);
+    assert.equal(elements['quick-log-duration'].value, '1h 30m');
+
+    vm.runInContext('applyAccumulatedFocusToQuickLog(25)', sandbox);
+    assert.equal(elements['quick-log-duration'].value, '30m');
+
+    // A stray sub-step bank still lands on one full step rather than zero.
+    vm.runInContext('applyAccumulatedFocusToQuickLog(3)', sandbox);
+    assert.equal(elements['quick-log-duration'].value, '15m');
+
+    vm.runInContext('applyAccumulatedFocusToQuickLog(0)', sandbox);
+    assert.equal(elements['quick-log-duration'].value, '15m');
+});
+
+test('quick-log rejects an empty box and logs quality before effort', async () => {
+    const { sandbox, elements, added } = createQuickLogContext();
+
+    elements['quick-log-note'].value = 'Premature';
+    await vm.runInContext('submitQuickLog({preventDefault(){}})', sandbox);
+
+    assert.equal(added.length, 0);
+    assert.equal(elements['quick-log-error'].classList.contains('hidden'), false);
+    assert.ok(elements['quick-log-error'].innerText.includes('Set a duration'));
+
+    vm.runInContext('stepQuickLogMinutes(1); stepQuickLogMinutes(1)', sandbox); // 30m
+    vm.runInContext('setQuickLogRating("quality", 5)', sandbox);
+    vm.runInContext('setQuickLogRating("effort", 2)', sandbox);
     elements['quick-log-note'].value = 'Deep work';
     await vm.runInContext('submitQuickLog({preventDefault(){}})', sandbox);
 
-    const work = added[added.length - 1].payload;
+    assert.equal(added.length, 1);
+    const work = added[0].payload;
     assert.equal(work.type, 'work');
     assert.equal(work.user, 'North');
-    assert.equal(work.hours, 0.4167);
-    assert.equal(work.normalHours, 0.4167);
-    assert.ok(Math.abs(work.points - 1.2501) < 1e-9); // 3.0 avg rating × hours
-    assert.equal(work.results, 3);
-    assert.equal(work.effort, 3);
+    assert.equal(work.role, 'illustrator');
+    assert.equal(work.hours, 0.5);
+    assert.equal(work.normalHours, 0.5);
+    assert.equal(work.overCapHours, 0);
+    assert.equal(work.results, 5); // Quality
+    assert.equal(work.effort, 2); // Effort
+    assert.ok(Math.abs(work.points - 1.75) < 1e-9); // avg(5, 2) × 0.5h
     assert.equal(work.reflectionText, 'Deep work');
     assert.equal(elements['quick-log-note'].value, '');
+    assert.equal(elements['quick-log-duration'].value, '0m'); // fresh session after saving
+    assert.equal(elements['quick-log-error'].classList.contains('hidden'), true);
     assert.equal(elements['quick-log-submit-btn'].innerText, '✓ Logged!');
-
-    // --- Chore (ratings hidden, note doubles as reflectionText) ---
-    vm.runInContext('setQuickLogCategory("chore")', sandbox);
-    elements['quick-log-note'].value = 'Laundry';
-    await vm.runInContext('submitQuickLog({preventDefault(){}})', sandbox);
-
-    const chore = added[added.length - 1].payload;
-    assert.equal(chore.type, 'chore');
-    assert.equal(chore.hours, 0.25); // 15m default
-    assert.equal(chore.note, 'Laundry');
-    assert.equal(chore.reflectionText, 'Laundry');
-    assert.equal(elements['quick-log-note'].value, '');
-
-    // --- Workout (strain from Effort, results from Quality) ---
-    vm.runInContext('setQuickLogCategory("workout")', sandbox);
-    elements['quick-log-duration'].value = '45';
-    vm.runInContext('onQuickLogDurationInput()', sandbox);
-    vm.runInContext('setQuickLogRating("effort", 4)', sandbox);
-    vm.runInContext('setQuickLogRating("quality", 5)', sandbox);
-    await vm.runInContext('submitQuickLog({preventDefault(){}})', sandbox);
-
-    const workout = added[added.length - 1].payload;
-    assert.equal(workout.type, 'workout');
-    assert.equal(workout.hours, 0.75);
-    assert.equal(workout.strain, 4);
-    assert.equal(workout.results, 5);
-    assert.equal(elements['quick-log-note'].value, '');
 });
+
+test('holding the stepper repeats in 15-minute steps until released', () => {
+    const { sandbox, elements } = createQuickLogContext();
+    const timeouts = [];
+    const intervals = [];
+    sandbox.setTimeout = fn => { timeouts.push(fn); return 1; };
+    sandbox.setInterval = fn => { intervals.push(fn); return 2; };
+    sandbox.clearTimeout = () => {};
+    sandbox.clearInterval = () => {};
+
+    vm.runInContext('holdQuickLogMinutes(1, {type: "mousedown", preventDefault(){}})', sandbox);
+    assert.equal(elements['quick-log-duration'].value, '15m'); // immediate step
+    assert.equal(timeouts.length, 1);
+
+    timeouts[0](); // 300ms hold threshold reached -> start repeating
+    assert.equal(intervals.length, 1);
+
+    intervals[0]();
+    intervals[0]();
+    assert.equal(elements['quick-log-duration'].value, '45m');
+    assert.equal(vm.runInContext('getQuickLogMinutes()', sandbox), 45);
+});
+
+test('quick-log markup drops presets and categories, and keeps quality ahead of effort', () => {
+    assert.ok(!indexHtml.includes('data-quick-category'));
+    assert.ok(!indexHtml.includes('quick-log-duration-chips'));
+    assert.ok(!indexHtml.includes('quick-log-duration-unit'));
+    assert.ok(!indexHtml.includes('2-3 taps'));
+    assert.ok(!/id="quick-log-duration"[^>]*type="number"/.test(indexHtml));
+    assert.ok(!/type="number"[^>]*id="quick-log-duration"/.test(indexHtml));
+    assert.ok(/id="quick-log-duration"[^>]*readonly/.test(indexHtml));
+
+    const qualityAt = indexHtml.indexOf('id="quick-log-quality-strip"');
+    const effortAt = indexHtml.indexOf('id="quick-log-effort-strip"');
+    assert.ok(qualityAt > -1 && effortAt > -1, 'both rating strips must exist');
+    assert.ok(qualityAt < effortAt, 'quality must render before effort');
+});
+
 
