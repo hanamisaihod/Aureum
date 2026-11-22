@@ -19,6 +19,7 @@ auth.onAuthStateChanged(async u=>{
         startGlobalUIRenderer();attachPomoSpectatorListener();
         updatePresenceTimestamp();
     }else{
+        if(typeof restoreDefaultDocumentTitle==='function')restoreDefaultDocumentTitle();
         if(modal)modal.classList.remove('hidden');
         if(app)app.classList.add('hidden');
     }
@@ -405,6 +406,7 @@ function loadUserData(){
         pEl.innerText=`฿${Math.round(finalPayout).toLocaleString()}`;
         pEl.className=isVaulted?"text-3xl font-extrabold text-amber-400 mt-1.5 opacity-70 line-through":"text-3xl font-extrabold text-emerald-400 mt-1.5";
         renderAllowanceMultiplierUI(allowanceBreakdown);
+        if(typeof refreshPayoffReceipt==='function')refreshPayoffReceipt();
 
         $('today-hours-label').innerText=`${formatHours(todayHours)} / ${formatHours(softCap)} hrs`;
         $('daily-bar').style.width=`${Math.min((todayHours/softCap)*100,100)}%`;
@@ -456,6 +458,7 @@ try {
     if (typeof renderMonthlyPerformanceCodex === 'function') renderMonthlyPerformanceCodex();
     setInterval(() => {
         if (typeof renderGuildActivityTicker === 'function') renderGuildActivityTicker();
+        if (typeof updatePayoffReceiptButtonState === 'function') updatePayoffReceiptButtonState();
     }, 30000);
 } catch (e) {}
 

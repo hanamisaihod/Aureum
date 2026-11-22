@@ -5,6 +5,13 @@
 let myPomoMode='focus',myPomoRound=1,myPomoTime=_cachedFocus*60,myPomoEndTime=null,myPomoInitialTime=_cachedFocus*60,myPomoIsRunning=false,myPomoInterval=null,currentSessionWasPaused=false;
 let pomoUIRenderInterval=null,pomoSyncUnsubscribe=null,spectatorSettings=null,shadowSpectatorTime=_cachedFocus*60,shadowSpectatorIsRunning=false,shadowSpectatorInterval=null;
 
+// Live tab-title sync + synthesized completion chime (no audio files).
+const DEFAULT_TITLE=(document.title||'Aureum').trim()||'Aureum';
+const TIMER_CHIME_STORAGE_KEY='aureum_timer_chime_muted';
+let timerChimeMuted=false;
+try{timerChimeMuted=localStorage.getItem(TIMER_CHIME_STORAGE_KEY)==='true';}catch(e){}
+let lastAppliedDocumentTitle=document.title||DEFAULT_TITLE;
+
 try{
     const _initTEl=$('pomo-timer-display'),_initFBtn=$('pomo-mode-focus');
     if(_initTEl)_initTEl.innerText=`${_cachedFocus.toString().padStart(2,'0')}:00`;
@@ -27,6 +34,114 @@ function handleUserSelectPomoMode(mode) {
     if (loggedInUser !== viewedUser) return;
     setMyPomoMode(mode);
 }
+
+// ----------------------------------------------------------------------------
+// TAB TITLE — [12:34] Focus • Aureum / [PAUSED 12:34] Focus • Aureum
+// ----------------------------------------------------------------------------
+function getPomoModeLabel(mode) {
+    if (mode === 'short') return 'Short Break';
+    if (mode === 'long') return 'Long Break';
+    return 'Focus';
+}
+
+function formatPomoClockTitle(secs) {
+    const safe = Math.max(0, Math.round(Number(secs) || 0));
+    return `${Math.floor(safe / 60).toString().padStart(2, '0')}:${(safe % 60).toString().padStart(2, '0')}`;
+}
+
+function applyDocumentTitle(title) {
+    const next = title || DEFAULT_TITLE;
+    if (next === lastAppliedDocumentTitle && document.title === next) return;
+    document.title = next;
+    lastAppliedDocumentTitle = next;
+}
+
+function restoreDefaultDocumentTitle() {
+    applyDocumentTitle(DEFAULT_TITLE);
+}
+
+/**
+ * Mirrors the live Pomodoro state into the browser tab title.
+ * Running -> [mm:ss] Label • Aureum, paused -> [PAUSED mm:ss] Label • Aureum,
+ * idle/reset/completed -> the original page title.
+ */
+function syncPomodoroDocumentTitle(secs, isRunning, mode, initSecs, isSelf, wasPaused) {
+    if (!isSelf) { restoreDefaultDocumentTitle(); return; }
+    const clock = formatPomoClockTitle(secs);
+    if (isRunning) {
+        applyDocumentTitle(`[${clock}] ${getPomoModeLabel(mode)} • Aureum`);
+        return;
+    }
+    const initial = Math.max(0, Math.round(Number(initSecs) || 0));
+    if (wasPaused || (secs > 0 && secs < initial)) {
+        applyDocumentTitle(`[PAUSED ${clock}] ${getPomoModeLabel(mode)} • Aureum`);
+        return;
+    }
+    restoreDefaultDocumentTitle();
+}
+
+// ----------------------------------------------------------------------------
+// COMPLETION CHIME — warm C5 -> G5 two-note sine/triangle bell
+// ----------------------------------------------------------------------------
+function unlockPomoAudio() {
+    try {
+        const c = getAudioContext();
+        if (c && c.state === 'suspended' && typeof c.resume === 'function') c.resume().catch(() => {});
+    } catch (e) {}
+}
+
+function playTimerChime() {
+    if (timerChimeMuted || audioMuted) return;
+    try {
+        const c = getAudioContext();
+        if (c.state === 'suspended' && typeof c.resume === 'function') c.resume().catch(() => {});
+        const now = c.currentTime;
+        // 523.25 Hz (C5) then 783.99 Hz (G5) 180ms later, each with a soft
+        // octave shimmer and a 0.8s exponential fade.
+        const notes = [
+            { freq: 523.25, at: 0, type: 'sine', peak: 0.22 },
+            { freq: 1046.50, at: 0, type: 'sine', peak: 0.06 },
+            { freq: 783.99, at: 0.18, type: 'triangle', peak: 0.20 },
+            { freq: 1567.98, at: 0.18, type: 'sine', peak: 0.05 }
+        ];
+        notes.forEach(note => {
+            const osc = c.createOscillator();
+            const gain = c.createGain();
+            const start = now + note.at;
+            osc.type = note.type;
+            osc.frequency.setValueAtTime(note.freq, start);
+            gain.gain.setValueAtTime(0.0001, start);
+            gain.gain.exponentialRampToValueAtTime(note.peak, start + 0.025);
+            gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.8);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start(start);
+            osc.stop(start + 0.82);
+        });
+    } catch (e) {}
+}
+
+function updateTimerChimeToggleUI() {
+    const btn = $('pomo-chime-toggle');
+    if (!btn) return;
+    btn.innerText = timerChimeMuted ? '🔇' : '🔔';
+    btn.title = timerChimeMuted ? 'Timer chime muted (click to enable)' : 'Timer chime on (click to mute)';
+    btn.setAttribute('aria-pressed', timerChimeMuted ? 'false' : 'true');
+    btn.classList.toggle('opacity-60', timerChimeMuted);
+}
+
+function toggleTimerChime(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    timerChimeMuted = !timerChimeMuted;
+    try { localStorage.setItem(TIMER_CHIME_STORAGE_KEY, String(timerChimeMuted)); } catch (err) {}
+    updateTimerChimeToggleUI();
+    if (!timerChimeMuted) {
+        unlockPomoAudio();
+        playTimerChime();
+    }
+}
+
+try { updateTimerChimeToggleUI(); } catch (e) {}
 
 async function syncMyPomoToCloud(){
     if(!loggedInUser)return;
@@ -53,7 +168,7 @@ function startMyPomoBackgroundTimer(){
         
         if(myPomoTime<=0){
             myPomoTime=0;myPomoIsRunning=false;myPomoEndTime=null;clearInterval(myPomoInterval);
-            playPomoSound(userSettings.pomoSound);syncMyPomoToCloud();
+            playPomoSound(userSettings.pomoSound);playTimerChime();restoreDefaultDocumentTitle();syncMyPomoToCloud();
             const totalRounds=parseInt(userSettings.pomoRounds)||4;
             if(myPomoMode==='focus'){
                 userSettings.completedPomoHistory=userSettings.completedPomoHistory||[];
@@ -110,10 +225,15 @@ function applyAccumulatedHoursToWorkInput(e){
     if(loggedInUser!==viewedUser)return;
     const secs=userSettings.unloggedFocusSecs||0;
     if(secs<=0)return;
-    const accumHrs=Math.max(0.1, parseFloat((secs/3600).toFixed(2)));
-    const timeInput=$('work-time');
+    const accumulatedMinutes=Math.max(1,Math.round(secs/60));
+    // The legacy modal is gone — fill the inline Quick-Log card instead.
+    if(typeof applyAccumulatedFocusToQuickLog==='function'){
+        applyAccumulatedFocusToQuickLog(accumulatedMinutes,e);
+        return;
+    }
+    const timeInput=$('quick-log-duration');
     if(timeInput){
-        timeInput.value=accumHrs.toFixed(2);
+        timeInput.value=String(accumulatedMinutes);
         playTone('step');
     }
 }
@@ -122,22 +242,19 @@ function openLogWorkModal(prefillHours, e){
     if(e&&e.stopPropagation)e.stopPropagation();
     if(loggedInUser!==viewedUser)return;
     updateUnloggedFocusDisplay();
-    const timeInput=$('work-time');
-    if(timeInput&&prefillHours!==undefined&&prefillHours!==null){
-        timeInput.value=Number(prefillHours).toFixed(2);
+    const minutes=(prefillHours!==undefined&&prefillHours!==null)
+        ? Math.max(1,Math.round(Number(prefillHours)*60))
+        : null;
+    if(typeof focusQuickLogCard==='function'){
+        focusQuickLogCard(minutes);
+        playTone('save');
+        return;
     }
-    const modal=$('log-work-modal');
-    if(modal){
-        modal.classList.remove('hidden');
-    }
-    playTone('save');
-    setTimeout(()=>{
-        const refl=$('work-reflection');
-        if(refl)refl.focus();
-        else if(timeInput)timeInput.focus();
-    },60);
+    const card=$('work-form-card');
+    if(card&&card.scrollIntoView)card.scrollIntoView({behavior:'smooth',block:'center'});
 }
 
+// Kept as a no-op so any legacy caller can safely close the retired modal.
 function closeLogWorkModal(e){
     if(e&&e.stopPropagation)e.stopPropagation();
     const modal=$('log-work-modal');
@@ -222,11 +339,15 @@ function setMyPomoMode(mode){
     const f=parseInt(userSettings.pomoFocus)||25,s=parseInt(userSettings.pomoShort)||5,l=parseInt(userSettings.pomoLong)||15;
     myPomoInitialTime=(mode==='focus'?f:(mode==='short'?s:l))*60;myPomoTime=myPomoInitialTime;
     updatePomoStepButtonsUI(mode);
+    restoreDefaultDocumentTitle();
     syncMyPomoToCloud();
 }
 
 function toggleMyPomoTimer(){
     if(loggedInUser!==viewedUser)return;requestNotificationPermission();
+    // Unlock the AudioContext from this direct user gesture so the completion
+    // chime is never blocked by autoplay policies.
+    unlockPomoAudio();
     if(myPomoIsRunning){
         myPomoIsRunning=false;currentSessionWasPaused=true;myPomoEndTime=null;clearInterval(myPomoInterval);
     }else{
@@ -236,7 +357,7 @@ function toggleMyPomoTimer(){
     }
     syncMyPomoToCloud();
 }
-function resetMyPomoTimer(){if(loggedInUser===viewedUser){clearInterval(myPomoInterval);myPomoIsRunning=false;myPomoEndTime=null;myPomoRound=1;setMyPomoMode('focus')}}
+function resetMyPomoTimer(){if(loggedInUser===viewedUser){clearInterval(myPomoInterval);myPomoIsRunning=false;myPomoEndTime=null;myPomoRound=1;setMyPomoMode('focus');restoreDefaultDocumentTitle()}}
 function handleClockClick(){if(loggedInUser===viewedUser)toggleMyPomoTimer()}
 
 async function initAndRecoverMyPomoState(){
@@ -281,6 +402,10 @@ function startGlobalUIRenderer(){
         let secs=isSelf?myPomoTime:shadowSpectatorTime,isR=isSelf?myPomoIsRunning:shadowSpectatorIsRunning,mode=isSelf?myPomoMode:(spectatorSettings?.livePomoState?.mode||'focus'),round=isSelf?myPomoRound:(spectatorSettings?.livePomoState?.round||1);
         let f=parseInt((isSelf?userSettings:spectatorSettings)?.pomoFocus)||25,s=parseInt((isSelf?userSettings:spectatorSettings)?.pomoShort)||5,l=parseInt((isSelf?userSettings:spectatorSettings)?.pomoLong)||15,totR=parseInt((isSelf?userSettings:spectatorSettings)?.pomoRounds)||4;
         let initT=(mode==='focus'?f:(mode==='short'?s:l))*60;
+
+        // Live tab title: [mm:ss] while running, [PAUSED mm:ss] while paused,
+        // original page title when idle / reset / completed.
+        syncPomodoroDocumentTitle(secs,isR,mode,initT,isSelf,isSelf?currentSessionWasPaused:false);
 
         $('pomo-mode-focus').innerText=`Focus (${f}m)`;$('pomo-mode-short').innerText=`Short (${s}m)`;$('pomo-mode-long').innerText=`Long (${l}m)`;
         $('pomo-timer-display').innerText=`${Math.floor(secs/60).toString().padStart(2,'0')}:${(secs%60).toString().padStart(2,'0')}`;

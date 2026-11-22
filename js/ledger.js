@@ -6,15 +6,32 @@
 // js/choreMultiplier.js (calculateChoreMultiplier, calculateMonthlyAllowanceBreakdown,
 // sumMonthlyChoreHours) so it can also be unit-tested outside the browser.
 
-async function logWork(e){
-    e.preventDefault();
-    const T=parseFloat($('work-time').value),R=parseFloat($('work-results').value),E=parseFloat($('work-effort').value);
-    const reflectionText=($('work-reflection')?.value||'').trim();
+/**
+ * Builds the canonical Firestore `logs` payload for a work session plus the
+ * allowance deltas the UI uses for its confirmation toast.
+ *
+ * Shared by the Sanctuary/legacy form (`logWork`) and the inline Quick-Log
+ * card so points, soft-cap split, and payout math can never drift apart.
+ *
+ * @param {number|string} hours
+ * @param {number|string} results - quality (1-5)
+ * @param {number|string} effort - effort (1-5)
+ * @param {string} reflectionText
+ * @returns {{payload:Object,choreMultiplier:Object,maxCash:number,cashAfter:number,netCashEarned:number,T:number,R:number,E:number}}
+ */
+function buildWorkLogPayload(hours, results, effort, reflectionText){
+    const parsedHours=parseFloat(hours);
+    const T=Number.isFinite(parsedHours)?Math.max(0,parsedHours):0;
+    const parsedResults=parseFloat(results);
+    const parsedEffort=parseFloat(effort);
+    const R=Number.isFinite(parsedResults)?Math.max(1,Math.min(5,parsedResults)):3;
+    const E=Number.isFinite(parsedEffort)?Math.max(1,Math.min(5,parsedEffort)):3;
+    const note=(reflectionText||'').trim();
     const softCap=userSettings.dailySoftCap||4,baseRate=(R+E)/2;
     const normH=Math.min(T,Math.max(0,softCap-currentTodayHoursLogged)),overH=T-normH;
     const pts=(normH*baseRate)+(overH*baseRate*0.25);
-    const targetPts=(userSettings.weeklyHours||10)*12,pointRate=targetPts>0?(userSettings.monthlyCash/targetPts):0;
-    const maxCash=userSettings.monthlyCash*((userSettings.maxBonusCapPct||125)/100);
+    const targetPts=(userSettings.weeklyHours||10)*12,pointRate=targetPts>0?((userSettings.monthlyCash||8000)/targetPts):0;
+    const maxCash=(userSettings.monthlyCash||8000)*((userSettings.maxBonusCapPct||125)/100);
 
     const now=new Date();
     let currentMonthlyPts=0;
@@ -44,11 +61,24 @@ async function logWork(e){
         results:R,
         effort:E,
         points:pts,
-        reflectionText:reflectionText,
+        reflectionText:note,
         timestamp:firebase.firestore.FieldValue.serverTimestamp()
     };
 
-    await db.collection('logs').add(payload);
+    return {payload,choreMultiplier,maxCash,cashAfter,netCashEarned,T,R,E};
+}
+
+async function logWork(e){
+    e.preventDefault();
+    const built=buildWorkLogPayload(
+        $('work-time')?.value,
+        $('work-results')?.value,
+        $('work-effort')?.value,
+        $('work-reflection')?.value||''
+    );
+    const {T,R,E,choreMultiplier,maxCash,cashAfter,netCashEarned}=built;
+
+    await db.collection('logs').add(built.payload);
 
     userSettings.unloggedFocusSecs=0;
     if(typeof updateUnloggedFocusDisplay==='function')updateUnloggedFocusDisplay();
