@@ -2,6 +2,10 @@
 // AUREUM — Crucible & Sanctuary Logging + History Ledgers
 // ============================================================================
 
+// NOTE: The monthly chore → allowance multiplier engine lives in
+// js/choreMultiplier.js (calculateChoreMultiplier, calculateMonthlyAllowanceBreakdown,
+// sumMonthlyChoreHours) so it can also be unit-tested outside the browser.
+
 async function logWork(e){
     e.preventDefault();
     const T=parseFloat($('work-time').value),R=parseFloat($('work-results').value),E=parseFloat($('work-effort').value);
@@ -12,14 +16,20 @@ async function logWork(e){
     const targetPts=(userSettings.weeklyHours||10)*12,pointRate=targetPts>0?(userSettings.monthlyCash/targetPts):0;
     const maxCash=userSettings.monthlyCash*((userSettings.maxBonusCapPct||125)/100);
 
-    const now=new Date();let currentMonthlyPts=0;
+    const now=new Date();
+    let currentMonthlyPts=0;
     currentRawLogsCache.forEach(l=>{
-        if(l.type==='work'){
-            const d=getLogDate(l);
-            if(d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth())currentMonthlyPts+=(l.points||0);
-        }
+        const d=getLogDate(l);
+        if(d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&l.type==='work')currentMonthlyPts+=(l.points||0);
     });
-    const cashBefore=Math.min(currentMonthlyPts*pointRate,maxCash),cashAfter=Math.min((currentMonthlyPts+pts)*pointRate,maxCash);
+    const currentMonthlyChoreHours=sumMonthlyChoreHours(currentRawLogsCache,now.getFullYear(),now.getMonth());
+
+    // The chore tier multiplier applies retroactively to the whole month's allowance.
+    const baseCashBefore=Math.min(currentMonthlyPts*pointRate,maxCash);
+    const baseCashAfter=Math.min((currentMonthlyPts+pts)*pointRate,maxCash);
+    const choreMultiplier=calculateChoreMultiplier(currentMonthlyChoreHours);
+    const cashBefore=calculateMonthlyAllowanceBreakdown(baseCashBefore,currentMonthlyChoreHours).finalMonthlyAllowance;
+    const cashAfter=calculateMonthlyAllowanceBreakdown(baseCashAfter,currentMonthlyChoreHours).finalMonthlyAllowance;
     const netCashEarned=Math.max(0,cashAfter-cashBefore);
 
     const payload={
@@ -46,7 +56,8 @@ async function logWork(e){
     if($('work-time'))$('work-time').value='1.00';
     if(typeof closeLogWorkModal==='function')closeLogWorkModal();
 
-    showToast({title:'⚗️ Work Saved',subtitle:`<strong>+฿${Math.round(netCashEarned).toLocaleString()} Earned</strong> (${T}h @ Lvl ${R}/${E})`,icon:'🎯',tier:'gold',originEvt:e});
+    const multiplierInfo = choreMultiplier.tier > 0 ? ` <span class="text-amber-300">×${choreMultiplier.multiplier.toFixed(2)} Chore Bonus (+${choreMultiplier.bonusPercent})</span>` : '';
+    showToast({title:'⚗️ Work Saved',subtitle:`<strong>+฿${Math.round(netCashEarned).toLocaleString()} Earned</strong> (${T}h @ Lvl ${R}/${E})${multiplierInfo}`,icon:'🎯',tier:'gold',originEvt:e});
     loadUserData();
 }
 
@@ -71,8 +82,21 @@ async function logHealth(e){
 async function logChore(e){
     e.preventDefault();
     const hrs=parseFloat($('chore-time').value),note=$('chore-note').value.trim();
+    const now=new Date();
+    const hoursBeforeLog=sumMonthlyChoreHours(currentRawLogsCache,now.getFullYear(),now.getMonth());
     await db.collection('logs').add({type:'chore',user:loggedInUser,hours:hrs,note:note,reflectionText:note,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
-    showToast({title:'🧹 Chore Logged',subtitle:`${hrs}h saved${note?`: "${note}"`:''}`,icon:'🏰',tier:'silver',originEvt:e});
+
+    // The realtime snapshot may or may not have delivered the new entry by now,
+    // so prefer the snapshot total and otherwise project it from the log itself.
+    const snapshotHours=sumMonthlyChoreHours(currentRawLogsCache,now.getFullYear(),now.getMonth());
+    const currentMonthlyChoreHours=snapshotHours>hoursBeforeLog?snapshotHours:(hoursBeforeLog+hrs);
+
+    const choreMultiplier = calculateChoreMultiplier(currentMonthlyChoreHours);
+    const tierInfo = choreMultiplier.isMaxTier 
+        ? `🏆 <strong>Max Tier Unlocked!</strong> +${choreMultiplier.bonusPercent} Bonus Active`
+        : `📊 ${choreMultiplier.tierLabel} • +${choreMultiplier.bonusPercent} • ${formatHours(choreMultiplier.hoursToNextTier)}h to ${choreMultiplier.nextTierLabel}`;
+    
+    showToast({title:'🧹 Chore Logged',subtitle:`${hrs}h saved${note?`: \"${note}\"`:''}<br>${tierInfo}`,icon:'🏰',tier:'silver',originEvt:e, duration: 4000});
     $('chore-note').value='';loadUserData();
 }
 
@@ -1051,14 +1075,20 @@ function renderMonthlyPerformanceCodex() {
     const totalFocusHours = workLogs.reduce((acc, l) => acc + (l.hours || 0), 0);
     const totalSanctuaryHours = workoutLogs.reduce((acc, l) => acc + (l.hours || 0), 0) + choreLogs.reduce((acc, l) => acc + (l.hours || 0), 0);
     const monthlyPoints = workLogs.reduce((acc, l) => acc + (l.points || 0), 0);
-
+    
     const targetCash = activeSettings.monthlyCash || 8000;
     const targetPts = (activeSettings.weeklyHours || 10) * 12;
     const pointRate = targetPts > 0 ? (targetCash / targetPts) : 0;
     const maxBonusPct = activeSettings.maxBonusCapPct || 125;
     const maxCash = targetCash * (maxBonusPct / 100);
-    const allowancePayout = Math.min(monthlyPoints * pointRate, maxCash);
-    const payoutPct = targetCash > 0 ? Math.min(Math.round((allowancePayout / targetCash) * 100), maxBonusPct) : 0;
+
+    // Monthly chore hours drive a tier multiplier that is applied retroactively
+    // to the month's entire accumulated base allowance.
+    const monthlyChoreHours = sumMonthlyChoreHours(monthLogs, targetYear, targetMonth);
+    const baseAllowance = Math.min(monthlyPoints * pointRate, maxCash);
+    const allowanceBreakdown = calculateMonthlyAllowanceBreakdown(baseAllowance, monthlyChoreHours);
+    const allowancePayout = allowanceBreakdown.finalMonthlyAllowance;
+    const payoutPct = targetCash > 0 ? Math.min(Math.round((allowancePayout / targetCash) * 100), maxBonusPct * allowanceBreakdown.multiplier) : 0;
     const isVaulted = Boolean(activeSettings.vaultedMonths?.[`${targetYear}-${targetMonth}`]);
 
     let avgQuality = 0, avgEffort = 0, peakFlowCount = 0, stalwartCount = 0;
@@ -1100,7 +1130,9 @@ function renderMonthlyPerformanceCodex() {
         qMeta, avgQuality, qRound, peakFlowCount, eMeta, avgEffort, eRound, stalwartCount,
         radarSvg: _buildCodexStatRadarSvg(statScores),
         reflectionCardHtml: _buildCodexReflectionCardHtml(standout, monthYearTitle),
-        milestonesCardHtml: _buildCodexMilestonesCardHtml(monthYearTitle, styleInfo, hybridTitle, peakFlowCount, stalwartCount, softCapDays, activeDaysSet.size, softCap, statScores, topStats, totalSanctuaryHours, (activeSettings.unlockedBadges || []).length)
+        milestonesCardHtml: _buildCodexMilestonesCardHtml(monthYearTitle, styleInfo, hybridTitle, peakFlowCount, stalwartCount, softCapDays, activeDaysSet.size, softCap, statScores, topStats, totalSanctuaryHours, (activeSettings.unlockedBadges || []).length),
+        // Chore-to-allowance multiplier breakdown
+        choreMultiplier: { ...allowanceBreakdown, monthlyChoreHours }
     });
 }
 
@@ -1117,7 +1149,7 @@ function _buildCodexFrontGridHtml(d) {
                         <div class="text-2xl sm:text-3xl font-black text-emerald-400 font-mono mt-1.5 ${d.isVaulted ? 'line-through opacity-75' : ''}">฿${Math.round(d.allowancePayout).toLocaleString()}</div>
                     </div>
                     <div class="pt-2.5 mt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-mono">
-                        <span>Base: ฿${d.targetCash.toLocaleString()}</span>
+                        <span>Target: ฿${d.targetCash.toLocaleString()}</span>
                         <span>Cap: ฿${Math.round(d.maxCash).toLocaleString()}</span>
                     </div>
                 </div>
@@ -1174,6 +1206,64 @@ function _buildCodexFrontGridHtml(d) {
                 </div>
                 <div class="w-full flex items-center justify-center py-1">${d.radarSvg}</div>
                 <div class="w-full text-center text-[10px] font-mono text-amber-300/80 pt-1 border-t border-slate-800/70">✨ Click Folio to Flip for Standout Reflection &amp; Craft Milestones ↻</div>
+            </div>
+        </div>
+        ${_buildChoreMultiplierCardHtml(d.choreMultiplier)}`;
+}
+
+function _buildChoreMultiplierCardHtml(cm) {
+    if (!cm) return '';
+    const baseText = Math.round(cm.baseAllowance || 0).toLocaleString();
+    const bonusText = Math.round(cm.choreBonusAmount || 0).toLocaleString();
+    const totalText = Math.round(cm.finalMonthlyAllowance || 0).toLocaleString();
+    const progress = Math.min(100, Math.max(0, cm.progressPercent || 0));
+    const tierPips = [1, 2, 3, 4, 5].map(n => `<span class="flex-1 h-1.5 rounded-full ${cm.tier >= n ? 'bg-sky-400' : 'bg-slate-800 border border-slate-700/60'}"></span>`).join('');
+    const nextLabel = cm.isMaxTier
+        ? '🏆 Max Tier Unlocked — +25% locked in'
+        : `${formatHours(cm.hoursToNextTier)}h to ${cm.nextTierLabel}`;
+
+    return `
+        <div class="mt-3.5 p-4 rounded-2xl bg-slate-950/85 border border-sky-500/30">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                <span class="text-[10px] font-black uppercase tracking-widest text-sky-300 flex items-center gap-1.5"><span>🧹</span> <span>Chore-to-Allowance Multiplier</span></span>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">${cm.tierLabel}${cm.isMaxTier ? ' · MAX' : ''}</span>
+                    <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">+${cm.bonusPercent} • ×${cm.multiplier.toFixed(2)}</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 pt-3">
+                <div class="lg:col-span-7">
+                    <div class="flex items-baseline justify-between gap-2">
+                        <div>
+                            <span class="text-2xl font-black font-mono text-sky-300">${formatHours(cm.monthlyChoreHours ?? cm.totalHours)}</span>
+                            <span class="text-xs font-bold text-slate-400"> / ${cm.maxTierHours || 50}.0 chore hrs this month</span>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Tier ${cm.tier} of ${cm.maxTier || 5}</span>
+                    </div>
+                    <div class="w-full bg-slate-900/90 h-2.5 rounded-full mt-2 overflow-hidden border border-slate-700/60" role="progressbar" aria-label="Progress toward next chore allowance tier" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress)}">
+                        <div class="h-full rounded-full bg-gradient-to-r from-sky-500 to-emerald-400 transition-all duration-700" style="width:${progress}%"></div>
+                    </div>
+                    <div class="flex items-center justify-between text-[10px] font-mono mt-1.5 gap-2">
+                        <span class="text-slate-400">${nextLabel}</span>
+                        <span class="${cm.isMaxTier ? 'text-amber-300' : 'text-emerald-400'} font-bold">${cm.isMaxTier ? 'MAX' : Math.round(progress) + '%'}</span>
+                    </div>
+                    <div class="flex items-center gap-1 mt-2">${tierPips}</div>
+                    <div class="text-[10px] font-mono text-slate-500 mt-1">Each 10h unlocks +5% · 50h = Tier 5 max</div>
+                </div>
+                <div class="lg:col-span-5 space-y-1.5 font-mono text-[11px]">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-slate-400">Base Work Allowance</span>
+                        <span class="text-slate-100 font-bold">฿${baseText}</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-slate-400">Chore Multiplier Bonus (+${cm.bonusPercent})</span>
+                        <span class="text-emerald-400 font-bold">+฿${bonusText}</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2 pt-1.5 border-t border-slate-800">
+                        <span class="text-slate-300 font-bold">Total Monthly Allowance</span>
+                        <span class="text-emerald-300 font-black">฿${totalText}</span>
+                    </div>
+                </div>
             </div>
         </div>`;
 }

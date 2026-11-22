@@ -18,6 +18,7 @@ Aureum/
     ├── config.js       # DOM selector helper ($), Firebase initialization, rating & badge catalogs
     ├── state.js        # Shared application state, user settings, and real-time listener handles
     ├── utils.js        # Date/hour formatting, press-and-hold repeaters, right-drag scrolling, rating UI
+    ├── choreMultiplier.js # Monthly chore-hours → allowance multiplier engine (tiers, monthly breakdown, aggregation)
     ├── effects.js      # HTML5 Canvas particle burst engine, dynamic SVG background patterns, theme/cursor appliers
     ├── audio.js        # Web Audio API synthesizer (12 multi-oscillator tones), mute toggle, desktop notifications
     ├── ranks.js        # 100-tier Aureate Rank system, Lifetime PWR calculator, Rank Progression Roadmap modal
@@ -30,6 +31,9 @@ Aureum/
     ├── ledger.js       # Crucible/Sanctuary logging handlers and filterable History Ledgers
     ├── settings.js     # Forge settings management, status preset picker modal, avatar customization
     └── app.js          # Authentication lifecycle, Duo HUD real-time listeners, tab router, and main data loader
+
+tests/
+└── chore-multiplier.test.js  # Node test-runner unit tests for tier boundaries & retroactive allowance payouts
 ```
 
 ## Running Locally
@@ -46,3 +50,15 @@ Because Aureum uses standard browser-native HTML, CSS, and JavaScript files with
    ```
 3. **Using VS Code:**
    Open `index.html` with the **Live Server** extension, or open `index.html` directly in your browser.
+
+## Monthly Chore → Allowance Multiplier
+
+Every 10 hours of logged chores in the active calendar month unlocks a **+5%** retroactive bonus on the month's entire base work allowance, capped at **Tier 5 (+25% at 50h)**. Chore hours reset automatically on the 1st of each month. The multiplier is derived from logs on every realtime snapshot, so adding, deleting, or editing a chore log recalculates the tier and payout immediately.
+
+## Testing
+
+Unit tests use the built-in Node test runner (Node 18+) and require no dependencies:
+
+```bash
+npm test
+```

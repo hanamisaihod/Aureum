@@ -137,7 +137,20 @@ function updateChartData(type, logs, pointRate, maxCash) {
 
     if (type === 'work') {
         let values = new Array(labels.length).fill(0);
+
+        // Monthly chore hours per calendar month, used to resolve each log's
+        // retroactive allowance multiplier (all log types may be passed in).
+        const choreHoursByMonth = {};
         logs.forEach(l => {
+            if (l.type !== 'chore') return;
+            const d = getLogDate(l);
+            const key = `${d.getFullYear()}-${d.getMonth()}`;
+            choreHoursByMonth[key] = (choreHoursByMonth[key] || 0) + (parseFloat(l.hours) || 0);
+        });
+        const multiplierForDate = d => calculateChoreMultiplier(choreHoursByMonth[`${d.getFullYear()}-${d.getMonth()}`] || 0).multiplier;
+
+        logs.forEach(l => {
+            if (l.type !== 'work') return;
             const d = getLogDate(l);
             let idx = -1;
             if (range === 'daily') {
@@ -156,14 +169,19 @@ function updateChartData(type, logs, pointRate, maxCash) {
             }
             if (idx >= 0 && idx < values.length) {
                 if (workChartUnit === 'money') {
-                    values[idx] += (l.points || 0) * pointRate;
+                    values[idx] += (l.points || 0) * pointRate * multiplierForDate(d);
                 } else {
                     values[idx] += (l.hours || 0);
                 }
             }
         });
         if (workChartUnit === 'money') {
-            values = values.map(v => Math.min(v, maxCash));
+            values = values.map((v, i) => {
+                if (range === 'monthly') {
+                    return Math.min(v, maxCash * multiplierForDate(new Date(now.getFullYear(), i, 1)));
+                }
+                return Math.min(v, maxCash * 1.25);
+            });
         }
         charts['work'].data.labels = labels;
         charts['work'].data.datasets[0].backgroundColor = range === 'monthly'

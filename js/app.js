@@ -256,6 +256,50 @@ function switchTab(t){
     if(t==='crucible')attachPomoSpectatorListener();
 }
 
+function renderAllowanceMultiplierUI(info){
+    if(!info)return;
+    const tierPill=$('allowance-tier-pill');
+    if(tierPill){
+        tierPill.innerText=info.isMaxTier?`🏆 Tier 5 · +${info.bonusPercent}`:`🧹 ${info.tierLabel} · +${info.bonusPercent}`;
+        tierPill.className=info.tier>0
+            ?"text-[10px] font-extrabold px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30"
+            :"text-[10px] font-extrabold px-2 py-0.5 rounded bg-slate-800/80 text-slate-400 border border-slate-700";
+        tierPill.title=`${formatHours(info.totalHours)} chore hrs this month • ×${info.multiplier.toFixed(2)} allowance multiplier`;
+    }
+
+    const baseEl=$('allowance-base-amount');
+    if(baseEl)baseEl.innerText=`฿${Math.round(info.baseAllowance).toLocaleString()}`;
+
+    const rateEl=$('allowance-bonus-rate');
+    if(rateEl)rateEl.innerText=`(+${info.bonusPercent})`;
+
+    const bonusEl=$('allowance-bonus-amount');
+    if(bonusEl){
+        bonusEl.innerText=`+฿${Math.round(info.choreBonusAmount).toLocaleString()}`;
+        bonusEl.className=info.choreBonusAmount>0?"text-emerald-400 font-bold":"text-slate-500 font-bold";
+    }
+
+    const bar=$('chore-tier-bar'),pct=$('chore-tier-progress-pct'),label=$('chore-tier-progress-label');
+    const progressPct=Math.min(100,Math.max(0,info.progressPercent));
+    if(bar){
+        bar.style.width=`${progressPct}%`;
+        const track=bar.parentElement;
+        if(track&&track.setAttribute)track.setAttribute('aria-valuenow',String(Math.round(progressPct)));
+    }
+    if(pct){
+        pct.innerText=info.isMaxTier?'MAX':`${Math.round(info.progressPercent)}%`;
+        pct.className=info.isMaxTier?"shrink-0 font-bold text-amber-300":"shrink-0 font-bold text-emerald-400";
+    }
+    if(label){
+        label.innerText=info.isMaxTier
+            ?`🏆 Max Tier Unlocked • ${formatHours(info.totalHours)}h logged`
+            :`${formatHours(info.totalHours)}h / ${info.nextTierHours}h • ${formatHours(info.hoursToNextTier)}h to ${info.nextTierLabel}`;
+    }
+
+    const payoutEl=$('monthly-payout');
+    if(payoutEl)payoutEl.title=`Base ฿${Math.round(info.baseAllowance).toLocaleString()} + Chore Bonus ฿${Math.round(info.choreBonusAmount).toLocaleString()} = ฿${Math.round(info.finalMonthlyAllowance).toLocaleString()}`;
+}
+
 function loadUserData(){
     if(userLogsUnsubscribe)userLogsUnsubscribe();
     userLogsUnsubscribe=db.collection('logs').where('user','==',viewedUser).onSnapshot(snapshot=>{
@@ -275,13 +319,18 @@ function loadUserData(){
         rawLogs.sort((a,b)=>getLogDate(b).getTime()-getLogDate(a).getTime());
         currentTodayHoursLogged=todayHours;currentRawLogsCache=rawLogs;
 
-        const targetPts=userSettings.weeklyHours*12,pointRate=userSettings.monthlyCash/targetPts,maxCash=userSettings.monthlyCash*(userSettings.maxBonusCapPct/100);
-        const finalPayout=Math.min(monthlyPoints*pointRate,maxCash),softCap=userSettings.dailySoftCap||4;
-        const isVaulted=userSettings.vaultedMonths?.[`${now.getFullYear()}-${now.getMonth()}`];
+        const activeSettings=(loggedInUser===viewedUser)?userSettings:((typeof spectatorSettings!=='undefined'&&spectatorSettings)||duoPresenceData[viewedUser]?.settings||userSettings);
+        const targetPts=(activeSettings.weeklyHours||10)*12,pointRate=targetPts>0?((activeSettings.monthlyCash||8000)/targetPts):0,maxCash=(activeSettings.monthlyCash||8000)*((activeSettings.maxBonusCapPct||125)/100);
+        const choreHours=sumMonthlyChoreHours(rawLogs,now.getFullYear(),now.getMonth());
+        const baseAllowance=Math.min(monthlyPoints*pointRate,maxCash);
+        const allowanceBreakdown=calculateMonthlyAllowanceBreakdown(baseAllowance,choreHours);
+        const finalPayout=allowanceBreakdown.finalMonthlyAllowance,softCap=userSettings.dailySoftCap||4;
+        const isVaulted=activeSettings.vaultedMonths?.[`${now.getFullYear()}-${now.getMonth()}`];
 
         const pEl=$('monthly-payout');
         pEl.innerText=`฿${Math.round(finalPayout).toLocaleString()}`;
         pEl.className=isVaulted?"text-3xl font-extrabold text-amber-400 mt-1.5 opacity-70 line-through":"text-3xl font-extrabold text-emerald-400 mt-1.5";
+        renderAllowanceMultiplierUI(allowanceBreakdown);
 
         $('today-hours-label').innerText=`${formatHours(todayHours)} / ${formatHours(softCap)} hrs`;
         $('daily-bar').style.width=`${Math.min((todayHours/softCap)*100,100)}%`;
@@ -314,8 +363,8 @@ function loadUserData(){
         renderAureateInsight(currentInsightIndex,false);
         startAureateInsightsAutoCycle();
 
-        updateGoalGauge(finalPayout,userSettings.monthlyCash);
-        updateChartData('work',rawLogs.filter(l=>l.type==='work'),pointRate,maxCash);
+        updateGoalGauge(finalPayout,(activeSettings.monthlyCash||8000));
+        updateChartData('work',rawLogs,pointRate,maxCash);
         updateChartData('sanctuary',rawLogs,pointRate,maxCash);
 
         const todayDiary=rawLogs.find(l=>l.type==='diary'&&getLogDate(l)>=startToday);

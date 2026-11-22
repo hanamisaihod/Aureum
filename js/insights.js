@@ -137,19 +137,25 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
         if (d.getTime() >= sevenDaysAgo) last7DaysPts += pts;
     });
 
-    const mtdCash = Math.min(mtdPts * pointRate, maxBonus);
+    const mtdChoreHours = sumMonthlyChoreHours(rawLogs, curYear, curMonth);
+    const mtdTier = calculateChoreMultiplier(mtdChoreHours);
+    const baseMtdCash = Math.min(mtdPts * pointRate, maxBonus);
     const sevenDayDailyAvgCash = (last7DaysPts * pointRate) / 7;
-    const projectedCash = Math.min(maxBonus, mtdCash + (sevenDayDailyAvgCash * remainingDays));
-    const lastMonthCash = Math.min(lastMonthPts * pointRate, maxBonus);
+    const baseProjectedCash = Math.min(maxBonus, baseMtdCash + (sevenDayDailyAvgCash * remainingDays));
+    const projectedCash = baseProjectedCash * mtdTier.multiplier;
+    const lastMonthChoreHours = sumMonthlyChoreHours(rawLogs, prevYear, prevMonth);
+    const lastMonthCash = Math.min(lastMonthPts * pointRate, maxBonus) * calculateChoreMultiplier(lastMonthChoreHours).multiplier;
+
+    const tierSuffix = mtdTier.tier > 0 ? ` • 🧹 +${mtdTier.bonusPercent} Tier ${mtdTier.tier}` : '';
 
     let forecastComparison = '';
     if (lastMonthCash > 0) {
         const pctDiff = Math.round(((projectedCash - lastMonthCash) / lastMonthCash) * 100);
         const sign = pctDiff >= 0 ? '+' : '';
-        forecastComparison = `${sign}${pctDiff}% vs last month (฿${Math.round(lastMonthCash).toLocaleString()})`;
+        forecastComparison = `${sign}${pctDiff}% vs last month (฿${Math.round(lastMonthCash).toLocaleString()})${tierSuffix}`;
     } else {
         const targetPct = Math.round((projectedCash / (settings.monthlyCash || 8000)) * 100);
-        forecastComparison = `${targetPct}% of monthly base (฿${Math.round(sevenDayDailyAvgCash).toLocaleString()}/d pace)`;
+        forecastComparison = `${targetPct}% of monthly base (฿${Math.round(sevenDayDailyAvgCash).toLocaleString()}/d pace)${tierSuffix}`;
     }
 
     insights.push({
@@ -184,15 +190,21 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
     // 5. Career Earnings (Retained)
     // Calculates the lifetime total sum of all allowance paid out across all recorded sessions.
     const monthlyPtsMap = {};
-    workLogs.forEach(l => {
+    const monthlyChoreMap = {};
+    rawLogs.forEach(l => {
         const d = getLogDate(l);
         const key = `${d.getFullYear()}-${d.getMonth()}`;
-        monthlyPtsMap[key] = (monthlyPtsMap[key] || 0) + (l.points || 0);
+        if (l.type === 'work') {
+            monthlyPtsMap[key] = (monthlyPtsMap[key] || 0) + (l.points || 0);
+        } else if (l.type === 'chore') {
+            monthlyChoreMap[key] = (monthlyChoreMap[key] || 0) + (parseFloat(l.hours) || 0);
+        }
     });
     let lifetimeEarnings = 0;
     const activeMonths = Object.keys(monthlyPtsMap).length;
-    Object.values(monthlyPtsMap).forEach(pts => {
-        lifetimeEarnings += Math.min(pts * pointRate, maxBonus);
+    Object.entries(monthlyPtsMap).forEach(([key, pts]) => {
+        const baseCash = Math.min(pts * pointRate, maxBonus);
+        lifetimeEarnings += baseCash * calculateChoreMultiplier(monthlyChoreMap[key] || 0).multiplier;
     });
 
     insights.push({
