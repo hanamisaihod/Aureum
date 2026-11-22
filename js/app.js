@@ -10,6 +10,7 @@ auth.onAuthStateChanged(async u=>{
         viewedUser=loggedInUser;
         userSettings.role=loggedInUser==='Cream'?'author':'illustrator';
         initDuoHUDListeners();
+        if(typeof initHudInfoPopup==='function')initHudInfoPopup();
         initRealtimeSettingsListener();initGlobalHeaderGlowListener();
         if(typeof initGuildActivityFeedListener==='function')initGuildActivityFeedListener();
         await initAndRecoverMyPomoState();
@@ -87,24 +88,27 @@ function renderDuoHUDCards(){
             else{badgeEl.innerText="PEER";badgeEl.className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase shrink-0"}
         }
 
-        // ZONE 2: Live Habit Thermostat Badge & Rolling 7-Day Summary
+        // ZONE 2: Live Habit Thermostat Trigger & Rolling 7-Day Info Popup
         const uLogs = duoPresenceData[u].logs || (u === viewedUser ? currentRawLogsCache : []);
         const thermostat = typeof computeHabitThermostat === 'function'
             ? computeHabitThermostat(uLogs, s || {}, Date.now())
-            : { state: 'STEADY_CRUISE', label: '🌿 Steady Cruise', message: '', metrics: { workH: 0, choreH: 0, workoutH: 0, activeDays: 0, avgQuality: 0 } };
+            : { state: 'STEADY_CRUISE', label: '🌿 Steady Cruise', message: '', metrics: { workH: 0, choreH: 0, workoutH: 0, totalH: 0, activeDays: 0, avgQuality: 0 } };
+
+        hudThermostatCache[u] = { user: u, displayName: dispName, thermostat };
 
         const thermostatBadgeEl = $(`hud-thermostat-badge-${u.toLowerCase()}`);
         if(thermostatBadgeEl) {
             thermostatBadgeEl.innerText = thermostat.label;
-            thermostatBadgeEl.className = `text-[10px] font-black px-2 py-0.5 rounded-full border whitespace-nowrap ${getThermostatBadgeClasses(thermostat.state)}`;
-            thermostatBadgeEl.title = thermostat.message;
+            thermostatBadgeEl.className = `text-[10px] font-black px-2 py-0.5 rounded-full border whitespace-nowrap ${typeof getThermostatBadgeClasses === 'function' ? getThermostatBadgeClasses(thermostat.state) : 'bg-slate-800 text-slate-300 border-slate-700'}`;
         }
 
-        const summaryEl = $(`hud-thermostat-summary-${u.toLowerCase()}`);
-        if(summaryEl) {
-            summaryEl.innerText = `${formatHours(thermostat.metrics.workH)}h Work • ${formatHours(thermostat.metrics.choreH)}h Chores`;
-            summaryEl.title = `${formatHours(thermostat.metrics.workoutH)}h Workout • ${thermostat.metrics.activeDays} active days • ${thermostat.metrics.avgQuality > 0 ? thermostat.metrics.avgQuality.toFixed(1) : '—'} avg quality`;
+        const triggerEl = $(`hud-thermostat-trigger-${u.toLowerCase()}`);
+        if(triggerEl && triggerEl.setAttribute){
+            triggerEl.setAttribute('aria-expanded', hudInfoPopupUser === u ? 'true' : 'false');
+            triggerEl.classList.toggle('is-open', hudInfoPopupUser === u);
         }
+
+        if(hudInfoPopupUser === u) renderHudInfoPopup(u);
 
         if($(`hud-hours-${u.toLowerCase()}`)) $(`hud-hours-${u.toLowerCase()}`).innerText=`${formatHours(duoPresenceData[u].hoursToday||0)}/${formatHours(s.dailySoftCap||4)}h`;
     });
@@ -322,7 +326,6 @@ function loadUserData(){
             duoPresenceData[viewedUser].logs=rawLogs;
         }
         renderDuoHUDCards();
-        renderHabitThermostatPanel(rawLogs,activeSettings);
 
         aureateInsightsData=calculateAureateInsights(rawLogs,userSettings.completedPomoHistory||[],userSettings);
         renderAureateInsight(currentInsightIndex,false);
@@ -355,64 +358,223 @@ try {
 } catch (e) {}
 
 // ============================================================================
-// HABIT THERMOSTAT — Adaptive Dashboard Card & Quick Actions
+// HABIT THERMOSTAT — Personal Card Metrics & Quick Actions
 // ============================================================================
 
 function getThermostatMetricItems(metrics) {
+    const m = metrics || {};
     return [
-        { icon: '⚗️', label: 'Work', value: `${formatHours(metrics.workH)}h`, tint: 'text-amber-300' },
-        { icon: '🧹', label: 'Chores', value: `${formatHours(metrics.choreH)}h`, tint: 'text-sky-300' },
-        { icon: '🏃', label: 'Workout', value: `${formatHours(metrics.workoutH)}h`, tint: 'text-rose-300' },
-        { icon: '📅', label: 'Active Days', value: `${metrics.activeDays}/7`, tint: 'text-emerald-300' },
-        { icon: '✨', label: 'Avg Quality', value: metrics.avgQuality > 0 ? metrics.avgQuality.toFixed(1) : '—', tint: 'text-slate-200' }
+        { icon: '⚗️', label: 'Work', value: `${formatHours(m.workH)}h`, tint: 'text-amber-300' },
+        { icon: '🧹', label: 'Chores', value: `${formatHours(m.choreH)}h`, tint: 'text-sky-300' },
+        { icon: '🏃', label: 'Workout', value: `${formatHours(m.workoutH)}h`, tint: 'text-rose-300' },
+        { icon: '📅', label: 'Active Days', value: `${m.activeDays || 0}/7`, tint: 'text-emerald-300' },
+        { icon: '✨', label: 'Avg Quality', value: m.avgQuality > 0 ? m.avgQuality.toFixed(1) : '—', tint: 'text-slate-200' },
+        { icon: '🗓️', label: 'Total', value: `${formatHours(m.totalH)}h`, tint: 'text-slate-100' }
     ];
 }
 
-function renderHabitThermostatPanel(logs, settings) {
-    const panel = $('habit-thermostat-panel');
-    if (!panel || typeof computeHabitThermostat !== 'function') return;
+// ============================================================================
+// HUD INFO POPUP — Hover / Click Thermostat Breakdown on the Personal Cards
+// ============================================================================
 
-    const thermostat = computeHabitThermostat(logs || [], settings || {}, Date.now());
-    const badge = $('thermostat-state-badge');
-    const message = $('thermostat-message');
-    const metricsEl = $('thermostat-metrics');
-    const actionsEl = $('thermostat-actions');
+function initHudInfoPopup() {
+    const popup = $('hud-info-popup');
+    if (!popup || popup.dataset.hudInfoBound === 'true') return;
+    popup.dataset.hudInfoBound = 'true';
 
-    if (badge) {
-        badge.innerText = thermostat.label;
-        badge.className = `text-[11px] font-black px-2.5 py-1 rounded-full border whitespace-nowrap ${getThermostatBadgeClasses(thermostat.state)}`;
-        badge.title = thermostat.message;
-    }
-    if (message) message.innerText = thermostat.message;
+    ['North', 'Cream'].forEach(user => {
+        const trigger = $(`hud-thermostat-trigger-${user.toLowerCase()}`);
+        if (!trigger) return;
 
-    if (metricsEl) {
-        metricsEl.innerHTML = getThermostatMetricItems(thermostat.metrics).map(item => `
-            <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
-                <div class="text-[9px] uppercase tracking-wider font-extrabold text-slate-500">${item.icon} ${item.label}</div>
-                <div class="text-sm font-black font-mono ${item.tint} mt-0.5">${item.value}</div>
-            </div>`).join('');
-    }
+        trigger.addEventListener('mouseenter', () => showHudInfoPopup(user, false));
+        trigger.addEventListener('mouseleave', scheduleHudInfoPopupHide);
+        trigger.addEventListener('focus', () => showHudInfoPopup(user, false));
+        trigger.addEventListener('blur', scheduleHudInfoPopupHide);
+        trigger.addEventListener('click', event => {
+            event.stopPropagation();
+            toggleHudInfoPopup(user);
+        });
+    });
 
-    if (actionsEl) {
-        if (thermostat.isCorrective && loggedInUser === viewedUser) {
-            const actionBtns = (thermostat.quickActions || []).map(action => `
-                <button type="button" onclick="startThermostatQuickAction('${action.type}', ${action.mins})"
-                    class="px-3 py-1.5 rounded-lg text-[11px] font-extrabold bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 transition-all">
-                    ${escapeHtml(action.label)}
-                </button>`).join('');
-            const breakBtn = (thermostat.state === 'OVERHEATING' && thermostat.recommendedPomo)
-                ? `<button type="button" onclick="startThermostatLongBreak(${thermostat.recommendedPomo.breakMins})"
-                    class="px-3 py-1.5 rounded-lg text-[11px] font-extrabold bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/50 ring-2 ring-amber-400/25 transition-all">
-                    🧘 Suggested Long Break (${thermostat.recommendedPomo.breakMins}m)
-                </button>`
-                : '';
-            actionsEl.innerHTML = actionBtns + breakBtn;
-        } else {
-            actionsEl.innerHTML = '';
-        }
+    popup.addEventListener('mouseenter', cancelHudInfoPopupHide);
+    popup.addEventListener('mouseleave', scheduleHudInfoPopupHide);
+
+    document.addEventListener('pointerdown', event => {
+        if (!hudInfoPopupUser) return;
+        if (popup.contains(event.target)) return;
+        if (event.target && event.target.closest && event.target.closest('.hud-thermostat-trigger')) return;
+        hideHudInfoPopup();
+    });
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && hudInfoPopupUser) hideHudInfoPopup();
+    });
+
+    const reposition = () => {
+        if (!hudInfoPopupUser) return;
+        positionHudInfoPopup($(`hud-thermostat-trigger-${hudInfoPopupUser.toLowerCase()}`));
+    };
+    window.addEventListener('resize', reposition);
+    window.addEventListener('scroll', reposition, { passive: true });
+}
+
+function getHudThermostatSnapshot(user) {
+    if (hudThermostatCache[user]) return hudThermostatCache[user];
+    const logs = duoPresenceData[user]?.logs || [];
+    const settings = duoPresenceData[user]?.settings || {};
+    const thermostat = typeof computeHabitThermostat === 'function'
+        ? computeHabitThermostat(logs, settings, Date.now())
+        : {
+            state: 'STEADY_CRUISE',
+            label: '🌿 Steady Cruise',
+            message: 'Balanced, sustainable rhythm with no alarms tripped.',
+            isCorrective: false,
+            quickActions: [],
+            recommendedPomo: null,
+            metrics: { workH: 0, choreH: 0, workoutH: 0, totalH: 0, activeDays: 0, avgQuality: 0 }
+        };
+    return { user, displayName: getUserDisplayName(user), thermostat };
+}
+
+function cancelHudInfoPopupHide() {
+    if (hudInfoPopupHideTimer) {
+        clearTimeout(hudInfoPopupHideTimer);
+        hudInfoPopupHideTimer = null;
     }
 }
 
+function scheduleHudInfoPopupHide() {
+    if (hudInfoPopupPinned) return;
+    cancelHudInfoPopupHide();
+    hudInfoPopupHideTimer = setTimeout(() => {
+        hudInfoPopupHideTimer = null;
+        if (!hudInfoPopupPinned) hideHudInfoPopup();
+    }, 220);
+}
+
+function showHudInfoPopup(user, pin) {
+    if (!user) return;
+    cancelHudInfoPopupHide();
+    if (pin) {
+        hudInfoPopupPinned = true;
+    } else if (hudInfoPopupUser && hudInfoPopupUser !== user) {
+        hudInfoPopupPinned = false;
+    }
+    hudInfoPopupUser = user;
+    renderHudInfoPopup(user);
+    positionHudInfoPopup($(`hud-thermostat-trigger-${user.toLowerCase()}`));
+    updateHudInfoPopupAria();
+}
+
+function toggleHudInfoPopup(user) {
+    if (hudInfoPopupUser === user && hudInfoPopupPinned) {
+        hideHudInfoPopup();
+        return;
+    }
+    showHudInfoPopup(user, true);
+}
+
+function hideHudInfoPopup() {
+    cancelHudInfoPopupHide();
+    hudInfoPopupPinned = false;
+    hudInfoPopupUser = null;
+    const popup = $('hud-info-popup');
+    if (popup) {
+        popup.classList.add('hidden');
+        popup.setAttribute('aria-hidden', 'true');
+    }
+    updateHudInfoPopupAria();
+}
+
+function updateHudInfoPopupAria() {
+    ['North', 'Cream'].forEach(user => {
+        const trigger = $(`hud-thermostat-trigger-${user.toLowerCase()}`);
+        if (!trigger || !trigger.setAttribute) return;
+        const isOpen = hudInfoPopupUser === user;
+        trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        trigger.classList.toggle('is-open', isOpen);
+    });
+}
+
+function positionHudInfoPopup(trigger) {
+    const popup = $('hud-info-popup');
+    if (!popup || !trigger || typeof trigger.getBoundingClientRect !== 'function') return;
+    popup.classList.remove('hidden');
+    const gap = 10, margin = 12;
+    const rect = trigger.getBoundingClientRect();
+    const width = popup.offsetWidth || 304;
+    const height = popup.offsetHeight || 240;
+    let left = rect.right + gap;
+    let top = rect.top;
+    if (left + width > window.innerWidth - margin) {
+        left = Math.min(Math.max(margin, rect.left), Math.max(margin, window.innerWidth - width - margin));
+        top = rect.bottom + gap;
+    }
+    if (top + height > window.innerHeight - margin) top = window.innerHeight - height - margin;
+    if (top < margin) top = margin;
+    popup.style.left = `${Math.round(left)}px`;
+    popup.style.top = `${Math.round(top)}px`;
+}
+
+function renderHudInfoPopup(user) {
+    const popup = $('hud-info-popup');
+    const body = $('hud-info-popup-body');
+    if (!popup || !body || !user) return;
+    const snapshot = getHudThermostatSnapshot(user);
+    const thermostat = snapshot.thermostat;
+    const metrics = thermostat.metrics || {};
+    const isSelf = loggedInUser === viewedUser && viewedUser === user;
+    const badgeClasses = typeof getThermostatBadgeClasses === 'function'
+        ? getThermostatBadgeClasses(thermostat.state)
+        : 'bg-slate-800 text-slate-300 border-slate-700';
+
+    const metricTiles = getThermostatMetricItems(metrics).map(item => `
+        <div class="p-2 rounded-xl bg-slate-900/80 border border-slate-800 text-center min-w-0">
+            <div class="text-[9px] uppercase tracking-wider font-extrabold text-slate-500 truncate">${item.icon} ${escapeHtml(item.label)}</div>
+            <div class="text-sm font-black font-mono ${item.tint} mt-0.5">${escapeHtml(item.value)}</div>
+        </div>`).join('');
+
+    let actionsHtml = '';
+    if (isSelf && thermostat.isCorrective) {
+        const actionBtns = (thermostat.quickActions || []).map(action => `
+            <button type="button" onclick="startThermostatQuickAction('${action.type}', ${action.mins})"
+                class="px-2.5 py-1.5 rounded-lg text-[10px] font-extrabold bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 transition-all">
+                ${escapeHtml(action.label)}
+            </button>`).join('');
+        const breakBtn = (thermostat.state === 'OVERHEATING' && thermostat.recommendedPomo)
+            ? `<button type="button" onclick="startThermostatLongBreak(${thermostat.recommendedPomo.breakMins})"
+                class="px-2.5 py-1.5 rounded-lg text-[10px] font-extrabold bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/50 transition-all">
+                🧘 Suggested Long Break (${thermostat.recommendedPomo.breakMins}m)
+            </button>`
+            : '';
+        if (actionBtns || breakBtn) {
+            actionsHtml = `<div class="flex items-center gap-2 flex-wrap pt-1">${actionBtns}${breakBtn}</div>`;
+        }
+    }
+
+    body.innerHTML = `
+        <div class="flex items-start justify-between gap-2 pb-2 border-b border-slate-800/90">
+            <div class="min-w-0">
+                <div class="text-[9px] uppercase tracking-widest font-black text-slate-400">🌡️ Habit Thermostat</div>
+                <div class="text-sm font-black text-slate-100 truncate">${escapeHtml(snapshot.displayName)}</div>
+            </div>
+            <button type="button" onclick="hideHudInfoPopup()" aria-label="Close thermostat info"
+                class="text-slate-400 hover:text-white text-xs font-black px-2 py-0.5 rounded-lg bg-slate-900/90 border border-slate-700 transition-all shrink-0">✕</button>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-[10px] font-black px-2 py-0.5 rounded-full border whitespace-nowrap ${badgeClasses}">${escapeHtml(thermostat.label)}</span>
+            <span class="text-[9px] font-mono text-slate-500">Rolling 7 days</span>
+        </div>
+        <p class="text-[11px] text-slate-300 leading-relaxed">${escapeHtml(thermostat.message || 'Balanced, sustainable rhythm with no alarms tripped.')}</p>
+        <div class="grid grid-cols-2 gap-2">${metricTiles}</div>
+        ${actionsHtml}
+        <div class="text-[9px] font-mono text-slate-500 pt-2 border-t border-slate-800/70">
+            ${isSelf ? 'Your personal card • Click the badge to pin this breakdown' : 'Peer card • Read-only preview'}
+        </div>`;
+
+    popup.classList.remove('hidden');
+    popup.setAttribute('aria-hidden', 'false');
+}
 
 function startThermostatQuickAction(type, mins) {
     if (loggedInUser !== viewedUser) return;
@@ -439,7 +601,7 @@ function startThermostatQuickAction(type, mins) {
             icon: '🌡️',
             tier: 'gold'
         });
-        renderHabitThermostatPanel(currentRawLogsCache, userSettings);
+        hideHudInfoPopup();
         return;
     }
 
@@ -466,6 +628,7 @@ function startThermostatQuickAction(type, mins) {
         icon: '🌡️',
         tier: 'emerald'
     });
+    hideHudInfoPopup();
 }
 
 function startThermostatLongBreak(mins) {
@@ -492,5 +655,6 @@ function startThermostatLongBreak(mins) {
         icon: '🌡️',
         tier: 'gold'
     });
+    hideHudInfoPopup();
 }
 

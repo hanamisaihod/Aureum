@@ -30,7 +30,7 @@ Aureum/
     ├── journal.js      # Two-page Chronicle Journal book reader and daily reflection saving
     ├── ledger.js       # Crucible/Sanctuary logging handlers and filterable History Ledgers
     ├── settings.js     # Forge settings management, status preset picker modal, avatar customization
-    └── app.js          # Authentication lifecycle, Duo HUD real-time listeners, tab router, and main data loader
+    └── app.js          # Authentication lifecycle, Duo HUD listeners, personal card thermostat info popup, tab router, and main data loader
 
 tests/
 └── chore-multiplier.test.js  # Node test-runner unit tests for tier boundaries & retroactive allowance payouts

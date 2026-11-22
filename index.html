@@ -101,13 +101,15 @@
                         </div>
                     </div>
 
-                    <!-- ZONE 2: LIVE HABIT THERMOSTAT & ROLLING 7-DAY SUMMARY -->
-                    <div class="pt-2 border-t border-slate-800/80 space-y-1.5">
+                    <!-- ZONE 2: LIVE HABIT THERMOSTAT TRIGGER (HOVER OR CLICK FOR THE 7-DAY INFO POPUP) -->
+                    <div class="pt-2 border-t border-slate-800/80">
                         <div class="flex items-center justify-between gap-2 min-w-0">
-                            <span id="hud-thermostat-badge-north" class="text-[10px] font-black px-2 py-0.5 rounded-full border whitespace-nowrap bg-teal-500/15 text-teal-300 border-teal-500/35">🌿 Steady Cruise</span>
+                            <button type="button" id="hud-thermostat-trigger-north" data-hud-user="North" aria-haspopup="dialog" aria-controls="hud-info-popup" aria-expanded="false" class="hud-thermostat-trigger min-w-0">
+                                <span id="hud-thermostat-badge-north" class="text-[10px] font-black px-2 py-0.5 rounded-full border whitespace-nowrap bg-teal-500/15 text-teal-300 border-teal-500/35">🌿 Steady Cruise</span>
+                                <span class="hud-info-glyph" aria-hidden="true">i</span>
+                            </button>
                             <span id="hud-hours-north" class="text-[10px] font-mono font-bold text-slate-400 whitespace-nowrap">0.0/4.0h</span>
                         </div>
-                        <div id="hud-thermostat-summary-north" class="text-[10px] font-mono text-slate-400 truncate">0.0h Work • 0.0h Chores</div>
                     </div>
                 </div>
 
@@ -130,13 +132,15 @@
                         </div>
                     </div>
 
-                    <!-- ZONE 2: LIVE HABIT THERMOSTAT & ROLLING 7-DAY SUMMARY -->
-                    <div class="pt-2 border-t border-slate-800/80 space-y-1.5">
+                    <!-- ZONE 2: LIVE HABIT THERMOSTAT TRIGGER (HOVER OR CLICK FOR THE 7-DAY INFO POPUP) -->
+                    <div class="pt-2 border-t border-slate-800/80">
                         <div class="flex items-center justify-between gap-2 min-w-0">
-                            <span id="hud-thermostat-badge-cream" class="text-[10px] font-black px-2 py-0.5 rounded-full border whitespace-nowrap bg-teal-500/15 text-teal-300 border-teal-500/35">🌿 Steady Cruise</span>
+                            <button type="button" id="hud-thermostat-trigger-cream" data-hud-user="Cream" aria-haspopup="dialog" aria-controls="hud-info-popup" aria-expanded="false" class="hud-thermostat-trigger min-w-0">
+                                <span id="hud-thermostat-badge-cream" class="text-[10px] font-black px-2 py-0.5 rounded-full border whitespace-nowrap bg-teal-500/15 text-teal-300 border-teal-500/35">🌿 Steady Cruise</span>
+                                <span class="hud-info-glyph" aria-hidden="true">i</span>
+                            </button>
                             <span id="hud-hours-cream" class="text-[10px] font-mono font-bold text-slate-400 whitespace-nowrap">0.0/4.0h</span>
                         </div>
-                        <div id="hud-thermostat-summary-cream" class="text-[10px] font-mono text-slate-400 truncate">0.0h Work • 0.0h Chores</div>
                     </div>
                 </div>
             </div>
@@ -276,24 +280,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- ADAPTIVE HABIT THERMOSTAT PANEL (REPLACES LEGACY POWER MATRIX CARD) -->
-                <div id="habit-thermostat-panel" class="card p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
-                    <div class="flex items-start justify-between gap-3 flex-wrap">
-                        <div class="min-w-0 flex-1">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="text-[10px] uppercase tracking-widest font-black text-slate-400">🌡️ Habit Thermostat</span>
-                                <span id="thermostat-state-badge" class="text-[11px] font-black px-2.5 py-1 rounded-full border whitespace-nowrap bg-teal-500/15 text-teal-300 border-teal-500/35">🌿 Steady Cruise</span>
-                                <span class="text-[10px] font-mono text-slate-500">Rolling 7 days</span>
-                            </div>
-                            <p id="thermostat-message" class="text-xs text-slate-300 mt-1.5 leading-relaxed">Balanced, sustainable rhythm with no alarms tripped.</p>
-                        </div>
-                        <div id="thermostat-actions" class="flex items-center gap-2 flex-wrap justify-end"></div>
-                    </div>
-                    <div id="thermostat-metrics" class="grid grid-cols-2 sm:grid-cols-5 gap-2"></div>
-                </div>
-
-
-
                 <!-- MAIN WORK & FOCUS HUB (LEFT: POMODORO TIMER 65% | RIGHT: STACKED LOG WORK + TASKS 35%) -->
                 <div id="crucible-hub-grid" class="crucible-hub-grid grid grid-cols-1 gap-6 items-stretch">
                     <!-- LEFT COLUMN: POMODORO FOCUS TIMER CARD (~65% WIDTH, MATCHES STACKED RIGHT HEIGHT) -->
@@ -953,6 +939,11 @@
         </div>
 
         <div id="badge-toast-container"></div>
+    </div>
+
+    <!-- HUD INFO POPUP — PERSONAL CARD THERMOSTAT BREAKDOWN -->
+    <div id="hud-info-popup" role="dialog" aria-hidden="true" aria-label="Habit thermostat breakdown" class="hud-info-popup card fixed z-[95] hidden w-[19rem] max-w-[calc(100vw-2rem)] p-4 rounded-2xl border border-slate-700/90 shadow-2xl">
+        <div id="hud-info-popup-body" class="space-y-3"></div>
     </div>
 
     <!-- APPLICATION MODULES -->

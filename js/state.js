@@ -71,6 +71,12 @@ let currentRawLogsCache = [];
 let globalAllLogsCache = [];
 let activeTickerLogIndex = 0;
 let monthlyCodexFlipped = false;
+
+// HUD info popup (personal card thermostat breakdown)
+let hudInfoPopupUser = null;
+let hudInfoPopupPinned = false;
+let hudInfoPopupHideTimer = null;
+let hudThermostatCache = { North: null, Cream: null };
 let settingsUnsubscribe = null;
 let globalLogsUnsubscribe = null;
 let userLogsUnsubscribe = null;
