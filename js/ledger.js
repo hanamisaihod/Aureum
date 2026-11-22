@@ -24,12 +24,14 @@ async function logWork(e){
     });
     const currentMonthlyChoreHours=sumMonthlyChoreHours(currentRawLogsCache,now.getFullYear(),now.getMonth());
 
-    // The chore tier multiplier applies retroactively to the whole month's allowance.
+    // The chore tier multiplier applies retroactively to the whole month's allowance,
+    // but maxCash (target allowance × max bonus cap %) is a hard ceiling the bonus
+    // can never push past.
     const baseCashBefore=Math.min(currentMonthlyPts*pointRate,maxCash);
     const baseCashAfter=Math.min((currentMonthlyPts+pts)*pointRate,maxCash);
     const choreMultiplier=calculateChoreMultiplier(currentMonthlyChoreHours);
-    const cashBefore=calculateMonthlyAllowanceBreakdown(baseCashBefore,currentMonthlyChoreHours).finalMonthlyAllowance;
-    const cashAfter=calculateMonthlyAllowanceBreakdown(baseCashAfter,currentMonthlyChoreHours).finalMonthlyAllowance;
+    const cashBefore=calculateMonthlyAllowanceBreakdown(baseCashBefore,currentMonthlyChoreHours,maxCash).finalMonthlyAllowance;
+    const cashAfter=calculateMonthlyAllowanceBreakdown(baseCashAfter,currentMonthlyChoreHours,maxCash).finalMonthlyAllowance;
     const netCashEarned=Math.max(0,cashAfter-cashBefore);
 
     const payload={
@@ -57,7 +59,8 @@ async function logWork(e){
     if(typeof closeLogWorkModal==='function')closeLogWorkModal();
 
     const multiplierInfo = choreMultiplier.tier > 0 ? ` <span class="text-amber-300">×${choreMultiplier.multiplier.toFixed(2)} Chore Bonus (+${choreMultiplier.bonusPercent})</span>` : '';
-    showToast({title:'⚗️ Work Saved',subtitle:`<strong>+฿${Math.round(netCashEarned).toLocaleString()} Earned</strong> (${T}h @ Lvl ${R}/${E})${multiplierInfo}`,icon:'🎯',tier:'gold',originEvt:e});
+    const capInfo = maxCash > 0 && cashAfter >= maxCash - 0.005 ? ` <span class="text-amber-300">⛔ Monthly limit ฿${Math.round(maxCash).toLocaleString()}</span>` : '';
+    showToast({title:'⚗️ Work Saved',subtitle:`<strong>+฿${Math.round(netCashEarned).toLocaleString()} Earned</strong> (${T}h @ Lvl ${R}/${E})${multiplierInfo}${capInfo}`,icon:'🎯',tier:'gold',originEvt:e});
     loadUserData();
 }
 
@@ -1037,12 +1040,13 @@ function renderMonthlyPerformanceCodex() {
     const maxCash = targetCash * (maxBonusPct / 100);
 
     // Monthly chore hours drive a tier multiplier that is applied retroactively
-    // to the month's entire accumulated base allowance.
+    // to the month's entire accumulated base allowance — hard-capped at maxCash
+    // (target allowance × max bonus cap %) so the bonus can never exceed it.
     const monthlyChoreHours = sumMonthlyChoreHours(monthLogs, targetYear, targetMonth);
     const baseAllowance = Math.min(monthlyPoints * pointRate, maxCash);
-    const allowanceBreakdown = calculateMonthlyAllowanceBreakdown(baseAllowance, monthlyChoreHours);
+    const allowanceBreakdown = calculateMonthlyAllowanceBreakdown(baseAllowance, monthlyChoreHours, maxCash);
     const allowancePayout = allowanceBreakdown.finalMonthlyAllowance;
-    const payoutPct = targetCash > 0 ? Math.min(Math.round((allowancePayout / targetCash) * 100), maxBonusPct * allowanceBreakdown.multiplier) : 0;
+    const payoutPct = targetCash > 0 ? Math.min(Math.round((allowancePayout / targetCash) * 100), maxBonusPct) : 0;
     const isVaulted = Boolean(activeSettings.vaultedMonths?.[`${targetYear}-${targetMonth}`]);
 
     let avgQuality = 0, avgEffort = 0, peakFlowCount = 0, stalwartCount = 0;
@@ -1226,6 +1230,7 @@ function _buildChoreMultiplierCardHtml(cm) {
                         <span class="text-slate-300 font-bold">Total Monthly Allowance</span>
                         <span class="text-emerald-300 font-black">฿${totalText}</span>
                     </div>
+                    ${cm.payoutCapped ? `<div class="text-[10px] text-amber-300/90 pt-1">⛔ Hard-capped at the monthly limit ฿${Math.round(cm.monthlyAllowanceLimit || 0).toLocaleString()} (target × max bonus cap) — the chore bonus never raises it.</div>` : ''}
                 </div>
             </div>
         </div>`;

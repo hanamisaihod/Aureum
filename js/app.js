@@ -301,7 +301,12 @@ function renderAllowanceMultiplierUI(info){
     if(baseEl)baseEl.innerText=`฿${Math.round(info.baseAllowance).toLocaleString()}`;
 
     const rateEl=$('allowance-bonus-rate');
-    if(rateEl)rateEl.innerText=`(+${info.bonusPercent})`;
+    if(rateEl){
+        rateEl.innerText=`(+${info.bonusPercent})`;
+        rateEl.title=info.payoutCapped
+            ?`Chore bonus trimmed so the payout never exceeds the ฿${Math.round(info.monthlyAllowanceLimit||0).toLocaleString()} monthly limit (target × max bonus cap).`
+            :'';
+    }
 
     const bonusEl=$('allowance-bonus-amount');
     if(bonusEl){
@@ -359,7 +364,12 @@ function renderAllowanceMultiplierUI(info){
     }
 
     const payoutEl=$('monthly-payout');
-    if(payoutEl)payoutEl.title=`Base ฿${Math.round(info.baseAllowance).toLocaleString()} + Chore Bonus ฿${Math.round(info.choreBonusAmount).toLocaleString()} = ฿${Math.round(info.finalMonthlyAllowance).toLocaleString()}`;
+    if(payoutEl){
+        const capNote=info.payoutCapped
+            ?` · Capped at monthly limit ฿${Math.round(info.monthlyAllowanceLimit||0).toLocaleString()} (target × max bonus cap)`
+            :'';
+        payoutEl.title=`Base ฿${Math.round(info.baseAllowance).toLocaleString()} + Chore Bonus ฿${Math.round(info.choreBonusAmount).toLocaleString()} = ฿${Math.round(info.finalMonthlyAllowance).toLocaleString()}${capNote}`;
+    }
 }
 
 function loadUserData(){
@@ -385,7 +395,9 @@ function loadUserData(){
         const targetPts=(activeSettings.weeklyHours||10)*12,pointRate=targetPts>0?((activeSettings.monthlyCash||8000)/targetPts):0,maxCash=(activeSettings.monthlyCash||8000)*((activeSettings.maxBonusCapPct||125)/100);
         const choreHours=sumMonthlyChoreHours(rawLogs,now.getFullYear(),now.getMonth());
         const baseAllowance=Math.min(monthlyPoints*pointRate,maxCash);
-        const allowanceBreakdown=calculateMonthlyAllowanceBreakdown(baseAllowance,choreHours);
+        // maxCash is the hard monthly limit: target allowance × max bonus cap %.
+        // The chore bonus is applied inside the limit and can never exceed it.
+        const allowanceBreakdown=calculateMonthlyAllowanceBreakdown(baseAllowance,choreHours,maxCash);
         const finalPayout=allowanceBreakdown.finalMonthlyAllowance,softCap=userSettings.dailySoftCap||4;
         const isVaulted=activeSettings.vaultedMonths?.[`${now.getFullYear()}-${now.getMonth()}`];
 

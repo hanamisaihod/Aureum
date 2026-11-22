@@ -97,26 +97,43 @@ function calculateChoreMultiplier(choreHours) {
 /**
  * Applies the unlocked tier multiplier retroactively to an entire month's
  * accumulated base work allowance.
+ *
+ * The optional `monthlyAllowanceLimit` is a HARD ceiling — the monthly limit
+ * defined as `targetAllowance × maxBonusCapPct / 100`. The chore tier bonus can
+ * never push the payout above it, and the bonus itself never changes the limit.
  * @param {number|string} baseWorkAllowance - Base allowance earned from work logs this month
  * @param {number|string} choreHours - Total chore hours logged this month
+ * @param {number|string} [monthlyAllowanceLimit] - Hard monthly ceiling (target allowance × max bonus cap %)
  * @returns {ReturnType<typeof calculateChoreMultiplier> & {
  *   baseAllowance: number,
  *   finalMonthlyAllowance: number,
- *   choreBonusAmount: number
+ *   choreBonusAmount: number,
+ *   monthlyAllowanceLimit: number|null,
+ *   payoutCapped: boolean
  * }}
  */
-function calculateMonthlyAllowanceBreakdown(baseWorkAllowance, choreHours) {
+function calculateMonthlyAllowanceBreakdown(baseWorkAllowance, choreHours, monthlyAllowanceLimit) {
     const parsedBase = parseFloat(baseWorkAllowance);
-    const base = Math.max(0, Number.isFinite(parsedBase) ? parsedBase : 0);
+    const safeBase = Math.max(0, Number.isFinite(parsedBase) ? parsedBase : 0);
+
+    // Resolve the hard limit first. Invalid/omitted limits mean "no ceiling".
+    const parsedLimit = parseFloat(monthlyAllowanceLimit);
+    const limit = Number.isFinite(parsedLimit) && parsedLimit >= 0 ? _choreRound2(parsedLimit) : null;
+
+    // The base work allowance can never sit above the limit either.
+    const base = limit === null ? safeBase : Math.min(safeBase, limit);
     const tierInfo = calculateChoreMultiplier(choreHours);
     const baseAllowance = _choreRound2(base);
-    const finalMonthlyAllowance = _choreRound2(baseAllowance * tierInfo.multiplier);
+    const uncappedAllowance = _choreRound2(baseAllowance * tierInfo.multiplier);
+    const finalMonthlyAllowance = limit === null ? uncappedAllowance : Math.min(uncappedAllowance, limit);
 
     return {
         ...tierInfo,
         baseAllowance,
         finalMonthlyAllowance,
-        choreBonusAmount: _choreRound2(finalMonthlyAllowance - baseAllowance)
+        choreBonusAmount: _choreRound2(finalMonthlyAllowance - baseAllowance),
+        monthlyAllowanceLimit: limit,
+        payoutCapped: limit !== null && (safeBase > limit || uncappedAllowance > finalMonthlyAllowance)
     };
 }
 

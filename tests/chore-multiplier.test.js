@@ -195,6 +195,56 @@ test('50h max tier caps the bonus with no further growth', () => {
     assert.equal(at80.nextTierLabel, 'Max Tier Unlocked');
 });
 
+test('chore bonus can never push the payout past the monthly limit', () => {
+    const limit = 10000; // e.g. target ฿8,000 × 125% max bonus cap
+
+    // Bonus would overflow the ceiling: trimmed to the limit exactly.
+    const atCap = calculateMonthlyAllowanceBreakdown(9900, 50, limit);
+    assert.equal(atCap.baseAllowance, 9900);
+    assert.equal(atCap.finalMonthlyAllowance, limit);
+    assert.equal(atCap.choreBonusAmount, 100);
+    assert.equal(atCap.monthlyAllowanceLimit, limit);
+    assert.equal(atCap.payoutCapped, true);
+
+    // Base work already sits above the limit: everything clamps to the limit.
+    const overCap = calculateMonthlyAllowanceBreakdown(12000, 50, limit);
+    assert.equal(overCap.baseAllowance, limit);
+    assert.equal(overCap.finalMonthlyAllowance, limit);
+    assert.equal(overCap.choreBonusAmount, 0);
+    assert.equal(overCap.payoutCapped, true);
+
+    // Bonus fits under the ceiling: applied in full and not flagged as capped.
+    const underCap = calculateMonthlyAllowanceBreakdown(4000, 50, limit);
+    assert.equal(underCap.finalMonthlyAllowance, 5000);
+    assert.equal(underCap.choreBonusAmount, 1000);
+    assert.equal(underCap.payoutCapped, false);
+
+    // Breakdown identity still holds after clamping.
+    assert.equal(atCap.finalMonthlyAllowance, atCap.baseAllowance + atCap.choreBonusAmount);
+});
+
+test('the monthly limit stays fixed and is never scaled by the chore tier', () => {
+    const targetAllowance = 8000;
+    const maxBonusCapPct = 125;
+    const limit = targetAllowance * (maxBonusCapPct / 100); // ฿10,000
+
+    for (let hours = 0; hours <= 70; hours += 2.5) {
+        const result = calculateMonthlyAllowanceBreakdown(9999, hours, limit);
+        assert.ok(result.finalMonthlyAllowance <= limit, `payout exceeded the limit at ${hours}h`);
+        assert.equal(result.monthlyAllowanceLimit, limit, `limit drifted at ${hours}h`);
+        assert.equal(result.finalMonthlyAllowance, result.baseAllowance + result.choreBonusAmount);
+    }
+});
+
+test('omitting or invalidating the monthly limit keeps the uncapped behaviour', () => {
+    assert.equal(calculateMonthlyAllowanceBreakdown(1000, 50).finalMonthlyAllowance, 1250);
+    assert.equal(calculateMonthlyAllowanceBreakdown(1000, 50, undefined).finalMonthlyAllowance, 1250);
+    assert.equal(calculateMonthlyAllowanceBreakdown(1000, 50, null).finalMonthlyAllowance, 1250);
+    assert.equal(calculateMonthlyAllowanceBreakdown(1000, 50, 'abc').finalMonthlyAllowance, 1250);
+    assert.equal(calculateMonthlyAllowanceBreakdown(1000, 50).monthlyAllowanceLimit, null);
+    assert.equal(calculateMonthlyAllowanceBreakdown(1000, 50).payoutCapped, false);
+});
+
 test('integration: raw monthly logs feed the allowance breakdown', () => {
     const monthlyCash = 8000;
     const weeklyHours = 10;
@@ -216,11 +266,19 @@ test('integration: raw monthly logs feed the allowance breakdown', () => {
     assert.equal(choreHours, 10.75); // 4 + 6.75, October chore excluded
 
     const baseAllowance = Math.min(points * pointRate, maxCash);
-    const breakdown = calculateMonthlyAllowanceBreakdown(baseAllowance, choreHours);
+    const breakdown = calculateMonthlyAllowanceBreakdown(baseAllowance, choreHours, maxCash);
 
     assert.equal(breakdown.tier, 1);
     assert.equal(breakdown.baseAllowance, 4000);
     assert.equal(breakdown.finalMonthlyAllowance, 4200);
     assert.equal(breakdown.choreBonusAmount, 200);
     assert.equal(breakdown.hoursToNextTier, 9.25);
+    assert.equal(breakdown.monthlyAllowanceLimit, maxCash);
+    assert.equal(breakdown.payoutCapped, false);
+    assert.ok(breakdown.finalMonthlyAllowance <= maxCash);
+
+    // Even a maxed-out month stays inside the monthly limit.
+    const maxedOut = calculateMonthlyAllowanceBreakdown(maxCash, 50, maxCash);
+    assert.equal(maxedOut.finalMonthlyAllowance, maxCash);
+    assert.equal(maxedOut.payoutCapped, true);
 });

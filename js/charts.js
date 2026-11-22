@@ -176,12 +176,9 @@ function updateChartData(type, logs, pointRate, maxCash) {
             }
         });
         if (workChartUnit === 'money') {
-            values = values.map((v, i) => {
-                if (range === 'monthly') {
-                    return Math.min(v, maxCash * multiplierForDate(new Date(now.getFullYear(), i, 1)));
-                }
-                return Math.min(v, maxCash * 1.25);
-            });
+            // maxCash is the hard monthly limit (target allowance × max bonus cap %).
+            // The chore multiplier never pushes a bucket above it.
+            values = values.map(v => Math.min(v, maxCash));
         }
         charts['work'].data.labels = labels;
         charts['work'].data.datasets[0].backgroundColor = range === 'monthly'

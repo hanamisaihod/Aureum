@@ -13,8 +13,11 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
     const pomoList = pomoHistory || [];
 
     const targetPts = (settings.weeklyHours || 10) * 12;
-    const pointRate = targetPts > 0 ? (settings.monthlyCash || 8000) / targetPts : 0;
-    const maxBonus = (settings.monthlyCash || 8000) * ((settings.maxBonusCapPct || 125) / 100);
+    const targetCash = settings.monthlyCash || 8000;
+    const pointRate = targetPts > 0 ? targetCash / targetPts : 0;
+    // Hard monthly limit = target allowance × max bonus cap %. Chore bonuses are
+    // applied inside this ceiling and can never raise or exceed it.
+    const monthlyLimit = targetCash * ((settings.maxBonusCapPct || 125) / 100);
 
     // 1. The Catalyst Hour
     // Identifies the 2-hour daily window with the highest average Quality (>= 4) achieved during high-effort work (Effort >= 4).
@@ -152,14 +155,19 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
 
     const mtdChoreHours = sumMonthlyChoreHours(rawLogs, curYear, curMonth);
     const mtdTier = calculateChoreMultiplier(mtdChoreHours);
-    const baseMtdCash = Math.min(mtdPts * pointRate, maxBonus);
+    const baseMtdCash = Math.min(mtdPts * pointRate, monthlyLimit);
     const sevenDayDailyAvgCash = (last7DaysPts * pointRate) / 7;
-    const baseProjectedCash = Math.min(maxBonus, baseMtdCash + (sevenDayDailyAvgCash * remainingDays));
-    const projectedCash = baseProjectedCash * mtdTier.multiplier;
+    const baseProjectedCash = Math.min(monthlyLimit, baseMtdCash + (sevenDayDailyAvgCash * remainingDays));
+    // The estimate is hard-capped at the monthly limit — the chore bonus can
+    // never push the projection above target allowance × max bonus cap %.
+    const rawProjectedCash = baseProjectedCash * mtdTier.multiplier;
+    const projectedCash = Math.min(monthlyLimit, rawProjectedCash);
+    const projectionCapped = rawProjectedCash > monthlyLimit + 0.005;
     const lastMonthChoreHours = sumMonthlyChoreHours(rawLogs, prevYear, prevMonth);
-    const lastMonthCash = Math.min(lastMonthPts * pointRate, maxBonus) * calculateChoreMultiplier(lastMonthChoreHours).multiplier;
+    const lastMonthCash = Math.min(monthlyLimit, Math.min(lastMonthPts * pointRate, monthlyLimit) * calculateChoreMultiplier(lastMonthChoreHours).multiplier);
 
-    const tierSuffix = mtdTier.tier > 0 ? ` • 🧹 +${mtdTier.bonusPercent} Tier ${mtdTier.tier}` : '';
+    const capSuffix = projectionCapped ? ` • ⛔ ฿${Math.round(monthlyLimit).toLocaleString()} monthly cap` : '';
+    const tierSuffix = (mtdTier.tier > 0 ? ` • 🧹 +${mtdTier.bonusPercent} Tier ${mtdTier.tier}` : '') + capSuffix;
 
     let forecastComparison = '';
     if (lastMonthCash > 0) {
@@ -167,7 +175,7 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
         const sign = pctDiff >= 0 ? '+' : '';
         forecastComparison = `${sign}${pctDiff}% vs last month (฿${Math.round(lastMonthCash).toLocaleString()})${tierSuffix}`;
     } else {
-        const targetPct = Math.round((projectedCash / (settings.monthlyCash || 8000)) * 100);
+        const targetPct = Math.round((projectedCash / targetCash) * 100);
         forecastComparison = `${targetPct}% of monthly base (฿${Math.round(sevenDayDailyAvgCash).toLocaleString()}/d pace)${tierSuffix}`;
     }
 
@@ -216,8 +224,9 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
     let lifetimeEarnings = 0;
     const activeMonths = Object.keys(monthlyPtsMap).length;
     Object.entries(monthlyPtsMap).forEach(([key, pts]) => {
-        const baseCash = Math.min(pts * pointRate, maxBonus);
-        lifetimeEarnings += baseCash * calculateChoreMultiplier(monthlyChoreMap[key] || 0).multiplier;
+        const baseCash = Math.min(pts * pointRate, monthlyLimit);
+        // Each month's payout is hard-capped at the monthly limit.
+        lifetimeEarnings += Math.min(monthlyLimit, baseCash * calculateChoreMultiplier(monthlyChoreMap[key] || 0).multiplier);
     });
 
     insights.push({
