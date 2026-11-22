@@ -228,8 +228,66 @@ function switchTab(t){
     if(t==='crucible')attachPomoSpectatorListener();
 }
 
+/**
+ * Builds the compact tier-ladder rows shown in the allowance hover panel.
+ * Reads the shared chore-multiplier constants so the ladder never drifts from
+ * the pure calculation engine in js/choreMultiplier.js.
+ */
+function buildChoreTierLadderHtml(info){
+    if(!info)return '';
+    const stepHours=(typeof CHORE_TIER_STEP_HOURS==='number')?CHORE_TIER_STEP_HOURS:10;
+    const maxTier=(typeof CHORE_MAX_TIER==='number')?CHORE_MAX_TIER:5;
+    const bonusStepPct=(typeof CHORE_TIER_BONUS_RATE==='number')?Math.round(CHORE_TIER_BONUS_RATE*100):5;
+    let html='';
+    for(let tier=0;tier<=maxTier;tier++){
+        const floorHours=tier*stepHours;
+        const isCurrent=info.tier===tier,isUnlocked=tier<=info.tier;
+        const rangeLabel=(tier===maxTier)?`${formatHours(floorHours)}h+`:`${formatHours(floorHours)}–${formatHours(floorHours+stepHours)}h`;
+        const rowClass=isCurrent
+            ?'bg-sky-500/15 border border-sky-500/40 text-sky-100'
+            :isUnlocked
+                ?'bg-slate-900/70 border border-emerald-500/20 text-slate-300'
+                :'bg-slate-900/40 border border-slate-800/70 text-slate-500';
+        const icon=isCurrent?(info.isMaxTier?'🏆':'🎯'):(isUnlocked?'✓':'🔒');
+        const pctClass=isUnlocked?'text-emerald-400':'text-slate-600';
+        html+=`<div class="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-1.5 py-0.5 rounded-md font-mono text-[9px] ${rowClass}">
+            <span class="font-black whitespace-nowrap">${icon} T${tier}</span>
+            <span class="opacity-80 truncate">${rangeLabel}</span>
+            <span class="font-black ${pctClass}">+${tier*bonusStepPct}%</span>
+        </div>`;
+    }
+    return html;
+}
+
+/**
+ * Binds the allowance card's chore-bonus bar. Hover/focus reveals the breakdown
+ * via CSS; this only adds a tap/click pin so touch devices can open it too.
+ */
+function initChoreBonusPanel(){
+    const zone=$('chore-bonus-zone'),track=$('chore-tier-track');
+    if(!zone||!track||zone.dataset.choreBonusBound==='true')return;
+    zone.dataset.choreBonusBound='true';
+
+    track.addEventListener('click',event=>{
+        event.stopPropagation();
+        const willOpen=!zone.classList.contains('is-open');
+        zone.classList.toggle('is-open',willOpen);
+        // Blur on close so :focus-within does not immediately reopen the panel.
+        if(!willOpen&&typeof track.blur==='function')track.blur();
+    });
+    document.addEventListener('pointerdown',event=>{
+        if(!zone.classList.contains('is-open'))return;
+        if(zone.contains(event.target))return;
+        zone.classList.remove('is-open');
+    });
+    document.addEventListener('keydown',event=>{
+        if(event.key==='Escape')zone.classList.remove('is-open');
+    });
+}
+
 function renderAllowanceMultiplierUI(info){
     if(!info)return;
+    initChoreBonusPanel();
     const tierPill=$('allowance-tier-pill');
     if(tierPill){
         tierPill.innerText=info.isMaxTier?`🏆 Tier 5 · +${info.bonusPercent}`:`🧹 ${info.tierLabel} · +${info.bonusPercent}`;
@@ -248,7 +306,34 @@ function renderAllowanceMultiplierUI(info){
     const bonusEl=$('allowance-bonus-amount');
     if(bonusEl){
         bonusEl.innerText=`+฿${Math.round(info.choreBonusAmount).toLocaleString()}`;
-        bonusEl.className=info.choreBonusAmount>0?"text-emerald-400 font-bold":"text-slate-500 font-bold";
+        bonusEl.className=info.choreBonusAmount>0
+            ?'text-xs font-black font-mono text-emerald-400 mt-0.5'
+            :'text-xs font-black font-mono text-slate-500 mt-0.5';
+    }
+
+    // Hover-panel headline stats
+    const multEl=$('allowance-multiplier-badge');
+    if(multEl)multEl.innerText=`×${info.multiplier.toFixed(2)}`;
+
+    const loggedEl=$('allowance-hours-logged');
+    if(loggedEl)loggedEl.innerText=`${formatHours(info.totalHours)}h`;
+
+    const nextEl=$('allowance-hours-to-next');
+    if(nextEl){
+        nextEl.innerText=info.isMaxTier?'MAX':`${formatHours(info.hoursToNextTier)}h`;
+        nextEl.className=info.isMaxTier
+            ?'text-xs font-black font-mono text-amber-300 mt-0.5'
+            :'text-xs font-black font-mono text-emerald-400 mt-0.5';
+    }
+
+    const ladderEl=$('chore-tier-ladder');
+    if(ladderEl)ladderEl.innerHTML=buildChoreTierLadderHtml(info);
+
+    const stepHintEl=$('chore-tier-step-hint');
+    if(stepHintEl){
+        const stepHours=(typeof CHORE_TIER_STEP_HOURS==='number')?CHORE_TIER_STEP_HOURS:10;
+        const bonusStepPct=(typeof CHORE_TIER_BONUS_RATE==='number')?Math.round(CHORE_TIER_BONUS_RATE*100):5;
+        stepHintEl.innerText=`${formatHours(stepHours)}h → +${bonusStepPct}% / tier`;
     }
 
     const bar=$('chore-tier-bar'),pct=$('chore-tier-progress-pct'),label=$('chore-tier-progress-label');
@@ -256,16 +341,21 @@ function renderAllowanceMultiplierUI(info){
     if(bar){
         bar.style.width=`${progressPct}%`;
         const track=bar.parentElement;
-        if(track&&track.setAttribute)track.setAttribute('aria-valuenow',String(Math.round(progressPct)));
+        if(track&&track.setAttribute){
+            track.setAttribute('aria-valuenow',String(Math.round(progressPct)));
+            track.setAttribute('aria-valuetext',info.isMaxTier
+                ?`Max tier unlocked • ${formatHours(info.totalHours)}h chore hours • +${info.bonusPercent} allowance`
+                :`${formatHours(info.totalHours)}h of ${info.nextTierHours}h chore hours • ${formatHours(info.hoursToNextTier)}h to ${info.nextTierLabel}`);
+        }
     }
     if(pct){
         pct.innerText=info.isMaxTier?'MAX':`${Math.round(info.progressPercent)}%`;
-        pct.className=info.isMaxTier?"shrink-0 font-bold text-amber-300":"shrink-0 font-bold text-emerald-400";
+        pct.className=info.isMaxTier?'chore-tier-pct is-max':'chore-tier-pct';
     }
     if(label){
         label.innerText=info.isMaxTier
-            ?`🏆 Max Tier Unlocked • ${formatHours(info.totalHours)}h logged`
-            :`${formatHours(info.totalHours)}h / ${info.nextTierHours}h • ${formatHours(info.hoursToNextTier)}h to ${info.nextTierLabel}`;
+            ?`🏆 ${formatHours(info.totalHours)}h · Max`
+            :`🧹 ${formatHours(info.totalHours)}h / ${info.nextTierHours}h`;
     }
 
     const payoutEl=$('monthly-payout');

@@ -227,26 +227,54 @@
                                 </div>
                             </div>
                             <div class="text-3xl font-extrabold text-emerald-400 mt-1.5" id="monthly-payout">฿0</div>
-                            <div class="mt-2 space-y-0.5 text-[11px] font-mono text-slate-400">
-                                <div class="flex items-center justify-between gap-2">
-                                    <span>Base Work Allowance</span>
-                                    <span id="allowance-base-amount" class="text-slate-200 font-bold">฿0</span>
-                                </div>
-                                <div class="flex items-center justify-between gap-2">
-                                    <span>Chore Bonus <span id="allowance-bonus-rate" class="text-amber-300">(+0%)</span></span>
-                                    <span id="allowance-bonus-amount" class="text-slate-500 font-bold">+฿0</span>
-                                </div>
-                            </div>
                         </div>
-                        <div class="pt-2.5 border-t border-slate-800/80 mt-2">
-                            <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 gap-2">
-                                <span id="chore-tier-progress-label" class="truncate">0h / 10h • 10h to Tier 1 (+5%)</span>
-                                <span id="chore-tier-progress-pct" class="shrink-0 font-bold text-emerald-400">0%</span>
+                        <div id="chore-bonus-zone" class="chore-bonus-zone relative mt-3 pt-2.5 border-t border-slate-800/80">
+                            <div id="chore-tier-track" class="chore-tier-track" role="progressbar" tabindex="0" aria-label="Chore bonus progress toward the next allowance tier" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="0h of 10h chore hours logged">
+                                <div id="chore-tier-bar" class="chore-tier-bar-fill" style="width:0%"></div>
+                                <div class="chore-tier-track-content">
+                                    <span id="chore-tier-progress-label">🧹 0h / 10h</span>
+                                    <span class="chore-tier-track-meta">
+                                        <span class="chore-tier-hint" aria-hidden="true">i</span>
+                                        <span id="chore-tier-progress-pct" class="chore-tier-pct">0%</span>
+                                    </span>
+                                </div>
                             </div>
-                            <div class="relative w-full bg-slate-900/80 h-2.5 rounded-full mt-1.5 overflow-hidden border border-slate-700/60" role="progressbar" aria-label="Progress toward next chore allowance tier" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                                <div id="chore-tier-bar" class="h-full rounded-full bg-gradient-to-r from-sky-500 to-emerald-400 transition-all duration-700" style="width:0%"></div>
+                            <div id="chore-bonus-panel" class="chore-bonus-panel">
+                                <div class="flex items-center justify-between gap-2 pb-1.5 border-b border-slate-800/90">
+                                    <span class="text-[9px] uppercase tracking-widest font-black text-amber-400">🧹 Chore Bonus</span>
+                                    <span id="allowance-multiplier-badge" class="text-[10px] font-black font-mono px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">×1.00</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-1.5 py-1.5">
+                                    <div class="p-1.5 rounded-lg bg-slate-900/80 border border-slate-800 min-w-0">
+                                        <div class="text-[8px] uppercase tracking-wider font-extrabold text-slate-500 truncate">Base Allowance</div>
+                                        <div id="allowance-base-amount" class="text-xs font-black font-mono text-slate-100 mt-0.5">฿0</div>
+                                    </div>
+                                    <div class="p-1.5 rounded-lg bg-slate-900/80 border border-slate-800 min-w-0">
+                                        <div class="text-[8px] uppercase tracking-wider font-extrabold text-slate-500 truncate">Chore Bonus <span id="allowance-bonus-rate" class="text-amber-300">(+0%)</span></div>
+                                        <div id="allowance-bonus-amount" class="text-xs font-black font-mono text-slate-500 mt-0.5">+฿0</div>
+                                    </div>
+                                    <div class="p-1.5 rounded-lg bg-slate-900/80 border border-slate-800 min-w-0">
+                                        <div class="text-[8px] uppercase tracking-wider font-extrabold text-slate-500 truncate">Hours Logged</div>
+                                        <div id="allowance-hours-logged" class="text-xs font-black font-mono text-sky-300 mt-0.5">0h</div>
+                                    </div>
+                                    <div class="p-1.5 rounded-lg bg-slate-900/80 border border-slate-800 min-w-0">
+                                        <div class="text-[8px] uppercase tracking-wider font-extrabold text-slate-500 truncate">To Next Tier</div>
+                                        <div id="allowance-hours-to-next" class="text-xs font-black font-mono text-emerald-400 mt-0.5">10h</div>
+                                    </div>
+                                </div>
+                                <div class="pt-1.5 border-t border-slate-800/90">
+                                    <div class="flex items-center justify-between gap-2 text-[8px] uppercase tracking-wider font-black text-slate-500 mb-1">
+                                        <span>Tier Ladder</span>
+                                        <span id="chore-tier-step-hint" class="font-mono text-slate-400 normal-case tracking-normal">10h → +5% / tier</span>
+                                    </div>
+                                    <div id="chore-tier-ladder" class="space-y-0.5">
+                                        <!-- Tier ladder rows injected by renderAllowanceMultiplierUI() -->
+                                    </div>
+                                </div>
+                                <div class="pt-1.5 mt-1.5 border-t border-slate-800/90 text-[9px] font-mono text-slate-500">
+                                    Target Base ฿<span id="label-monthly-cash">8,000</span> · <span id="label-weekly-hrs">10</span> hrs/wk
+                                </div>
                             </div>
-                            <div class="text-[10px] text-slate-500 mt-1.5">Target Base: ฿<span id="label-monthly-cash">8,000</span> (<span id="label-weekly-hrs">10</span> hrs/wk)</div>
                         </div>
                     </div>
 
