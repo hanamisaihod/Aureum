@@ -1,34 +1,10 @@
 // ============================================================================
-// AUREUM — Forge Settings, Status Picker Modal & Avatar Customization
+// AUREUM — Forge Settings & Avatar Customization
 // ============================================================================
 
 async function updatePresenceTimestamp(){
     if(!loggedInUser)return;
     try{await db.collection('settings').doc(loggedInUser).set({lastActiveTimestamp:Date.now()},{merge:true})}catch(e){}
-}
-
-function editUserStatusNote(user,e){
-    if(e)e.stopPropagation();if(user!==loggedInUser)return;
-    $('status-picker-modal').classList.remove('hidden');
-}
-function closeStatusPicker(){$('status-picker-modal').classList.add('hidden')}
-
-async function selectStatusPreset(noteText){
-    if(!noteText)return;
-    userSettings.statusNote=noteText;closeStatusPicker();playTone('save');
-    spawnParticleBurst(window.innerWidth/2, window.innerHeight/3);
-    renderDuoHUDCards();
-    showToast({title:'💬 Status Updated',subtitle:`"${noteText}"`,icon:'✨',tier:'gold'});
-    await db.collection('settings').doc(loggedInUser).set({statusNote:noteText},{merge:true});
-}
-
-async function promptCustomStatus(){
-    closeStatusPicker();
-    const current=userSettings.statusNote||(loggedInUser==='North'?'Drawing 🎨':'Writing ✍️');
-    const customNote=prompt('Enter status (max 25 chars):',current);
-    if(customNote!==null&&customNote.trim()){
-        await selectStatusPreset(customNote.trim().substring(0,25));
-    }
 }
 
 async function applyCustomDisplayName(){

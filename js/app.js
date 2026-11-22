@@ -9,8 +9,6 @@ auth.onAuthStateChanged(async u=>{
         loggedInUser=(u.uid==="ioxjbBLDH0NDLDWVoYCjq8p3PYU2"||u.email?.toLowerCase().includes("cream"))?'Cream':'North';
         viewedUser=loggedInUser;
         userSettings.role=loggedInUser==='Cream'?'author':'illustrator';
-        duoPresenceData.North.role='illustrator';
-        duoPresenceData.Cream.role='author';
         initDuoHUDListeners();
         initRealtimeSettingsListener();initGlobalHeaderGlowListener();
         if(typeof initGuildActivityFeedListener==='function')initGuildActivityFeedListener();
@@ -89,49 +87,23 @@ function renderDuoHUDCards(){
             else{badgeEl.innerText="PEER";badgeEl.className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase shrink-0"}
         }
 
-        const statusEl=$(`hud-status-${u.toLowerCase()}`);
-        if(statusEl){
-            const note=s.statusNote||(u==='North'?'Drawing 🎨':'Writing ✍️');
-            statusEl.innerText=note;
-        }
-
-        // ZONE 2: Dynamic Title, SVG Class Crest & Level Zone
-        const pwr = duoPresenceData[u].powerScore || 0;
+        // ZONE 2: Live Habit Thermostat Badge & Rolling 7-Day Summary
         const uLogs = duoPresenceData[u].logs || (u === viewedUser ? currentRawLogsCache : []);
-        const rankDetails = getRankDetails(pwr, uLogs, u, s);
+        const thermostat = typeof computeHabitThermostat === 'function'
+            ? computeHabitThermostat(uLogs, s || {}, Date.now())
+            : { state: 'STEADY_CRUISE', label: '🌿 Steady Cruise', message: '', metrics: { workH: 0, choreH: 0, workoutH: 0, activeDays: 0, avgQuality: 0 } };
 
-        const crestEl = $(`hud-crest-${u.toLowerCase()}`);
-        if(crestEl && typeof renderClassCrest === 'function') {
-            crestEl.innerHTML = renderClassCrest(rankDetails.role, rankDetails.topStats, rankDetails.level, 30);
+        const thermostatBadgeEl = $(`hud-thermostat-badge-${u.toLowerCase()}`);
+        if(thermostatBadgeEl) {
+            thermostatBadgeEl.innerText = thermostat.label;
+            thermostatBadgeEl.className = `text-[10px] font-black px-2 py-0.5 rounded-full border whitespace-nowrap ${getThermostatBadgeClasses(thermostat.state)}`;
+            thermostatBadgeEl.title = thermostat.message;
         }
 
-        const titleEl = $(`hud-title-${u.toLowerCase()}`);
-        if(titleEl) {
-            titleEl.innerText = rankDetails.hybridTitle;
-            titleEl.title = `${rankDetails.tierName} • ${rankDetails.hybridTitle} (${rankDetails.roleLabel} — ${rankDetails.domain} Domain)`;
-        }
-
-        const rankEl = $(`hud-rank-${u.toLowerCase()}`);
-        if(rankEl) rankEl.innerText = `Lvl ${rankDetails.level}`;
-
-        // ZONE 3: Progress Zone (Accumulated Power EXP vs Target EXP + Single Progress Bar)
-        const pwrEl = $(`hud-pwr-${u.toLowerCase()}`);
-        if(pwrEl) {
-            if(rankDetails.nextThreshold !== null) {
-                pwrEl.innerText = `${pwr.toLocaleString()} / ${rankDetails.nextThreshold.toLocaleString()} EXP`;
-            } else {
-                pwrEl.innerText = `${pwr.toLocaleString()} EXP (MAX)`;
-            }
-        }
-
-        const progPctEl = $(`hud-rank-progress-pct-${u.toLowerCase()}`);
-        if(progPctEl) {
-            progPctEl.innerText = `${Math.round(rankDetails.progressPct)}%`;
-        }
-
-        const progBarEl = $(`hud-rank-bar-${u.toLowerCase()}`);
-        if(progBarEl) {
-            progBarEl.style.width = `${Math.min(100, Math.max(0, rankDetails.progressPct))}%`;
+        const summaryEl = $(`hud-thermostat-summary-${u.toLowerCase()}`);
+        if(summaryEl) {
+            summaryEl.innerText = `${formatHours(thermostat.metrics.workH)}h Work • ${formatHours(thermostat.metrics.choreH)}h Chores`;
+            summaryEl.title = `${formatHours(thermostat.metrics.workoutH)}h Workout • ${thermostat.metrics.activeDays} active days • ${thermostat.metrics.avgQuality > 0 ? thermostat.metrics.avgQuality.toFixed(1) : '—'} avg quality`;
         }
 
         if($(`hud-hours-${u.toLowerCase()}`)) $(`hud-hours-${u.toLowerCase()}`).innerText=`${formatHours(duoPresenceData[u].hoursToday||0)}/${formatHours(s.dailySoftCap||4)}h`;
@@ -201,10 +173,6 @@ function initGlobalHeaderGlowListener(){
         globalAllLogsCache=allLogs;
         duoPresenceData.North.hoursToday=nH;duoPresenceData.Cream.hoursToday=cH;
         duoPresenceData.North.logs=nLogs;duoPresenceData.Cream.logs=cLogs;
-        duoPresenceData.North.powerScore=calculateLifetimePWR(nLogs);
-        duoPresenceData.Cream.powerScore=calculateLifetimePWR(cLogs);
-        duoPresenceData.North.workStyle=calculateRolling30DayQE(nLogs,'North',duoPresenceData.North.settings).archetype;
-        duoPresenceData.Cream.workStyle=calculateRolling30DayQE(cLogs,'Cream',duoPresenceData.Cream.settings).archetype;
         renderDuoHUDCards();
         if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
     });
@@ -350,14 +318,11 @@ function loadUserData(){
             yieldPill.innerText="⚡ Standard";yieldPill.className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
         }
 
-        const lifetimePWR=calculateLifetimePWR(rawLogs);
         if(duoPresenceData[viewedUser]){
-            duoPresenceData[viewedUser].powerScore=lifetimePWR;
             duoPresenceData[viewedUser].logs=rawLogs;
-            duoPresenceData[viewedUser].workStyle=calculateRolling30DayQE(rawLogs,viewedUser,userSettings).archetype;
         }
         renderDuoHUDCards();
-        calculateAndRenderPowerMeter(rawLogs);
+        renderHabitThermostatPanel(rawLogs,activeSettings);
 
         aureateInsightsData=calculateAureateInsights(rawLogs,userSettings.completedPomoHistory||[],userSettings);
         renderAureateInsight(currentInsightIndex,false);
@@ -388,3 +353,144 @@ try {
         if (typeof renderGuildActivityTicker === 'function') renderGuildActivityTicker();
     }, 30000);
 } catch (e) {}
+
+// ============================================================================
+// HABIT THERMOSTAT — Adaptive Dashboard Card & Quick Actions
+// ============================================================================
+
+function getThermostatMetricItems(metrics) {
+    return [
+        { icon: '⚗️', label: 'Work', value: `${formatHours(metrics.workH)}h`, tint: 'text-amber-300' },
+        { icon: '🧹', label: 'Chores', value: `${formatHours(metrics.choreH)}h`, tint: 'text-sky-300' },
+        { icon: '🏃', label: 'Workout', value: `${formatHours(metrics.workoutH)}h`, tint: 'text-rose-300' },
+        { icon: '📅', label: 'Active Days', value: `${metrics.activeDays}/7`, tint: 'text-emerald-300' },
+        { icon: '✨', label: 'Avg Quality', value: metrics.avgQuality > 0 ? metrics.avgQuality.toFixed(1) : '—', tint: 'text-slate-200' }
+    ];
+}
+
+function renderHabitThermostatPanel(logs, settings) {
+    const panel = $('habit-thermostat-panel');
+    if (!panel || typeof computeHabitThermostat !== 'function') return;
+
+    const thermostat = computeHabitThermostat(logs || [], settings || {}, Date.now());
+    const badge = $('thermostat-state-badge');
+    const message = $('thermostat-message');
+    const metricsEl = $('thermostat-metrics');
+    const actionsEl = $('thermostat-actions');
+
+    if (badge) {
+        badge.innerText = thermostat.label;
+        badge.className = `text-[11px] font-black px-2.5 py-1 rounded-full border whitespace-nowrap ${getThermostatBadgeClasses(thermostat.state)}`;
+        badge.title = thermostat.message;
+    }
+    if (message) message.innerText = thermostat.message;
+
+    if (metricsEl) {
+        metricsEl.innerHTML = getThermostatMetricItems(thermostat.metrics).map(item => `
+            <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
+                <div class="text-[9px] uppercase tracking-wider font-extrabold text-slate-500">${item.icon} ${item.label}</div>
+                <div class="text-sm font-black font-mono ${item.tint} mt-0.5">${item.value}</div>
+            </div>`).join('');
+    }
+
+    if (actionsEl) {
+        if (thermostat.isCorrective && loggedInUser === viewedUser) {
+            const actionBtns = (thermostat.quickActions || []).map(action => `
+                <button type="button" onclick="startThermostatQuickAction('${action.type}', ${action.mins})"
+                    class="px-3 py-1.5 rounded-lg text-[11px] font-extrabold bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 transition-all">
+                    ${escapeHtml(action.label)}
+                </button>`).join('');
+            const breakBtn = (thermostat.state === 'OVERHEATING' && thermostat.recommendedPomo)
+                ? `<button type="button" onclick="startThermostatLongBreak(${thermostat.recommendedPomo.breakMins})"
+                    class="px-3 py-1.5 rounded-lg text-[11px] font-extrabold bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/50 ring-2 ring-amber-400/25 transition-all">
+                    🧘 Suggested Long Break (${thermostat.recommendedPomo.breakMins}m)
+                </button>`
+                : '';
+            actionsEl.innerHTML = actionBtns + breakBtn;
+        } else {
+            actionsEl.innerHTML = '';
+        }
+    }
+}
+
+
+function startThermostatQuickAction(type, mins) {
+    if (loggedInUser !== viewedUser) return;
+    const duration = Math.max(1, parseInt(mins, 10) || 15);
+
+    if (type === 'work') {
+        switchTab('crucible');
+        userSettings.pomoFocus = duration;
+        try { localStorage.setItem('aureum_pomo_focus', String(duration)); } catch (e) {}
+
+        if (typeof setMyPomoMode === 'function') {
+            myPomoIsRunning = false;
+            myPomoEndTime = null;
+            if (myPomoInterval) clearInterval(myPomoInterval);
+            setMyPomoMode('focus');
+            if (typeof toggleMyPomoTimer === 'function') toggleMyPomoTimer();
+        }
+
+        db.collection('settings').doc(loggedInUser).set({ pomoFocus: duration }, { merge: true }).catch(() => {});
+        playTone('save');
+        showToast({
+            title: `⚡ ${duration}m Focus Started`,
+            subtitle: 'Thermostat preset applied to the Crucible timer.',
+            icon: '🌡️',
+            tier: 'gold'
+        });
+        renderHabitThermostatPanel(currentRawLogsCache, userSettings);
+        return;
+    }
+
+    const formMap = {
+        chore: { tab: 'sanctuary', input: 'chore-time', card: 'chore-form-card', label: 'Chore' },
+        workout: { tab: 'sanctuary', input: 'workout-time', card: 'workout-form-card', label: 'Workout' }
+    };
+    const cfg = formMap[type];
+    if (!cfg) return;
+
+    switchTab(cfg.tab);
+    const hours = Math.max(0.25, Math.round((duration / 60) * 100) / 100);
+    const input = $(cfg.input);
+    if (input) input.value = hours.toFixed(2);
+
+    const card = $(cfg.card);
+    if (card && card.scrollIntoView) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (input && input.focus) setTimeout(() => input.focus(), 120);
+
+    playTone('save');
+    showToast({
+        title: `🌿 ${cfg.label} Quick Log Ready`,
+        subtitle: `${duration}m pre-filled in the Sanctuary form.`,
+        icon: '🌡️',
+        tier: 'emerald'
+    });
+}
+
+function startThermostatLongBreak(mins) {
+    if (loggedInUser !== viewedUser) return;
+    const duration = Math.max(1, parseInt(mins, 10) || 10);
+
+    switchTab('crucible');
+    userSettings.pomoLong = duration;
+    try { localStorage.setItem('aureum_pomo_long', String(duration)); } catch (e) {}
+
+    if (typeof setMyPomoMode === 'function') {
+        myPomoIsRunning = false;
+        myPomoEndTime = null;
+        if (myPomoInterval) clearInterval(myPomoInterval);
+        setMyPomoMode('long');
+        if (typeof toggleMyPomoTimer === 'function') toggleMyPomoTimer();
+    }
+
+    db.collection('settings').doc(loggedInUser).set({ pomoLong: duration }, { merge: true }).catch(() => {});
+    playTone('save');
+    showToast({
+        title: `🧘 ${duration}m Recovery Break Started`,
+        subtitle: 'Overheating guardrail: protect your pacing.',
+        icon: '🌡️',
+        tier: 'gold'
+    });
+}
+

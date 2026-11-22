@@ -28,12 +28,6 @@ try {
     if (_scodex !== null) _cachedShowMonthlyCodex = _scodex === 'true';
 } catch (e) {}
 
-const USER_ROLE_BINDINGS = {
-    North: { role: 'illustrator', domain: 'Artisan', label: 'Illustrator' },
-    Hanamisaihod: { role: 'illustrator', domain: 'Artisan', label: 'Illustrator' },
-    Cream: { role: 'author', domain: 'Chronicler', label: 'Author' }
-};
-
 let activeChronicleFilter = 'all';
 
 let userSettings = {
@@ -56,7 +50,6 @@ let userSettings = {
     bgOpacity: 20,
     avatarUrl: '',
     particleIntensity: 15,
-    statusNote: '',
     audioMuted: false,
     showMonthlyCodex: _cachedShowMonthlyCodex,
     vaultedMonths: {},
@@ -69,8 +62,8 @@ let goalsTargetsLocked = true;
 let goalsUnlockConfirmPending = false;
 
 let duoPresenceData = {
-    North: { role: 'illustrator', domain: 'Artisan', settings: {}, hoursToday: 0, powerScore: 0, logs: [], workStyle: 'Grand Virtuoso' },
-    Cream: { role: 'author', domain: 'Chronicler', settings: {}, hoursToday: 0, powerScore: 0, logs: [], workStyle: 'Arch-Chronicler' }
+    North: { settings: {}, hoursToday: 0, logs: [] },
+    Cream: { settings: {}, hoursToday: 0, logs: [] }
 };
 
 let currentTodayHoursLogged = 0;

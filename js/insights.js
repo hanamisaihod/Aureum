@@ -97,14 +97,27 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
     }
 
     // 2. The Grindset Ratio
-    // Calculates the rolling 30-day numerical averages for Quality vs. Effort and Peak Focus Ratio.
-    const qe30 = calculateRolling30DayQE(rawLogs);
-    if (qe30.count > 0) {
-        const peakFocusPct = Math.round((qe30.stalwartCount / qe30.count) * 100);
+    // Rolling 30-day Quality vs. Effort averages + peak-focus shift count,
+    // computed directly from raw work logs (no legacy progression engine).
+    const thirtyDayCutoff = Date.now() - (30 * 86400000);
+    const recentWorkLogs = workLogs.filter(l => getLogDate(l).getTime() >= thirtyDayCutoff);
+    const totalShifts30d = recentWorkLogs.length;
+    let sumQuality30d = 0, sumEffort30d = 0, stalwartCount = 0;
+    recentWorkLogs.forEach(l => {
+        const q = parseFloat(l.results) || 3;
+        const e = parseFloat(l.effort) || 3;
+        sumQuality30d += q;
+        sumEffort30d += e;
+        if (q >= 4 && e >= 4) stalwartCount++;
+    });
+    if (totalShifts30d > 0) {
+        const avgQuality30d = sumQuality30d / totalShifts30d;
+        const avgEffort30d = sumEffort30d / totalShifts30d;
+        const peakFocusPct = Math.round((stalwartCount / totalShifts30d) * 100);
         insights.push({
             icon: '⚖️',
             category: 'The Grindset Ratio',
-            value: `${qe30.avgQuality.toFixed(1)} Avg Quality | ${qe30.avgEffort.toFixed(1)} Avg Effort`,
+            value: `${avgQuality30d.toFixed(1)} Avg Quality | ${avgEffort30d.toFixed(1)} Avg Effort`,
             detail: `${peakFocusPct}% Peak Focus Shifts`
         });
     } else {

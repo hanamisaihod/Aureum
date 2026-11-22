@@ -43,6 +43,11 @@ function getUserDisplayName(userKey) {
     return u;
 }
 
+function getUserRole(userOrRole) {
+    const raw = String(userOrRole || (typeof viewedUser !== 'undefined' ? viewedUser : 'North')).trim().toLowerCase();
+    return (raw === 'cream' || raw === 'author') ? 'author' : 'illustrator';
+}
+
 const GOALS_TARGET_FIELD_IDS = ['setting-monthly-cash', 'setting-weekly-hrs', 'setting-daily-soft-cap', 'setting-bonus-cap'];
 
 // Right-Click Drag Window Scrolling & Hold Cleanup

@@ -241,13 +241,6 @@ function formatActivityCategoryTag(l) {
 function _renderChronicleCardHtml(l,idx,isSelf,pointRate,diaryByDay){
     const d=getLogDate(l);
     const dayKey=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-    const endOfDayMs=new Date(d.getFullYear(),d.getMonth(),d.getDate(),23,59,59,999).getTime();
-    const logsUpToDay=currentRawLogsCache.filter(x=>getLogDate(x).getTime()<=endOfDayMs);
-    const pwrOnDay=calculateLifetimePWR(logsUpToDay);
-    const scoresOnDay=typeof computeStatScoresFromLogs==='function'?computeStatScoresFromLogs(logsUpToDay,userSettings,30,endOfDayMs):{};
-    const roleOnDay=typeof getUserRole==='function'?getUserRole(l.role||l.user||viewedUser):'illustrator';
-    const classTitleOnDay=typeof getHybridClassTitle==='function'?getHybridClassTitle(roleOnDay,scoresOnDay):'Grand Virtuoso';
-    const rankOnDay=getRankDetails(pwrOnDay,logsUpToDay,roleOnDay,userSettings);
 
     const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     const timeStr=d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
@@ -271,7 +264,7 @@ function _renderChronicleCardHtml(l,idx,isSelf,pointRate,diaryByDay){
     const cardDomId=`chronicle-card-${l.id||idx}`;
     const delBtn=(isSelf&&l.id)?`<button type="button" onclick="deleteLogEntry('${l.id}', event)" title="Delete entry" aria-label="Delete entry" class="chronicle-delete-btn w-6 h-6 rounded-lg flex items-center justify-center text-sm font-black leading-none text-slate-400 hover:text-red-300 bg-slate-800/70 hover:bg-red-500/20 border border-slate-700/70 hover:border-red-500/40 shrink-0">&times;</button>`:'';
 
-    return `<div id="${cardDomId}" onclick="toggleChronicleCardFlip('${cardDomId}', event)" class="chronicle-flip-card cursor-pointer select-none"><div class="chronicle-flip-card-inner"><div class="chronicle-flip-card-front p-4 sm:p-5 rounded-2xl bg-slate-900/95 border border-slate-800/90 flex flex-col justify-between gap-3.5"><div class="space-y-2 border-b border-slate-800/80 pb-3"><div class="text-sm font-black text-slate-100 leading-snug break-words">${primaryTitle}</div><div class="flex items-center justify-between gap-2 flex-wrap"><div class="flex items-center gap-1.5 text-[11px] font-mono text-slate-400 whitespace-nowrap"><span>${dateStr}</span><span class="text-slate-600">•</span><span>${timeStr}</span></div><div class="flex items-center gap-2 shrink-0">${accentBadge}${delBtn}</div></div></div><div class="space-y-2.5"><div class="guild-activity-type-tag w-full justify-between flex-wrap"><span class="text-xs font-extrabold text-amber-200 leading-snug">${escapeHtml(activityMeta.tagText)}</span><span class="text-[10px] font-mono font-bold text-slate-400 whitespace-nowrap">Lvl ${rankOnDay.level} • ${escapeHtml(classTitleOnDay)}</span></div>${directReflection ? `<p class="text-xs text-slate-300 leading-relaxed break-words">${escapeHtml(directReflection)}</p>` : ''}</div><div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-800/60 flex-wrap"><div class="flex items-center gap-1.5 flex-wrap">${_buildChronicleStatBadges(l)}</div></div></div><div class="chronicle-flip-card-back p-4 sm:p-5 rounded-2xl bg-slate-950/95 border border-amber-500/35 flex flex-col justify-between gap-3"><div class="space-y-1.5 border-b border-slate-800 pb-2.5"><div class="flex items-center justify-between gap-2"><span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-1.5"><span>📜</span> <span>${l.type==='diary'?'Diary Reflection':(directReflection?'Session Reflection':'Daily Reflection')}</span></span><div class="flex items-center gap-2 shrink-0"><span class="text-[11px] font-mono text-slate-400 whitespace-nowrap">${dateStr}</span>${delBtn}</div></div><div class="text-[11px] font-mono text-slate-400">${escapeHtml(classTitleOnDay)} • Lvl ${rankOnDay.level} ${escapeHtml(rankOnDay.tierName)}</div></div><div class="flex-1 flex items-center overflow-y-auto custom-scroll py-1">${hasNote?`<p class="text-xs text-slate-200 italic leading-relaxed break-words">"${escapeHtml(backText)}"</p>`:`<p class="text-xs text-slate-500 italic">No reflection text recorded for this entry.</p>`}</div><div class="flex items-center justify-between gap-2 text-[10px] font-mono text-slate-400 border-t border-slate-900 pt-2 flex-wrap"><span>${escapeHtml(activityMeta.shortTagText)}</span></div></div></div></div>`;
+    return `<div id="${cardDomId}" onclick="toggleChronicleCardFlip('${cardDomId}', event)" class="chronicle-flip-card cursor-pointer select-none"><div class="chronicle-flip-card-inner"><div class="chronicle-flip-card-front p-4 sm:p-5 rounded-2xl bg-slate-900/95 border border-slate-800/90 flex flex-col justify-between gap-3.5"><div class="space-y-2 border-b border-slate-800/80 pb-3"><div class="text-sm font-black text-slate-100 leading-snug break-words">${primaryTitle}</div><div class="flex items-center justify-between gap-2 flex-wrap"><div class="flex items-center gap-1.5 text-[11px] font-mono text-slate-400 whitespace-nowrap"><span>${dateStr}</span><span class="text-slate-600">•</span><span>${timeStr}</span></div><div class="flex items-center gap-2 shrink-0">${accentBadge}${delBtn}</div></div></div><div class="space-y-2.5"><div class="guild-activity-type-tag w-full justify-between flex-wrap"><span class="text-xs font-extrabold text-amber-200 leading-snug">${escapeHtml(activityMeta.tagText)}</span></div>${directReflection ? `<p class="text-xs text-slate-300 leading-relaxed break-words">${escapeHtml(directReflection)}</p>` : ''}</div><div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-800/60 flex-wrap"><div class="flex items-center gap-1.5 flex-wrap">${_buildChronicleStatBadges(l)}</div></div></div><div class="chronicle-flip-card-back p-4 sm:p-5 rounded-2xl bg-slate-950/95 border border-amber-500/35 flex flex-col justify-between gap-3"><div class="space-y-1.5 border-b border-slate-800 pb-2.5"><div class="flex items-center justify-between gap-2"><span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-1.5"><span>📜</span> <span>${l.type==='diary'?'Diary Reflection':(directReflection?'Session Reflection':'Daily Reflection')}</span></span><div class="flex items-center gap-2 shrink-0"><span class="text-[11px] font-mono text-slate-400 whitespace-nowrap">${dateStr}</span>${delBtn}</div></div></div><div class="flex-1 flex items-center overflow-y-auto custom-scroll py-1">${hasNote?`<p class="text-xs text-slate-200 italic leading-relaxed break-words">"${escapeHtml(backText)}"</p>`:`<p class="text-xs text-slate-500 italic">No reflection text recorded for this entry.</p>`}</div><div class="flex items-center justify-between gap-2 text-[10px] font-mono text-slate-400 border-t border-slate-900 pt-2 flex-wrap"><span>${escapeHtml(activityMeta.shortTagText)}</span></div></div></div></div>`;
 }
 
 
@@ -871,73 +864,41 @@ function toggleMonthlyCodexFlip(evt) {
     const btnLabel = $('monthly-codex-flip-btn-label');
     if (btnLabel) {
         btnLabel.innerText = monthlyCodexFlipped
-            ? '↻ Flip to Front: Metrics & 30d Stat Radar'
+            ? '↻ Flip to Front: Metrics & Balance Snapshot'
             : '↻ Flip Folio: Standout Reflection & Milestones';
     }
     playTone('save');
 }
 
-function _buildCodexStatRadarSvg(statScores) {
-    const statOrder = [
-        { key: 'STR', icon: '⚔️', color: '#ef4444' },
-        { key: 'DEX', icon: '🎯', color: '#10b981' },
-        { key: 'INT', icon: '🧠', color: '#38bdf8' },
-        { key: 'VIT', icon: '🛡️', color: '#f59e0b' },
-        { key: 'WIS', icon: '📖', color: '#fbbf24' },
-        { key: 'WIL', icon: '🔥', color: '#f97316' }
+function _buildCodexBalanceSnapshotHtml(balance) {
+    const rows = [
+        { icon: '⚗️', label: 'Focus Work', hours: balance.workH, bar: 'from-amber-500 to-orange-400', text: 'text-amber-300' },
+        { icon: '🧹', label: 'Chores', hours: balance.choreH, bar: 'from-sky-500 to-cyan-400', text: 'text-sky-300' },
+        { icon: '🏃', label: 'Workout', hours: balance.workoutH, bar: 'from-rose-500 to-pink-400', text: 'text-rose-300' }
     ];
-    const vbW = 280, vbH = 225, cx = 140, cy = 112, maxR = 72;
-    const angles = [-90, -30, 30, 90, 150, 210];
-
-    const rings = [0.33, 0.66, 1.0].map((rRatio, rIdx) => {
-        const pts = angles.map(deg => {
-            const rad = (deg * Math.PI) / 180;
-            return `${(cx + Math.cos(rad) * maxR * rRatio).toFixed(1)},${(cy + Math.sin(rad) * maxR * rRatio).toFixed(1)}`;
-        }).join(' ');
-        const strokeCol = rIdx === 2 ? 'rgba(245, 158, 11, 0.45)' : 'rgba(148, 163, 184, 0.2)';
-        return `<polygon points="${pts}" fill="none" stroke="${strokeCol}" stroke-width="${rIdx === 2 ? '1.3' : '0.9'}" stroke-dasharray="${rIdx === 1 ? '2,2' : 'none'}" />`;
-    }).join('');
-
-    const axes = angles.map(deg => {
-        const rad = (deg * Math.PI) / 180;
-        return `<line x1="${cx}" y1="${cy}" x2="${(cx + Math.cos(rad) * maxR).toFixed(1)}" y2="${(cy + Math.sin(rad) * maxR).toFixed(1)}" stroke="rgba(148, 163, 184, 0.22)" stroke-width="1" />`;
-    }).join('');
-
-    const dataPts = [];
-    const nodes = statOrder.map((st, i) => {
-        const val = Math.max(12, Math.min(99, Number(statScores?.[st.key]) || 15));
-        const ratio = Math.max(0.16, Math.min(1, val / 99));
-        const rad = (angles[i] * Math.PI) / 180;
-        const vx = cx + Math.cos(rad) * maxR * ratio;
-        const vy = cy + Math.sin(rad) * maxR * ratio;
-        dataPts.push(`${vx.toFixed(1)},${vy.toFixed(1)}`);
-
-        const lx = cx + Math.cos(rad) * (maxR + 24);
-        const ly = cy + Math.sin(rad) * (maxR + 20);
-        const g = typeof getStatGrade === 'function' ? getStatGrade(val) : { grade: 'B', color: '#f59e0b' };
-
+    const maxH = Math.max(1, balance.workH, balance.choreH, balance.workoutH);
+    const rowsHtml = rows.map(row => {
+        const pct = Math.min(100, Math.max(0, (row.hours / maxH) * 100));
         return `
-            <circle cx="${vx.toFixed(1)}" cy="${vy.toFixed(1)}" r="3.8" fill="${st.color}" stroke="#020617" stroke-width="1.3" />
-            <text x="${lx.toFixed(1)}" y="${(ly - 4).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" fill="#e2e8f0" font-size="9.5" font-weight="900" font-family="monospace">${st.key}</text>
-            <text x="${lx.toFixed(1)}" y="${(ly + 6.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" fill="${g.color}" font-size="9" font-weight="800" font-family="monospace">${g.grade}${val}</text>
-        `;
+            <div class="space-y-1">
+                <div class="flex items-center justify-between text-[10px] font-mono">
+                    <span class="text-slate-400">${row.icon} ${row.label}</span>
+                    <span class="${row.text} font-bold">${formatHours(row.hours)}h</span>
+                </div>
+                <div class="w-full bg-slate-900/90 h-2 rounded-full overflow-hidden border border-slate-700/60">
+                    <div class="h-full rounded-full bg-gradient-to-r ${row.bar} transition-all duration-700" style="width:${pct}%"></div>
+                </div>
+            </div>`;
     }).join('');
 
     return `
-        <svg viewBox="0 0 ${vbW} ${vbH}" class="w-full max-w-[265px] h-auto select-none mx-auto overflow-visible">
-            <defs>
-                <radialGradient id="codexRadarFill" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.52" />
-                    <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.20" />
-                </radialGradient>
-            </defs>
-            ${rings}
-            ${axes}
-            <polygon points="${dataPts.join(' ')}" fill="url(#codexRadarFill)" stroke="#fbbf24" stroke-width="2" stroke-linejoin="round" />
-            <circle cx="${cx}" cy="${cy}" r="2" fill="#fef08a" />
-            ${nodes}
-        </svg>
-    `;
+        <div class="w-full space-y-2.5">
+            ${rowsHtml}
+            <div class="flex items-center justify-between text-[10px] font-mono pt-1 border-t border-slate-800/70">
+                <span class="text-slate-400">📅 ${balance.activeDays} Active Days</span>
+                <span class="text-emerald-300 font-bold">${balance.totalH > 0 ? formatHours(balance.totalH) + 'h Total' : 'No logs yet'}</span>
+            </div>
+        </div>`;
 }
 
 function _selectMonthlyStandoutReflection(monthLogs, allLogs) {
@@ -996,13 +957,15 @@ function _buildCodexReflectionCardHtml(standout, monthYearTitle) {
         </div>`;
 }
 
-function _buildCodexMilestonesCardHtml(monthYearTitle, styleInfo, hybridTitle, peakFlowCount, stalwartCount, softCapDays, activeDaysCount, softCap, statScores, topStats, totalSanctuaryHours, unlockedBadgesCount) {
+function _buildCodexMilestonesCardHtml(monthYearTitle, peakFlowCount, stalwartCount, softCapDays, activeDaysCount, softCap, totalSanctuaryHours, unlockedBadgesCount, thermostat) {
+    const thermostatLabel = thermostat ? thermostat.label : '🌿 Steady Cruise';
+    const thermostatMessage = thermostat ? thermostat.message : 'Balanced, sustainable rhythm with no alarms tripped.';
     return `
         <div class="lg:col-span-6 p-4 sm:p-5 rounded-2xl bg-slate-950/90 border border-amber-500/35 flex flex-col justify-between space-y-3">
             <div class="space-y-2.5">
                 <div class="flex items-center justify-between gap-2 border-b border-slate-800/90 pb-2">
                     <span class="text-[10px] font-black uppercase tracking-widest text-amber-400 flex items-center gap-1.5"><span>🏛️</span> <span>Craft Milestone Notes • ${escapeHtml(monthYearTitle)}</span></span>
-                    <span class="text-[10px] font-mono font-bold text-emerald-400">${styleInfo.icon} ${escapeHtml(hybridTitle)}</span>
+                    <span class="text-[10px] font-mono font-bold text-emerald-400">${escapeHtml(thermostatLabel)}</span>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                     <div class="p-3 rounded-xl bg-slate-900/85 border border-slate-800">
@@ -1016,9 +979,9 @@ function _buildCodexMilestonesCardHtml(monthYearTitle, styleInfo, hybridTitle, p
                         <p class="text-[10px] text-slate-400 mt-0.5 leading-snug">Reached ${formatHours(softCap)}h daily soft cap ${softCapDays} ${softCapDays === 1 ? 'time' : 'times'} this period.</p>
                     </div>
                     <div class="p-3 rounded-xl bg-slate-900/85 border border-slate-800">
-                        <div class="text-[10px] font-extrabold uppercase tracking-wider text-sky-300">📐 Archetype Resonance</div>
-                        <div class="text-xs font-bold text-slate-100 mt-1">${styleInfo.combo} (${statScores[topStats[0]] || 15} / ${statScores[topStats[1]] || 15})</div>
-                        <p class="text-[10px] text-slate-400 mt-0.5 leading-snug">${escapeHtml(styleInfo.desc)}</p>
+                        <div class="text-[10px] font-extrabold uppercase tracking-wider text-sky-300">🌡️ Habit Thermostat</div>
+                        <div class="text-xs font-bold text-slate-100 mt-1">${escapeHtml(thermostatLabel)}</div>
+                        <p class="text-[10px] text-slate-400 mt-0.5 leading-snug">${escapeHtml(thermostatMessage)}</p>
                     </div>
                     <div class="p-3 rounded-xl bg-slate-900/85 border border-slate-800">
                         <div class="text-[10px] font-extrabold uppercase tracking-wider text-purple-300">🏺 Sanctuary &amp; Relics</div>
@@ -1027,7 +990,7 @@ function _buildCodexMilestonesCardHtml(monthYearTitle, styleInfo, hybridTitle, p
                     </div>
                 </div>
             </div>
-            <div class="text-center text-[10px] font-mono text-amber-300/80 pt-2 border-t border-slate-800/70">✨ Click Folio to Return to Allowance Metrics &amp; 30-Day Stat Radar ↻</div>
+            <div class="text-center text-[10px] font-mono text-amber-300/80 pt-2 border-t border-slate-800/70">✨ Click Folio to Return to Allowance Metrics &amp; Balance Snapshot ↻</div>
         </div>`;
 }
 
@@ -1058,15 +1021,6 @@ function renderMonthlyPerformanceCodex() {
     const allLogs = Array.isArray(currentRawLogsCache) ? currentRawLogsCache : [];
     const monthLogs = allLogs.filter(l => { const d = getLogDate(l); return d.getFullYear() === targetYear && d.getMonth() === targetMonth; });
     const logsUpToPeriod = allLogs.filter(l => getLogDate(l).getTime() <= endOfPeriodMs);
-
-    const role = typeof getUserRole === 'function' ? getUserRole(viewedUser) : 'illustrator';
-    const domainInfo = typeof getUserDomainInfo === 'function' ? getUserDomainInfo(role) : { roleLabel: 'Illustrator', domain: 'Artisan' };
-    const statScores = typeof computeStatScoresFromLogs === 'function' ? computeStatScoresFromLogs(logsUpToPeriod, activeSettings, 30, endOfPeriodMs) : { STR: 40, DEX: 50, INT: 45, VIT: 40, WIS: 45, WIL: 42 };
-    const topStats = typeof getTopStatKeysFromMap === 'function' ? getTopStatKeysFromMap(statScores, role) : ['DEX', 'WIS'];
-    const hybridTitle = typeof getHybridClassTitle === 'function' ? getHybridClassTitle(role, statScores) : 'Grand Virtuoso';
-    const pwrScore = typeof calculateLifetimePWR === 'function' ? calculateLifetimePWR(logsUpToPeriod) : 0;
-    const rankDetails = typeof getRankDetails === 'function' ? getRankDetails(pwrScore, logsUpToPeriod, role, activeSettings) : { level: 1, tierName: 'Initiate' };
-    const crestSvg = typeof renderClassCrest === 'function' ? renderClassCrest(role, topStats, rankDetails.level, 56) : '';
 
     const workLogs = monthLogs.filter(l => l.type === 'work');
     const workoutLogs = monthLogs.filter(l => l.type === 'workout');
@@ -1117,20 +1071,29 @@ function renderMonthlyPerformanceCodex() {
     const softCap = activeSettings.dailySoftCap || 4;
     const softCapDays = Object.values(dailyWorkHours).filter(h => h >= softCap).length;
     const standout = _selectMonthlyStandoutReflection(monthLogs, logsUpToPeriod);
-    const styleInfo = (typeof WORK_STYLE_INFO !== 'undefined' && WORK_STYLE_INFO[hybridTitle])
-        ? WORK_STYLE_INFO[hybridTitle]
-        : { icon: '👑', combo: `${topStats[0]} + ${topStats[1]}`, tagline: 'Aureate Synthesis', desc: 'Balanced mastery across daily focus and reflection.' };
+    const monthlyThermostat = typeof computeHabitThermostat === 'function'
+        ? computeHabitThermostat(monthLogs, activeSettings, endOfPeriodMs)
+        : null;
+    const monthlyChoreHoursTotal = choreLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
+    const monthlyWorkoutHours = workoutLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
+    const monthlyBalance = {
+        workH: totalFocusHours,
+        choreH: monthlyChoreHoursTotal,
+        workoutH: monthlyWorkoutHours,
+        activeDays: activeDaysSet.size,
+        totalH: totalFocusHours + monthlyChoreHoursTotal + monthlyWorkoutHours
+    };
 
     container.innerHTML = _assembleCodexFolioHtml({
-        crestSvg, monthYearTitle, isVaulted, hybridTitle, rankDetails, domainInfo, topStats,
-        flipBtnText: monthlyCodexFlipped ? '↻ Flip to Front: Metrics & 30d Stat Radar' : '↻ Flip Folio: Standout Reflection & Milestones',
+        monthYearTitle, isVaulted,
+        flipBtnText: monthlyCodexFlipped ? '↻ Flip to Front: Metrics & Balance Snapshot' : '↻ Flip Folio: Standout Reflection & Milestones',
         flipStateClass: monthlyCodexFlipped ? 'is-flipped' : '',
         payoutPct, allowancePayout, targetCash, maxCash, workLogsCount: workLogs.length,
         totalFocusHours, totalSanctuaryHours, activeDaysCount: activeDaysSet.size,
         qMeta, avgQuality, qRound, peakFlowCount, eMeta, avgEffort, eRound, stalwartCount,
-        radarSvg: _buildCodexStatRadarSvg(statScores),
+        balance: monthlyBalance,
         reflectionCardHtml: _buildCodexReflectionCardHtml(standout, monthYearTitle),
-        milestonesCardHtml: _buildCodexMilestonesCardHtml(monthYearTitle, styleInfo, hybridTitle, peakFlowCount, stalwartCount, softCapDays, activeDaysSet.size, softCap, statScores, topStats, totalSanctuaryHours, (activeSettings.unlockedBadges || []).length),
+        milestonesCardHtml: _buildCodexMilestonesCardHtml(monthYearTitle, peakFlowCount, stalwartCount, softCapDays, activeDaysSet.size, softCap, totalSanctuaryHours, (activeSettings.unlockedBadges || []).length, monthlyThermostat),
         // Chore-to-allowance multiplier breakdown
         choreMultiplier: { ...allowanceBreakdown, monthlyChoreHours }
     });
@@ -1201,10 +1164,10 @@ function _buildCodexFrontGridHtml(d) {
             </div>
             <div class="lg:col-span-5 p-4 rounded-2xl bg-slate-950/90 border border-amber-500/30 flex flex-col justify-between items-center">
                 <div class="w-full flex items-center justify-between border-b border-slate-800/80 pb-2 mb-1">
-                    <span class="text-[10px] font-black uppercase tracking-widest text-amber-300 flex items-center gap-1.5"><span>⚡</span> <span>30-Day Stat Radar Snapshot</span></span>
-                    <span class="text-[10px] font-mono text-slate-400">${d.topStats[0]}/${d.topStats[1]} Core</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-amber-300 flex items-center gap-1.5"><span>🌿</span> <span>Monthly Balance Snapshot</span></span>
+                    <span class="text-[10px] font-mono text-slate-400">${d.balance.activeDays}d Active</span>
                 </div>
-                <div class="w-full flex items-center justify-center py-1">${d.radarSvg}</div>
+                <div class="w-full flex items-center justify-center py-2">${_buildCodexBalanceSnapshotHtml(d.balance)}</div>
                 <div class="w-full text-center text-[10px] font-mono text-amber-300/80 pt-1 border-t border-slate-800/70">✨ Click Folio to Flip for Standout Reflection &amp; Craft Milestones ↻</div>
             </div>
         </div>
@@ -1295,20 +1258,19 @@ function _assembleCodexFolioHtml(d) {
 
             <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-amber-500/25">
                 <div class="flex items-center gap-3.5 min-w-0">
-                    <div class="p-1.5 rounded-2xl bg-slate-950/95 border border-amber-500/40 shadow-lg shrink-0">${d.crestSvg}</div>
                     <div class="min-w-0">
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-[10px] font-mono font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full codex-foil-badge">👑 Monthly Performance Codex</span>
                             <span class="text-xs font-mono font-black text-amber-300 uppercase tracking-wider">• ${escapeHtml(d.monthYearTitle)}</span>
                             ${d.isVaulted ? '<span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">🏛️ Vaulted</span>' : ''}
                         </div>
-                        <h2 class="text-lg sm:text-2xl font-black codex-foil-title tracking-tight mt-0.5 truncate">${escapeHtml(getUserDisplayName(viewedUser))} — ${escapeHtml(d.hybridTitle)}</h2>
+                        <h2 class="text-lg sm:text-2xl font-black codex-foil-title tracking-tight mt-0.5 truncate">${escapeHtml(getUserDisplayName(viewedUser))} — Monthly Folio</h2>
                         <div class="text-[11px] font-mono text-slate-400 flex items-center gap-2 flex-wrap">
-                            <span>Lvl ${d.rankDetails.level} ${escapeHtml(d.rankDetails.tierName)}</span>
+                            <span>${formatHours(d.totalFocusHours)}h Focus</span>
                             <span>•</span>
-                            <span>${escapeHtml(d.domainInfo.domain)} (${escapeHtml(d.domainInfo.roleLabel)})</span>
+                            <span>${d.activeDaysCount} Active Days</span>
                             <span>•</span>
-                            <span class="text-amber-300 font-bold">Synergy: ${d.topStats[0]} + ${d.topStats[1]}</span>
+                            <span class="text-amber-300 font-bold">🌿 ${formatHours(d.totalSanctuaryHours)}h Sanctuary</span>
                         </div>
                     </div>
                 </div>
@@ -1319,7 +1281,7 @@ function _assembleCodexFolioHtml(d) {
                 </div>
             </div>
 
-            <div id="monthly-codex-flip-container" onclick="toggleMonthlyCodexFlip(event)" class="codex-flip-card ${d.flipStateClass} relative z-10 mt-4 cursor-pointer select-none" title="Click to flip between Metrics/Stat Radar and Monthly Reflection/Milestones">
+            <div id="monthly-codex-flip-container" onclick="toggleMonthlyCodexFlip(event)" class="codex-flip-card ${d.flipStateClass} relative z-10 mt-4 cursor-pointer select-none" title="Click to flip between Metrics/Balance Snapshot and Monthly Reflection/Milestones">
                 <div class="codex-flip-card-inner">
                     <div class="codex-flip-card-front">${_buildCodexFrontGridHtml(d)}</div>
                     <div class="codex-flip-card-back">

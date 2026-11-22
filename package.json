@@ -1,7 +1,7 @@
 {
   "name": "aureum",
   "version": "2.1.0",
-  "description": "AUREUM — The Aureate Standard. Duo productivity, focus timer, sanctuary tracker, and 100-tier rank progression web application.",
+  "description": "AUREUM — The Aureate Standard. Duo productivity, focus timer, sanctuary tracker, and a 5-state habit thermostat web application.",
   "private": true,
   "scripts": {
     "start": "npx --yes serve . -l 3000",
