@@ -13,8 +13,8 @@ function initCharts() {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
-            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' }, beginAtZero: true }
+            x: { grid: { color: '#334155' }, ticks: { color: '#a9b8cc', font: { size: 12, weight: '600' } } },
+            y: { grid: { color: '#334155' }, ticks: { color: '#a9b8cc', font: { size: 12, weight: '600' } }, beginAtZero: true }
         },
         plugins: { legend: { display: false } }
     };
@@ -44,7 +44,7 @@ function initCharts() {
                 { label: '🍨 Snacks', data: [], backgroundColor: '#f43f5e', borderColor: '#f43f5e', borderRadius: 4, fill: false }
             ]
         },
-        options: { ...opts, plugins: { legend: { display: true, labels: { color: '#94a3b8', font: { size: 11, weight: 'bold' } } } } }
+        options: { ...opts, plugins: { legend: { display: true, labels: { color: '#cbd5e1', font: { size: 12, weight: 'bold' } } } } }
     });
 }
 

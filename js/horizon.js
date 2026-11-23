@@ -586,7 +586,33 @@ function renderHorizonKpis(trajectory, scope) {
     }
 }
 
-const HORIZON_CHART_W = 760;
+const HORIZON_CHART_W = 760;      // fallback width when the shell cannot be measured
+const HORIZON_CHART_MIN_W = 300;  // keep the plot legible on very narrow phones
+
+/**
+ * Measures the live CSS pixel width of a Horizon chart shell. The SVG viewBox
+ * is pinned to that width so one unit equals one CSS pixel. Without this the
+ * fixed 760-unit viewBox gets scaled down inside the half-width sweet-spot and
+ * duration cards, shrinking 9px axis labels to roughly 5px on screen.
+ * @param {HTMLElement|null} target
+ * @returns {number}
+ */
+function _horizonChartWidth(target) {
+    if (!target) return HORIZON_CHART_W;
+    let padX = 0;
+    try {
+        if (typeof getComputedStyle === 'function') {
+            const styles = getComputedStyle(target);
+            padX = (parseFloat(styles.paddingLeft) || 0) + (parseFloat(styles.paddingRight) || 0);
+        }
+    } catch (e) { padX = 0; }
+    let raw = target.clientWidth || 0;
+    if (!raw && typeof target.getBoundingClientRect === 'function') {
+        raw = Math.round(target.getBoundingClientRect().width) || 0;
+    }
+    const measured = Math.round(raw - padX);
+    return measured > 0 ? Math.max(HORIZON_CHART_MIN_W, measured) : HORIZON_CHART_W;
+}
 
 function _horizonScale(value, domainMin, domainMax, rangeMin, rangeMax) {
     if (!(domainMax > domainMin)) return rangeMin;
@@ -618,9 +644,11 @@ function _horizonLinePath(points) {
 }
 
 
-function buildTrajectorySvg(trajectory) {
-    const W = HORIZON_CHART_W, H = 280;
-    const pad = { l: 54, r: 18, t: 18, b: 30 };
+function buildTrajectorySvg(trajectory, width) {
+    const W = Math.max(HORIZON_CHART_MIN_W, Math.round(_horizonNumber(width, HORIZON_CHART_W)));
+    const H = 280;
+    const narrow = W < 420;
+    const pad = { l: narrow ? 54 : 64, r: 18, t: 18, b: 32 };
     const plotW = W - pad.l - pad.r;
     const plotH = H - pad.t - pad.b;
     const days = Math.max(1, trajectory.daysInMonth);
@@ -707,7 +735,7 @@ function buildTrajectorySvg(trajectory) {
 function renderHorizonTrajectoryChart(trajectory) {
     const target = $('horizon-trajectory-chart');
     if (!target || !trajectory) return;
-    target.innerHTML = buildTrajectorySvg(trajectory);
+    target.innerHTML = buildTrajectorySvg(trajectory, _horizonChartWidth(target));
 }
 
 
@@ -718,9 +746,11 @@ function _horizonHourTick(hour) {
     return `${display}${suffix}`;
 }
 
-function buildSweetSpotSvg(sweet) {
-    const W = HORIZON_CHART_W, H = 250;
-    const pad = { l: 34, r: 14, t: 18, b: 32 };
+function buildSweetSpotSvg(sweet, width) {
+    const W = Math.max(HORIZON_CHART_MIN_W, Math.round(_horizonNumber(width, HORIZON_CHART_W)));
+    const H = 250;
+    const narrow = W < 420;
+    const pad = { l: narrow ? 30 : 36, r: narrow ? 12 : 16, t: 20, b: 34 };
     const plotW = W - pad.l - pad.r;
     const plotH = H - pad.t - pad.b;
     const groupW = plotW / 24;
@@ -802,13 +832,15 @@ function renderHorizonSweetSpot(sweet) {
         target.innerHTML = `<div class="horizon-empty">No work sessions logged yet — the sweet-spot map appears after your first focus session.</div>`;
         return;
     }
-    target.innerHTML = buildSweetSpotSvg(sweet);
+    target.innerHTML = buildSweetSpotSvg(sweet, _horizonChartWidth(target));
 }
 
 
-function buildDurationSvg(distribution) {
-    const W = HORIZON_CHART_W, H = 250;
-    const pad = { l: 38, r: 44, t: 18, b: 46 };
+function buildDurationSvg(distribution, width) {
+    const W = Math.max(HORIZON_CHART_MIN_W, Math.round(_horizonNumber(width, HORIZON_CHART_W)));
+    const H = 250;
+    const narrow = W < 420;
+    const pad = { l: narrow ? 30 : 40, r: narrow ? 30 : 46, t: 20, b: 50 };
     const plotW = W - pad.l - pad.r;
     const plotH = H - pad.t - pad.b;
     const buckets = distribution.buckets;
@@ -831,6 +863,10 @@ function buildDurationSvg(distribution) {
     const baseY = pad.t + plotH;
     let bars = '', labels = '', hoverCells = '';
     const qualityPoints = [];
+    // Band names need ~60px each to stay legible; drop them to a single range
+    // row on narrow phones instead of letting the labels collide.
+    const showBandNames = groupW >= 58;
+    const labelBaseY = showBandNames ? baseY + 17 : baseY + 22;
     buckets.forEach((bucket, idx) => {
         const centerX = pad.l + groupW * idx + groupW / 2;
         const barHeight = (bucket.count / maxCount) * plotH;
@@ -846,8 +882,12 @@ function buildDurationSvg(distribution) {
         } else {
             qualityPoints.push(null);
         }
-        labels += `<text x="${centerX.toFixed(2)}" y="${baseY + 15}" text-anchor="middle" class="horizon-axis-label horizon-band-name">${_horizonEscape(bucket.name)}</text>`;
-        labels += `<text x="${centerX.toFixed(2)}" y="${baseY + 28}" text-anchor="middle" class="horizon-axis-label">${_horizonEscape(bucket.label)}</text>`;
+        if (showBandNames) {
+            labels += `<text x="${centerX.toFixed(2)}" y="${labelBaseY}" text-anchor="middle" class="horizon-axis-label horizon-band-name">${_horizonEscape(bucket.name)}</text>`;
+            labels += `<text x="${centerX.toFixed(2)}" y="${baseY + 32}" text-anchor="middle" class="horizon-axis-label">${_horizonEscape(bucket.label)}</text>`;
+        } else {
+            labels += `<text x="${centerX.toFixed(2)}" y="${labelBaseY}" text-anchor="middle" class="horizon-axis-label">${_horizonEscape(bucket.label)}</text>`;
+        }
         hoverCells += `<rect x="${(pad.l + groupW * idx).toFixed(2)}" y="${pad.t}" width="${groupW.toFixed(2)}" height="${plotH}" class="horizon-hover-cell" data-horizon-tip="${_horizonEscape(tip)}"><title>${_horizonEscape(tip)}</title></rect>`;
     });
 
@@ -892,7 +932,7 @@ function renderHorizonDuration(distribution) {
         target.innerHTML = `<div class="horizon-empty">No completed sessions yet — finish a Pomodoro round or log a work session.</div>`;
         return;
     }
-    target.innerHTML = buildDurationSvg(distribution);
+    target.innerHTML = buildDurationSvg(distribution, _horizonChartWidth(target));
 }
 
 
@@ -964,7 +1004,38 @@ function setHorizonUser(key) {
     resizeHorizonCharts();
 }
 
+let _horizonLastView = null;
+let _horizonResizeBound = false;
+
+/**
+ * Re-renders the three hand-built SVGs from the last computed payload. The
+ * charts are drawn at a 1:1 pixel scale, so they must be rebuilt whenever the
+ * chart shell changes width (window resize, sidebar collapse, tab mount).
+ */
+function _renderHorizonSvgCharts() {
+    const cache = _horizonLastView;
+    if (!cache) return;
+    renderHorizonTrajectoryChart(cache.trajectory);
+    renderHorizonSweetSpot(cache.sweet);
+    renderHorizonDuration(cache.distribution);
+}
+
+function _bindHorizonChartResize() {
+    if (_horizonResizeBound || typeof window === 'undefined') return;
+    _horizonResizeBound = true;
+    let timer = null;
+    window.addEventListener('resize', () => {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+            timer = null;
+            if (typeof activeTab !== 'undefined' && activeTab !== 'horizon') return;
+            resizeHorizonCharts();
+        }, 150);
+    }, { passive: true });
+}
+
 function resizeHorizonCharts() {
+    _renderHorizonSvgCharts();
     if (typeof charts === 'undefined' || !charts) return;
     const run = () => {
         ['work', 'sanctuary'].forEach(key => {
@@ -1015,6 +1086,8 @@ function renderHorizonView() {
     }
 
     initHorizonTooltip();
+    _bindHorizonChartResize();
+    _horizonLastView = { trajectory, sweet, distribution };
     if (typeof setTimeout === 'function') setTimeout(resizeHorizonCharts, 60);
     return { scope, trajectory, sweet, distribution };
 }
