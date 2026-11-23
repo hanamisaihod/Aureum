@@ -185,39 +185,51 @@ function setChronicleDeckFilter(filterKey){
             btn.className=k===activeChronicleFilter
                 ?"px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all theme-accent-btn flex items-center gap-1.5"
                 :"px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900/90 text-slate-400 hover:text-white border border-slate-800 flex items-center gap-1.5";
+            btn.setAttribute('aria-pressed', k===activeChronicleFilter ? 'true' : 'false');
         }
     });
     applyLedgerFilter();
 }
 
-function toggleChronicleCardFlip(cardId,e){
-    if(e&&e.target&&e.target.closest('button'))return;
-    const el=$(cardId);
-    if(el)el.classList.toggle('is-flipped');
+function _chronicleWorkRole(l){
+    return typeof getUserRole === 'function'
+        ? getUserRole(l?.role || l?.user || viewedUser)
+        : ((l?.user || viewedUser) === 'Cream' ? 'author' : 'illustrator');
 }
 
-function _buildChronicleStatBadges(l){
-    if(l.type==='work'){
-        const q=l.results||3,e=l.effort||3;
-        const badges=[
-            `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">🎯 DEX Q${q}</span>`,
-            `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold bg-sky-500/15 text-sky-300 border border-sky-500/30">🧠 INT +${formatHours(l.hours)}h</span>`,
-            `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold bg-rose-500/15 text-rose-300 border border-rose-500/30">⚔️ STR E${e}</span>`
-        ];
-        if((l.overCapHours||0)>0)badges.push(`<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold bg-amber-500/15 text-amber-300 border border-amber-500/30">🍵 Soft Cap</span>`);
-        return badges.join('');
-    }
-    if(l.type==='workout'){
-        return `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold bg-rose-500/15 text-rose-300 border border-rose-500/30">⚔️ STR Lvl ${l.strain||3}</span><span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold bg-amber-500/15 text-amber-300 border border-amber-500/30">🔥 WIL +${formatHours(l.hours)}h</span>`;
-    }
-    if(l.type==='chore'){
-        return `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold bg-amber-500/15 text-amber-300 border border-amber-500/30">🛡️ VIT +${formatHours(l.hours)}h</span><span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold bg-orange-500/15 text-orange-300 border border-orange-500/30">🔥 WIL Order</span>`;
-    }
-    if(l.type==='health'){
-        return `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">🛡️ VIT Treat Lvl ${l.level||1}</span>`;
-    }
-    return `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold bg-amber-500/15 text-amber-300 border border-amber-500/30">📖 WIS Chronicle</span><span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold bg-purple-500/15 text-purple-300 border border-purple-500/30">✨ Lore Entry</span>`;
+function _chronicleRecordIcon(l){
+    if(l.type==='work')return _chronicleWorkRole(l)==='author'?'✒️':'🎨';
+    return ({workout:'🏃',chore:'🧹',health:'🍨'})[l.type]||'📖';
 }
+
+function _chronicleRecordLabel(l){
+    if(l.type==='work')return _chronicleWorkRole(l)==='author'?'Writing Session':'Illustration Session';
+    if(l.type==='workout')return 'Fitness';
+    if(l.type==='chore')return 'Chores';
+    if(l.type==='health')return 'Recovery';
+    return l.type==='diary'?'Diary Reflection':'Reflection';
+}
+
+function _chronicleRecordDetails(l){
+    const parts=[];
+    if(l.type==='work'){
+        parts.push(formatActivityDuration(l.hours||0));
+        parts.push(`Q${Math.max(1,Math.min(5,parseFloat(l.results)||3))}`);
+        parts.push(`E${Math.max(1,Math.min(5,parseFloat(l.effort)||3))}`);
+        if((l.overCapHours||0)>0)parts.push('🍵 Soft Cap');
+    }else if(l.type==='workout'){
+        parts.push(formatActivityDuration(l.hours||0));
+        parts.push(`Intensity ${Math.max(1,Math.min(5,parseInt(l.strain)||3))}`);
+    }else if(l.type==='chore'){
+        parts.push(formatActivityDuration(l.hours||0));
+    }else if(l.type==='health'){
+        parts.push(`Level ${Math.max(1,parseInt(l.level)||1)}`);
+    }else{
+        parts.push('Journal entry');
+    }
+    return parts.join(' · ');
+}
+
 function formatActivityCategoryTag(l) {
     const role = typeof getUserRole === 'function'
         ? getUserRole(l?.role || l?.user || viewedUser)
@@ -271,48 +283,41 @@ function formatActivityCategoryTag(l) {
     };
 }
 
-function _renderChronicleCardHtml(l,idx,isSelf,pointRate,diaryByDay){
+function _renderChronicleRecordHtml(l,idx,isSelf,pointRate){
     const d=getLogDate(l);
-    const dayKey=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-
     const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     const timeStr=d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    const isoStr=isNaN(d.getTime())?'':new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
 
-    const activityMeta = formatActivityCategoryTag(l);
-    const directReflection=(l.reflectionText||l.text||l.note||'').trim();
-    const linkedDiary=directReflection?'':(diaryByDay[dayKey]||'').trim();
-    const backText=directReflection||linkedDiary;
-    const hasNote=Boolean(backText);
+    const label=_chronicleRecordLabel(l);
+    const details=_chronicleRecordDetails(l);
+    const note=String(l.reflectionText||l.text||l.note||'').trim();
+    const noteHtml=note?`<div class="text-[10px] text-slate-400 italic truncate" title="${escapeHtml(note)}">"${escapeHtml(note)}"</div>`:'';
+    const payoutHtml=l.type==='work'
+        ?`<span class="chronicle-record-payout">+฿${Math.round((l.points||0)*pointRate).toLocaleString()}</span>`
+        :'';
+    const recordId=String(l.id||idx);
+    const delBtn=(isSelf&&l.id)
+        ?`<button type="button" class="chronicle-delete-btn" onclick="deleteLogEntry('${escapeHtml(recordId)}', event)" title="Delete this record" aria-label="Delete ${escapeHtml(label)} record from ${escapeHtml(dateStr)} ${escapeHtml(timeStr)}">✕</button>`
+        :'';
 
-    const primaryTitle = (l.type === 'health' && l.note && l.note.trim())
-        ? `🍨 ${escapeHtml(l.note.trim())}`
-        : activityMeta.title;
-
-    let accentBadge='';
-    if(l.type==='work'){
-        const earned=Math.round((l.points||0)*pointRate);
-        accentBadge=`<span class="px-2 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-[11px] font-mono font-black text-emerald-400 whitespace-nowrap">+฿${earned.toLocaleString()}</span>`;
-    }
-
-    const cardDomId=`chronicle-card-${l.id||idx}`;
-    const delBtn=(isSelf&&l.id)?`<button type="button" onclick="deleteLogEntry('${l.id}', event)" title="Delete entry" aria-label="Delete entry" class="chronicle-delete-btn w-6 h-6 rounded-lg flex items-center justify-center text-sm font-black leading-none text-slate-400 hover:text-red-300 bg-slate-800/70 hover:bg-red-500/20 border border-slate-700/70 hover:border-red-500/40 shrink-0">&times;</button>`:'';
-
-    return `<div id="${cardDomId}" onclick="toggleChronicleCardFlip('${cardDomId}', event)" class="chronicle-flip-card cursor-pointer select-none"><div class="chronicle-flip-card-inner"><div class="chronicle-flip-card-front p-4 sm:p-5 rounded-2xl bg-slate-900/95 border border-slate-800/90 flex flex-col justify-between gap-3.5"><div class="space-y-2 border-b border-slate-800/80 pb-3"><div class="text-sm font-black text-slate-100 leading-snug break-words">${primaryTitle}</div><div class="flex items-center justify-between gap-2 flex-wrap"><div class="flex items-center gap-1.5 text-[11px] font-mono text-slate-400 whitespace-nowrap"><span>${dateStr}</span><span class="text-slate-600">•</span><span>${timeStr}</span></div><div class="flex items-center gap-2 shrink-0">${accentBadge}${delBtn}</div></div></div><div class="space-y-2.5"><div class="guild-activity-type-tag w-full justify-between flex-wrap"><span class="text-xs font-extrabold text-amber-200 leading-snug">${escapeHtml(activityMeta.tagText)}</span></div>${directReflection ? `<p class="text-xs text-slate-300 leading-relaxed break-words">${escapeHtml(directReflection)}</p>` : ''}</div><div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-800/60 flex-wrap"><div class="flex items-center gap-1.5 flex-wrap">${_buildChronicleStatBadges(l)}</div></div></div><div class="chronicle-flip-card-back p-4 sm:p-5 rounded-2xl bg-slate-950/95 border border-amber-500/35 flex flex-col justify-between gap-3"><div class="space-y-1.5 border-b border-slate-800 pb-2.5"><div class="flex items-center justify-between gap-2"><span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-1.5"><span>📜</span> <span>${l.type==='diary'?'Diary Reflection':(directReflection?'Session Reflection':'Daily Reflection')}</span></span><div class="flex items-center gap-2 shrink-0"><span class="text-[11px] font-mono text-slate-400 whitespace-nowrap">${dateStr}</span>${delBtn}</div></div></div><div class="flex-1 flex items-center overflow-y-auto custom-scroll py-1">${hasNote?`<p class="text-xs text-slate-200 italic leading-relaxed break-words">"${escapeHtml(backText)}"</p>`:`<p class="text-xs text-slate-500 italic">No reflection text recorded for this entry.</p>`}</div><div class="flex items-center justify-between gap-2 text-[10px] font-mono text-slate-400 border-t border-slate-900 pt-2 flex-wrap"><span>${escapeHtml(activityMeta.shortTagText)}</span></div></div></div></div>`;
+    return `<li class="chronicle-record" data-record-id="${escapeHtml(recordId)}">
+        <span class="chronicle-record-icon" aria-hidden="true">${_chronicleRecordIcon(l)}</span>
+        <div class="min-w-0 flex-1 space-y-0.5">
+            <div class="flex items-baseline justify-between gap-2 min-w-0">
+                <span class="text-xs font-black text-slate-100 truncate">${escapeHtml(label)}</span>
+                <time class="text-[10px] font-mono text-slate-400 whitespace-nowrap shrink-0"${isoStr?` datetime="${isoStr}"`:''}>${escapeHtml(dateStr)} · ${escapeHtml(timeStr)}</time>
+            </div>
+            <div class="text-[10px] font-mono text-slate-400 truncate">${escapeHtml(details)}</div>${noteHtml}
+        </div>${payoutHtml}${delBtn}
+    </li>`;
 }
-
 
 function renderLedgerLists(logs){
     const deckEl=$('chronicle-deck-grid');
     if(!deckEl)return;
     const isSelf=(loggedInUser===viewedUser);
     const sorted=[...(logs||[])].sort((a,b)=>getLogDate(b).getTime()-getLogDate(a).getTime());
-
-    const diaryByDay={};
-    currentRawLogsCache.filter(x=>x.type==='diary').forEach(dLog=>{
-        const d=getLogDate(dLog);
-        const k=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-        if(!diaryByDay[k]&&dLog.text)diaryByDay[k]=dLog.text;
-    });
 
     const filtered=sorted.filter(l=>{
         if(activeChronicleFilter==='work')return l.type==='work';
@@ -324,14 +329,14 @@ function renderLedgerLists(logs){
         return true;
     });
 
-    if($('chronicle-deck-count'))$('chronicle-deck-count').innerText=`${filtered.length} ${filtered.length===1?'Card':'Cards'}`;
+    if($('chronicle-deck-count'))$('chronicle-deck-count').innerText=`${filtered.length} ${filtered.length===1?'Record':'Records'}`;
     if(filtered.length===0){
-        deckEl.innerHTML=`<div class="col-span-full p-8 rounded-2xl bg-slate-900/50 border border-slate-800 text-center text-xs text-slate-400 italic">No chronicle cards match this filter.</div>`;
+        deckEl.innerHTML=`<li class="p-6 rounded-xl bg-slate-900/50 border border-slate-800 text-center text-xs text-slate-400 italic">No chronicle records match this filter.</li>`;
         return;
     }
 
     const pointRate=((userSettings.weeklyHours||10)*12)>0?(userSettings.monthlyCash/((userSettings.weeklyHours||10)*12)):0;
-    deckEl.innerHTML=filtered.map((l,idx)=>_renderChronicleCardHtml(l,idx,isSelf,pointRate,diaryByDay)).join('');
+    deckEl.innerHTML=filtered.map((l,idx)=>_renderChronicleRecordHtml(l,idx,isSelf,pointRate)).join('');
 }
 
 // ============================================================================
@@ -539,44 +544,6 @@ function getEffectiveReactionsForTarget(logOrId) {
     return result;
 }
 
-function getActivityCardStatGainPill(log) {
-    const type = log?.type || 'work';
-    const role = typeof getUserRole === 'function' ? getUserRole(log?.role || log?.user) : 'illustrator';
-
-    if (type === 'work') {
-        const h = Math.max(0.25, parseFloat(log.hours) || 1);
-        const q = Math.max(1, Math.min(5, parseFloat(log.results) || 3));
-        const e = Math.max(1, Math.min(5, parseFloat(log.effort) || 3));
-        if (e >= 4 && e > q) {
-            const strGain = Math.max(2, Math.round(h * (1.8 + e * 0.7)));
-            return { label: `+${strGain} STR`, classes: 'bg-rose-500/15 text-rose-300 border-rose-500/35' };
-        }
-        if (role === 'author' && q <= 3) {
-            const intGain = Math.max(2, Math.round(h * (1.8 + q * 0.65)));
-            return { label: `+${intGain} INT`, classes: 'bg-sky-500/15 text-sky-300 border-sky-500/35' };
-        }
-        const dexGain = Math.max(2, Math.round(h * (1.8 + q * 0.75)));
-        return { label: `+${dexGain} DEX`, classes: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/35' };
-    }
-    if (type === 'workout') {
-        const h = Math.max(0.25, parseFloat(log.hours) || 0.75);
-        const strain = Math.max(1, Math.min(5, parseInt(log.strain) || 3));
-        const vitGain = Math.max(3, Math.round(h * (4.2 + strain * 1.6)));
-        return { label: `+${vitGain} VIT`, classes: 'bg-amber-500/15 text-amber-300 border-amber-500/35' };
-    }
-    if (type === 'chore') {
-        const h = Math.max(0.25, parseFloat(log.hours) || 0.5);
-        const vitGain = Math.max(3, Math.round(h * 7));
-        return { label: `+${vitGain} VIT`, classes: 'bg-amber-500/15 text-amber-300 border-amber-500/35' };
-    }
-    if (type === 'health') {
-        const lvl = Math.max(1, Math.min(5, parseInt(log.level) || 1));
-        const vitGain = Math.max(2, lvl * 2);
-        return { label: `+${vitGain} VIT`, classes: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/35' };
-    }
-    return { label: '+3 WIS', classes: 'bg-purple-500/15 text-purple-300 border-purple-500/35' };
-}
-
 function formatGuildActivityHeaderInfo(log) {
     const rawUser = log?.user || 'North';
     const userName = escapeHtml(getUserDisplayName(rawUser));
@@ -608,7 +575,6 @@ function _renderGuildActivityCardHtml(log, idx) {
     const cardId = String(log.id || `guild_card_${idx}`);
     const safeCardDomId = cardId.replace(/[^a-zA-Z0-9_-]/g, '_');
     const { userName, avatarUrl, actionSummary, timeAgo } = formatGuildActivityHeaderInfo(log);
-    const statPill = getActivityCardStatGainPill(log);
     const activityMeta = formatActivityCategoryTag(log);
 
     const counts = getEffectiveReactionsForTarget(log);
@@ -632,20 +598,15 @@ function _renderGuildActivityCardHtml(log, idx) {
 
     return `
         <article class="guild-activity-card space-y-2.5" data-activity-card-id="${escapeHtml(cardId)}">
-            <div class="flex items-start justify-between gap-2">
-                <div class="flex items-center gap-2.5 min-w-0">
-                    <img src="${avatarUrl}" alt="${userName}" class="guild-card-avatar" loading="lazy">
-                    <div class="min-w-0 leading-snug">
-                        <div class="text-[11px] text-slate-200 break-words">
-                            <span class="font-black text-white">${userName}</span>
-                            <span class="text-slate-300"> ${actionSummary}</span>
-                        </div>
-                        <div class="text-[9px] font-mono text-slate-400 mt-0.5">${timeAgo}</div>
+            <div class="flex items-center gap-2.5 min-w-0">
+                <img src="${avatarUrl}" alt="${userName}" class="guild-card-avatar" loading="lazy">
+                <div class="min-w-0 leading-snug">
+                    <div class="text-[11px] text-slate-200 break-words">
+                        <span class="font-black text-white">${userName}</span>
+                        <span class="text-slate-300"> ${actionSummary}</span>
                     </div>
+                    <div class="text-[9px] font-mono text-slate-400 mt-0.5">${timeAgo}</div>
                 </div>
-                <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-extrabold border shrink-0 ${statPill.classes}">
-                    ${escapeHtml(statPill.label)}
-                </span>
             </div>
             <div class="flex items-center justify-between gap-2 pt-0.5 flex-wrap">
                 <div class="guild-activity-type-tag">

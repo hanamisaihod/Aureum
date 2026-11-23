@@ -21,7 +21,6 @@ Aureum/
     ├── choreMultiplier.js # Monthly chore-hours → allowance multiplier engine (tiers, monthly breakdown, aggregation)
     ├── effects.js      # HTML5 Canvas particle burst engine, dynamic SVG background patterns, theme/cursor appliers
     ├── audio.js        # Web Audio API synthesizer (12 multi-oscillator tones), mute toggle, desktop notifications
-    ├── ranks.js        # 100-tier Aureate Rank system, Lifetime PWR calculator, Rank Progression Roadmap modal
     ├── insights.js     # Real-time Aureate Insights synthesis and auto-cycling sidebar banner
     ├── badges.js       # Relics achievement grid renderer, toast notifications, unlock evaluator
     ├── todos.js        # Scratchpad task list CRUD and Firestore synchronization

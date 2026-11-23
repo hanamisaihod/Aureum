@@ -381,7 +381,6 @@
                                         <span>🍵 Soft Cap Active</span>
                                     </div>
                                 </div>
-                                <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 whitespace-nowrap" title="Focused studio work.">+DEX / +STR</span>
                             </div>
 
                             <form id="quick-log-form" onsubmit="submitQuickLog(event)" class="space-y-3" autocomplete="off">
@@ -424,7 +423,6 @@
                                 <div class="flex flex-wrap justify-between items-center gap-2">
                                     <div class="flex items-center gap-2">
                                         <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>📝</span> <span>Tasks</span></h2>
-                                        <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" title="Precision and fine craft execution.">+DEX</span>
                                     </div>
                                     <div class="flex items-center gap-1.5 flex-wrap">
                                         <span id="todo-count-active" class="text-[11px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 whitespace-nowrap">0 Active</span>
@@ -463,7 +461,6 @@
                         <div id="workout-form-card" class="card p-6 rounded-2xl flex flex-col justify-between relative">
                             <div class="mb-4 flex items-center justify-between gap-2">
                                 <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>🏃</span> <span>Fitness</span></h2>
-                                <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30" title="Physical endurance, chores, and daily recovery.">+VIT</span>
                             </div>
                             <form onsubmit="logWorkout(event)" class="space-y-4">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -504,7 +501,6 @@
                             <div id="chore-form-card" class="card p-6 rounded-2xl flex flex-col justify-between relative h-full">
                                 <div class="mb-4 flex items-center justify-between gap-2">
                                     <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>🧹</span> <span>Chores</span></h2>
-                                    <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30" title="Physical endurance, chores, and daily recovery.">+VIT</span>
                                 </div>
                                 <form onsubmit="logChore(event)" class="space-y-4 flex-1 flex flex-col justify-between">
                                     <div class="space-y-4">
@@ -528,7 +524,6 @@
                             <div id="health-form-card" class="card p-6 rounded-2xl flex flex-col justify-between relative h-full">
                                 <div class="mb-4 flex items-center justify-between gap-2">
                                     <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>🍨</span> <span>Snacks</span></h2>
-                                    <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30" title="Physical endurance, chores, and daily recovery.">+VIT</span>
                                 </div>
                                 <form onsubmit="logHealth(event)" class="space-y-4 flex-1 flex flex-col justify-between">
                                     <div class="space-y-4">
@@ -579,7 +574,6 @@
                         <div class="flex items-center gap-2.5">
                             <span class="text-2xl">📖</span>
                             <h2 class="text-xl font-black text-slate-100">Chronicle Journal</h2>
-                            <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-purple-500/15 text-purple-300 border border-purple-500/30" title="Self-reflection, synthesis, and milestone mastery.">+WIS</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <button onmousedown="startHoldJournalPage(-1, event)" ontouchstart="startHoldJournalPage(-1, event)" class="px-3.5 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-xl text-xs font-bold transition-all select-none">◀ Prev</button>
@@ -672,20 +666,22 @@
                     </div>
                 </div>
 
-                <!-- SECTION 2: UNIFIED CHRONICLE DECK TIMELINE -->
-                <div class="card p-5 sm:p-6 rounded-2xl space-y-5">
+                <!-- SECTION 2: CHRONICLE RECORD LEDGER (AUDIT & PURGE) -->
+                <div class="card p-5 sm:p-6 rounded-2xl space-y-4">
                     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-800 pb-4">
-                        <div class="flex items-center gap-2.5 flex-wrap">
-                            <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>📜</span> <span>Chronicle Deck</span></h2>
-                            <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-purple-500/15 text-purple-300 border border-purple-500/30" title="Self-reflection, synthesis, and milestone mastery.">+WIS</span>
-                            <span id="chronicle-deck-count" class="text-[11px] font-mono font-extrabold px-2.5 py-0.5 rounded-lg bg-slate-900 text-amber-300 border border-amber-500/30">0 Cards</span>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2.5 flex-wrap">
+                                <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>📜</span> <span>Chronicle Deck</span></h2>
+                                <span id="chronicle-deck-count" role="status" aria-live="polite" class="text-[11px] font-mono font-extrabold px-2.5 py-0.5 rounded-lg bg-slate-900 text-amber-300 border border-amber-500/30">0 Records</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 font-medium mt-0.5">Review logged records and purge any false entries.</p>
                         </div>
                         <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-between lg:justify-end">
-                            <div class="flex flex-wrap items-center gap-1.5">
-                                <button type="button" id="chronicle-filter-all" onclick="setChronicleDeckFilter('all')" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all theme-accent-btn flex items-center gap-1.5"><span>🃏</span> <span>All</span></button>
-                                <button type="button" id="chronicle-filter-work" onclick="setChronicleDeckFilter('work')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900/90 text-slate-400 hover:text-white border border-slate-800 flex items-center gap-1.5"><span>⚗️</span> <span>Work</span></button>
-                                <button type="button" id="chronicle-filter-sanctuary" onclick="setChronicleDeckFilter('sanctuary')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900/90 text-slate-400 hover:text-white border border-slate-800 flex items-center gap-1.5"><span>🌿</span> <span>Sanctuary</span></button>
-                                <button type="button" id="chronicle-filter-reflections" onclick="setChronicleDeckFilter('reflections')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900/90 text-slate-400 hover:text-white border border-slate-800 flex items-center gap-1.5"><span>📖</span> <span>Reflections</span></button>
+                            <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter records by type">
+                                <button type="button" id="chronicle-filter-all" aria-pressed="true" onclick="setChronicleDeckFilter('all')" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all theme-accent-btn flex items-center gap-1.5"><span>🃏</span> <span>All</span></button>
+                                <button type="button" id="chronicle-filter-work" aria-pressed="false" onclick="setChronicleDeckFilter('work')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900/90 text-slate-400 hover:text-white border border-slate-800 flex items-center gap-1.5"><span>⚗️</span> <span>Work</span></button>
+                                <button type="button" id="chronicle-filter-sanctuary" aria-pressed="false" onclick="setChronicleDeckFilter('sanctuary')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900/90 text-slate-400 hover:text-white border border-slate-800 flex items-center gap-1.5"><span>🌿</span> <span>Sanctuary</span></button>
+                                <button type="button" id="chronicle-filter-reflections" aria-pressed="false" onclick="setChronicleDeckFilter('reflections')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900/90 text-slate-400 hover:text-white border border-slate-800 flex items-center gap-1.5"><span>📖</span> <span>Reflections</span></button>
                             </div>
                             <div class="flex items-center gap-2 bg-slate-900/80 px-2.5 py-1.5 rounded-xl border border-slate-700">
                                 <label for="ledger-month-select" class="text-[10px] text-slate-400 font-bold uppercase tracking-wider whitespace-nowrap">Month:</label>
@@ -694,7 +690,7 @@
                         </div>
                     </div>
 
-                    <div id="chronicle-deck-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-h-[680px] overflow-y-auto pr-1 custom-scroll"></div>
+                    <ul id="chronicle-deck-grid" aria-label="Logged records" class="list-none p-0 m-0 space-y-1.5 max-h-[620px] overflow-y-auto pr-1 custom-scroll"></ul>
                 </div>
             </div>
 
