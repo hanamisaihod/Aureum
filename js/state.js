@@ -11,6 +11,7 @@ let activeHoldTimer = null;
 let activeHoldInterval = null;
 let isTouchScrolling = false;
 let currentJournalPageIndex = 0;
+let journalFlipTimer = null;
 
 let _cachedFocus = 25;
 let _cachedShort = 5;

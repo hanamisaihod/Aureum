@@ -183,8 +183,158 @@ aside.app-sidebar > * {
     box-shadow: 0 0 10px rgba(0,0,0,0.8);z-index: 10;
 }
 .journal-page {
+    position: relative;
     background: rgba(18, 23, 33, 0.92);border: 1px solid rgba(255, 255, 255, 0.07);
     box-shadow: inset 0 0 20px rgba(0,0,0,0.4);transition: all 0.3s ease;
+}
+
+/* ============================================================================
+   CHRONICLE SHELF — JOURNAL ON TOP, LEDGER DECK DIRECTLY BELOW
+   ============================================================================ */
+.chronicle-journal-panel {
+    box-shadow: 0 20px 50px rgba(0,0,0,0.85), 0 18px 34px -26px rgba(245, 158, 11, 0.28), inset 0 0 40px rgba(0,0,0,0.6);
+}
+.chronicle-shelf-divider {
+    position: relative;
+    height: 1px;
+    margin-inline: 0.25rem;
+    background: linear-gradient(90deg,
+        rgba(245, 158, 11, 0) 0%,
+        rgba(245, 158, 11, 0.28) 20%,
+        rgba(148, 163, 184, 0.22) 50%,
+        rgba(245, 158, 11, 0.28) 80%,
+        rgba(245, 158, 11, 0) 100%);
+}
+.chronicle-shelf-divider::after {
+    content: '';
+    position: absolute;left: 50%;top: 50%;
+    width: 0.4rem;height: 0.4rem;
+    transform: translate(-50%, -50%) rotate(45deg);
+    border-radius: 1px;
+    background: rgba(245, 158, 11, 0.7);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.45);
+}
+
+/* ============================================================================
+   REFLECTION JOURNAL — PURE CSS 3D SHEET-TURN PAGE FLIP
+   ============================================================================ */
+.journal-stage {
+    perspective: 1200px;
+    perspective-origin: 50% 45%;
+}
+.journal-reader-page {
+    perspective: 1200px;
+    transform-origin: left center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+/* Dynamic spine shadow + far-edge highlight painted only while a sheet turns. */
+.journal-reader-page::after {
+    content: '';
+    position: absolute;inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    opacity: 0;
+    background:
+        linear-gradient(90deg,
+            rgba(0, 0, 0, 0.62) 0%,
+            rgba(0, 0, 0, 0.2) 14%,
+            rgba(255, 255, 255, 0) 44%,
+            rgba(255, 255, 255, 0.05) 86%,
+            rgba(245, 158, 11, 0.2) 100%);
+}
+/* The physical leaf that sweeps across the active page. */
+.journal-flip-sheet {
+    position: absolute;inset: 0;
+    z-index: 6;
+    pointer-events: none;
+    border-radius: inherit;
+    opacity: 0;
+    transform: rotateY(0deg);
+    transform-origin: left center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background:
+        linear-gradient(90deg,
+            rgba(0, 0, 0, 0.78) 0%,
+            rgba(15, 23, 42, 0.94) 7%,
+            rgba(30, 41, 59, 0.9) 58%,
+            rgba(245, 158, 11, 0.18) 100%);
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+.journal-reader-page.flip-next {
+    animation: journalPageFlipNext 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.journal-reader-page.flip-next::after {
+    animation: journalEdgeShadowNext 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.journal-reader-page.flip-next .journal-flip-sheet {
+    animation: journalSheetNext 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.journal-reader-page.flip-prev {
+    animation: journalPageFlipPrev 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.journal-reader-page.flip-prev::after {
+    animation: journalEdgeShadowPrev 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.journal-reader-page.flip-prev .journal-flip-sheet {
+    animation: journalSheetPrev 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes journalPageFlipNext {
+    0%   { transform: rotateY(0deg); }
+    42%  { transform: rotateY(-8deg); }
+    100% { transform: rotateY(0deg); }
+}
+@keyframes journalEdgeShadowNext {
+    0%   { opacity: 0; }
+    32%  { opacity: 0.9; }
+    100% { opacity: 0; }
+}
+@keyframes journalSheetNext {
+    0%   { opacity: 0.96; transform: rotateY(0deg); }
+    68%  { opacity: 0.62; }
+    100% { opacity: 0; transform: rotateY(-105deg); }
+}
+
+@keyframes journalPageFlipPrev {
+    0%   { transform: rotateY(-8deg); opacity: 0.72; }
+    58%  { transform: rotateY(2deg); opacity: 1; }
+    100% { transform: rotateY(0deg); opacity: 1; }
+}
+@keyframes journalEdgeShadowPrev {
+    0%   { opacity: 0.9; }
+    100% { opacity: 0; }
+}
+@keyframes journalSheetPrev {
+    0%   { opacity: 0; transform: rotateY(-105deg); }
+    36%  { opacity: 0.72; }
+    100% { opacity: 0; transform: rotateY(0deg); }
+}
+
+.journal-nav-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+@media (max-width: 639px) {
+    .journal-book { border-radius: 1.35rem; }
+    .chronicle-shelf-divider { margin-inline: 0; opacity: 0.85; }
+    .journal-flip-sheet { box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.5); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .journal-reader-page.flip-next,
+    .journal-reader-page.flip-prev,
+    .journal-reader-page.flip-next::after,
+    .journal-reader-page.flip-prev::after,
+    .journal-reader-page.flip-next .journal-flip-sheet,
+    .journal-reader-page.flip-prev .journal-flip-sheet {
+        animation: none !important;
+    }
 }
 .custom-scroll::-webkit-scrollbar { width: 6px; }
 .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 9999px; }

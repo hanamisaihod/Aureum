@@ -526,8 +526,62 @@
                 <!-- SECTION 0: CONFIGURABLE MONTHLY PERFORMANCE CODEX (DARK-MODE FANTASY FOLIO) -->
                 <div id="monthly-performance-codex-section" class="hidden transition-all duration-300"></div>
 
-                <!-- SECTION 1: CHRONICLE RECORD LEDGER (AUDIT & PURGE) -->
-                <div class="card p-5 sm:p-6 rounded-2xl space-y-4">
+                <!-- SECTION 1: REFLECTION JOURNAL — TOP SHELF PAGE-TURN READER -->
+                <div class="journal-book chronicle-journal-panel p-5 sm:p-8 rounded-3xl relative overflow-hidden space-y-4">
+                    <div class="journal-spine hidden sm:block"></div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-800/90 pb-3">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <span class="text-2xl" aria-hidden="true">📖</span>
+                            <div class="min-w-0">
+                                <h2 class="text-lg sm:text-xl font-black text-slate-100">Reflection Journal</h2>
+                                <p class="text-[10px] sm:text-[11px] text-slate-400 font-medium truncate">One reflection per page · use Prev / Next or ← →</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between sm:justify-end gap-1.5 sm:gap-2 w-full sm:w-auto" role="group" aria-label="Journal page navigation">
+                            <button type="button" id="journal-prev-btn" aria-label="Previous journal page" onmousedown="startHoldJournalPage(-1, event)" ontouchstart="startHoldJournalPage(-1, event)" class="journal-nav-btn px-3 sm:px-3.5 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-xl text-xs font-bold transition-all select-none">◀ Prev</button>
+                            <span id="journal-page-number-label" class="text-xs font-mono font-bold text-amber-400 px-1.5 sm:px-2 whitespace-nowrap" aria-live="polite">Page 1</span>
+                            <button type="button" id="journal-next-btn" aria-label="Next journal page" onmousedown="startHoldJournalPage(1, event)" ontouchstart="startHoldJournalPage(1, event)" class="journal-nav-btn px-3 sm:px-3.5 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-xl text-xs font-bold transition-all select-none">Next ▶</button>
+                        </div>
+                    </div>
+
+                    <div class="journal-stage grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 relative z-10 pt-1">
+                        <div class="journal-page journal-writer-page p-5 sm:p-6 rounded-2xl flex flex-col justify-between min-h-[320px]">
+                            <form id="diary-form-card" onsubmit="saveDailyDiary(event)" class="space-y-3 flex-1 flex flex-col justify-between">
+                                <div class="space-y-2 flex-1">
+                                    <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
+                                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1.5"><span>✍️</span> <span>Write Today's Page</span></span>
+                                        <span id="diary-status-badge" class="text-xs font-bold text-amber-300">Saved ✨</span>
+                                    </div>
+                                    <textarea id="diary-text" rows="7" placeholder="Write today's reflection..." autocomplete="off" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-sm text-slate-100 font-serif focus:outline-none focus:border-amber-500 resize-none flex-1 leading-relaxed"></textarea>
+                                </div>
+                                <div class="flex justify-between items-center border-t border-slate-800/80 pt-2">
+                                    <span class="text-[10px] text-slate-500 font-mono">Page Left</span>
+                                    <button type="submit" class="theme-accent-btn font-black px-6 py-2 rounded-xl text-xs transition-all">Sign & Save Page</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div id="journal-reader-page" role="group" class="journal-page journal-reader-page p-5 sm:p-6 rounded-2xl flex flex-col justify-between min-h-[320px]" aria-label="Chronicle reader page">
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
+                                    <span class="text-xs font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5"><span>📜</span> <span>Chronicle Reader</span></span>
+                                    <span id="book-right-date" class="text-xs font-mono text-slate-400">---</span>
+                                </div>
+                                <div id="book-right-content" class="text-sm text-slate-200 italic leading-relaxed font-serif pt-1 max-h-[240px] overflow-y-auto">
+                                    No entry logged for this page.
+                                </div>
+                            </div>
+                            <div class="text-right border-t border-slate-800/80 pt-2 text-[10px] text-slate-500 font-mono" id="book-right-footer">Page Right</div>
+                            <span class="journal-flip-sheet" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chronicle-shelf-divider" aria-hidden="true"></div>
+
+                <!-- SECTION 2: CHRONICLE RECORD LEDGER (AUDIT & PURGE) -->
+                <div class="card chronicle-deck-panel p-5 sm:p-6 rounded-2xl space-y-4">
                     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-800 pb-4">
                         <div class="min-w-0">
                             <div class="flex items-center gap-2.5 flex-wrap">
@@ -551,54 +605,6 @@
                     </div>
 
                     <ul id="chronicle-deck-grid" aria-label="Logged records" class="list-none p-0 m-0 space-y-1.5 max-h-[620px] overflow-y-auto pr-1 custom-scroll"></ul>
-                </div>
-
-                <!-- SECTION 2: REFLECTION JOURNAL (RELOCATED FROM SANCTUARY) -->
-                <div class="journal-book p-6 sm:p-8 rounded-3xl relative overflow-hidden space-y-4">
-                    <div class="journal-spine hidden sm:block"></div>
-                    
-                    <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-                        <div class="flex items-center gap-2.5">
-                            <span class="text-2xl">📖</span>
-                            <h2 class="text-xl font-black text-slate-100">Chronicle Journal</h2>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button onmousedown="startHoldJournalPage(-1, event)" ontouchstart="startHoldJournalPage(-1, event)" class="px-3.5 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-xl text-xs font-bold transition-all select-none">◀ Prev</button>
-                            <span id="journal-page-number-label" class="text-xs font-mono font-bold text-amber-400 px-2">Page 1</span>
-                            <button onmousedown="startHoldJournalPage(1, event)" ontouchstart="startHoldJournalPage(1, event)" class="px-3.5 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-xl text-xs font-bold transition-all select-none">Next ▶</button>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10 pt-2">
-                        <div class="journal-page p-5 sm:p-6 rounded-2xl flex flex-col justify-between min-h-[320px]">
-                            <form id="diary-form-card" onsubmit="saveDailyDiary(event)" class="space-y-3 flex-1 flex flex-col justify-between">
-                                <div class="space-y-2 flex-1">
-                                    <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
-                                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1.5"><span>✍️</span> <span>Write Today's Page</span></span>
-                                        <span id="diary-status-badge" class="text-xs font-bold text-amber-300">Saved ✨</span>
-                                    </div>
-                                    <textarea id="diary-text" rows="7" placeholder="Write today's reflection..." autocomplete="off" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-sm text-slate-100 font-serif focus:outline-none focus:border-amber-500 resize-none flex-1 leading-relaxed"></textarea>
-                                </div>
-                                <div class="flex justify-between items-center border-t border-slate-800/80 pt-2">
-                                    <span class="text-[10px] text-slate-500 font-mono">Page Left</span>
-                                    <button type="submit" class="theme-accent-btn font-black px-6 py-2 rounded-xl text-xs transition-all">Sign & Save Page</button>
-                                </div>
-                            </form>
-                        </div>
-
-                        <div class="journal-page p-5 sm:p-6 rounded-2xl flex flex-col justify-between min-h-[320px]">
-                            <div class="space-y-3">
-                                <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
-                                    <span class="text-xs font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5"><span>📜</span> <span>Chronicle Reader</span></span>
-                                    <span id="book-right-date" class="text-xs font-mono text-slate-400">---</span>
-                                </div>
-                                <div id="book-right-content" class="text-sm text-slate-200 italic leading-relaxed font-serif pt-1 max-h-[240px] overflow-y-auto">
-                                    No entry logged for this page.
-                                </div>
-                            </div>
-                            <div class="text-right border-t border-slate-800/80 pt-2 text-[10px] text-slate-500 font-mono" id="book-right-footer">Page Right</div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
