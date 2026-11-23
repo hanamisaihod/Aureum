@@ -33,11 +33,13 @@ function initDuoHUDListeners(){
         if(doc.exists)duoPresenceData.North.settings=doc.data();
         renderDuoHUDCards();
         if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
+        if(activeTab==='horizon'&&typeof renderHorizonView==='function')renderHorizonView();
     });
     unsubscribeCreamSettings=db.collection('settings').doc('Cream').onSnapshot(doc=>{
         if(doc.exists)duoPresenceData.Cream.settings=doc.data();
         renderDuoHUDCards();
         if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
+        if(activeTab==='horizon'&&typeof renderHorizonView==='function')renderHorizonView();
     });
 }
 
@@ -154,6 +156,9 @@ function initRealtimeSettingsListener(){
         if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
         if(typeof renderMonthlyPerformanceCodex==='function')renderMonthlyPerformanceCodex();
         if(currentRawLogsCache.length>0)loadUserData();
+        // Settings (incl. completedPomoHistory) feed the Horizon projections and
+        // duration distribution, so re-render live while that tab is mounted.
+        if(activeTab==='horizon'&&typeof renderHorizonView==='function')renderHorizonView();
     });
 }
 
@@ -180,6 +185,8 @@ function initGlobalHeaderGlowListener(){
         duoPresenceData.North.logs=nLogs;duoPresenceData.Cream.logs=cLogs;
         renderDuoHUDCards();
         if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
+        // Keeps the Horizon duo scope honest as either partner logs new entries.
+        if(activeTab==='horizon'&&typeof renderHorizonView==='function')renderHorizonView();
     });
 }
 
@@ -190,7 +197,11 @@ async function handleLogin(e){
 }
 function handleLogout(){auth.signOut()}
 
-function switchActiveUser(target){viewedUser=target;initRealtimeSettingsListener();updateUserSwitcherUI();attachPomoSpectatorListener();loadUserData()}
+function switchActiveUser(target){
+    viewedUser=target;
+    if(typeof resetHorizonUserSelection==='function')resetHorizonUserSelection();
+    initRealtimeSettingsListener();updateUserSwitcherUI();attachPomoSpectatorListener();loadUserData();
+}
 
 function updateUserSwitcherUI(){
     const isSelf=loggedInUser===viewedUser;
@@ -217,15 +228,24 @@ function switchTab(t){
         goalsTargetsLocked=true;
         goalsUnlockConfirmPending=false;
     }
-    ['crucible','sanctuary','chronicles','relics','forge'].forEach(x=>{
-        $(`tab-${x}`)?.classList.add('hidden');
+    const tabKeys=['crucible','sanctuary','chronicles','horizon','relics','forge'];
+    tabKeys.forEach(x=>{
+        // Panels follow the historical `tab-*` id, with Horizon mounted as `view-horizon`.
+        const panel=$(`tab-${x}`)||$(`view-${x}`);
+        if(panel)panel.classList.add('hidden');
         const nav=$(`nav-${x}`);
         if(nav)nav.className=x===t?"tab-btn active px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap":"tab-btn px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap";
     });
-    $(`tab-${t}`)?.classList.remove('hidden');
+    const activePanel=$(`tab-${t}`)||$(`view-${t}`);
+    if(activePanel)activePanel.classList.remove('hidden');
+    activeTab=t;
     if(t==='forge'&&typeof applyGoalsTargetsLockUI==='function')applyGoalsTargetsLockUI();
     if(t==='sanctuary'&&typeof renderGuildActivityFeed==='function')renderGuildActivityFeed();
     if(t==='chronicles'&&typeof renderMonthlyPerformanceCodex==='function')renderMonthlyPerformanceCodex();
+    if(t==='horizon'&&typeof renderHorizonView==='function'){
+        renderHorizonView();
+        if(typeof resizeHorizonCharts==='function')resizeHorizonCharts();
+    }
     if(t==='crucible')attachPomoSpectatorListener();
 }
 
@@ -431,10 +451,6 @@ function loadUserData(){
         }
         renderDuoHUDCards();
 
-        aureateInsightsData=calculateAureateInsights(rawLogs,userSettings.completedPomoHistory||[],userSettings);
-        renderAureateInsight(currentInsightIndex,false);
-        startAureateInsightsAutoCycle();
-
         updateGoalGauge(finalPayout,(activeSettings.monthlyCash||8000));
         updateChartData('work',rawLogs,pointRate,maxCash);
         updateChartData('sanctuary',rawLogs,pointRate,maxCash);
@@ -450,6 +466,7 @@ function loadUserData(){
         if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
         if(typeof renderMonthlyPerformanceCodex==='function')renderMonthlyPerformanceCodex();
         evaluateBadges(rawLogs,userSettings.completedPomoHistory||[],viewedUser);
+        if(activeTab==='horizon'&&typeof renderHorizonView==='function')renderHorizonView();
     });
 }
 

@@ -1,11 +1,9 @@
 // ============================================================================
-// AUREUM — Aureate Insights Real-Time Synthesis & Auto-Cycle Banner
+// AUREUM — Aureate Insights Synthesis & Horizon Bento Card Renderer
 // ============================================================================
-
-let aureateInsightsData = [];
-let currentInsightIndex = 0;
-let insightsAutoCycleTimer = null;
-let insightsAutoCyclePaused = false;
+// The insights are computed from raw logs + the habit thermostat only. They are
+// rendered exclusively inside #view-horizon; the sidebar no longer owns any
+// insight markup, render calls, or auto-cycling state.
 
 function calculateAureateInsights(rawLogs, pomoHistory, settings) {
     const insights = [];
@@ -288,85 +286,85 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
         });
     }
 
+    // 7. Consistency Streak
+    // Current consecutive active-day streak plus the best 30-day coverage.
+    const activeDaySet = new Set();
+    const activityLogs = rawLogs.filter(l => ['work', 'chore', 'workout', 'diary', 'health'].includes(l.type));
+    activityLogs.forEach(l => {
+        const d = getLogDate(l);
+        if (isNaN(d.getTime())) return;
+        activeDaySet.add(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`);
+    });
+    const dayKeyFor = (d) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    let currentStreak = 0;
+    const cursor = new Date();
+    cursor.setHours(0, 0, 0, 0);
+    // Allow today to be empty until it is logged; start from yesterday then.
+    if (!activeDaySet.has(dayKeyFor(cursor))) cursor.setDate(cursor.getDate() - 1);
+    while (activeDaySet.has(dayKeyFor(cursor))) {
+        currentStreak += 1;
+        cursor.setDate(cursor.getDate() - 1);
+    }
+    let activeIn30 = 0;
+    for (let offset = 0; offset < 30; offset++) {
+        const d = new Date();
+        d.setDate(d.getDate() - offset);
+        if (activeDaySet.has(dayKeyFor(d))) activeIn30 += 1;
+    }
+    insights.push({
+        icon: '🔥',
+        category: 'Consistency Streak',
+        value: `${currentStreak} Day${currentStreak === 1 ? '' : 's'}`,
+        detail: `${activeIn30}/30 active days • ${activeDaySet.size} total active days`
+    });
+
+    // 8. Habit Thermostat
+    // Reads the rolling 7-day state straight from computeHabitThermostat.
+    const thermostat = (typeof computeHabitThermostat === 'function')
+        ? computeHabitThermostat(rawLogs, settings, Date.now())
+        : null;
+    if (thermostat) {
+        const m = thermostat.metrics || {};
+        insights.push({
+            icon: '🌡️',
+            category: 'Habit Thermostat',
+            value: thermostat.label,
+            detail: `${formatHours(m.workH || 0)}h work • ${formatHours(m.choreH || 0)}h chores • ${m.activeDays || 0}/7 active days`
+        });
+    }
+
     return insights;
 }
 
-function renderAureateInsight(idx, animated) {
-    if (!aureateInsightsData || aureateInsightsData.length === 0) return;
-    idx = Math.max(0, Math.min(aureateInsightsData.length - 1, idx));
-    currentInsightIndex = idx;
-    const data = aureateInsightsData[idx];
+const HORIZON_INSIGHT_TONES = ['amber', 'emerald', 'sky', 'violet', 'rose', 'teal', 'gold', 'indigo'];
 
-    const container = $('insights-content-container');
-    const updateDOM = () => {
-        if ($('insight-icon-box')) $('insight-icon-box').innerText = data.icon;
-        if ($('insight-category')) $('insight-category').innerText = data.category;
-        if ($('insight-value')) $('insight-value').innerText = data.value;
-        if ($('insight-description')) $('insight-description').innerText = data.detail;
-        if ($('insights-counter')) $('insights-counter').innerText = `${idx + 1} of ${aureateInsightsData.length}`;
-        renderInsightsDots(idx, aureateInsightsData.length);
-    };
-
-    if (animated && container) {
-        container.style.opacity = '0';
-        container.style.transform = 'translateY(3px)';
-        setTimeout(() => {
-            updateDOM();
-            container.style.opacity = '1';
-            container.style.transform = 'translateY(0)';
-        }, 180);
-    } else {
-        updateDOM();
+/**
+ * Renders the relocated Aureate Insight cards as a responsive bento grid inside
+ * #view-horizon. Each card is a static read of the computed insight payload, so
+ * add/edit/delete log snapshots simply re-run the calculation and re-render.
+ * @param {Array<{icon:string,category:string,value:string,detail:string}>} insights
+ */
+function renderHorizonInsightCards(insights) {
+    const grid = $('horizon-insight-grid');
+    if (!grid) return;
+    if (!Array.isArray(insights) || insights.length === 0) {
+        grid.innerHTML = '<div class="horizon-empty sm:col-span-2 xl:col-span-4">No insights yet — log a session to synthesize the bento.</div>';
+        return;
     }
-}
-
-function renderInsightsDots(activeIdx, total) {
-    const dotsEl = $('insights-dots-container');
-    if (!dotsEl) return;
-    let html = '';
-    for (let i = 0; i < total; i++) {
-        const isActive = (i === activeIdx);
-        html += `<button type="button" onclick="selectAureateInsight(${i})" class="h-1 rounded-full transition-all duration-300 ${isActive ? 'w-3.5 bg-amber-400' : 'w-1 bg-slate-700 hover:bg-slate-500'}" title="Go to insight ${i + 1}"></button>`;
-    }
-    dotsEl.innerHTML = html;
-}
-
-function cycleAureateInsight(delta) {
-    if (!aureateInsightsData || aureateInsightsData.length === 0) return;
-    const n = aureateInsightsData.length;
-    currentInsightIndex = (currentInsightIndex + delta + n) % n;
-    renderAureateInsight(currentInsightIndex, true);
-}
-
-function selectAureateInsight(idx) {
-    renderAureateInsight(idx, true);
-}
-
-function startAureateInsightsAutoCycle() {
-    if (insightsAutoCycleTimer) clearInterval(insightsAutoCycleTimer);
-    insightsAutoCycleTimer = setInterval(() => {
-        if (!insightsAutoCyclePaused && aureateInsightsData && aureateInsightsData.length > 1) {
-            currentInsightIndex = (currentInsightIndex + 1) % aureateInsightsData.length;
-            renderAureateInsight(currentInsightIndex, true);
-        }
-    }, 6000);
-
-    const banner = $('aureate-insights-banner');
-    if (banner && !banner._hoverBound) {
-        banner._hoverBound = true;
-        banner.addEventListener('mouseenter', () => { insightsAutoCyclePaused = true; });
-        banner.addEventListener('mouseleave', () => {
-            if ($('insights-autoplay-icon')?.innerText === '⏸') {
-                insightsAutoCyclePaused = false;
-            }
-        });
-    }
-}
-
-function toggleAureateInsightsAutoPlay() {
-    insightsAutoCyclePaused = !insightsAutoCyclePaused;
-    const icon = $('insights-autoplay-icon');
-    if (icon) icon.innerText = insightsAutoCyclePaused ? '▶' : '⏸';
-    const btn = $('insights-autoplay-btn');
-    if (btn) btn.title = insightsAutoCyclePaused ? 'Resume auto-cycle' : 'Pause auto-cycle';
+    grid.innerHTML = insights.map((insight, idx) => {
+        const tone = HORIZON_INSIGHT_TONES[idx % HORIZON_INSIGHT_TONES.length];
+        const icon = escapeHtml(insight.icon || '✨');
+        const category = escapeHtml(insight.category || 'Insight');
+        const value = escapeHtml(insight.value || '—');
+        const detail = escapeHtml(insight.detail || '');
+        return `<article class="horizon-insight-card" data-tone="${tone}" aria-label="${category}">
+            <div class="flex items-start justify-between gap-2">
+                <span class="horizon-insight-icon" aria-hidden="true">${icon}</span>
+                <span class="horizon-insight-index">${String(idx + 1).padStart(2, '0')}</span>
+            </div>
+            <div class="horizon-insight-category">${category}</div>
+            <div class="horizon-insight-value">${value}</div>
+            <div class="horizon-insight-detail">${detail}</div>
+        </article>`;
+    }).join('');
 }

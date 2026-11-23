@@ -29,6 +29,7 @@ try {
 } catch (e) {}
 
 let activeChronicleFilter = 'all';
+let activeTab = 'crucible';
 
 let userSettings = {
     displayName: '',

@@ -160,10 +160,6 @@ aside.app-sidebar {
 aside.app-sidebar > * {
     flex-shrink: 0 !important;
 }
-#aureate-insights-banner {
-    flex-shrink: 0 !important;
-    min-height: fit-content !important;
-}
 @media (min-width: 1024px) and (min-height: 860px) {
     aside.app-sidebar {
         position: sticky;
@@ -194,7 +190,6 @@ aside.app-sidebar > * {
 .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 9999px; }
 .custom-scroll::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.4); border-radius: 9999px; }
 .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(245, 158, 11, 0.5); }
-.insight-fade { transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1), transform 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
 
 /* Chronicle Deck — compact audit records (review & purge false entries) */
 .chronicle-record{
@@ -592,5 +587,184 @@ input:checked + .forge-toggle-track .forge-toggle-thumb {
     box-shadow: 0 0 8px rgba(254, 240, 138, 0.8);
 }
 
+
+
+/* ============================================================================
+   HORIZON — ANALYTICS & FORECASTING VIEW
+   Forecast hero, scope toggle, KPI pills, SVG charts, tooltip & insight bento
+   ============================================================================ */
+.horizon-hero { overflow: hidden; }
+.horizon-hero::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(circle at 10% 0%, var(--accent-glow) 0%, transparent 46%);
+    opacity: 0.32;
+}
+.horizon-scope-toggle {
+    display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.2rem;
+    border-radius: 0.85rem; background: rgba(2, 6, 23, 0.78);
+    border: 1px solid rgba(51, 65, 85, 0.85);
+}
+.horizon-scope-btn {
+    padding: 0.35rem 0.7rem; border-radius: 0.65rem; font-size: 11px; font-weight: 800;
+    color: #94a3b8; border: 1px solid transparent; background: transparent;
+    transition: all 0.2s ease; white-space: nowrap; cursor: pointer;
+}
+.horizon-scope-btn:hover { color: #f8fafc; background: rgba(255, 255, 255, 0.06); }
+.horizon-scope-btn:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+.horizon-scope-btn.is-active {
+    background: linear-gradient(135deg, var(--accent-glow) 0%, rgba(255, 255, 255, 0.05) 100%);
+    color: var(--accent-primary); border-color: var(--accent-primary);
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+.horizon-kpi {
+    position: relative; padding: 0.6rem 0.7rem 0.6rem 0.85rem; border-radius: 0.9rem;
+    background: rgba(2, 6, 23, 0.62); border: 1px solid rgba(51, 65, 85, 0.85);
+    min-width: 0; overflow: hidden;
+}
+.horizon-kpi::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--accent-primary);
+}
+.horizon-kpi[data-tone="emerald"]::before { background: #10b981; }
+.horizon-kpi[data-tone="violet"]::before { background: #a78bfa; }
+.horizon-kpi[data-tone="amber"]::before { background: #f59e0b; }
+.horizon-kpi[data-tone="sky"]::before { background: #38bdf8; }
+.horizon-kpi-label {
+    display: flex; align-items: center; gap: 0.3rem; font-size: 9px; font-weight: 900;
+    letter-spacing: 0.06em; text-transform: uppercase; color: #94a3b8;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.horizon-kpi-value {
+    margin-top: 0.2rem; font-size: 1.05rem; font-weight: 900; line-height: 1.15;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.horizon-kpi-sub {
+    margin-top: 0.15rem; font-size: 9.5px; font-weight: 600; color: #64748b;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.horizon-chart-shell {
+    position: relative; width: 100%; padding: 0.4rem 0.25rem; border-radius: 0.9rem;
+    background: rgba(2, 6, 23, 0.45); border: 1px solid rgba(30, 41, 59, 0.85);
+}
+.horizon-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.horizon-grid-line { stroke: rgba(51, 65, 85, 0.55); stroke-width: 1; stroke-dasharray: 3 5; }
+.horizon-axis-line { stroke: rgba(100, 116, 139, 0.55); stroke-width: 1; }
+.horizon-axis-label {
+    fill: #94a3b8; font-size: 9px; font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.horizon-axis-label-quality { fill: #f59e0b; }
+.horizon-band-name { fill: #e2e8f0; font-size: 9.5px; font-weight: 900; }
+.horizon-today-line { stroke: rgba(245, 158, 11, 0.6); stroke-width: 1; stroke-dasharray: 4 4; }
+.horizon-today-label {
+    fill: #fbbf24; font-size: 9px; font-weight: 900;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.horizon-series-actual {
+    fill: none; stroke: #10b981; stroke-width: 2.4;
+    stroke-linecap: round; stroke-linejoin: round;
+}
+.horizon-series-base {
+    fill: none; stroke: #f59e0b; stroke-width: 1.7;
+    stroke-dasharray: 5 4; stroke-linecap: round;
+}
+.horizon-series-total {
+    fill: none; stroke: #a78bfa; stroke-width: 1.9;
+    stroke-dasharray: 2 4; stroke-linecap: round;
+}
+.horizon-series-quality {
+    fill: none; stroke: #f59e0b; stroke-width: 1.6;
+    stroke-dasharray: 4 3; stroke-linecap: round; opacity: 0.9;
+}
+.horizon-dot-actual { fill: #10b981; stroke: #022c22; stroke-width: 1.5; }
+.horizon-dot-total { fill: #a78bfa; stroke: #1e1b4b; stroke-width: 1.5; }
+.horizon-dot-quality { fill: #f59e0b; stroke: #1c1917; stroke-width: 1.2; }
+.horizon-bar-quality { fill: #f59e0b; opacity: 0.92; }
+.horizon-bar-effort { fill: #38bdf8; opacity: 0.85; }
+.horizon-bar-duration { fill: #10b981; opacity: 0.85; }
+.horizon-band-peak {
+    fill: rgba(245, 158, 11, 0.12); stroke: rgba(245, 158, 11, 0.35); stroke-width: 1;
+}
+.horizon-band-strain {
+    fill: rgba(244, 63, 94, 0.1); stroke: rgba(244, 63, 94, 0.3); stroke-width: 1;
+}
+.horizon-hover-cell { fill: transparent; cursor: crosshair; }
+.horizon-hover-cell:hover { fill: rgba(255, 255, 255, 0.045); }
+.horizon-empty {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    min-height: 150px; padding: 1rem; font-size: 11px; font-style: italic; color: #64748b;
+}
+.horizon-tooltip {
+    position: fixed; z-index: 120; pointer-events: none;
+    max-width: min(22rem, calc(100vw - 1rem)); padding: 0.4rem 0.55rem; border-radius: 0.5rem;
+    background: rgba(2, 6, 23, 0.97); border: 1px solid rgba(245, 158, 11, 0.45);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75); color: #e2e8f0;
+    font-size: 10px; font-weight: 700; line-height: 1.35;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.horizon-legend-swatch {
+    display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 0.2rem;
+}
+.horizon-legend-dashed {
+    -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 3px, transparent 3px 5px);
+    mask-image: repeating-linear-gradient(90deg, #000 0 3px, transparent 3px 5px);
+}
+.horizon-insight-card {
+    position: relative; display: flex; flex-direction: column; gap: 0.2rem;
+    min-width: 0; padding: 0.7rem 0.75rem; border-radius: 0.9rem;
+    background: linear-gradient(160deg, rgba(15, 23, 42, 0.95) 0%, rgba(2, 6, 23, 0.92) 100%);
+    border: 1px solid rgba(51, 65, 85, 0.8);
+    box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.8);
+    transition: border-color 0.2s ease, transform 0.2s ease; overflow: hidden;
+}
+.horizon-insight-card:hover { transform: translateY(-2px); border-color: var(--accent-primary); }
+.horizon-insight-card::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(circle at 100% 0%, rgba(245, 158, 11, 0.12), transparent 55%);
+}
+.horizon-insight-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 1.8rem; height: 1.8rem; border-radius: 0.55rem; font-size: 0.95rem;
+    background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.25);
+}
+.horizon-insight-index {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.6rem; font-weight: 900; color: #475569;
+}
+.horizon-insight-category {
+    margin-top: 0.2rem; font-size: 0.58rem; font-weight: 900; letter-spacing: 0.06em;
+    text-transform: uppercase; color: #fbbf24; line-height: 1.2; overflow-wrap: anywhere;
+}
+.horizon-insight-value {
+    font-size: 0.82rem; font-weight: 900; color: #f8fafc;
+    line-height: 1.25; overflow-wrap: anywhere;
+}
+.horizon-insight-detail {
+    font-size: 0.66rem; font-weight: 600; color: #94a3b8;
+    line-height: 1.35; overflow-wrap: anywhere;
+}
+.horizon-insight-card[data-tone="emerald"] .horizon-insight-category,
+.horizon-insight-card[data-tone="emerald"] .horizon-insight-icon { color: #6ee7b7; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1); }
+.horizon-insight-card[data-tone="sky"] .horizon-insight-category,
+.horizon-insight-card[data-tone="sky"] .horizon-insight-icon { color: #7dd3fc; border-color: rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.1); }
+.horizon-insight-card[data-tone="violet"] .horizon-insight-category,
+.horizon-insight-card[data-tone="violet"] .horizon-insight-icon { color: #c4b5fd; border-color: rgba(167, 139, 250, 0.4); background: rgba(167, 139, 250, 0.1); }
+.horizon-insight-card[data-tone="rose"] .horizon-insight-category,
+.horizon-insight-card[data-tone="rose"] .horizon-insight-icon { color: #fda4af; border-color: rgba(244, 63, 94, 0.4); background: rgba(244, 63, 94, 0.1); }
+.horizon-insight-card[data-tone="teal"] .horizon-insight-category,
+.horizon-insight-card[data-tone="teal"] .horizon-insight-icon { color: #5eead4; border-color: rgba(20, 184, 166, 0.4); background: rgba(20, 184, 166, 0.1); }
+.horizon-insight-card[data-tone="gold"] .horizon-insight-category,
+.horizon-insight-card[data-tone="gold"] .horizon-insight-icon { color: #fde68a; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.1); }
+.horizon-insight-card[data-tone="indigo"] .horizon-insight-category,
+.horizon-insight-card[data-tone="indigo"] .horizon-insight-icon { color: #a5b4fc; border-color: rgba(99, 102, 241, 0.4); background: rgba(99, 102, 241, 0.1); }
+
+@media (max-width: 639px) {
+    .horizon-axis-label { font-size: 8px; }
+    .horizon-kpi-value { font-size: 0.95rem; }
+    .horizon-kpi-sub { display: none; }
+    .horizon-scope-btn { padding: 0.3rem 0.5rem; font-size: 10px; }
+}
 
 

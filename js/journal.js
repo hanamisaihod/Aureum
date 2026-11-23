@@ -44,6 +44,10 @@ function renderJournalBookView(diaryLogs) {
         rightFooter.innerText = "Page Right";
         return;
     }
+    // Clamp after deletions so a removed last page cannot leave a dangling index.
+    if (currentJournalPageIndex > diaryLogs.length - 1) {
+        currentJournalPageIndex = Math.max(0, diaryLogs.length - 1);
+    }
     const log = diaryLogs[currentJournalPageIndex];
     const logDate = getLogDate(log);
     label.innerText = `Page ${currentJournalPageIndex + 1} of ${diaryLogs.length}`;

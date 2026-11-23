@@ -150,56 +150,10 @@
                 <button onclick="switchTab('crucible')" id="nav-crucible" class="tab-btn active px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span class="text-lg">⚗️</span> <span>Crucible</span></button>
                 <button onclick="switchTab('sanctuary')" id="nav-sanctuary" class="tab-btn px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span class="text-lg">🌿</span> <span>Sanctuary</span></button>
                 <button onclick="switchTab('chronicles')" id="nav-chronicles" class="tab-btn px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span class="text-lg">📜</span> <span>Chronicles</span></button>
+                <button onclick="switchTab('horizon')" id="nav-horizon" class="tab-btn px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span class="text-lg" aria-hidden="true">🌅</span> <span>Horizon</span></button>
                 <button onclick="switchTab('relics')" id="nav-relics" class="tab-btn px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span class="text-lg">🏺</span> <span>Relics</span></button>
                 <button onclick="switchTab('forge')" id="nav-forge" class="tab-btn px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-3 w-full justify-start whitespace-nowrap"><span class="text-lg">⚙️</span> <span>Forge</span></button>
             </nav>
-
-            <!-- AUREATE INSIGHTS BANNER IN SIDEBAR (COMPACT & FITTING) -->
-            <div id="aureate-insights-banner" class="card relative shrink-0 rounded-xl p-3 border border-amber-500/25 bg-gradient-to-r from-amber-950/25 via-slate-900/85 to-slate-900/40 shadow-md space-y-2">
-                <div class="flex items-center justify-between gap-1 pb-1.5 border-b border-slate-800/80">
-                    <div class="flex items-center gap-1.5 min-w-0">
-                        <span class="text-[9px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1 shrink-0">
-                            <span>✨</span> INSIGHTS
-                        </span>
-                        <span id="insights-counter" class="text-[10px] font-mono text-slate-400">1 of 6</span>
-                    </div>
-                    <div class="flex items-center gap-1 shrink-0">
-                        <button type="button" onclick="cycleAureateInsight(-1)" class="w-5 h-5 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs transition-all border border-slate-700/60" title="Previous Insight">‹</button>
-                        <button type="button" onclick="cycleAureateInsight(1)" class="w-5 h-5 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs transition-all border border-slate-700/60" title="Next Insight">›</button>
-                        <button type="button" onclick="toggleAureateInsightsAutoPlay()" id="insights-autoplay-btn" class="w-5 h-5 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-[9px] transition-all border border-slate-700/60" title="Auto-cycle toggle">
-                            <span id="insights-autoplay-icon">⏸</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- FADE TRANSITION CONTENT CONTAINER -->
-                <div id="insights-content-container" class="relative insight-fade opacity-100 transform translate-y-0 flex items-center min-h-[52px]">
-                    <div class="flex items-start gap-2.5 w-full min-w-0">
-                        <div id="insight-icon-box" class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-base shrink-0 mt-0.5">
-                            ⚡
-                        </div>
-                        <div class="min-w-0 flex-1 space-y-0.5">
-                            <div class="text-[9px] uppercase tracking-wider font-extrabold text-amber-400/90 break-words leading-tight" id="insight-category">
-                                The Catalyst Hour
-                            </div>
-                            <div class="text-sm font-black text-slate-100 break-words leading-snug" id="insight-value">
-                                Awaiting Logs
-                            </div>
-                            <div class="text-[10px] text-slate-400 break-words leading-snug font-medium" id="insight-description">
-                                Synthesizing real-time logs...
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SUBTLE PROGRESS / DOTS -->
-                <div class="flex items-center justify-between pt-1.5 border-t border-slate-800/50 text-[9px] text-slate-500">
-                    <div id="insights-dots-container" class="flex items-center gap-1">
-                        <!-- Injected dynamically via JS -->
-                    </div>
-                    <span class="font-mono text-[9px] text-slate-500">⚡ Realtime</span>
-                </div>
-            </div>
 
             <div class="pt-3 border-t border-slate-800 flex justify-between items-center text-xs shrink-0">
                 <button onclick="handleLogout()" class="text-slate-400 hover:text-slate-200 font-semibold underline">Sign Out</button>
@@ -565,8 +519,41 @@
                         </div>
                     </section>
                 </div>
+            </div>
 
-                <!-- INTERACTIVE IMMERSIVE TWO-PAGE REFLECTION BOOK -->
+            <!-- TAB 3: CHRONICLES -->
+            <div id="tab-chronicles" class="space-y-6 hidden">
+                <!-- SECTION 0: CONFIGURABLE MONTHLY PERFORMANCE CODEX (DARK-MODE FANTASY FOLIO) -->
+                <div id="monthly-performance-codex-section" class="hidden transition-all duration-300"></div>
+
+                <!-- SECTION 1: CHRONICLE RECORD LEDGER (AUDIT & PURGE) -->
+                <div class="card p-5 sm:p-6 rounded-2xl space-y-4">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-800 pb-4">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2.5 flex-wrap">
+                                <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>📜</span> <span>Chronicle Deck</span></h2>
+                                <span id="chronicle-deck-count" role="status" aria-live="polite" class="text-[11px] font-mono font-extrabold px-2.5 py-0.5 rounded-lg bg-slate-900 text-amber-300 border border-amber-500/30">0 Records</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 font-medium mt-0.5">Review logged records and purge any false entries.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-between lg:justify-end">
+                            <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter records by type">
+                                <button type="button" id="chronicle-filter-all" aria-pressed="true" onclick="setChronicleDeckFilter('all')" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all theme-accent-btn flex items-center gap-1.5"><span>🃏</span> <span>All</span></button>
+                                <button type="button" id="chronicle-filter-work" aria-pressed="false" onclick="setChronicleDeckFilter('work')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900/90 text-slate-400 hover:text-white border border-slate-800 flex items-center gap-1.5"><span>⚗️</span> <span>Work</span></button>
+                                <button type="button" id="chronicle-filter-sanctuary" aria-pressed="false" onclick="setChronicleDeckFilter('sanctuary')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900/90 text-slate-400 hover:text-white border border-slate-800 flex items-center gap-1.5"><span>🌿</span> <span>Sanctuary</span></button>
+                                <button type="button" id="chronicle-filter-reflections" aria-pressed="false" onclick="setChronicleDeckFilter('reflections')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900/90 text-slate-400 hover:text-white border border-slate-800 flex items-center gap-1.5"><span>📖</span> <span>Reflections</span></button>
+                            </div>
+                            <div class="flex items-center gap-2 bg-slate-900/80 px-2.5 py-1.5 rounded-xl border border-slate-700">
+                                <label for="ledger-month-select" class="text-[10px] text-slate-400 font-bold uppercase tracking-wider whitespace-nowrap">Month:</label>
+                                <select id="ledger-month-select" onchange="applyLedgerFilter()" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-0.5 text-xs text-white focus:outline-none"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul id="chronicle-deck-grid" aria-label="Logged records" class="list-none p-0 m-0 space-y-1.5 max-h-[620px] overflow-y-auto pr-1 custom-scroll"></ul>
+                </div>
+
+                <!-- SECTION 2: REFLECTION JOURNAL (RELOCATED FROM SANCTUARY) -->
                 <div class="journal-book p-6 sm:p-8 rounded-3xl relative overflow-hidden space-y-4">
                     <div class="journal-spine hidden sm:block"></div>
                     
@@ -615,83 +602,138 @@
                 </div>
             </div>
 
-            <!-- TAB 3: CHRONICLES -->
-            <div id="tab-chronicles" class="space-y-6 hidden">
-                <!-- SECTION 0: CONFIGURABLE MONTHLY PERFORMANCE CODEX (DARK-MODE FANTASY FOLIO) -->
-                <div id="monthly-performance-codex-section" class="hidden transition-all duration-300"></div>
-
-                <!-- SECTION 1: ANALYTICS SUMMARY HEADER (COMPACT WORK & SANCTUARY TREND CHARTS) -->
-                <div id="chronicles-analytics-header" class="grid grid-cols-1 xl:grid-cols-2 gap-5">
-                    <div class="card p-4 sm:p-5 rounded-2xl">
-                        <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <h3 class="text-sm sm:text-base font-black text-slate-100">⚗️ Work Analytics</h3>
-                                <div class="flex bg-slate-900/90 p-0.5 rounded-lg border border-slate-700 text-[11px] gap-0.5">
-                                    <button type="button" onclick="setWorkChartUnit('money')" id="btn-work-unit-money" class="px-2.5 py-1 rounded-md font-bold transition-all theme-accent-btn flex items-center gap-1"><span>฿</span> <span>Money</span></button>
-                                    <button type="button" onclick="setWorkChartUnit('hours')" id="btn-work-unit-hours" class="px-2.5 py-1 rounded-md font-bold transition-all text-slate-400 hover:text-white flex items-center gap-1"><span>⏱️</span> <span>Hours</span></button>
-                                </div>
-                                <div class="flex bg-slate-900/90 p-0.5 rounded-lg border border-slate-700 text-[11px] gap-0.5">
-                                    <button type="button" onclick="setWorkChartMode('bar')" id="btn-work-mode-bar" class="px-2 py-1 rounded-md font-bold transition-all theme-accent-btn">📊</button>
-                                    <button type="button" onclick="setWorkChartMode('line')" id="btn-work-mode-line" class="px-2 py-1 rounded-md font-bold transition-all text-slate-400 hover:text-white">📈</button>
-                                    <button type="button" onclick="setWorkChartMode('area')" id="btn-work-mode-area" class="px-2 py-1 rounded-md font-bold transition-all text-slate-400 hover:text-white">🌊</button>
-                                </div>
-                            </div>
-                            <div class="flex bg-slate-900/80 p-0.5 rounded-lg border border-slate-700 text-[11px] font-semibold">
-                                <button onclick="setChartRange('work', 'daily')" id="btn-work-daily" class="px-2 py-1 rounded-md text-slate-400">Daily</button>
-                                <button onclick="setChartRange('work', 'weekly')" id="btn-work-weekly" class="px-2 py-1 rounded-md text-slate-400">Weekly</button>
-                                <button onclick="setChartRange('work', 'monthly')" id="btn-work-monthly" class="px-2 py-1 rounded-md text-slate-400">Monthly</button>
-                                <button onclick="setChartRange('work', 'yearly')" id="btn-work-yearly" class="px-2 py-1 rounded-md text-slate-400">Yearly</button>
-                            </div>
+            <!-- TAB: HORIZON — ANALYTICS & FORECASTING -->
+            <div id="view-horizon" class="hidden space-y-6">
+                <!-- SCOPE HEADER -->
+                <div class="card p-4 sm:p-5 rounded-2xl flex flex-wrap items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2.5 flex-wrap">
+                            <span class="text-2xl" aria-hidden="true">🌅</span>
+                            <h2 class="text-lg sm:text-xl font-black text-slate-100">Horizon</h2>
+                            <span id="horizon-scope-badge" class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">North</span>
                         </div>
-                        <div class="h-44 sm:h-48 w-full relative"><canvas id="workChart"></canvas></div>
+                        <p class="text-[11px] text-slate-400 font-medium mt-1">Earning trajectory, focus-quality windows, duration distribution, and the relocated analytics.</p>
                     </div>
-
-                    <div class="card p-4 sm:p-5 rounded-2xl">
-                        <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-sm sm:text-base font-black text-slate-100">🌿 Sanctuary Trends</h3>
-                                <div class="flex bg-slate-900/90 p-0.5 rounded-lg border border-slate-700 text-[11px] gap-0.5">
-                                    <button type="button" onclick="setSanctuaryChartMode('bar')" id="btn-sanctuary-mode-bar" class="px-2.5 py-1 rounded-md font-bold transition-all theme-accent-btn">📊 Bar</button>
-                                    <button type="button" onclick="setSanctuaryChartMode('line')" id="btn-sanctuary-mode-line" class="px-2.5 py-1 rounded-md font-bold transition-all text-slate-400 hover:text-white">📈 Line</button>
-                                </div>
-                            </div>
-                            <div class="flex bg-slate-900/80 p-0.5 rounded-lg border border-slate-700 text-[11px] font-semibold">
-                                <button onclick="setChartRange('sanctuary', 'daily')" id="btn-sanctuary-daily" class="px-2 py-1 rounded-md text-slate-400">Daily</button>
-                                <button onclick="setChartRange('sanctuary', 'weekly')" id="btn-sanctuary-weekly" class="px-2 py-1 rounded-md text-slate-400">Weekly</button>
-                                <button onclick="setChartRange('sanctuary', 'monthly')" id="btn-sanctuary-monthly" class="px-2 py-1 rounded-md text-slate-400">Monthly</button>
-                                <button onclick="setChartRange('sanctuary', 'yearly')" id="btn-sanctuary-yearly" class="px-2 py-1 rounded-md text-slate-400">Yearly</button>
-                            </div>
-                        </div>
-                        <div class="h-44 sm:h-48 w-full"><canvas id="sanctuaryChart"></canvas></div>
+                    <div class="horizon-scope-toggle" role="group" aria-label="Horizon data scope">
+                        <button type="button" id="horizon-scope-north" onclick="setHorizonUser('North')" aria-pressed="false" class="horizon-scope-btn">North</button>
+                        <button type="button" id="horizon-scope-cream" onclick="setHorizonUser('Cream')" aria-pressed="false" class="horizon-scope-btn">Cream</button>
+                        <button type="button" id="horizon-scope-duo" onclick="setHorizonUser('Duo')" aria-pressed="false" class="horizon-scope-btn">Duo Combined</button>
                     </div>
                 </div>
 
-                <!-- SECTION 2: CHRONICLE RECORD LEDGER (AUDIT & PURGE) -->
-                <div class="card p-5 sm:p-6 rounded-2xl space-y-4">
-                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-800 pb-4">
+                <!-- SECTION A: MONTHLY EARNING TRAJECTORY & PROJECTION (HERO) -->
+                <section class="card horizon-hero p-4 sm:p-5 rounded-2xl space-y-4" aria-labelledby="horizon-trajectory-heading">
+                    <div class="flex flex-wrap items-start justify-between gap-3">
                         <div class="min-w-0">
-                            <div class="flex items-center gap-2.5 flex-wrap">
-                                <h2 class="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2"><span>📜</span> <span>Chronicle Deck</span></h2>
-                                <span id="chronicle-deck-count" role="status" aria-live="polite" class="text-[11px] font-mono font-extrabold px-2.5 py-0.5 rounded-lg bg-slate-900 text-amber-300 border border-amber-500/30">0 Records</span>
-                            </div>
-                            <p class="text-[11px] text-slate-400 font-medium mt-0.5">Review logged records and purge any false entries.</p>
+                            <h3 id="horizon-trajectory-heading" class="text-sm sm:text-base font-black text-slate-100 flex items-center gap-2"><span aria-hidden="true">📈</span> <span>Monthly Earning Trajectory</span></h3>
+                            <p id="horizon-trajectory-caption" class="text-[11px] text-slate-400 font-medium mt-1">Day 1 → month end, actual pace vs projected payout.</p>
                         </div>
-                        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-between lg:justify-end">
-                            <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter records by type">
-                                <button type="button" id="chronicle-filter-all" aria-pressed="true" onclick="setChronicleDeckFilter('all')" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all theme-accent-btn flex items-center gap-1.5"><span>🃏</span> <span>All</span></button>
-                                <button type="button" id="chronicle-filter-work" aria-pressed="false" onclick="setChronicleDeckFilter('work')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900/90 text-slate-400 hover:text-white border border-slate-800 flex items-center gap-1.5"><span>⚗️</span> <span>Work</span></button>
-                                <button type="button" id="chronicle-filter-sanctuary" aria-pressed="false" onclick="setChronicleDeckFilter('sanctuary')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900/90 text-slate-400 hover:text-white border border-slate-800 flex items-center gap-1.5"><span>🌿</span> <span>Sanctuary</span></button>
-                                <button type="button" id="chronicle-filter-reflections" aria-pressed="false" onclick="setChronicleDeckFilter('reflections')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900/90 text-slate-400 hover:text-white border border-slate-800 flex items-center gap-1.5"><span>📖</span> <span>Reflections</span></button>
-                            </div>
-                            <div class="flex items-center gap-2 bg-slate-900/80 px-2.5 py-1.5 rounded-xl border border-slate-700">
-                                <label for="ledger-month-select" class="text-[10px] text-slate-400 font-bold uppercase tracking-wider whitespace-nowrap">Month:</label>
-                                <select id="ledger-month-select" onchange="applyLedgerFilter()" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-0.5 text-xs text-white focus:outline-none"></select>
-                            </div>
+                        <div class="flex items-center gap-3 text-[10px] font-bold text-slate-400 flex-wrap">
+                            <span class="flex items-center gap-1.5"><span class="horizon-legend-swatch" style="background:#10b981"></span> Actual</span>
+                            <span class="flex items-center gap-1.5"><span class="horizon-legend-swatch horizon-legend-dashed" style="background:#f59e0b"></span> Projected base</span>
+                            <span class="flex items-center gap-1.5"><span class="horizon-legend-swatch horizon-legend-dashed" style="background:#a78bfa"></span> Projected payout</span>
                         </div>
                     </div>
+                    <div id="horizon-kpi-row" class="grid grid-cols-2 xl:grid-cols-4 gap-2.5"></div>
+                    <div id="horizon-trajectory-chart" class="horizon-chart-shell" role="img" aria-label="Monthly earning trajectory chart"></div>
+                    <p id="horizon-trajectory-note" class="text-[10px] font-mono text-slate-500 leading-relaxed"></p>
+                </section>
 
-                    <ul id="chronicle-deck-grid" aria-label="Logged records" class="list-none p-0 m-0 space-y-1.5 max-h-[620px] overflow-y-auto pr-1 custom-scroll"></ul>
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                    <!-- SECTION B: TIME-OF-DAY SWEET SPOT -->
+                    <section class="card p-4 sm:p-5 rounded-2xl space-y-3" aria-labelledby="horizon-sweetspot-heading">
+                        <div>
+                            <h3 id="horizon-sweetspot-heading" class="text-sm sm:text-base font-black text-slate-100 flex items-center gap-2"><span aria-hidden="true">🕰️</span> <span>Time-of-Day Sweet Spot</span></h3>
+                            <p class="text-[11px] text-slate-400 font-medium mt-1">Average quality vs effort by hour of day.</p>
+                        </div>
+                        <p id="horizon-sweetspot-insight" class="text-[11px] text-slate-300 leading-relaxed"></p>
+                        <div id="horizon-sweetspot-chart" class="horizon-chart-shell" role="img" aria-label="Quality and effort by hour of day"></div>
+                        <div class="flex items-center gap-3 text-[10px] font-bold text-slate-400 flex-wrap">
+                            <span class="flex items-center gap-1.5"><span class="horizon-legend-swatch" style="background:#f59e0b"></span> Quality</span>
+                            <span class="flex items-center gap-1.5"><span class="horizon-legend-swatch" style="background:#38bdf8"></span> Effort</span>
+                            <span class="flex items-center gap-1.5"><span class="horizon-legend-swatch" style="background:rgba(245,158,11,0.18)"></span> Peak clarity</span>
+                            <span class="flex items-center gap-1.5"><span class="horizon-legend-swatch" style="background:rgba(244,63,94,0.18)"></span> High strain</span>
+                        </div>
+                    </section>
+
+                    <!-- SECTION C: PREFERRED FOCUS DURATION -->
+                    <section class="card p-4 sm:p-5 rounded-2xl space-y-3" aria-labelledby="horizon-duration-heading">
+                        <div>
+                            <h3 id="horizon-duration-heading" class="text-sm sm:text-base font-black text-slate-100 flex items-center gap-2"><span aria-hidden="true">⏳</span> <span>Preferred Focus Duration</span></h3>
+                            <p class="text-[11px] text-slate-400 font-medium mt-1">Session count and average quality per duration band.</p>
+                        </div>
+                        <p id="horizon-duration-insight" class="text-[11px] text-slate-300 leading-relaxed"></p>
+                        <div id="horizon-duration-chart" class="horizon-chart-shell" role="img" aria-label="Focus session duration distribution"></div>
+                        <div class="flex items-center gap-3 text-[10px] font-bold text-slate-400 flex-wrap">
+                            <span class="flex items-center gap-1.5"><span class="horizon-legend-swatch" style="background:#10b981"></span> Sessions</span>
+                            <span class="flex items-center gap-1.5"><span class="horizon-legend-swatch" style="background:#f59e0b"></span> Avg quality</span>
+                        </div>
+                    </section>
                 </div>
+
+                <!-- SECTION D: RELOCATED CHRONICLE CHARTS -->
+                <section class="space-y-3" aria-labelledby="horizon-chronicle-charts-heading">
+                    <div class="flex items-center gap-2.5 flex-wrap">
+                        <h3 id="horizon-chronicle-charts-heading" class="text-base sm:text-lg font-black text-slate-100 flex items-center gap-2"><span aria-hidden="true">📊</span> <span>Chronicle Analytics</span></h3>
+                        <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">RELOCATED</span>
+                    </div>
+                    <div id="chronicles-analytics-header" class="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                        <div class="card p-4 sm:p-5 rounded-2xl">
+                            <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <h3 class="text-sm sm:text-base font-black text-slate-100">⚗️ Work Analytics</h3>
+                                    <div class="flex bg-slate-900/90 p-0.5 rounded-lg border border-slate-700 text-[11px] gap-0.5">
+                                        <button type="button" onclick="setWorkChartUnit('money')" id="btn-work-unit-money" class="px-2.5 py-1 rounded-md font-bold transition-all theme-accent-btn flex items-center gap-1"><span>฿</span> <span>Money</span></button>
+                                        <button type="button" onclick="setWorkChartUnit('hours')" id="btn-work-unit-hours" class="px-2.5 py-1 rounded-md font-bold transition-all text-slate-400 hover:text-white flex items-center gap-1"><span>⏱️</span> <span>Hours</span></button>
+                                    </div>
+                                    <div class="flex bg-slate-900/90 p-0.5 rounded-lg border border-slate-700 text-[11px] gap-0.5">
+                                        <button type="button" onclick="setWorkChartMode('bar')" id="btn-work-mode-bar" class="px-2 py-1 rounded-md font-bold transition-all theme-accent-btn">📊</button>
+                                        <button type="button" onclick="setWorkChartMode('line')" id="btn-work-mode-line" class="px-2 py-1 rounded-md font-bold transition-all text-slate-400 hover:text-white">📈</button>
+                                        <button type="button" onclick="setWorkChartMode('area')" id="btn-work-mode-area" class="px-2 py-1 rounded-md font-bold transition-all text-slate-400 hover:text-white">🌊</button>
+                                    </div>
+                                </div>
+                                <div class="flex bg-slate-900/80 p-0.5 rounded-lg border border-slate-700 text-[11px] font-semibold">
+                                    <button onclick="setChartRange('work', 'daily')" id="btn-work-daily" class="px-2 py-1 rounded-md text-slate-400">Daily</button>
+                                    <button onclick="setChartRange('work', 'weekly')" id="btn-work-weekly" class="px-2 py-1 rounded-md text-slate-400">Weekly</button>
+                                    <button onclick="setChartRange('work', 'monthly')" id="btn-work-monthly" class="px-2 py-1 rounded-md text-slate-400">Monthly</button>
+                                    <button onclick="setChartRange('work', 'yearly')" id="btn-work-yearly" class="px-2 py-1 rounded-md text-slate-400">Yearly</button>
+                                </div>
+                            </div>
+                            <div class="h-44 sm:h-48 w-full relative"><canvas id="workChart"></canvas></div>
+                        </div>
+
+                        <div class="card p-4 sm:p-5 rounded-2xl">
+                            <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-sm sm:text-base font-black text-slate-100">🌿 Sanctuary Trends</h3>
+                                    <div class="flex bg-slate-900/90 p-0.5 rounded-lg border border-slate-700 text-[11px] gap-0.5">
+                                        <button type="button" onclick="setSanctuaryChartMode('bar')" id="btn-sanctuary-mode-bar" class="px-2.5 py-1 rounded-md font-bold transition-all theme-accent-btn">📊 Bar</button>
+                                        <button type="button" onclick="setSanctuaryChartMode('line')" id="btn-sanctuary-mode-line" class="px-2.5 py-1 rounded-md font-bold transition-all text-slate-400 hover:text-white">📈 Line</button>
+                                    </div>
+                                </div>
+                                <div class="flex bg-slate-900/80 p-0.5 rounded-lg border border-slate-700 text-[11px] font-semibold">
+                                    <button onclick="setChartRange('sanctuary', 'daily')" id="btn-sanctuary-daily" class="px-2 py-1 rounded-md text-slate-400">Daily</button>
+                                    <button onclick="setChartRange('sanctuary', 'weekly')" id="btn-sanctuary-weekly" class="px-2 py-1 rounded-md text-slate-400">Weekly</button>
+                                    <button onclick="setChartRange('sanctuary', 'monthly')" id="btn-sanctuary-monthly" class="px-2 py-1 rounded-md text-slate-400">Monthly</button>
+                                    <button onclick="setChartRange('sanctuary', 'yearly')" id="btn-sanctuary-yearly" class="px-2 py-1 rounded-md text-slate-400">Yearly</button>
+                                </div>
+                            </div>
+                            <div class="h-44 sm:h-48 w-full"><canvas id="sanctuaryChart"></canvas></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION E: RELOCATED AUREATE INSIGHT CARDS -->
+                <section class="space-y-3" aria-labelledby="horizon-insights-heading">
+                    <div class="flex items-center justify-between gap-2 flex-wrap">
+                        <div class="flex items-center gap-2.5 flex-wrap">
+                            <h3 id="horizon-insights-heading" class="text-base sm:text-lg font-black text-slate-100 flex items-center gap-2"><span aria-hidden="true">✨</span> <span>Aureate Insights</span></h3>
+                            <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">RELOCATED</span>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-500">Live • raw logs &amp; habit thermostat</span>
+                    </div>
+                    <div id="horizon-insight-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3"></div>
+                </section>
             </div>
 
             <!-- TAB 4: RELICS -->
@@ -980,6 +1022,7 @@
     <script src="js/pomodoro.js"></script>
     <script src="js/charts.js"></script>
     <script src="js/journal.js"></script>
+    <script src="js/horizon.js"></script>
     <script src="js/ledger.js"></script>
     <script src="js/quickLog.js"></script>
     <script src="js/receipt.js"></script>
