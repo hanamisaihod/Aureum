@@ -1,5 +1,5 @@
 // ============================================================================
-// AUREUM — 5-State Habit Thermostat Unit Tests
+// AUREUM — 6-State Habit Thermostat Unit Tests
 // Run with: npm test
 // ============================================================================
 
@@ -8,9 +8,12 @@ const assert = require('node:assert/strict');
 
 const {
     computeHabitThermostat,
+    resolveThermostatThresholds,
     HABIT_THERMOSTAT_STATES,
+    THERMOSTAT_THRESHOLD_DEFAULTS,
     THERMOSTAT_DAY_MS,
-    THERMOSTAT_FUTURE_GRACE_MS
+    THERMOSTAT_FUTURE_GRACE_MS,
+    THERMOSTAT_DEFAULT_WINDOW_DAYS
 } = require('../js/thermostat.js');
 
 const REF = new Date(2026, 10, 15, 12, 0, 0).getTime(); // Nov 15 2026, 12:00 local
@@ -63,20 +66,38 @@ test('OVERHEATING wins priority over TUNNEL_VISION and reports rolling metrics',
     assert.equal(result.quickActions[0].mins, 25);
 });
 
-test('COLD_START triggers on empty history', () => {
+test('NO_DATA placeholder for a completely empty history', () => {
     const result = computeHabitThermostat([], {}, REF);
 
-    assert.equal(result.state, 'COLD_START');
-    assert.equal(result.label, '❄️ Cold Start');
-    assert.equal(result.tone, 'corrective');
+    assert.equal(result.state, 'NO_DATA');
+    assert.equal(result.label, '⏳ Warming Up');
+    assert.equal(result.tone, 'neutral');
+    assert.equal(result.isCorrective, false);
+    assert.equal(result.isPlaceholder, true);
+    assert.equal(result.priority, 0);
     assert.equal(result.metrics.workH, 0);
     assert.equal(result.metrics.totalH, 0);
     assert.equal(result.metrics.activeDays, 0);
     assert.equal(result.metrics.avgEffort, 0);
     assert.equal(result.metrics.avgQuality, 0);
     assert.equal(result.metrics.prevAvgQuality, 0);
-    assert.equal(result.quickActions.length, 2);
-    assert.deepEqual(result.quickActions.map(a => a.type), ['work', 'chore']);
+    assert.equal(result.quickActions.length, 1);
+    assert.deepEqual(result.quickActions.map(a => a.type), ['work']);
+    assert.equal(result.explain[0].id, 'noData.usableLogs');
+    assert.equal(result.explain[0].passed, false);
+});
+
+test('stale history stays COLD_START instead of NO_DATA', () => {
+    // The user logged 40 days ago: nothing in either window, but history exists,
+    // so the honest read is "low momentum", not "no data yet".
+    const stale = [makeLog('work', 4, 40, { results: 4, effort: 3 })];
+    const result = computeHabitThermostat(stale, {}, REF);
+
+    assert.equal(result.state, 'COLD_START');
+    assert.equal(result.metrics.totalH, 0);
+    assert.equal(result.isPlaceholder, false);
+    assert.equal(result.explain[0].id, 'noData.usableLogs');
+    assert.equal(result.explain[0].passed, true);
 });
 
 test('COLD_START hysteresis: 3.5h stays cold until totalH >= 4.5 and activeDays >= 3', () => {
@@ -279,7 +300,7 @@ test('rolling windows respect the 7d/14d boundaries and +5m future grace', () =>
 test('invalid and non-array inputs are handled defensively', () => {
     for (const input of [null, undefined, {}, 'not-a-log-array', 42]) {
         const result = computeHabitThermostat(input, null, REF);
-        assert.equal(result.state, 'COLD_START');
+        assert.equal(result.state, 'NO_DATA');
         assert.equal(result.metrics.totalH, 0);
         assert.equal(result.metrics.activeDays, 0);
     }
@@ -298,6 +319,7 @@ test('invalid and non-array inputs are handled defensively', () => {
 
 test('every state definition exposes the required label, message, and adaptive action', () => {
     const expected = {
+        NO_DATA: ['⏳ Warming Up', false, 0],
         OVERHEATING: ['🔥 Overheating', true, 1],
         COLD_START: ['❄️ Cold Start', true, 2],
         TUNNEL_VISION: ['🔭 Tunnel-Vision', true, 3],
@@ -327,5 +349,159 @@ test('every state definition exposes the required label, message, and adaptive a
         { label: '15m Sanctuary Reset', type: 'chore', mins: 15 },
         { label: '15m Mobility / Walk', type: 'workout', mins: 15 }
     ]);
+    assert.deepEqual(HABIT_THERMOSTAT_STATES.NO_DATA.action.quickActions, [
+        { label: '15m Starter Craft', type: 'work', mins: 15 }
+    ]);
+});
+
+test('windowDays widens the rolling window for monthly Codex cards', () => {
+    const logs = [
+        makeLog('work', 2, 1, { results: 4, effort: 3 }),
+        makeLog('work', 2, 3, { results: 4, effort: 3 }),
+        makeLog('work', 2, 20, { results: 4, effort: 3 }),
+        makeLog('work', 2, 25, { results: 4, effort: 3 })
+    ];
+
+    const weekly = computeHabitThermostat(logs, {}, REF);
+    assert.equal(weekly.metrics.windowDays, THERMOSTAT_DEFAULT_WINDOW_DAYS);
+    assert.equal(weekly.metrics.workH, 4);
+
+    const monthly = computeHabitThermostat(logs, {}, REF, { windowDays: 30 });
+    assert.equal(monthly.metrics.windowDays, 30);
+    assert.equal(monthly.metrics.workH, 8);
+    assert.equal(monthly.window.windowDays, 30);
+    assert.equal(monthly.window.previousWindowDays, 30);
+    assert.equal(monthly.window.endMs, REF + THERMOSTAT_FUTURE_GRACE_MS);
+
+    // Out-of-range / junk options fall back to the 7-day default.
+    assert.equal(computeHabitThermostat(logs, {}, REF, { windowDays: 'nope' }).metrics.windowDays, 7);
+    assert.equal(computeHabitThermostat(logs, {}, REF, { windowDays: 0 }).metrics.windowDays, 7);
+});
+
+test('thresholds derive from weeklyHours and accept explicit overrides', () => {
+    assert.deepEqual(resolveThermostatThresholds({}), JSON.parse(JSON.stringify(THERMOSTAT_THRESHOLD_DEFAULTS)));
+    assert.deepEqual({ ...resolveThermostatThresholds({ weeklyHours: 10 }).workH }, { overheat: 14, tunnel: 8, dialed: 8 });
+    assert.deepEqual({ ...resolveThermostatThresholds({ weeklyHours: 20 }).workH }, { overheat: 28, tunnel: 16, dialed: 16 });
+    assert.deepEqual(
+        { ...resolveThermostatThresholds({ weeklyHours: 20, thermostat: { workH: { overheat: 18 } } }).workH },
+        { overheat: 18, tunnel: 16, dialed: 16 }
+    );
+    // Junk overrides fall through to the derived/default gate.
+    assert.deepEqual(
+        { ...resolveThermostatThresholds({ thermostat: { workH: { overheat: 'nope', tunnel: -4 } } }).workH },
+        { overheat: 14, tunnel: 8, dialed: 8 }
+    );
+    assert.equal(resolveThermostatThresholds(null).quality.dialedAvg, 3.8);
+});
+
+test('weeklyHours target scales the OVERHEATING ceiling', () => {
+    const logs = [
+        makeLog('work', 6, 0, { results: 3, effort: 4.5 }),
+        makeLog('work', 5, 2, { results: 3, effort: 4.5 }),
+        makeLog('work', 5, 4, { results: 3, effort: 4.5 })
+    ];
+
+    const defaultTarget = computeHabitThermostat(logs, {}, REF);
+    assert.equal(defaultTarget.state, 'OVERHEATING');
+
+    const highTarget = computeHabitThermostat(logs, { weeklyHours: 20 }, REF);
+    assert.notEqual(highTarget.state, 'OVERHEATING');
+    assert.equal(highTarget.explain.find(e => e.id === 'overheating.workH').threshold, 28);
+});
+
+test('missing quality ratings are counted without changing the fallback maths', () => {
+    const logs = [
+        makeLog('work', 3, 0, { results: 4, effort: 3.4 }),
+        makeLog('work', 3, 2, { effort: 3.4 }),
+        makeLog('work', 3, 4, { effort: 3.4 })
+    ];
+
+    const result = computeHabitThermostat(logs, {}, REF);
+
+    assert.equal(result.metrics.workLogsCount, 3);
+    assert.equal(result.metrics.missingRatingCount, 2);
+    assert.equal(result.metrics.qualityCoverage, 0.33);
+    // Unrated logs keep contributing the 3.0 fallback: (4 + 3 + 3) / 3.
+    assert.equal(result.metrics.avgQuality, 3.33);
+});
+
+test('explain traces the rules that produced the winning state', () => {
+    const logs = [
+        makeLog('work', 6, 0, { results: 3, effort: 4.5 }),
+        makeLog('work', 5, 2, { results: 3, effort: 4.5 }),
+        makeLog('work', 5, 4, { results: 3, effort: 4.5 })
+    ];
+    const result = computeHabitThermostat(logs, {}, REF);
+    assert.equal(result.state, 'OVERHEATING');
+
+    const reasons = result.explain.filter(e => e.state === result.state && e.passed && !e.skipped);
+    const ids = reasons.map(e => e.id);
+    assert.ok(ids.includes('overheating.workH'), 'work-hour gate is explained');
+    assert.ok(ids.includes('overheating.effort'), 'effort gate is explained');
+    assert.equal(result.explain.find(e => e.id === 'overheating.qualityDrop').passed, false);
+    assert.equal(result.explain.find(e => e.id === 'overheating.hysteresis').passed, true);
+
+    // Every entry is renderable by the HUD popup.
+    result.explain.forEach(entry => {
+        assert.equal(typeof entry.id, 'string');
+        assert.equal(typeof entry.label, 'string');
+        assert.ok(entry.label.length > 0);
+        assert.equal(typeof entry.passed, 'boolean');
+        assert.equal(typeof entry.skipped, 'boolean');
+        assert.ok(entry.threshold === null || typeof entry.threshold === 'number');
+    });
+});
+
+test('exactly one state is returned for a spread of log histories', () => {
+    const fixtures = [
+        [],
+        [makeLog('work', 1, 0, { results: 3, effort: 3 })],
+        [
+            makeLog('work', 6, 0, { results: 3, effort: 4.5 }),
+            makeLog('work', 5, 2, { results: 3, effort: 4.5 }),
+            makeLog('work', 5, 4, { results: 3, effort: 4.5 })
+        ],
+        [
+            makeLog('work', 3, 0, { results: 3, effort: 3.2 }),
+            makeLog('work', 3, 2, { results: 3, effort: 3.2 }),
+            makeLog('work', 2, 4, { results: 3, effort: 3.2 })
+        ],
+        [
+            makeLog('work', 3, 0, { results: 4, effort: 3.4 }),
+            makeLog('work', 3, 2, { results: 4, effort: 3.4 }),
+            makeLog('work', 3, 4, { results: 4, effort: 3.4 }),
+            makeLog('chore', 2, 1)
+        ],
+        [makeLog('chore', 1, 0), makeLog('workout', 0.5, 2)],
+        [{ type: 'work', hours: 4 }],
+        [
+            makeLog('work', 12, 0, { results: 4, effort: 3 }),
+            makeLog('work', 12, 1, { results: 4, effort: 3 })
+        ]
+    ];
+
+    fixtures.forEach((logs, index) => {
+        const result = computeHabitThermostat(logs, {}, REF);
+        const definition = HABIT_THERMOSTAT_STATES[result.state];
+        assert.ok(definition, `fixture ${index} produced a known state`);
+        assert.equal(definition.state, result.state, `fixture ${index} state id matches`);
+        assert.equal(definition.label, result.label, `fixture ${index} label matches`);
+        assert.equal(definition.priority, result.priority, `fixture ${index} priority matches`);
+        assert.equal(typeof result.metrics.totalH, 'number');
+        assert.ok(Array.isArray(result.explain) && result.explain.length > 0, `fixture ${index} carries an explain trace`);
+    });
+});
+
+test('state tally stays 3 corrective versus 3 positive-or-neutral', () => {
+    const states = Object.values(HABIT_THERMOSTAT_STATES);
+
+    const corrective = states.filter(s => s.isCorrective).map(s => s.state).sort();
+    const other = states.filter(s => !s.isCorrective).map(s => s.state).sort();
+
+    assert.deepEqual(corrective, ['COLD_START', 'OVERHEATING', 'TUNNEL_VISION']);
+    assert.deepEqual(other, ['DIALED_IN', 'NO_DATA', 'STEADY_CRUISE']);
+    // NO_DATA is a neutral placeholder, so only two states are genuinely positive.
+    assert.equal(states.filter(s => !s.isCorrective && !s.isPlaceholder).length, 2);
+    assert.deepEqual(states.map(s => s.priority).sort((a, b) => a - b), [0, 1, 2, 3, 4, 5]);
 });
 

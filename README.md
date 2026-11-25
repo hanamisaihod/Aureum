@@ -35,7 +35,7 @@ Aureum/
 tests/
 ├── chore-multiplier.test.js  # Node test-runner unit tests for tier boundaries & retroactive allowance payouts
 ├── horizon.test.js           # Forecast math, sweet-spot windows, duration bands & duo merging
-└── thermostat.test.js        # 5-state habit thermostat priority waterfall & rolling windows
+└── thermostat.test.js        # 6-state habit thermostat priority waterfall, thresholds & rolling windows
 ```
 
 ## Horizon Analytics

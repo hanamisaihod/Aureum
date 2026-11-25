@@ -952,8 +952,8 @@ function _buildCodexReflectionCardHtml(standout, monthYearTitle) {
 }
 
 function _buildCodexMilestonesCardHtml(monthYearTitle, peakFlowCount, stalwartCount, softCapDays, activeDaysCount, softCap, totalSanctuaryHours, unlockedBadgesCount, thermostat) {
-    const thermostatLabel = thermostat ? thermostat.label : '🌿 Steady Cruise';
-    const thermostatMessage = thermostat ? thermostat.message : 'Balanced, sustainable rhythm with no alarms tripped.';
+    const thermostatLabel = thermostat ? thermostat.label : '⏳ Warming Up';
+    const thermostatMessage = thermostat ? thermostat.message : 'Thermostat engine unavailable for this snapshot.';
     return `
         <div class="lg:col-span-6 p-4 sm:p-5 rounded-2xl bg-slate-950/90 border border-amber-500/35 flex flex-col justify-between space-y-3">
             <div class="space-y-2.5">
@@ -1066,8 +1066,16 @@ function renderMonthlyPerformanceCodex() {
     const softCap = activeSettings.dailySoftCap || 4;
     const softCapDays = Object.values(dailyWorkHours).filter(h => h >= softCap).length;
     const standout = _selectMonthlyStandoutReflection(monthLogs, logsUpToPeriod);
+    // The Codex thermostat describes the selected month (month-to-date while the
+    // current month is selected), not the trailing 7 days. The comparison window
+    // is the preceding equal-length span so quality-drop detection still works.
+    const thermostatDayMs = (typeof THERMOSTAT_DAY_MS === 'number' && THERMOSTAT_DAY_MS > 0)
+        ? THERMOSTAT_DAY_MS
+        : 86400000;
+    const monthStartMs = new Date(targetYear, targetMonth, 1).getTime();
+    const monthWindowDays = Math.max(1, Math.round((endOfPeriodMs - monthStartMs) / thermostatDayMs));
     const monthlyThermostat = typeof computeHabitThermostat === 'function'
-        ? computeHabitThermostat(monthLogs, activeSettings, endOfPeriodMs)
+        ? computeHabitThermostat(monthLogs, activeSettings, endOfPeriodMs, { windowDays: monthWindowDays })
         : null;
     const monthlyChoreHoursTotal = choreLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);
     const monthlyWorkoutHours = workoutLogs.reduce((acc, l) => acc + (parseFloat(l.hours) || 0), 0);

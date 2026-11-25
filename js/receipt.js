@@ -200,9 +200,17 @@ function computePayoffReceiptData(year, month) {
     const baseAllowance = Math.min(monthlyPoints * pointRate, maxCash);
     const breakdown = calculateMonthlyAllowanceBreakdown(baseAllowance, choreH, maxCash);
 
+    // The statement's thermostat describes the whole calendar month (month-to-date
+    // while the current month is open), so the window tracks the month span rather
+    // than the engine's default trailing 7 days.
+    const thermostatDayMs = (typeof THERMOSTAT_DAY_MS === 'number' && THERMOSTAT_DAY_MS > 0)
+        ? THERMOSTAT_DAY_MS
+        : 86400000;
+    const monthStartMs = new Date(year, month, 1).getTime();
+    const monthWindowDays = Math.max(1, Math.round((refMs - monthStartMs) / thermostatDayMs));
     const thermostat = typeof computeHabitThermostat === 'function'
-        ? computeHabitThermostat(monthLogs, settings, refMs)
-        : { state: 'STEADY_CRUISE', label: '🌿 Steady Cruise' };
+        ? computeHabitThermostat(monthLogs, settings, refMs, { windowDays: monthWindowDays })
+        : { state: 'NO_DATA', label: '⏳ Warming Up' };
 
     return {
         year, month, monthTitle, isCurrent,

@@ -95,7 +95,18 @@ function renderDuoHUDCards(){
         const uLogs = duoPresenceData[u].logs || (u === viewedUser ? currentRawLogsCache : []);
         const thermostat = typeof computeHabitThermostat === 'function'
             ? computeHabitThermostat(uLogs, s || {}, Date.now())
-            : { state: 'STEADY_CRUISE', label: '🌿 Steady Cruise', message: '', metrics: { workH: 0, choreH: 0, workoutH: 0, totalH: 0, activeDays: 0, avgQuality: 0 } };
+            : {
+                state: 'NO_DATA',
+                label: '⏳ Warming Up',
+                message: 'Thermostat engine unavailable — reload to restore live pacing.',
+                isCorrective: false,
+                isPlaceholder: true,
+                quickActions: [],
+                recommendedPomo: null,
+                explain: [],
+                window: null,
+                metrics: { workH: 0, choreH: 0, workoutH: 0, totalH: 0, activeDays: 0, avgQuality: 0, missingRatingCount: 0, qualityCoverage: 0, ignoredFutureLogs: 0, windowDays: 7 }
+            };
 
         hudThermostatCache[u] = { user: u, displayName: dispName, thermostat };
 
@@ -547,13 +558,16 @@ function getHudThermostatSnapshot(user) {
     const thermostat = typeof computeHabitThermostat === 'function'
         ? computeHabitThermostat(logs, settings, Date.now())
         : {
-            state: 'STEADY_CRUISE',
-            label: '🌿 Steady Cruise',
-            message: 'Balanced, sustainable rhythm with no alarms tripped.',
+            state: 'NO_DATA',
+            label: '⏳ Warming Up',
+            message: 'Thermostat engine unavailable — reload to restore live pacing.',
             isCorrective: false,
+            isPlaceholder: true,
             quickActions: [],
             recommendedPomo: null,
-            metrics: { workH: 0, choreH: 0, workoutH: 0, totalH: 0, activeDays: 0, avgQuality: 0 }
+            explain: [],
+            window: null,
+            metrics: { workH: 0, choreH: 0, workoutH: 0, totalH: 0, activeDays: 0, avgQuality: 0, missingRatingCount: 0, qualityCoverage: 0, ignoredFutureLogs: 0, windowDays: 7 }
         };
     return { user, displayName: getUserDisplayName(user), thermostat };
 }
@@ -656,8 +670,27 @@ function renderHudInfoPopup(user) {
             <div class="text-sm font-black font-mono ${item.tint} mt-0.5">${escapeHtml(item.value)}</div>
         </div>`).join('');
 
+    // Honest caveat when quality averages lean on the 3.0 fallback rating.
+    const missingRatings = parseInt(metrics.missingRatingCount, 10) || 0;
+    const caveatsHtml = missingRatings > 0
+        ? `<p class="text-[9px] font-mono text-amber-300/80 leading-snug">⚠ ${missingRatings} unrated work log${missingRatings === 1 ? '' : 's'} counted at quality 3.0</p>`
+        : '';
+
+    // "Why" trace straight from the engine's explain array.
+    const reasons = Array.isArray(thermostat.explain)
+        ? thermostat.explain.filter(entry => entry && entry.state === thermostat.state && entry.passed && !entry.skipped).slice(0, 3)
+        : [];
+    const reasonsHtml = (reasons.length > 0 && !thermostat.isPlaceholder)
+        ? `<div class="p-2.5 rounded-xl bg-slate-900/70 border border-slate-800">
+            <div class="text-[9px] uppercase tracking-wider font-extrabold text-slate-500">Why</div>
+            <ul class="mt-1 space-y-0.5">
+                ${reasons.map(entry => `<li class="text-[10px] text-slate-300 leading-snug">✓ ${escapeHtml(entry.label)} <span class="font-mono text-slate-500">(${escapeHtml(String(entry.value))})</span></li>`).join('')}
+            </ul>
+        </div>`
+        : '';
+
     let actionsHtml = '';
-    if (isSelf && thermostat.isCorrective) {
+    if (isSelf && (thermostat.isCorrective || thermostat.isPlaceholder)) {
         const actionBtns = (thermostat.quickActions || []).map(action => `
             <button type="button" onclick="startThermostatQuickAction('${action.type}', ${action.mins})"
                 class="px-2.5 py-1.5 rounded-lg text-[10px] font-extrabold bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 transition-all">
@@ -685,10 +718,12 @@ function renderHudInfoPopup(user) {
         </div>
         <div class="flex items-center gap-2 flex-wrap">
             <span class="text-[10px] font-black px-2 py-0.5 rounded-full border whitespace-nowrap ${badgeClasses}">${escapeHtml(thermostat.label)}</span>
-            <span class="text-[9px] font-mono text-slate-500">Rolling 7 days</span>
+            <span class="text-[9px] font-mono text-slate-500">Rolling ${(thermostat.window && thermostat.window.windowDays) || 7} days</span>
         </div>
         <p class="text-[11px] text-slate-300 leading-relaxed">${escapeHtml(thermostat.message || 'Balanced, sustainable rhythm with no alarms tripped.')}</p>
+        ${caveatsHtml}
         <div class="grid grid-cols-2 gap-2">${metricTiles}</div>
+        ${reasonsHtml}
         ${actionsHtml}
         <div class="text-[9px] font-mono text-slate-500 pt-2 border-t border-slate-800/70">
             ${isSelf ? 'Your personal card • Click the badge to pin this breakdown' : 'Peer card • Read-only preview'}
