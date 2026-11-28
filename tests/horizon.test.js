@@ -9,6 +9,7 @@ const assert = require('node:assert/strict');
 const {
     buildMonthlyTrajectory,
     mergeHorizonTrajectories,
+    applyDuoSpilloverProjection,
     computeSweetSpot,
     computeDurationDistribution,
     HORIZON_DURATION_BANDS
@@ -242,5 +243,85 @@ test('duo trajectories merge independent ledgers without losing totals', () => {
     assert.equal(duo.daysInMonth, 30);
     assert.equal(duo.projectedTotalSeries.length, 30);
     assert.equal(duo.monthlyLimit, north.monthlyLimit + cream.monthlyLimit);
+});
+
+
+test('duo spillover projection transfers the excess 1:1 and keeps the personal curve capped', () => {
+    const now = new Date(2026, 10, 21, 12, 0, 0);
+    // North blows past the ฿10,000 ceiling; Cream is comfortably below it.
+    const north = buildMonthlyTrajectory([workLog(5, 1000, 40)], SETTINGS, now);
+    const cream = buildMonthlyTrajectory([workLog(6, 20, 3)], SETTINGS, now);
+    const pair = applyDuoSpilloverProjection(north, cream);
+
+    assert.equal(north.personalCeiling, 10000);
+    assert.ok(north.mtdOverflow > 0);
+    assert.equal(pair.North.spilloverSentActual, north.mtdOverflow);
+    assert.equal(pair.North.spilloverReceivedActual, 0);
+    assert.equal(pair.North.earnedSoFar, 10000, 'sender stays exactly at the personal ceiling');
+
+    assert.equal(pair.Cream.spilloverSentActual, 0);
+    assert.equal(pair.Cream.spilloverReceivedActual, north.mtdOverflow);
+    closeTo(pair.Cream.earnedSoFar, cream.earnedSoFar + north.mtdOverflow, 0.02, 'receiver payout includes the transfer');
+
+    // Month-end projection mirrors the same rule and the last projected point
+    // equals the headline projected total to the cent.
+    assert.equal(pair.North.projectedTotal, 10000);
+    closeTo(pair.Cream.projectedTotal, cream.projectedTotal + north.projectedOverflow, 0.02, 'projected transfer');
+    const lastIdx = pair.Cream.projectedTotalSeries.length - 1;
+    closeTo(pair.Cream.projectedTotalSeries[lastIdx], pair.Cream.projectedTotal, 0.02, 'series ends at projected total');
+
+    // The sender keeps the uncapped overflow series for the dashed chart segment.
+    assert.ok(pair.North.projectedOverflowSeries.some(value => value !== null));
+});
+
+test('duo spillover projection cancels when both partners are over the ceiling', () => {
+    const now = new Date(2026, 10, 21, 12, 0, 0);
+    const north = buildMonthlyTrajectory([workLog(5, 1000, 40)], SETTINGS, now);
+    const cream = buildMonthlyTrajectory([workLog(6, 1000, 40)], SETTINGS, now);
+    const pair = applyDuoSpilloverProjection(north, cream);
+
+    assert.ok(north.mtdOverflow > 0);
+    assert.ok(cream.mtdOverflow > 0);
+    assert.equal(pair.North.spilloverSentActual, 0);
+    assert.equal(pair.North.spilloverReceivedActual, 0);
+    assert.equal(pair.Cream.spilloverSentActual, 0);
+    assert.equal(pair.Cream.spilloverReceivedActual, 0);
+    assert.equal(pair.North.projectedTotal, 10000);
+    assert.equal(pair.Cream.projectedTotal, 10000);
+    assert.equal(pair.North.bothMaxed, true);
+});
+
+test('merging spillover-adjusted trajectories sums household payouts', () => {
+    const now = new Date(2026, 10, 21, 12, 0, 0);
+    const north = buildMonthlyTrajectory([workLog(5, 1000, 40)], SETTINGS, now);
+    const cream = buildMonthlyTrajectory([workLog(6, 20, 3)], SETTINGS, now);
+    const pair = applyDuoSpilloverProjection(north, cream);
+    const duo = mergeHorizonTrajectories(pair.North, pair.Cream);
+
+    closeTo(duo.projectedTotal, pair.North.projectedTotal + pair.Cream.projectedTotal, 0.02, 'combined payout');
+    assert.equal(duo.projectedTotalSeries.length, 30);
+    assert.ok(duo.spilloverReceivedProjected > 0);
+});
+
+
+test('month-end horizon payout matches the pure duo allowance to the cent', () => {
+    const { computeDuoMonthlyAllowance } = require('../js/choreMultiplier.js');
+    const now = new Date(2026, 10, 30, 23, 0, 0); // last day of November 2026
+    const logs = [
+        { type: 'work', user: 'North', points: 135, hours: 50, timestamp: new Date(2026, 10, 2, 10, 0, 0) },
+        { type: 'chore', user: 'North', hours: 50, timestamp: new Date(2026, 10, 3, 10, 0, 0) }
+    ];
+    const north = buildMonthlyTrajectory(logs.filter(l => l.user === 'North'), SETTINGS, now);
+    const cream = buildMonthlyTrajectory([], SETTINGS, now);
+    const pair = applyDuoSpilloverProjection(north, cream);
+    const duo = computeDuoMonthlyAllowance(logs, { North: SETTINGS, Cream: SETTINGS }, 2026, 10);
+
+    // ฿9,000 base × 1.25 = ฿11,250 raw; personal ceiling ฿10,000; ฿1,250 spills.
+    assert.equal(duo.North.spilloverSent, 1250);
+    assert.equal(duo.Cream.finalPayout, 1250);
+    assert.equal(pair.North.projectedTotal, duo.North.finalPayout);
+    assert.equal(pair.Cream.projectedTotal, duo.Cream.finalPayout);
+    assert.equal(pair.North.earnedSoFar, duo.North.finalPayout);
+    assert.equal(pair.Cream.earnedSoFar, duo.Cream.finalPayout);
 });
 

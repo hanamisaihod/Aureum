@@ -12,12 +12,18 @@ const RECEIPT_MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'Ju
 let payoffReceiptYear = null;
 let payoffReceiptMonth = null;
 
+function _receiptSettingsFor(user) {
+    if (!user) return userSettings || {};
+    if (user === loggedInUser) return userSettings || {};
+    if (user === viewedUser) {
+        if (typeof spectatorSettings !== 'undefined' && spectatorSettings) return spectatorSettings;
+        return duoPresenceData?.[user]?.settings || userSettings || {};
+    }
+    return duoPresenceData?.[user]?.settings || userSettings || {};
+}
+
 function _receiptViewedSettings() {
-    if (loggedInUser === viewedUser) return userSettings || {};
-    return (typeof spectatorSettings !== 'undefined' && spectatorSettings)
-        || duoPresenceData?.[viewedUser]?.settings
-        || userSettings
-        || {};
+    return _receiptSettingsFor(viewedUser);
 }
 
 function _receiptLogsForViewedUser() {
@@ -41,6 +47,11 @@ function _receiptSumHours(logs, type) {
 
 function _receiptMoney(value) {
     return `฿${Math.round(Number(value) || 0).toLocaleString('en-US')}`;
+}
+
+function _receiptMoney2(value) {
+    const num = Math.round((Number(value) || 0) * 100) / 100;
+    return `฿${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 function _receiptHours(value) {
@@ -200,6 +211,29 @@ function computePayoffReceiptData(year, month) {
     const baseAllowance = Math.min(monthlyPoints * pointRate, maxCash);
     const breakdown = calculateMonthlyAllowanceBreakdown(baseAllowance, choreH, maxCash);
 
+    // Co-Op Spillover is recomputed from the complete duo snapshot so the
+    // statement's "Final Allowance Payout" matches the dashboard to the cent.
+    // The raw breakdown shows what was earned before the personal ceiling.
+    const rawBreakdown = calculateMonthlyAllowanceBreakdown(monthlyPoints * pointRate, choreH);
+    const partner = viewedUser === 'North' ? 'Cream' : 'North';
+    let duoAllowance = null;
+    if (typeof computeDuoMonthlyAllowance === 'function') {
+        const settingsMap = {
+            North: _receiptSettingsFor('North'),
+            Cream: _receiptSettingsFor('Cream')
+        };
+        // The viewed user's figures must use exactly the settings above.
+        settingsMap[viewedUser] = settings;
+        duoAllowance = computeDuoMonthlyAllowance(_receiptAllLogs(), settingsMap, year, month);
+    }
+    const spillover = duoAllowance ? (duoAllowance[viewedUser] || null) : null;
+    const spilloverSent = spillover ? (Number(spillover.spilloverSent) || 0) : 0;
+    const spilloverReceived = spillover ? (Number(spillover.spilloverReceived) || 0) : 0;
+    const hasSpillover = spilloverSent > 0 || spilloverReceived > 0;
+    const personalCappedEarned = spillover ? spillover.personalCappedEarned : breakdown.finalMonthlyAllowance;
+    const finalPayout = spillover ? spillover.finalPayout : breakdown.finalMonthlyAllowance;
+    const displayBreakdown = hasSpillover ? rawBreakdown : breakdown;
+
     // The statement's thermostat describes the whole calendar month (month-to-date
     // while the current month is open), so the window tracks the month span rather
     // than the engine's default trailing 7 days.
@@ -218,7 +252,10 @@ function computePayoffReceiptData(year, month) {
         isSelf: loggedInUser === viewedUser,
         workH, choreH, workoutH, monthlyPoints, workLogCount: workLogs.length, activeDays,
         pointRate, targetCash, targetPts, maxCash, maxBonusPct,
-        baseAllowance, breakdown, thermostat,
+        baseAllowance, breakdown, rawBreakdown, displayBreakdown, thermostat,
+        partner, partnerName: getUserDisplayName(partner),
+        spilloverSent, spilloverReceived, hasSpillover,
+        personalCappedEarned, finalPayout,
         duo: _receiptDuoMonthTotals(year, month)
     };
 }
@@ -280,19 +317,20 @@ function _receiptHeaderHtml(d) {
 }
 
 function _receiptEarningsSectionHtml(d) {
+    const b = d.displayBreakdown || d.breakdown;
     return `<section class="pt-3 receipt-dashed space-y-1.5">
         <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">Work &amp; Base Earnings</div>
         ${_receiptRowHtml('Total Work Hours', _receiptHours(d.workH))}
         ${_receiptRowHtml('Logged Shifts', String(d.workLogCount))}
         ${_receiptRowHtml('Base Rate', `฿${d.pointRate.toFixed(2)} / pt`)}
         ${_receiptRowHtml('Earned Points', `${formatHours(d.monthlyPoints)} pts`)}
-        ${_receiptRowHtml('Base Work Allowance', _receiptMoney(d.breakdown.baseAllowance), { strong: true })}
+        ${_receiptRowHtml('Base Work Allowance', _receiptMoney(b.baseAllowance), { strong: true })}
     </section>`;
 }
 
 
 function _receiptChoreSectionHtml(d) {
-    const cm = d.breakdown;
+    const cm = d.displayBreakdown || d.breakdown;
     const bonusTint = cm.choreBonusAmount > 0 ? 'text-emerald-400' : 'text-slate-400';
     const capNote = cm.payoutCapped
         ? `<p class="text-[10px] text-amber-300/90 leading-snug">Capped at the monthly limit ${_receiptMoney(cm.monthlyAllowanceLimit)} (target × max bonus cap).</p>`
@@ -311,14 +349,49 @@ function _receiptChoreSectionHtml(d) {
 }
 
 function _receiptTotalSectionHtml(d) {
-    return `<section class="pt-3 receipt-dashed">
+    const sent = Number(d.spilloverSent) || 0;
+    const received = Number(d.spilloverReceived) || 0;
+    const finalPayout = Number.isFinite(d.finalPayout) ? d.finalPayout : d.breakdown.finalMonthlyAllowance;
+
+    // Default statement: unchanged, clutter-free grand total.
+    if (sent <= 0 && received <= 0) {
+        return `<section class="pt-3 receipt-dashed">
         <div class="flex items-center justify-between gap-2">
             <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Grand Total</span>
             <span class="text-[9px] font-mono text-slate-500">Base + Retroactive Bonus</span>
         </div>
         <div class="flex items-end justify-between gap-2 mt-1">
             <span class="text-xs font-bold text-slate-300">Final Allowance Payout</span>
-            <span class="text-2xl font-black font-mono text-emerald-300">${_receiptMoney(d.breakdown.finalMonthlyAllowance)}</span>
+            <span class="text-2xl font-black font-mono text-emerald-300">${_receiptMoney(finalPayout)}</span>
+        </div>
+        <div class="text-[9px] font-mono text-slate-500 mt-0.5">Target ${_receiptMoney(d.targetCash)} · Cap ${_receiptMoney(d.maxCash)}</div>
+    </section>`;
+    }
+
+    // Co-Op Spillover statement: personal subtotal + the one active transfer.
+    const partnerName = escapeHtml(d.partnerName || d.partner || 'partner');
+    const spillRows = [];
+    if (sent > 0) {
+        const uncapped = d.rawBreakdown && Number.isFinite(d.rawBreakdown.finalMonthlyAllowance)
+            ? d.rawBreakdown.finalMonthlyAllowance
+            : (Number(d.personalCappedEarned) || 0) + sent;
+        spillRows.push(_receiptRowHtml('Personal Allowance Subtotal (Uncapped)', _receiptMoney2(uncapped), { strong: true }));
+        spillRows.push(`<p class="text-[9px] font-mono text-amber-300/90 leading-snug">Personal Cap Reached · excess flows to ${partnerName}</p>`);
+        spillRows.push(_receiptRowHtml(`Co-Op Spillover Sent (${partnerName})`, `-${_receiptMoney2(sent)}`, { tint: 'text-amber-300' }));
+    } else {
+        spillRows.push(_receiptRowHtml('Personal Allowance Subtotal', _receiptMoney(d.personalCappedEarned)));
+        spillRows.push(_receiptRowHtml(`Co-Op Spillover Received (${partnerName})`, `+${_receiptMoney2(received)}`, { tint: 'text-emerald-400' }));
+    }
+
+    return `<section class="pt-3 receipt-dashed">
+        <div class="flex items-center justify-between gap-2">
+            <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Grand Total</span>
+            <span class="text-[9px] font-mono text-slate-500">Base + Bonus + Co-Op</span>
+        </div>
+        <div class="space-y-1 mt-1">${spillRows.join('')}</div>
+        <div class="flex items-end justify-between gap-2 mt-1">
+            <span class="text-xs font-bold text-slate-300">Final Allowance Payout</span>
+            <span class="text-2xl font-black font-mono text-emerald-300">${_receiptMoney2(finalPayout)}</span>
         </div>
         <div class="text-[9px] font-mono text-slate-500 mt-0.5">Target ${_receiptMoney(d.targetCash)} · Cap ${_receiptMoney(d.maxCash)}</div>
     </section>`;

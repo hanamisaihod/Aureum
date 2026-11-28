@@ -50,6 +50,14 @@ function _horizonClamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
 }
 
+// Excess above a finite personal ceiling. Uncapped/misconfigured settings
+// (0, null, Infinity) never zero out normal earnings.
+function _horizonOverflowOf(rawValue, personalCeiling) {
+    if (!(Number.isFinite(personalCeiling) && personalCeiling > 0)) return 0;
+    const raw = _horizonNumber(rawValue, 0);
+    return raw > personalCeiling ? _horizonRound2(raw - personalCeiling) : 0;
+}
+
 function _horizonToDate(value) {
     if (!value) return null;
     if (typeof value.toDate === 'function') {
@@ -117,7 +125,14 @@ function buildMonthlyTrajectory(rawLogs, settings, nowDate = new Date()) {
     const bonusCapPct = _horizonNumber(s.maxBonusCapPct, 0) > 0 ? _horizonNumber(s.maxBonusCapPct, 0) : 125;
     const targetPoints = weeklyHours * 12;
     const pointRate = targetPoints > 0 ? monthlyCash / targetPoints : 0;
-    const monthlyLimit = monthlyCash * (bonusCapPct / 100);
+    // Personal ceiling = monthly base cap × (1 + maxBonusRate). The default
+    // maxBonusRate mirrors the tier ladder's +25% at 50h.
+    const explicitMaxBonusRate = _horizonNumber(s.maxBonusRate, NaN);
+    const maxBonusRate = Number.isFinite(explicitMaxBonusRate) && explicitMaxBonusRate >= 0
+        ? explicitMaxBonusRate
+        : Math.max(0, bonusCapPct / 100 - 1);
+    const personalCeiling = monthlyCash * (1 + maxBonusRate);
+    const monthlyLimit = personalCeiling;
 
     const dailyPoints = new Array(daysInMonth).fill(0);
     const dailyWorkHours = new Array(daysInMonth).fill(0);
@@ -146,41 +161,59 @@ function buildMonthlyTrajectory(rawLogs, settings, nowDate = new Date()) {
     }
 
     const currentTier = _horizonChoreTier(choreHoursToDate);
-    const baseToDate = Math.min(pointsToDate * pointRate, monthlyLimit);
-    const earnedSoFar = Math.min(monthlyLimit, baseToDate * currentTier.multiplier);
+    // Uncapped (raw) earnings drive spillover; capped values drive the personal
+    // curve so it visually stops at the personal ceiling.
+    const rawBaseToDate = pointsToDate * pointRate;
+    const rawEarnedSoFar = rawBaseToDate * currentTier.multiplier;
+    const baseToDate = Math.min(rawBaseToDate, monthlyLimit);
+    const earnedSoFar = Math.min(monthlyLimit, rawEarnedSoFar);
 
+    const rawDailyPaceBase = elapsedDays > 0 ? rawBaseToDate / elapsedDays : 0;
     const dailyPaceBase = elapsedDays > 0 ? baseToDate / elapsedDays : 0;
     const dailyPaceHours = elapsedDays > 0 ? workHoursToDate / elapsedDays : 0;
     const dailyPaceChore = elapsedDays > 0 ? choreHoursToDate / elapsedDays : 0;
 
     const projectedChoreHours = _horizonRound2(choreHoursToDate + (dailyPaceChore * remainingDays));
     const projectedTier = _horizonChoreTier(projectedChoreHours);
-    const projectedBase = Math.min(monthlyLimit, baseToDate + (dailyPaceBase * remainingDays));
-    const projectedTotalRaw = projectedBase * projectedTier.multiplier;
-    const projectedTotal = Math.min(monthlyLimit, projectedTotalRaw);
-    const payoutCapped = projectedTotalRaw > monthlyLimit + 0.005;
+    const rawProjectedBase = rawBaseToDate + (rawDailyPaceBase * remainingDays);
+    const projectedBase = Math.min(monthlyLimit, rawProjectedBase);
+    const rawProjectedTotal = rawProjectedBase * projectedTier.multiplier;
+    const projectedTotal = Math.min(monthlyLimit, rawProjectedTotal);
+    const payoutCapped = rawProjectedTotal > monthlyLimit + 0.005;
+    const mtdOverflow = _horizonOverflowOf(rawEarnedSoFar, personalCeiling);
+    const projectedOverflow = _horizonOverflowOf(rawProjectedTotal, personalCeiling);
 
     const cumulativeBase = new Array(daysInMonth).fill(0);
     const cumulativeActual = new Array(daysInMonth).fill(0);
+    const cumulativeRaw = new Array(daysInMonth).fill(0);
     let runningPoints = 0;
     for (let i = 0; i < daysInMonth; i++) {
         runningPoints += dailyPoints[i];
-        const base = Math.min(runningPoints * pointRate, monthlyLimit);
-        cumulativeBase[i] = _horizonRound2(base);
-        cumulativeActual[i] = _horizonRound2(Math.min(monthlyLimit, base * currentTier.multiplier));
+        const rawBase = runningPoints * pointRate;
+        const rawTotal = rawBase * currentTier.multiplier;
+        cumulativeBase[i] = _horizonRound2(Math.min(rawBase, monthlyLimit));
+        cumulativeRaw[i] = _horizonRound2(rawTotal);
+        cumulativeActual[i] = _horizonRound2(Math.min(monthlyLimit, rawTotal));
     }
 
     // Dashed projection: starts at today and runs through the last day.
     const projectedBaseSeries = new Array(daysInMonth).fill(null);
     const projectedTotalSeries = new Array(daysInMonth).fill(null);
+    const projectedRawSeries = new Array(daysInMonth).fill(null);
+    const projectedOverflowSeries = new Array(daysInMonth).fill(null);
     const todayIdx = elapsedDays - 1;
     projectedBaseSeries[todayIdx] = _horizonRound2(baseToDate);
     projectedTotalSeries[todayIdx] = _horizonRound2(earnedSoFar);
+    projectedRawSeries[todayIdx] = _horizonRound2(rawEarnedSoFar);
+    if (mtdOverflow > 0) projectedOverflowSeries[todayIdx] = _horizonRound2(rawEarnedSoFar);
     for (let step = 1; step <= remainingDays; step++) {
         const idx = todayIdx + step;
-        const base = Math.min(monthlyLimit, baseToDate + (dailyPaceBase * step));
-        projectedBaseSeries[idx] = _horizonRound2(base);
-        projectedTotalSeries[idx] = _horizonRound2(Math.min(monthlyLimit, base * projectedTier.multiplier));
+        const rawBase = rawBaseToDate + (rawDailyPaceBase * step);
+        const rawTotal = rawBase * projectedTier.multiplier;
+        projectedBaseSeries[idx] = _horizonRound2(Math.min(monthlyLimit, rawBase));
+        projectedTotalSeries[idx] = _horizonRound2(Math.min(monthlyLimit, rawTotal));
+        projectedRawSeries[idx] = _horizonRound2(rawTotal);
+        if (rawTotal > personalCeiling) projectedOverflowSeries[idx] = _horizonRound2(rawTotal);
     }
 
     const monthLabel = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -199,6 +232,8 @@ function buildMonthlyTrajectory(rawLogs, settings, nowDate = new Date()) {
         targetPoints,
         pointRate,
         monthlyLimit: _horizonRound2(monthlyLimit),
+        personalCeiling: Number.isFinite(personalCeiling) ? _horizonRound2(personalCeiling) : Infinity,
+        maxBonusRate,
         currentTier,
         projectedTier,
         dailyPoints,
@@ -206,20 +241,38 @@ function buildMonthlyTrajectory(rawLogs, settings, nowDate = new Date()) {
         dailyChoreHours,
         cumulativeBase,
         cumulativeActual,
+        cumulativeRaw,
         projectedBaseSeries,
         projectedTotalSeries,
+        projectedRawSeries,
+        projectedOverflowSeries,
         pointsToDate: _horizonRound2(pointsToDate),
         workHoursToDate: _horizonRound2(workHoursToDate),
         choreHoursToDate: _horizonRound2(choreHoursToDate),
         baseToDate: _horizonRound2(baseToDate),
+        rawBaseToDate: _horizonRound2(rawBaseToDate),
         earnedSoFar: _horizonRound2(earnedSoFar),
+        rawEarnedSoFar: _horizonRound2(rawEarnedSoFar),
+        mtdOverflow: _horizonRound2(mtdOverflow),
         dailyPaceBase: _horizonRound2(dailyPaceBase),
+        rawDailyPaceBase: _horizonRound2(rawDailyPaceBase),
         dailyPaceHours: _horizonRound2(dailyPaceHours),
         dailyPaceChore: _horizonRound2(dailyPaceChore),
         projectedChoreHours,
         projectedBase: _horizonRound2(projectedBase),
+        rawProjectedBase: _horizonRound2(rawProjectedBase),
         projectedTotal: _horizonRound2(projectedTotal),
+        rawProjectedTotal: _horizonRound2(rawProjectedTotal),
+        projectedOverflow: _horizonRound2(projectedOverflow),
         payoutCapped,
+        // Filled by applyDuoSpilloverProjection(); zeros keep solo reads safe.
+        spilloverSent: 0,
+        spilloverReceived: 0,
+        spilloverSentActual: 0,
+        spilloverReceivedActual: 0,
+        spilloverSentProjected: 0,
+        spilloverReceivedProjected: 0,
+        bothMaxed: false,
         hasLogs: pointsToDate > 0 || choreHoursToDate > 0
     };
 }
@@ -242,6 +295,12 @@ function mergeHorizonTrajectories(a, b) {
         return _horizonRound2((xv || 0) + (yv || 0));
     });
     const sumScalar = (key) => _horizonRound2((_horizonNumber(a[key], 0)) + (_horizonNumber(b[key], 0)));
+    const sumCeiling = () => {
+        const av = a.personalCeiling;
+        const bv = b.personalCeiling;
+        if (av === Infinity || bv === Infinity) return Infinity;
+        return _horizonRound2((_horizonNumber(av, 0)) + (_horizonNumber(bv, 0)));
+    };
     const projectedChoreHours = sumScalar('projectedChoreHours');
     return {
         ...a,
@@ -249,30 +308,132 @@ function mergeHorizonTrajectories(a, b) {
         monthlyCash: sumScalar('monthlyCash'),
         weeklyHours: sumScalar('weeklyHours'),
         monthlyLimit: sumScalar('monthlyLimit'),
+        personalCeiling: sumCeiling(),
         pointRate: _horizonRound2((_horizonNumber(a.pointRate, 0) + _horizonNumber(b.pointRate, 0)) / 2),
         dailyPoints: sumSeries(a.dailyPoints, b.dailyPoints),
         dailyWorkHours: sumSeries(a.dailyWorkHours, b.dailyWorkHours),
         dailyChoreHours: sumSeries(a.dailyChoreHours, b.dailyChoreHours),
         cumulativeBase: sumSeries(a.cumulativeBase, b.cumulativeBase),
         cumulativeActual: sumSeries(a.cumulativeActual, b.cumulativeActual),
+        cumulativeRaw: sumSeries(a.cumulativeRaw, b.cumulativeRaw),
         projectedBaseSeries: sumSeries(a.projectedBaseSeries, b.projectedBaseSeries),
         projectedTotalSeries: sumSeries(a.projectedTotalSeries, b.projectedTotalSeries),
+        projectedRawSeries: sumSeries(a.projectedRawSeries, b.projectedRawSeries),
+        projectedOverflowSeries: sumSeries(a.projectedOverflowSeries, b.projectedOverflowSeries),
         pointsToDate: sumScalar('pointsToDate'),
         workHoursToDate: sumScalar('workHoursToDate'),
         choreHoursToDate: sumScalar('choreHoursToDate'),
         baseToDate: sumScalar('baseToDate'),
+        rawBaseToDate: sumScalar('rawBaseToDate'),
         earnedSoFar: sumScalar('earnedSoFar'),
+        rawEarnedSoFar: sumScalar('rawEarnedSoFar'),
+        mtdOverflow: sumScalar('mtdOverflow'),
         dailyPaceBase: sumScalar('dailyPaceBase'),
+        rawDailyPaceBase: sumScalar('rawDailyPaceBase'),
         dailyPaceHours: sumScalar('dailyPaceHours'),
         dailyPaceChore: sumScalar('dailyPaceChore'),
         projectedChoreHours,
         projectedTier: _horizonChoreTier(projectedChoreHours),
         projectedBase: sumScalar('projectedBase'),
+        rawProjectedBase: sumScalar('rawProjectedBase'),
         projectedTotal: sumScalar('projectedTotal'),
+        rawProjectedTotal: sumScalar('rawProjectedTotal'),
+        projectedOverflow: sumScalar('projectedOverflow'),
+        spilloverSent: sumScalar('spilloverSent'),
+        spilloverReceived: sumScalar('spilloverReceived'),
+        spilloverSentActual: sumScalar('spilloverSentActual'),
+        spilloverReceivedActual: sumScalar('spilloverReceivedActual'),
+        spilloverSentProjected: sumScalar('spilloverSentProjected'),
+        spilloverReceivedProjected: sumScalar('spilloverReceivedProjected'),
+        bothMaxed: Boolean(a.bothMaxed || b.bothMaxed),
         payoutCapped: Boolean(a.payoutCapped || b.payoutCapped),
         hasLogs: Boolean(a.hasLogs || b.hasLogs),
         isDuo: true
     };
+}
+
+/**
+ * Applies the 1:1 Co-Op Spillover transfer to a pair of monthly trajectories.
+ *
+ * - `earnedSoFar` / `cumulativeActual` become personal capped earnings plus the
+ *   spillover actually received to date (both-maxed months cancel to zero).
+ * - `projectedTotal` / `projectedTotalSeries` become personal capped projection
+ *   plus projected spillover received, matching the Payoff Receipt math.
+ * - `projectedOverflowSeries` stays as the sender's uncapped curve so the chart
+ *   can draw a subtle dashed overflow segment above the ceiling.
+ *
+ * @param {Object} north
+ * @param {Object} cream
+ * @returns {{North: Object, Cream: Object}}
+ */
+function applyDuoSpilloverProjection(north, cream) {
+    if (!north || !cream) return { North: north || null, Cream: cream || null };
+
+    const pair = { North: north, Cream: cream };
+    const otherKey = { North: 'Cream', Cream: 'North' };
+    const actualOverflow = {
+        North: _horizonOverflowOf(north.rawEarnedSoFar, north.personalCeiling),
+        Cream: _horizonOverflowOf(cream.rawEarnedSoFar, cream.personalCeiling)
+    };
+    const projectedOverflow = {
+        North: _horizonOverflowOf(north.rawProjectedTotal, north.personalCeiling),
+        Cream: _horizonOverflowOf(cream.rawProjectedTotal, cream.personalCeiling)
+    };
+    // Month-level rule: if both partners finish above their ceiling, all
+    // transfers cancel so excess never inflates past the combined ceilings.
+    const bothActualMaxed = actualOverflow.North > 0 && actualOverflow.Cream > 0;
+    const bothProjectedMaxed = projectedOverflow.North > 0 && projectedOverflow.Cream > 0;
+
+    const result = {};
+    ['North', 'Cream'].forEach(key => {
+        const own = pair[key];
+        const partnerKey = otherKey[key];
+        const partner = pair[partnerKey];
+
+        const sentActual = bothActualMaxed ? 0 : actualOverflow[key];
+        const receivedActual = bothActualMaxed ? 0 : actualOverflow[partnerKey];
+        const sentProjected = bothProjectedMaxed ? 0 : projectedOverflow[key];
+        const receivedProjected = bothProjectedMaxed ? 0 : projectedOverflow[partnerKey];
+
+        const adjusted = { ...own };
+        adjusted.partner = partnerKey;
+        adjusted.spilloverSent = _horizonRound2(sentActual);
+        adjusted.spilloverReceived = _horizonRound2(receivedActual);
+        adjusted.spilloverSentActual = _horizonRound2(sentActual);
+        adjusted.spilloverReceivedActual = _horizonRound2(receivedActual);
+        adjusted.spilloverSentProjected = _horizonRound2(sentProjected);
+        adjusted.spilloverReceivedProjected = _horizonRound2(receivedProjected);
+        adjusted.bothMaxed = bothActualMaxed || bothProjectedMaxed;
+
+        // Actual curve: own capped cumulative + the partner's accrued overflow.
+        adjusted.cumulativeActual = own.cumulativeActual.map((value, idx) => {
+            const ownRaw = _horizonNumber(own.cumulativeRaw?.[idx], 0);
+            const partnerRaw = _horizonNumber(partner.cumulativeRaw?.[idx], 0);
+            const ownExcess = _horizonOverflowOf(ownRaw, own.personalCeiling);
+            const partnerExcess = _horizonOverflowOf(partnerRaw, partner.personalCeiling);
+            const mutual = bothActualMaxed || (ownExcess > 0 && partnerExcess > 0);
+            return _horizonRound2(Math.min(ownRaw, own.personalCeiling) + (mutual ? 0 : partnerExcess));
+        });
+
+        // Projected curve: own capped projection + partner's projected overflow.
+        adjusted.projectedTotalSeries = own.projectedTotalSeries.map((value, idx) => {
+            if (value === null) return null;
+            const ownRaw = _horizonNumber(own.projectedRawSeries?.[idx], 0);
+            const partnerRaw = _horizonNumber(partner.projectedRawSeries?.[idx], 0);
+            const ownExcess = _horizonOverflowOf(ownRaw, own.personalCeiling);
+            const partnerExcess = _horizonOverflowOf(partnerRaw, partner.personalCeiling);
+            const mutual = bothProjectedMaxed || (ownExcess > 0 && partnerExcess > 0);
+            return _horizonRound2(Math.min(ownRaw, own.personalCeiling) + (mutual ? 0 : partnerExcess));
+        });
+
+        adjusted.earnedSoFar = _horizonRound2(Math.min(own.rawEarnedSoFar, own.personalCeiling) + receivedActual);
+        adjusted.projectedTotal = _horizonRound2(Math.min(own.rawProjectedTotal, own.personalCeiling) + receivedProjected);
+        adjusted.mtdOverflow = _horizonRound2(actualOverflow[key]);
+        adjusted.projectedOverflow = _horizonRound2(projectedOverflow[key]);
+        result[key] = adjusted;
+    });
+
+    return result;
 }
 
 /**
@@ -547,14 +708,22 @@ function renderHorizonKpis(trajectory, scope) {
     if (!row || !trajectory) return;
     const tier = trajectory.projectedTier || _horizonChoreTier(0);
     const tierLabel = tier.tier > 0 ? `Tier ${tier.tier} · +${tier.bonusPercent}` : 'Tier 0 · +0%';
+    const isDuoScope = scope === 'Duo';
+    const receivedActual = isDuoScope ? 0 : (Number(trajectory.spilloverReceivedActual) || 0);
+    const receivedProjected = isDuoScope ? 0 : (Number(trajectory.spilloverReceivedProjected) || 0);
+    const sentProjected = isDuoScope ? 0 : (Number(trajectory.spilloverSentProjected) || 0);
+    const earnedSub = `${formatHours(trajectory.workHoursToDate)}h work · ${formatHours(trajectory.choreHoursToDate)}h chores`
+        + (receivedActual > 0 ? ` · +${_horizonBaht(receivedActual)} co-op` : '');
+    const projectedSub = `Base ${_horizonBaht(trajectory.projectedBase)}${trajectory.payoutCapped ? ' · capped' : ''}`
+        + (receivedProjected > 0 ? ` · +${_horizonBaht(receivedProjected)} co-op` : '');
     const pills = [
         {
             id: 'earned', icon: '💰', label: 'Earned So Far', value: _horizonBaht(trajectory.earnedSoFar),
-            sub: `${formatHours(trajectory.workHoursToDate)}h work · ${formatHours(trajectory.choreHoursToDate)}h chores`, tone: 'emerald'
+            sub: earnedSub, tone: 'emerald'
         },
         {
             id: 'projected', icon: '🌅', label: 'Projected Month-End', value: _horizonBaht(trajectory.projectedTotal),
-            sub: `Base ${_horizonBaht(trajectory.projectedBase)}${trajectory.payoutCapped ? ' · capped' : ''}`, tone: 'violet'
+            sub: projectedSub, tone: 'violet'
         },
         {
             id: 'pace', icon: '⚡', label: 'Current Pace / Day', value: _horizonBaht(trajectory.dailyPaceBase),
@@ -579,10 +748,13 @@ function renderHorizonKpis(trajectory, scope) {
     const note = $('horizon-trajectory-note');
     if (note) {
         const capNote = trajectory.payoutCapped
-            ? ` · projection capped at ${_horizonBaht(trajectory.monthlyLimit)} (target × max bonus cap)`
+            ? ` · personal curve capped at ${_horizonBaht(trajectory.monthlyLimit)}`
             : '';
+        const coOpNote = receivedProjected > 0
+            ? ` · includes +${_horizonBaht(receivedProjected)} Co-Op Spillover received`
+            : (sentProjected > 0 ? ` · +${_horizonBaht(sentProjected)} overflows to partner` : '');
         note.innerText = `Pace projects ${formatHours(trajectory.projectedChoreHours)}h chores by month end → ${tierLabel}. `
-            + `Projected payout = ${_horizonBaht(trajectory.projectedBase)} base × ${(tier.multiplier || 1).toFixed(2)}${capNote}.`;
+            + `Projected payout = ${_horizonBaht(trajectory.projectedBase)} base × ${(tier.multiplier || 1).toFixed(2)}${capNote}${coOpNote}.`;
     }
 }
 
@@ -657,6 +829,8 @@ function buildTrajectorySvg(trajectory, width) {
         trajectory.projectedTotal || 0,
         trajectory.projectedBase || 0,
         trajectory.earnedSoFar || 0,
+        trajectory.rawProjectedTotal || 0,
+        trajectory.rawEarnedSoFar || 0,
         1
     ));
     const xFor = (idx) => pad.l + (days === 1 ? plotW / 2 : (idx / (days - 1)) * plotW);
@@ -686,9 +860,26 @@ function buildTrajectorySvg(trajectory, width) {
     const projectedBasePoints = trajectory.projectedBaseSeries.map((value, idx) => value === null ? null : ({ x: xFor(idx), y: yFor(value) }));
     const projectedTotalPoints = trajectory.projectedTotalSeries.map((value, idx) => value === null ? null : ({ x: xFor(idx), y: yFor(value) }));
 
+    // Subtle dashed overflow segment: the uncapped projection above the personal
+    // ceiling. The first overflow day is bridged from the capped point so the
+    // segment visibly leaves the flat personal curve.
+    const overflowSeries = Array.isArray(trajectory.projectedOverflowSeries) ? trajectory.projectedOverflowSeries : [];
+    const overflowPoints = overflowSeries.map((value, idx) => (
+        value === null || value === undefined ? null : { x: xFor(idx), y: yFor(value) }
+    ));
+    for (let idx = 1; idx < overflowPoints.length; idx++) {
+        if (overflowPoints[idx] && !overflowPoints[idx - 1]) {
+            const prevRaw = Array.isArray(trajectory.projectedRawSeries) ? trajectory.projectedRawSeries[idx - 1] : null;
+            const ceiling = Number.isFinite(trajectory.personalCeiling) ? trajectory.personalCeiling : null;
+            const anchor = ceiling === null ? _horizonNumber(prevRaw, 0) : Math.min(_horizonNumber(prevRaw, ceiling), ceiling);
+            overflowPoints[idx - 1] = { x: xFor(idx - 1), y: yFor(anchor) };
+        }
+    }
+
     const actualPath = _horizonLinePath(actualPoints);
     const basePath = _horizonLinePath(projectedBasePoints);
     const totalPath = _horizonLinePath(projectedTotalPoints);
+    const overflowPath = _horizonLinePath(overflowPoints);
     const actualArea = actualPath && actualPoints.length > 1
         ? `${actualPath} L ${actualPoints[actualPoints.length - 1].x.toFixed(2)} ${pad.t + plotH} L ${actualPoints[0].x.toFixed(2)} ${pad.t + plotH} Z`
         : '';
@@ -699,10 +890,12 @@ function buildTrajectorySvg(trajectory, width) {
         const actual = trajectory.cumulativeActual[idx];
         const projectedBase = trajectory.projectedBaseSeries[idx];
         const projectedTotal = trajectory.projectedTotalSeries[idx];
+        const projectedOverflow = Array.isArray(trajectory.projectedOverflowSeries) ? trajectory.projectedOverflowSeries[idx] : null;
         const tipParts = [`Day ${idx + 1}`];
         if (isPast) tipParts.push(`Actual ${_horizonBaht(actual)}`);
         if (projectedBase !== null) tipParts.push(`Proj. base ${_horizonBaht(projectedBase)}`);
         if (projectedTotal !== null) tipParts.push(`Proj. payout ${_horizonBaht(projectedTotal)}`);
+        if (projectedOverflow !== null && projectedOverflow !== undefined) tipParts.push(`Over cap ${_horizonBaht(projectedOverflow)}`);
         const tip = tipParts.join(' · ');
         const cellW = plotW / days;
         hoverCells += `<rect x="${(xFor(idx) - cellW / 2).toFixed(2)}" y="${pad.t}" width="${cellW.toFixed(2)}" height="${plotH}" class="horizon-hover-cell" data-horizon-tip="${_horizonEscape(tip)}"><title>${_horizonEscape(tip)}</title></rect>`;
@@ -726,6 +919,7 @@ function buildTrajectorySvg(trajectory, width) {
         ${actualPath ? `<path d="${actualPath}" class="horizon-series-actual"/>` : ''}
         ${basePath ? `<path d="${basePath}" class="horizon-series-base"/>` : ''}
         ${totalPath ? `<path d="${totalPath}" class="horizon-series-total"/>` : ''}
+        ${overflowPath ? `<path d="${overflowPath}" class="horizon-series-overflow"/>` : ''}
         ${actualPoints.length ? `<circle cx="${actualPoints[actualPoints.length - 1].x.toFixed(1)}" cy="${actualPoints[actualPoints.length - 1].y.toFixed(1)}" r="4" class="horizon-dot-actual"/>` : ''}
         ${projectedTotalPoints[lastIdx] ? `<circle cx="${projectedTotalPoints[lastIdx].x.toFixed(1)}" cy="${projectedTotalPoints[lastIdx].y.toFixed(1)}" r="4" class="horizon-dot-total"/>` : ''}
         ${hoverCells}
@@ -1063,13 +1257,32 @@ function renderHorizonView() {
     const pomoHistory = _horizonResolvePomoHistory(scope);
 
     let trajectory;
+    let insightContext = null;
     if (scope === 'Duo') {
-        trajectory = mergeHorizonTrajectories(
-            buildMonthlyTrajectory(_horizonResolveLogs('North'), _horizonResolveSettings('North'), now),
-            buildMonthlyTrajectory(_horizonResolveLogs('Cream'), _horizonResolveSettings('Cream'), now)
-        );
+        const north = buildMonthlyTrajectory(_horizonResolveLogs('North'), _horizonResolveSettings('North'), now);
+        const cream = buildMonthlyTrajectory(_horizonResolveLogs('Cream'), _horizonResolveSettings('Cream'), now);
+        const pair = typeof applyDuoSpilloverProjection === 'function'
+            ? applyDuoSpilloverProjection(north, cream)
+            : { North: north, Cream: cream };
+        trajectory = mergeHorizonTrajectories(pair.North, pair.Cream);
     } else {
-        trajectory = buildMonthlyTrajectory(logs, settings, now);
+        // Both ledgers are projected, then the selected user's curve is read
+        // after the 1:1 transfer so it matches the Payoff Receipt.
+        const north = buildMonthlyTrajectory(_horizonResolveLogs('North'), _horizonResolveSettings('North'), now);
+        const cream = buildMonthlyTrajectory(_horizonResolveLogs('Cream'), _horizonResolveSettings('Cream'), now);
+        const pair = typeof applyDuoSpilloverProjection === 'function'
+            ? applyDuoSpilloverProjection(north, cream)
+            : { North: north, Cream: cream };
+        trajectory = pair[scope] || (scope === 'Cream' ? pair.Cream : pair.North);
+        if (trajectory) {
+            insightContext = {
+                projectedTotal: trajectory.projectedTotal,
+                spilloverReceivedProjected: trajectory.spilloverReceivedProjected || 0,
+                spilloverSentProjected: trajectory.spilloverSentProjected || 0,
+                spilloverReceivedActual: trajectory.spilloverReceivedActual || 0,
+                spilloverSentActual: trajectory.spilloverSentActual || 0
+            };
+        }
     }
 
     const sweet = computeSweetSpot(logs);
@@ -1082,7 +1295,7 @@ function renderHorizonView() {
     renderHorizonDuration(distribution);
 
     if (typeof renderHorizonInsightCards === 'function' && typeof calculateAureateInsights === 'function') {
-        renderHorizonInsightCards(calculateAureateInsights(logs, pomoHistory, settings));
+        renderHorizonInsightCards(calculateAureateInsights(logs, pomoHistory, settings, insightContext));
     }
 
     initHorizonTooltip();
@@ -1096,6 +1309,7 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         buildMonthlyTrajectory,
         mergeHorizonTrajectories,
+        applyDuoSpilloverProjection,
         computeSweetSpot,
         computeDurationDistribution,
         HORIZON_DURATION_BANDS,

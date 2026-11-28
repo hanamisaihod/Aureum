@@ -51,6 +51,7 @@ function createAppContext() {
         calculateChoreMultiplier: choreMultiplier.calculateChoreMultiplier,
         calculateMonthlyAllowanceBreakdown: choreMultiplier.calculateMonthlyAllowanceBreakdown,
         sumMonthlyChoreHours: choreMultiplier.sumMonthlyChoreHours,
+        computeDuoMonthlyAllowance: choreMultiplier.computeDuoMonthlyAllowance,
         computeHabitThermostat: thermostat.computeHabitThermostat,
         getThermostatBadgeClasses: thermostat.getThermostatBadgeClasses,
         playTone() {},
@@ -170,5 +171,47 @@ test('quick-log work payload keeps the canonical logs schema and points math', (
     assert.equal(built.payload.points, 11.25); // 2.5h × ((4+5)/2)
     assert.equal(built.payload.reflectionText, 'crafted');
     assert.equal(built.payload.timestamp, 'SERVER_TS');
+});
+
+
+test('payoff receipt renders the Co-Op Spillover line for sender and receiver', () => {
+    const context = createAppContext();
+    const y = 2026, m = 8; // September 2026
+    // North: ฿9,000 base × 1.25 (Tier 5) = ฿11,250 raw; ceiling ฿10,000.
+    // Excess ฿1,250 spills 1:1 to Cream.
+    const logs = [
+        makeLog('work', 'North', 50, 135, new Date(y, m, 2, 12)),
+        makeLog('chore', 'North', 50, undefined, new Date(y, m, 3, 12))
+    ];
+    setLogs(context, logs);
+
+    const sender = vm.runInContext(`computePayoffReceiptData(${y}, ${m})`, context);
+    assert.equal(sender.spilloverSent, 1250);
+    assert.equal(sender.spilloverReceived, 0);
+    assert.equal(sender.personalCappedEarned, 10000);
+    assert.equal(sender.finalPayout, 10000);
+    assert.equal(sender.hasSpillover, true);
+
+    const senderHtml = vm.runInContext(`_buildPayoffReceiptHtml(computePayoffReceiptData(${y}, ${m}))`, context);
+    assert.ok(senderHtml.includes('Co-Op Spillover Sent'));
+    assert.ok(senderHtml.includes('Personal Cap Reached'));
+    assert.ok(senderHtml.includes('฿1,250.00'));
+    assert.ok(senderHtml.includes('Final Allowance Payout'));
+    // The uncapped breakdown is shown so the receipt reconciles.
+    assert.ok(senderHtml.includes('฿11,250'));
+
+    // Switch to Cream's read-only statement. The personal ledger is empty but
+    // the shared duo snapshot still receives North's overflow.
+    vm.runInContext("loggedInUser='Cream'; viewedUser='Cream'; currentRawLogsCache=[];", context);
+    const receiver = vm.runInContext(`computePayoffReceiptData(${y}, ${m})`, context);
+    assert.equal(receiver.spilloverSent, 0);
+    assert.equal(receiver.spilloverReceived, 1250);
+    assert.equal(receiver.personalCappedEarned, 0);
+    assert.equal(receiver.finalPayout, 1250);
+
+    const receiverHtml = vm.runInContext(`_buildPayoffReceiptHtml(computePayoffReceiptData(${y}, ${m}))`, context);
+    assert.ok(receiverHtml.includes('Co-Op Spillover Received'));
+    assert.ok(receiverHtml.includes('+฿1,250.00'));
+    assert.ok(receiverHtml.includes('Final Allowance Payout'));
 });
 

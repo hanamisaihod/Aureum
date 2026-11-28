@@ -5,7 +5,7 @@
 // rendered exclusively inside #view-horizon; the sidebar no longer owns any
 // insight markup, render calls, or auto-cycling state.
 
-function calculateAureateInsights(rawLogs, pomoHistory, settings) {
+function calculateAureateInsights(rawLogs, pomoHistory, settings, duoContext) {
     const insights = [];
     const workLogs = rawLogs.filter(l => l.type === 'work');
     const pomoList = pomoHistory || [];
@@ -159,13 +159,20 @@ function calculateAureateInsights(rawLogs, pomoHistory, settings) {
     // The estimate is hard-capped at the monthly limit — the chore bonus can
     // never push the projection above target allowance × max bonus cap %.
     const rawProjectedCash = baseProjectedCash * mtdTier.multiplier;
-    const projectedCash = Math.min(monthlyLimit, rawProjectedCash);
+    // Co-Op Spillover arrives 1:1 from the partner and is added on top of the
+    // personal capped forecast (never multiplied by this user's chore tier).
+    const coOpReceived = Math.max(0, Number(duoContext?.spilloverReceivedProjected) || 0);
+    const coOpSent = Math.max(0, Number(duoContext?.spilloverSentProjected) || 0);
+    const projectedCash = Math.min(monthlyLimit, rawProjectedCash) + coOpReceived;
     const projectionCapped = rawProjectedCash > monthlyLimit + 0.005;
     const lastMonthChoreHours = sumMonthlyChoreHours(rawLogs, prevYear, prevMonth);
     const lastMonthCash = Math.min(monthlyLimit, Math.min(lastMonthPts * pointRate, monthlyLimit) * calculateChoreMultiplier(lastMonthChoreHours).multiplier);
 
-    const capSuffix = projectionCapped ? ` • ⛔ ฿${Math.round(monthlyLimit).toLocaleString()} monthly cap` : '';
-    const tierSuffix = (mtdTier.tier > 0 ? ` • 🧹 +${mtdTier.bonusPercent} Tier ${mtdTier.tier}` : '') + capSuffix;
+    const capSuffix = projectionCapped ? ` • ⛔ ฿${Math.round(monthlyLimit).toLocaleString()} personal cap` : '';
+    const coOpSuffix = coOpReceived > 0
+        ? ` • 🤝 +฿${Math.round(coOpReceived).toLocaleString()} co-op`
+        : (coOpSent > 0 ? ` • 🤝 ฿${Math.round(coOpSent).toLocaleString()} overflowing` : '');
+    const tierSuffix = (mtdTier.tier > 0 ? ` • 🧹 +${mtdTier.bonusPercent} Tier ${mtdTier.tier}` : '') + capSuffix + coOpSuffix;
 
     let forecastComparison = '';
     if (lastMonthCash > 0) {

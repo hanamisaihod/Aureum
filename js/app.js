@@ -32,18 +32,23 @@ function initDuoHUDListeners(){
     unsubscribeNorthSettings=db.collection('settings').doc('North').onSnapshot(doc=>{
         if(doc.exists)duoPresenceData.North.settings=doc.data();
         renderDuoHUDCards();
+        refreshDuoAllowanceSurface();
         if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
         if(activeTab==='horizon'&&typeof renderHorizonView==='function')renderHorizonView();
     });
     unsubscribeCreamSettings=db.collection('settings').doc('Cream').onSnapshot(doc=>{
         if(doc.exists)duoPresenceData.Cream.settings=doc.data();
         renderDuoHUDCards();
+        refreshDuoAllowanceSurface();
         if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
         if(activeTab==='horizon'&&typeof renderHorizonView==='function')renderHorizonView();
     });
 }
 
 function renderDuoHUDCards(){
+    // Pure read of the shared log cache: no extra Firestore reads or writes.
+    const now=new Date();
+    const duoAllowance=computeDuoAllowanceSnapshot(now.getFullYear(),now.getMonth());
     ['North','Cream'].forEach(u=>{
         const isMe=(u===loggedInUser),isViewing=(u===viewedUser);
         const s=isMe?userSettings:(spectatorSettings&&viewedUser===u?spectatorSettings:(duoPresenceData[u]?.settings||{}));
@@ -124,7 +129,14 @@ function renderDuoHUDCards(){
 
         if(hudInfoPopupUser === u) renderHudInfoPopup(u);
 
-        if($(`hud-hours-${u.toLowerCase()}`)) $(`hud-hours-${u.toLowerCase()}`).innerText=`${formatHours(duoPresenceData[u].hoursToday||0)}/${formatHours(s.dailySoftCap||4)}h`;
+        if($(`hud-hours-${u.toLowerCase()}`)){
+            const hoursEl=$(`hud-hours-${u.toLowerCase()}`);
+            const summary=`${formatHours(duoPresenceData[u].hoursToday||0)}/${formatHours(s.dailySoftCap||4)}h`;
+            const overflowing=!!(duoAllowance&&duoAllowance[u]&&duoAllowance[u].spilloverSent>0);
+            hoursEl.innerHTML=overflowing
+                ?`${summary} <span class="text-slate-500/80">• Overflowing</span>`
+                :summary;
+        }
     });
 }
 
@@ -191,10 +203,11 @@ function initGlobalHeaderGlowListener(){
                 if(logDate>=startToday&&d.type==='work')cH+=(d.hours||0);
             }
         });
-        globalAllLogsCache=allLogs;
         duoPresenceData.North.hoursToday=nH;duoPresenceData.Cream.hoursToday=cH;
         duoPresenceData.North.logs=nLogs;duoPresenceData.Cream.logs=cLogs;
+        globalAllLogsCache=allLogs;
         renderDuoHUDCards();
+        refreshDuoAllowanceSurface();
         if(typeof renderGuildActivityTicker==='function')renderGuildActivityTicker();
         // Keeps the Horizon duo scope honest as either partner logs new entries.
         if(activeTab==='horizon'&&typeof renderHorizonView==='function')renderHorizonView();
@@ -317,9 +330,104 @@ function initChoreBonusPanel(){
     });
 }
 
-function renderAllowanceMultiplierUI(info){
+/**
+ * Resolves the settings document that drives one partner's allowance math.
+ * Mirrors the active/spectator rules used by loadUserData() so the duo snapshot
+ * and the personal allowance card can never disagree.
+ */
+function resolveAllowanceSettingsForUser(user){
+    if(!user)return userSettings||{};
+    if(user===loggedInUser)return userSettings||{};
+    if(user===viewedUser&&typeof spectatorSettings!=='undefined'&&spectatorSettings)return spectatorSettings;
+    return duoPresenceData?.[user]?.settings||userSettings||{};
+}
+
+function buildDuoAllowanceSettingsMap(){
+    const map={};
+    ['North','Cream'].forEach(u=>{map[u]=resolveAllowanceSettingsForUser(u);});
+    return map;
+}
+
+// Global log snapshot first (both partners in one array); otherwise fall back to
+// the per-user realtime caches. Never mixes the two or duplicate-counts a log.
+function collectDuoLogsForAllowance(){
+    if(Array.isArray(globalAllLogsCache)&&globalAllLogsCache.length>0)return globalAllLogsCache;
+    const merged=[...(duoPresenceData?.North?.logs||[]),...(duoPresenceData?.Cream?.logs||[])];
+    if(merged.length>0)return merged;
+    return Array.isArray(currentRawLogsCache)?currentRawLogsCache:[];
+}
+
+function computeDuoAllowanceSnapshot(year,month){
+    if(typeof computeDuoMonthlyAllowance!=='function')return null;
+    const now=new Date();
+    const y=Number.isFinite(year)?year:now.getFullYear();
+    const m=Number.isFinite(month)?month:now.getMonth();
+    return computeDuoMonthlyAllowance(collectDuoLogsForAllowance(),buildDuoAllowanceSettingsMap(),y,m);
+}
+
+/**
+ * Lightweight live refresh used when the *partner's* snapshot changes. The
+ * viewed user's own breakdown is unchanged in that case, so only the payout
+ * total, the two inline spillover lines, and an open receipt need refreshing.
+ */
+function refreshDuoAllowanceSurface(){
+    const now=new Date();
+    const duo=computeDuoAllowanceSnapshot(now.getFullYear(),now.getMonth());
+    const spill=duo?(duo[viewedUser]||null):null;
+    if(!spill)return;
+
+    const pEl=$('monthly-payout');
+    if(pEl){
+        const activeSettings=(loggedInUser===viewedUser)?userSettings:((typeof spectatorSettings!=='undefined'&&spectatorSettings)||duoPresenceData[viewedUser]?.settings||userSettings);
+        const isVaulted=activeSettings.vaultedMonths?.[`${now.getFullYear()}-${now.getMonth()}`];
+        pEl.innerText=`฿${Math.round(spill.finalPayout).toLocaleString()}`;
+        pEl.className=isVaulted?"text-3xl font-extrabold text-amber-400 mt-1.5 opacity-70 line-through":"text-3xl font-extrabold text-emerald-400 mt-1.5";
+    }
+    renderAllowanceSpilloverIndicators(spill);
+    if(typeof refreshPayoffReceipt==='function')refreshPayoffReceipt();
+}
+
+function formatSpilloverMoney(value){
+    const num=Number(value)||0;
+    return `฿${num.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+}
+
+/**
+ * Renders the two compact Co-Op Spillover sub-lines on the allowance card.
+ * Both nodes stay hidden (and empty) unless a transfer is actually happening,
+ * so the default card layout is untouched.
+ */
+function renderAllowanceSpilloverIndicators(spillover){
+    const sentEl=$('allowance-spillover-sent'),recvEl=$('allowance-spillover-received');
+    const sent=Number(spillover?.spilloverSent)||0;
+    const received=Number(spillover?.spilloverReceived)||0;
+    const partner=spillover?.partner;
+    const partnerName=partner?getUserDisplayName(partner):'partner';
+
+    if(sentEl){
+        if(sent>0){
+            sentEl.innerText=`Maxed • +${formatSpilloverMoney(sent)} overflowing to ${partnerName}`;
+            sentEl.classList.remove('hidden');
+        }else{
+            sentEl.innerText='';
+            sentEl.classList.add('hidden');
+        }
+    }
+    if(recvEl){
+        if(received>0){
+            recvEl.innerText=`Includes +${formatSpilloverMoney(received)} Co-Op Spillover from ${partnerName}`;
+            recvEl.classList.remove('hidden');
+        }else{
+            recvEl.innerText='';
+            recvEl.classList.add('hidden');
+        }
+    }
+}
+
+function renderAllowanceMultiplierUI(info,spillover){
     if(!info)return;
     initChoreBonusPanel();
+    const spill=spillover||null;
     const tierPill=$('allowance-tier-pill');
     if(tierPill){
         tierPill.innerText=info.isMaxTier?`🏆 Tier 5 · +${info.bonusPercent}`:`🧹 ${info.tierLabel} · +${info.bonusPercent}`;
@@ -400,8 +508,18 @@ function renderAllowanceMultiplierUI(info){
         const capNote=info.payoutCapped
             ?` · Capped at monthly limit ฿${Math.round(info.monthlyAllowanceLimit||0).toLocaleString()} (target × max bonus cap)`
             :'';
-        payoutEl.title=`Base ฿${Math.round(info.baseAllowance).toLocaleString()} + Chore Bonus ฿${Math.round(info.choreBonusAmount).toLocaleString()} = ฿${Math.round(info.finalMonthlyAllowance).toLocaleString()}${capNote}`;
+        const personalTotal=Math.round(info.finalMonthlyAllowance).toLocaleString();
+        const spillPartnerName=(spill&&spill.partner)?getUserDisplayName(spill.partner):'partner';
+        let spillNote='';
+        if(spill&&spill.spilloverReceived>0){
+            spillNote=` + Co-Op ฿${(Number(spill.spilloverReceived)||0).toFixed(2)} from ${spillPartnerName} = ฿${Math.round(spill.finalPayout).toLocaleString()}`;
+        }else if(spill&&spill.spilloverSent>0){
+            spillNote=` · +฿${(Number(spill.spilloverSent)||0).toFixed(2)} overflows to ${spillPartnerName} (personal cap reached)`;
+        }
+        payoutEl.title=`Base ฿${Math.round(info.baseAllowance).toLocaleString()} + Chore Bonus ฿${Math.round(info.choreBonusAmount).toLocaleString()} = ฿${personalTotal}${capNote}${spillNote}`;
     }
+
+    renderAllowanceSpilloverIndicators(spill);
 }
 
 function loadUserData(){
@@ -430,13 +548,17 @@ function loadUserData(){
         // maxCash is the hard monthly limit: target allowance × max bonus cap %.
         // The chore bonus is applied inside the limit and can never exceed it.
         const allowanceBreakdown=calculateMonthlyAllowanceBreakdown(baseAllowance,choreHours,maxCash);
-        const finalPayout=allowanceBreakdown.finalMonthlyAllowance,softCap=userSettings.dailySoftCap||4;
+        // Co-Op Spillover is recomputed from the raw snapshot on every render, so
+        // late chore-tier jumps and deleted logs can never leave it stale.
+        const duoAllowance=computeDuoAllowanceSnapshot(now.getFullYear(),now.getMonth());
+        const viewedSpillover=duoAllowance?(duoAllowance[viewedUser]||null):null;
+        const finalPayout=viewedSpillover?viewedSpillover.finalPayout:allowanceBreakdown.finalMonthlyAllowance,softCap=userSettings.dailySoftCap||4;
         const isVaulted=activeSettings.vaultedMonths?.[`${now.getFullYear()}-${now.getMonth()}`];
 
         const pEl=$('monthly-payout');
         pEl.innerText=`฿${Math.round(finalPayout).toLocaleString()}`;
         pEl.className=isVaulted?"text-3xl font-extrabold text-amber-400 mt-1.5 opacity-70 line-through":"text-3xl font-extrabold text-emerald-400 mt-1.5";
-        renderAllowanceMultiplierUI(allowanceBreakdown);
+        renderAllowanceMultiplierUI(allowanceBreakdown,viewedSpillover);
         if(typeof refreshPayoffReceipt==='function')refreshPayoffReceipt();
 
         $('today-hours-label').innerText=`${formatHours(todayHours)} / ${formatHours(softCap)} hrs`;

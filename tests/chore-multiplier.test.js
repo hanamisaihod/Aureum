@@ -282,3 +282,168 @@ test('integration: raw monthly logs feed the allowance breakdown', () => {
     assert.equal(maxedOut.finalMonthlyAllowance, maxCash);
     assert.equal(maxedOut.payoutCapped, true);
 });
+
+// ============================================================================
+// CO-OP SPILLOVER — Pure duo math scenarios
+// ============================================================================
+
+const {
+    computeDuoMonthlyAllowance
+} = require('../js/choreMultiplier.js');
+
+const DUO_SETTINGS = {
+    North: { monthlyCash: 1200, weeklyHours: 10, maxBonusCapPct: 125 },
+    Cream: { monthlyCash: 1200, weeklyHours: 10, maxBonusCapPct: 125 }
+};
+
+function duoLog(type, user, hours, date, extra = {}) {
+    return { type, user, hours, timestamp: date, ...extra };
+}
+
+test('scenario 1 — below the personal ceiling produces zero spillover and no UI flags', () => {
+    const logs = [
+        duoLog('work', 'North', 1, new Date(2026, 10, 5, 10), { points: 100 })
+    ];
+    const result = computeDuoMonthlyAllowance(logs, DUO_SETTINGS, 2026, 10);
+    const north = result.North;
+    const cream = result.Cream;
+
+    // ฿1,200 target / 120 pts = ฿10/pt; 100 pts => ฿1,000 base, ceiling ฿1,500.
+    assert.equal(north.pointRate, 10);
+    assert.equal(north.rawBaseEarned, 1000);
+    assert.equal(north.personalCeiling, 1500);
+    assert.equal(north.rawTotalEarned, 1000);
+    assert.equal(north.personalCappedEarned, 1000);
+    assert.equal(north.spilloverGenerated, 0);
+    assert.equal(north.spilloverSent, 0);
+    assert.equal(north.spilloverReceived, 0);
+    assert.equal(north.finalPayout, 1000);
+    assert.equal(cream.spilloverReceived, 0);
+    assert.equal(result.bothMaxed, false);
+    assert.equal(result.hasSpillover, false);
+
+    // Every zero-log partner object still initializes cleanly.
+    ['workHours', 'choreHours', 'monthlyPoints', 'rawBaseEarned', 'rawTotalEarned',
+        'personalCappedEarned', 'spilloverSent', 'spilloverReceived', 'finalPayout'].forEach(key => {
+        assert.equal(cream[key], 0, `${key} initializes to 0`);
+        assert.ok(!Number.isNaN(cream[key]), `${key} is not NaN`);
+    });
+});
+
+test('scenario 2 — work above the ceiling overflows 1:1 without the receiver bonus multiplier', () => {
+    const logs = [
+        duoLog('work', 'North', 1, new Date(2026, 10, 5, 10), { points: 200 }), // ฿2,000 raw
+        duoLog('chore', 'Cream', 50, new Date(2026, 10, 6, 10))                // Tier 5 (+25%)
+    ];
+    const result = computeDuoMonthlyAllowance(logs, DUO_SETTINGS, 2026, 10);
+    const north = result.North;
+    const cream = result.Cream;
+
+    assert.equal(north.rawTotalEarned, 2000);
+    assert.equal(north.personalCappedEarned, 1500);
+    assert.equal(north.spilloverGenerated, 500);
+    assert.equal(north.spilloverSent, 500);
+    assert.equal(north.finalPayout, 1500);
+
+    // The ฿500 arrives whole — Cream's +25% chore tier must NOT multiply it.
+    assert.equal(cream.tier, 5);
+    assert.equal(cream.multiplier, 1.25);
+    assert.equal(cream.rawTotalEarned, 0);
+    assert.equal(cream.spilloverReceived, 500);
+    assert.equal(cream.finalPayout, 500);
+    assert.equal(north.spilloverSent, cream.spilloverReceived);
+    assert.equal(result.totalSent, result.totalReceived);
+});
+
+
+test('scenario 3 — a retroactive chore-tier jump creates spillover automatically', () => {
+    const baseLogs = [
+        duoLog('work', 'North', 2, new Date(2026, 10, 5, 10), { points: 129 }),
+        duoLog('chore', 'North', 30, new Date(2026, 10, 6, 10)) // Tier 3 (+15%)
+    ];
+    const before = computeDuoMonthlyAllowance(baseLogs, DUO_SETTINGS, 2026, 10);
+    assert.equal(before.North.tier, 3);
+    assert.equal(before.North.rawTotalEarned, 1483.5); // 1290 × 1.15
+    assert.ok(before.North.rawTotalEarned < before.North.personalCeiling);
+    assert.equal(before.North.spilloverSent, 0);
+    assert.equal(before.Cream.spilloverReceived, 0);
+
+    // Log 10 more chore hours: Tier 3 -> Tier 4. The retroactive +20% is
+    // applied to every work hour already logged, pushing the month over.
+    const afterLogs = baseLogs.concat([
+        duoLog('chore', 'North', 10, new Date(2026, 10, 20, 10))
+    ]);
+    const after = computeDuoMonthlyAllowance(afterLogs, DUO_SETTINGS, 2026, 10);
+    assert.equal(after.North.tier, 4);
+    assert.equal(after.North.rawTotalEarned, 1548); // 1290 × 1.20
+    assert.equal(after.North.spilloverSent, 48);
+    assert.equal(after.Cream.spilloverReceived, 48);
+    assert.equal(after.Cream.finalPayout, 48);
+});
+
+test('scenario 4 — deleting the overflowing log rolls spillover back to zero', () => {
+    const logs = [
+        duoLog('work', 'North', 1, new Date(2026, 10, 5, 10), { points: 200 }),
+        duoLog('work', 'North', 1, new Date(2026, 10, 6, 10), { points: 10 })
+    ];
+    const overflowing = computeDuoMonthlyAllowance(logs, DUO_SETTINGS, 2026, 10);
+    assert.ok(overflowing.North.spilloverSent > 0);
+    assert.ok(overflowing.Cream.spilloverReceived > 0);
+
+    // Delete the excess work log exactly as the ledger delete handler would.
+    const remaining = logs.filter(log => !(log.type === 'work' && log.points === 200));
+    const rolledBack = computeDuoMonthlyAllowance(remaining, DUO_SETTINGS, 2026, 10);
+    assert.equal(rolledBack.North.rawTotalEarned, 100);
+    assert.equal(rolledBack.North.spilloverSent, 0);
+    assert.equal(rolledBack.Cream.spilloverReceived, 0);
+    assert.equal(rolledBack.hasSpillover, false);
+});
+
+test('scenario 5 — both partners over the cap cancel mutual spillover to zero', () => {
+    const logs = [
+        duoLog('work', 'North', 1, new Date(2026, 10, 5, 10), { points: 200 }),
+        duoLog('work', 'Cream', 1, new Date(2026, 10, 5, 11), { points: 200 })
+    ];
+    const result = computeDuoMonthlyAllowance(logs, DUO_SETTINGS, 2026, 10);
+
+    assert.equal(result.bothMaxed, true);
+    assert.equal(result.North.spilloverGenerated, 500);
+    assert.equal(result.Cream.spilloverGenerated, 500);
+    assert.equal(result.North.spilloverSent, 0);
+    assert.equal(result.North.spilloverReceived, 0);
+    assert.equal(result.Cream.spilloverSent, 0);
+    assert.equal(result.Cream.spilloverReceived, 0);
+    assert.equal(result.North.finalPayout, 1500);
+    assert.equal(result.Cream.finalPayout, 1500);
+    assert.equal(result.hasSpillover, false);
+});
+
+test('spillover helpers treat uncapped or misconfigured caps as Infinity', () => {
+    const uncapped = {
+        North: { monthlyCash: 1200, weeklyHours: 10, monthlyBaseCap: 0 },
+        Cream: { monthlyCash: 1200, weeklyHours: 10, monthlyBaseCap: null }
+    };
+    const logs = [duoLog('work', 'North', 1, new Date(2026, 10, 5), { points: 200 })];
+    const result = computeDuoMonthlyAllowance(logs, uncapped, 2026, 10);
+
+    assert.equal(result.North.hasCap, false);
+    assert.equal(result.North.personalCeiling, Infinity);
+    assert.equal(result.North.spilloverGenerated, 0);
+    assert.equal(result.North.finalPayout, 2000, 'normal earnings are never zeroed out');
+    assert.equal(result.Cream.personalCeiling, Infinity);
+    assert.equal(result.Cream.spilloverReceived, 0);
+});
+
+test('duo math ignores other months and derives missing points from hours × ratings', () => {
+    const logs = [
+        duoLog('work', 'North', 2, new Date(2026, 10, 5), { points: 30 }),
+        duoLog('work', 'North', 5, new Date(2026, 9, 5), { points: 999 }), // October
+        duoLog('work', 'Cream', 2, new Date(2026, 10, 6), { results: 4, effort: 4 }) // no points
+    ];
+    const result = computeDuoMonthlyAllowance(logs, DUO_SETTINGS, 2026, 10);
+
+    assert.equal(result.North.monthlyPoints, 30);
+    assert.equal(result.North.rawBaseEarned, 300);
+    assert.equal(result.Cream.monthlyPoints, 8); // 2h × ((4+4)/2)
+    assert.equal(result.Cream.rawBaseEarned, 80);
+});
